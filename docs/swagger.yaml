@@ -1,0 +1,239 @@
+basePath: /api/v1
+definitions:
+  Domain.ErrorResponseDTO:
+    properties:
+      error:
+        type: string
+      errorType:
+        type: string
+      statusCode:
+        type: integer
+      statusText:
+        type: string
+    type: object
+  Domain.User:
+    properties:
+      created_at:
+        type: string
+      email:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      password:
+        type: string
+      ratings:
+        type: string
+      role_id:
+        type: string
+      school_id:
+        type: string
+      settings:
+        type: string
+      soft_deleted:
+        type: string
+      updated_at:
+        type: string
+    type: object
+externalDocs:
+  description: OpenAPI
+  url: https://swagger.io/resources/open-api/
+host: localhost:8080
+info:
+  contact:
+    email: support@swagger.io
+    name: API Support
+    url: http://www.swagger.io/support
+  description: Api used for the Cloud minor project - Language Fitness App..
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
+  title: Cloud Minor - Go - Gin API
+  version: "1.0"
+paths:
+  /users:
+    get:
+      consumes:
+      - application/json
+      description: Get all users
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/Domain.User'
+            type: array
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/Domain.ErrorResponseDTO'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/Domain.ErrorResponseDTO'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/Domain.ErrorResponseDTO'
+      summary: List all users
+      tags:
+      - users
+    post:
+      consumes:
+      - application/json
+      description: Create a new user
+      parameters:
+      - description: New user data
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/Domain.User'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/Domain.User'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/Domain.ErrorResponseDTO'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/Domain.ErrorResponseDTO'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/Domain.ErrorResponseDTO'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/Domain.ErrorResponseDTO'
+      summary: Add new user
+      tags:
+      - users
+  /users/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a user by ID
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/Domain.ErrorResponseDTO'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/Domain.ErrorResponseDTO'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/Domain.ErrorResponseDTO'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/Domain.ErrorResponseDTO'
+      summary: Remove one user
+      tags:
+      - users
+    get:
+      consumes:
+      - application/json
+      description: Get user by ID
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/Domain.User'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/Domain.ErrorResponseDTO'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/Domain.ErrorResponseDTO'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/Domain.ErrorResponseDTO'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/Domain.ErrorResponseDTO'
+      summary: Get one user
+      tags:
+      - users
+    patch:
+      consumes:
+      - application/json
+      description: Patch user by ID
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: New user data
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/Domain.User'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/Domain.User'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/Domain.ErrorResponseDTO'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/Domain.ErrorResponseDTO'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/Domain.ErrorResponseDTO'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/Domain.ErrorResponseDTO'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/Domain.ErrorResponseDTO'
+      summary: Update one user
+      tags:
+      - users
+swagger: "2.0"
