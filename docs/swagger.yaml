@@ -45,7 +45,7 @@ info:
     email: support@swagger.io
     name: API Support
     url: http://www.swagger.io/support
-  description: Api used for the Cloud minor project - Language Fitness App..
+  description: Api used for the Cloud minor project - Language Fitness controllers..
   license:
     name: Apache 2.0
     url: http://www.apache.org/licenses/LICENSE-2.0.html
@@ -79,6 +79,8 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/Domain.ErrorResponseDTO'
+      security:
+      - ApiKeyAuth: []
       summary: List all users
       tags:
       - users
@@ -116,6 +118,8 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/Domain.ErrorResponseDTO'
+      security:
+      - ApiKeyAuth: []
       summary: Add new user
       tags:
       - users
@@ -151,6 +155,8 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/Domain.ErrorResponseDTO'
+      security:
+      - ApiKeyAuth: []
       summary: Remove one user
       tags:
       - users
@@ -187,6 +193,8 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/Domain.ErrorResponseDTO'
+      security:
+      - BearerAuth: []
       summary: Get one user
       tags:
       - users
@@ -233,7 +241,14 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/Domain.ErrorResponseDTO'
+      security:
+      - ApiKeyAuth: []
       summary: Update one user
       tags:
       - users
+securityDefinitions:
+  BearerAuth:
+    in: header
+    name: Authorization
+    type: apiKey
 swagger: "2.0"
