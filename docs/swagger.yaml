@@ -80,7 +80,7 @@ paths:
           schema:
             $ref: '#/definitions/Domain.ErrorResponseDTO'
       security:
-      - ApiKeyAuth: []
+      - BearerAuth: []
       summary: List all users
       tags:
       - users
@@ -119,7 +119,7 @@ paths:
           schema:
             $ref: '#/definitions/Domain.ErrorResponseDTO'
       security:
-      - ApiKeyAuth: []
+      - BearerAuth: []
       summary: Add new user
       tags:
       - users
@@ -156,7 +156,7 @@ paths:
           schema:
             $ref: '#/definitions/Domain.ErrorResponseDTO'
       security:
-      - ApiKeyAuth: []
+      - BearerAuth: []
       summary: Remove one user
       tags:
       - users
@@ -242,7 +242,7 @@ paths:
           schema:
             $ref: '#/definitions/Domain.ErrorResponseDTO'
       security:
-      - ApiKeyAuth: []
+      - BearerAuth: []
       summary: Update one user
       tags:
       - users
