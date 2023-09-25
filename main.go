@@ -1,8 +1,8 @@
 package main
 
 import (
-	"example/cloud-api/Routes"
 	docs "example/cloud-api/docs"
+	"example/cloud-api/routes"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	swaggerfiles "github.com/swaggo/files"
@@ -35,7 +35,7 @@ func main() {
 	fmt.Println("Starting app")
 
 	r := gin.Default()
-	Routes.UserRoutes(r)
+	routes.UserRoutes(r)
 	docs.SwaggerInfo.BasePath = "/api/v1"
 
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))

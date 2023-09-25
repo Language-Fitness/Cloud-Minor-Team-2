@@ -48,26 +48,26 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/Domain.User"
+                                "$ref": "#/definitions/domain.User"
                             }
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/Domain.ErrorResponseDTO"
+                            "$ref": "#/definitions/domain.ErrorResponseDTO"
                         }
                     },
                     "403": {
                         "description": "Forbidden",
                         "schema": {
-                            "$ref": "#/definitions/Domain.ErrorResponseDTO"
+                            "$ref": "#/definitions/domain.ErrorResponseDTO"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/Domain.ErrorResponseDTO"
+                            "$ref": "#/definitions/domain.ErrorResponseDTO"
                         }
                     }
                 }
@@ -96,7 +96,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/Domain.User"
+                            "$ref": "#/definitions/domain.User"
                         }
                     }
                 ],
@@ -104,31 +104,31 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/Domain.User"
+                            "$ref": "#/definitions/domain.User"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/Domain.ErrorResponseDTO"
+                            "$ref": "#/definitions/domain.ErrorResponseDTO"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/Domain.ErrorResponseDTO"
+                            "$ref": "#/definitions/domain.ErrorResponseDTO"
                         }
                     },
                     "403": {
                         "description": "Forbidden",
                         "schema": {
-                            "$ref": "#/definitions/Domain.ErrorResponseDTO"
+                            "$ref": "#/definitions/domain.ErrorResponseDTO"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/Domain.ErrorResponseDTO"
+                            "$ref": "#/definitions/domain.ErrorResponseDTO"
                         }
                     }
                 }
@@ -165,31 +165,31 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/Domain.User"
+                            "$ref": "#/definitions/domain.User"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/Domain.ErrorResponseDTO"
+                            "$ref": "#/definitions/domain.ErrorResponseDTO"
                         }
                     },
                     "403": {
                         "description": "Forbidden",
                         "schema": {
-                            "$ref": "#/definitions/Domain.ErrorResponseDTO"
+                            "$ref": "#/definitions/domain.ErrorResponseDTO"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/Domain.ErrorResponseDTO"
+                            "$ref": "#/definitions/domain.ErrorResponseDTO"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/Domain.ErrorResponseDTO"
+                            "$ref": "#/definitions/domain.ErrorResponseDTO"
                         }
                     }
                 }
@@ -227,25 +227,25 @@ const docTemplate = `{
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/Domain.ErrorResponseDTO"
+                            "$ref": "#/definitions/domain.ErrorResponseDTO"
                         }
                     },
                     "403": {
                         "description": "Forbidden",
                         "schema": {
-                            "$ref": "#/definitions/Domain.ErrorResponseDTO"
+                            "$ref": "#/definitions/domain.ErrorResponseDTO"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/Domain.ErrorResponseDTO"
+                            "$ref": "#/definitions/domain.ErrorResponseDTO"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/Domain.ErrorResponseDTO"
+                            "$ref": "#/definitions/domain.ErrorResponseDTO"
                         }
                     }
                 }
@@ -281,7 +281,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/Domain.User"
+                            "$ref": "#/definitions/domain.User"
                         }
                     }
                 ],
@@ -289,37 +289,37 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/Domain.User"
+                            "$ref": "#/definitions/domain.User"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/Domain.ErrorResponseDTO"
+                            "$ref": "#/definitions/domain.ErrorResponseDTO"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/Domain.ErrorResponseDTO"
+                            "$ref": "#/definitions/domain.ErrorResponseDTO"
                         }
                     },
                     "403": {
                         "description": "Forbidden",
                         "schema": {
-                            "$ref": "#/definitions/Domain.ErrorResponseDTO"
+                            "$ref": "#/definitions/domain.ErrorResponseDTO"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/Domain.ErrorResponseDTO"
+                            "$ref": "#/definitions/domain.ErrorResponseDTO"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/Domain.ErrorResponseDTO"
+                            "$ref": "#/definitions/domain.ErrorResponseDTO"
                         }
                     }
                 }
@@ -327,7 +327,7 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "Domain.ErrorResponseDTO": {
+        "domain.ErrorResponseDTO": {
             "type": "object",
             "properties": {
                 "error": {
@@ -344,7 +344,7 @@ const docTemplate = `{
                 }
             }
         },
-        "Domain.User": {
+        "domain.User": {
             "type": "object",
             "properties": {
                 "created_at": {

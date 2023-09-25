@@ -1,6 +1,6 @@
 basePath: /api/v1
 definitions:
-  Domain.ErrorResponseDTO:
+  domain.ErrorResponseDTO:
     properties:
       error:
         type: string
@@ -11,7 +11,7 @@ definitions:
       statusText:
         type: string
     type: object
-  Domain.User:
+  domain.User:
     properties:
       created_at:
         type: string
@@ -65,20 +65,20 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/Domain.User'
+              $ref: '#/definitions/domain.User'
             type: array
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/Domain.ErrorResponseDTO'
+            $ref: '#/definitions/domain.ErrorResponseDTO'
         "403":
           description: Forbidden
           schema:
-            $ref: '#/definitions/Domain.ErrorResponseDTO'
+            $ref: '#/definitions/domain.ErrorResponseDTO'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/Domain.ErrorResponseDTO'
+            $ref: '#/definitions/domain.ErrorResponseDTO'
       security:
       - BearerAuth: []
       summary: List all users
@@ -94,30 +94,30 @@ paths:
         name: user
         required: true
         schema:
-          $ref: '#/definitions/Domain.User'
+          $ref: '#/definitions/domain.User'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/Domain.User'
+            $ref: '#/definitions/domain.User'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/Domain.ErrorResponseDTO'
+            $ref: '#/definitions/domain.ErrorResponseDTO'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/Domain.ErrorResponseDTO'
+            $ref: '#/definitions/domain.ErrorResponseDTO'
         "403":
           description: Forbidden
           schema:
-            $ref: '#/definitions/Domain.ErrorResponseDTO'
+            $ref: '#/definitions/domain.ErrorResponseDTO'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/Domain.ErrorResponseDTO'
+            $ref: '#/definitions/domain.ErrorResponseDTO'
       security:
       - BearerAuth: []
       summary: Add new user
@@ -142,19 +142,19 @@ paths:
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/Domain.ErrorResponseDTO'
+            $ref: '#/definitions/domain.ErrorResponseDTO'
         "403":
           description: Forbidden
           schema:
-            $ref: '#/definitions/Domain.ErrorResponseDTO'
+            $ref: '#/definitions/domain.ErrorResponseDTO'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/Domain.ErrorResponseDTO'
+            $ref: '#/definitions/domain.ErrorResponseDTO'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/Domain.ErrorResponseDTO'
+            $ref: '#/definitions/domain.ErrorResponseDTO'
       security:
       - BearerAuth: []
       summary: Remove one user
@@ -176,23 +176,23 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/Domain.User'
+            $ref: '#/definitions/domain.User'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/Domain.ErrorResponseDTO'
+            $ref: '#/definitions/domain.ErrorResponseDTO'
         "403":
           description: Forbidden
           schema:
-            $ref: '#/definitions/Domain.ErrorResponseDTO'
+            $ref: '#/definitions/domain.ErrorResponseDTO'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/Domain.ErrorResponseDTO'
+            $ref: '#/definitions/domain.ErrorResponseDTO'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/Domain.ErrorResponseDTO'
+            $ref: '#/definitions/domain.ErrorResponseDTO'
       security:
       - BearerAuth: []
       summary: Get one user
@@ -213,34 +213,34 @@ paths:
         name: user
         required: true
         schema:
-          $ref: '#/definitions/Domain.User'
+          $ref: '#/definitions/domain.User'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/Domain.User'
+            $ref: '#/definitions/domain.User'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/Domain.ErrorResponseDTO'
+            $ref: '#/definitions/domain.ErrorResponseDTO'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/Domain.ErrorResponseDTO'
+            $ref: '#/definitions/domain.ErrorResponseDTO'
         "403":
           description: Forbidden
           schema:
-            $ref: '#/definitions/Domain.ErrorResponseDTO'
+            $ref: '#/definitions/domain.ErrorResponseDTO'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/Domain.ErrorResponseDTO'
+            $ref: '#/definitions/domain.ErrorResponseDTO'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/Domain.ErrorResponseDTO'
+            $ref: '#/definitions/domain.ErrorResponseDTO'
       security:
       - BearerAuth: []
       summary: Update one user

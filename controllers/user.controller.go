@@ -12,11 +12,11 @@ import (
 // @Accept       json
 // @Produce      json
 // @Param        id   path      int  true  "User ID"
-// @Success      200  {object}  Domain.User
-// @Failure		 401  {object}	Domain.ErrorResponseDTO
-// @Failure		 403  {object}	Domain.ErrorResponseDTO
-// @Failure		 404  {object}	Domain.ErrorResponseDTO
-// @Failure		 500  {object}	Domain.ErrorResponseDTO
+// @Success      200  {object}  domain.User
+// @Failure		 401  {object}	domain.ErrorResponseDTO
+// @Failure		 403  {object}	domain.ErrorResponseDTO
+// @Failure		 404  {object}	domain.ErrorResponseDTO
+// @Failure		 500  {object}	domain.ErrorResponseDTO
 // @Router       /users/{id} [get]
 func GetOne(g *gin.Context) {
 
@@ -29,10 +29,10 @@ func GetOne(g *gin.Context) {
 // @Tags         users
 // @Accept       json
 // @Produce      json
-// @Success      200  {array}   Domain.User
-// @Failure		 401  {object}	Domain.ErrorResponseDTO
-// @Failure		 403  {object}	Domain.ErrorResponseDTO
-// @Failure		 500  {object}	Domain.ErrorResponseDTO
+// @Success      200  {array}   domain.User
+// @Failure		 401  {object}	domain.ErrorResponseDTO
+// @Failure		 403  {object}	domain.ErrorResponseDTO
+// @Failure		 500  {object}	domain.ErrorResponseDTO
 // @Router       /users [get]
 func GetAll(g *gin.Context) {
 
@@ -45,12 +45,12 @@ func GetAll(g *gin.Context) {
 // @Tags         users
 // @Accept       json
 // @Produce      json
-// @Param        user body Domain.User true "New user data"
-// @Success      200  {object}  Domain.User
-// @Failure		 400  {object}	Domain.ErrorResponseDTO
-// @Failure		 401  {object}	Domain.ErrorResponseDTO
-// @Failure		 403  {object}	Domain.ErrorResponseDTO
-// @Failure		 500  {object}	Domain.ErrorResponseDTO
+// @Param        user body domain.User true "New user data"
+// @Success      200  {object}  domain.User
+// @Failure		 400  {object}	domain.ErrorResponseDTO
+// @Failure		 401  {object}	domain.ErrorResponseDTO
+// @Failure		 403  {object}	domain.ErrorResponseDTO
+// @Failure		 500  {object}	domain.ErrorResponseDTO
 // @Router       /users [post]
 func Create(g *gin.Context) {
 
@@ -65,10 +65,10 @@ func Create(g *gin.Context) {
 // @Produce      json
 // @Param        id   path      int  true  "User ID"
 // @Success      200
-// @Failure		 401  {object}	Domain.ErrorResponseDTO
-// @Failure		 403  {object}	Domain.ErrorResponseDTO
-// @Failure		 404  {object}	Domain.ErrorResponseDTO
-// @Failure		 500  {object}	Domain.ErrorResponseDTO
+// @Failure		 401  {object}	domain.ErrorResponseDTO
+// @Failure		 403  {object}	domain.ErrorResponseDTO
+// @Failure		 404  {object}	domain.ErrorResponseDTO
+// @Failure		 500  {object}	domain.ErrorResponseDTO
 // @Router       /users/{id} [delete]
 func Delete(g *gin.Context) {
 
@@ -82,13 +82,13 @@ func Delete(g *gin.Context) {
 // @Accept       json
 // @Produce      json
 // @Param        id   path      int  true  "User ID"
-// @Param        user body Domain.User true "New user data"
-// @Success      200  {object}  Domain.User
-// @Failure		 400  {object}	Domain.ErrorResponseDTO
-// @Failure		 401  {object}	Domain.ErrorResponseDTO
-// @Failure		 403  {object}	Domain.ErrorResponseDTO
-// @Failure		 404  {object}	Domain.ErrorResponseDTO
-// @Failure		 500  {object}	Domain.ErrorResponseDTO
+// @Param        user body domain.User true "New user data"
+// @Success      200  {object}  domain.User
+// @Failure		 400  {object}	domain.ErrorResponseDTO
+// @Failure		 401  {object}	domain.ErrorResponseDTO
+// @Failure		 403  {object}	domain.ErrorResponseDTO
+// @Failure		 404  {object}	domain.ErrorResponseDTO
+// @Failure		 500  {object}	domain.ErrorResponseDTO
 // @Router       /users/{id} [patch]
 func Update(g *gin.Context) {
 
