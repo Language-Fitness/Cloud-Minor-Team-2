@@ -36,6 +36,7 @@ func main() {
 
 	r := gin.Default()
 	routes.UserRoutes(r)
+	routes.AuthRoutes(r)
 	docs.SwaggerInfo.BasePath = "/"
 
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))

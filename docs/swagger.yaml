@@ -1,17 +1,13 @@
 basePath: /
 definitions:
-  domain.ErrorResponseDTO:
+  domain.LoginDTO:
     properties:
-      error:
+      email:
         type: string
-      errorType:
-        type: string
-      statusCode:
-        type: integer
-      statusText:
+      password:
         type: string
     type: object
-  domain.User:
+  domain.UserDTO:
     properties:
       created_at:
         type: string
@@ -36,6 +32,22 @@ definitions:
       updated_at:
         type: string
     type: object
+  response.ErrorResponseDTO:
+    properties:
+      error:
+        type: string
+      errorType:
+        type: string
+      statusCode:
+        type: integer
+      statusText:
+        type: string
+    type: object
+  response.LoginResponseDTO:
+    properties:
+      bearer_token:
+        type: string
+    type: object
 externalDocs:
   description: OpenAPI
   url: https://swagger.io/resources/open-api/
@@ -53,6 +65,36 @@ info:
   title: Cloud Minor - Go - Gin API
   version: "1.0"
 paths:
+  /auth/login:
+    post:
+      consumes:
+      - application/json
+      description: Login with credentials
+      parameters:
+      - description: Login data
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/domain.LoginDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.LoginResponseDTO'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrorResponseDTO'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.ErrorResponseDTO'
+      summary: Log in to get a bearer token
+      tags:
+      - auth
   /users:
     get:
       consumes:
@@ -65,20 +107,20 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/domain.User'
+              $ref: '#/definitions/domain.UserDTO'
             type: array
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/domain.ErrorResponseDTO'
+            $ref: '#/definitions/response.ErrorResponseDTO'
         "403":
           description: Forbidden
           schema:
-            $ref: '#/definitions/domain.ErrorResponseDTO'
+            $ref: '#/definitions/response.ErrorResponseDTO'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/domain.ErrorResponseDTO'
+            $ref: '#/definitions/response.ErrorResponseDTO'
       security:
       - BearerAuth: []
       summary: List all users
@@ -94,30 +136,30 @@ paths:
         name: user
         required: true
         schema:
-          $ref: '#/definitions/domain.User'
+          $ref: '#/definitions/domain.UserDTO'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/domain.User'
+            $ref: '#/definitions/domain.UserDTO'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/domain.ErrorResponseDTO'
+            $ref: '#/definitions/response.ErrorResponseDTO'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/domain.ErrorResponseDTO'
+            $ref: '#/definitions/response.ErrorResponseDTO'
         "403":
           description: Forbidden
           schema:
-            $ref: '#/definitions/domain.ErrorResponseDTO'
+            $ref: '#/definitions/response.ErrorResponseDTO'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/domain.ErrorResponseDTO'
+            $ref: '#/definitions/response.ErrorResponseDTO'
       security:
       - BearerAuth: []
       summary: Add new user
@@ -142,19 +184,19 @@ paths:
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/domain.ErrorResponseDTO'
+            $ref: '#/definitions/response.ErrorResponseDTO'
         "403":
           description: Forbidden
           schema:
-            $ref: '#/definitions/domain.ErrorResponseDTO'
+            $ref: '#/definitions/response.ErrorResponseDTO'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/domain.ErrorResponseDTO'
+            $ref: '#/definitions/response.ErrorResponseDTO'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/domain.ErrorResponseDTO'
+            $ref: '#/definitions/response.ErrorResponseDTO'
       security:
       - BearerAuth: []
       summary: Remove one user
@@ -176,23 +218,23 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/domain.User'
+            $ref: '#/definitions/domain.UserDTO'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/domain.ErrorResponseDTO'
+            $ref: '#/definitions/response.ErrorResponseDTO'
         "403":
           description: Forbidden
           schema:
-            $ref: '#/definitions/domain.ErrorResponseDTO'
+            $ref: '#/definitions/response.ErrorResponseDTO'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/domain.ErrorResponseDTO'
+            $ref: '#/definitions/response.ErrorResponseDTO'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/domain.ErrorResponseDTO'
+            $ref: '#/definitions/response.ErrorResponseDTO'
       security:
       - BearerAuth: []
       summary: Get one user
@@ -213,34 +255,34 @@ paths:
         name: user
         required: true
         schema:
-          $ref: '#/definitions/domain.User'
+          $ref: '#/definitions/domain.UserDTO'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/domain.User'
+            $ref: '#/definitions/domain.UserDTO'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/domain.ErrorResponseDTO'
+            $ref: '#/definitions/response.ErrorResponseDTO'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/domain.ErrorResponseDTO'
+            $ref: '#/definitions/response.ErrorResponseDTO'
         "403":
           description: Forbidden
           schema:
-            $ref: '#/definitions/domain.ErrorResponseDTO'
+            $ref: '#/definitions/response.ErrorResponseDTO'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/domain.ErrorResponseDTO'
+            $ref: '#/definitions/response.ErrorResponseDTO'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/domain.ErrorResponseDTO'
+            $ref: '#/definitions/response.ErrorResponseDTO'
       security:
       - BearerAuth: []
       summary: Update one user

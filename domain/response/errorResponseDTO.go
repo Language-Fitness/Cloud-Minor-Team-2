@@ -1,4 +1,4 @@
-package domain
+package response
 
 type ErrorResponseDTO struct {
 	StatusText string
