@@ -9,7 +9,6 @@ import (
 func UserRoutes(router *gin.Engine) {
 
 	userRouter := router.Group("/users")
-
 	{
 		userRouter.POST("/", middlewares.Auth(), controllers.Create)
 		userRouter.GET("/", middlewares.Auth(), controllers.GetAll)

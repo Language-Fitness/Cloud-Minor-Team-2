@@ -13,7 +13,12 @@ func Auth() gin.HandlerFunc {
 
 		bearerToken := c.GetHeader("Authorization")
 		if bearerToken == "" {
-			c.AbortWithStatus(http.StatusUnauthorized)
+			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
+				"statusText": "failed",
+				"statusCode": 401,
+				"errorType":  "UnauthorizedException",
+				"error":      "No bearer token",
+			})
 			return
 		}
 
@@ -21,7 +26,12 @@ func Auth() gin.HandlerFunc {
 		err := services.ValidateToken(accessToken)
 		if err != nil {
 
-			c.AbortWithStatus(http.StatusForbidden)
+			c.AbortWithStatusJSON(http.StatusForbidden, gin.H{
+				"statusText": "failed",
+				"statusCode": 403,
+				"errorType":  "ForbiddenException",
+				"error":      "Invalid credentials",
+			})
 			return
 		}
 		c.Next()
