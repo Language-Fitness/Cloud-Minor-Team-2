@@ -21,7 +21,7 @@ func NewAuthService() *AuthService {
 	return &AuthService{}
 }
 
-func (a AuthService) CreateToken(userId string, role string) (tokenString string, err error) {
+func (a AuthService) MockCreateToken(userId string, role string) (tokenString string, err error) {
 	claims := CustomClaims{
 		Role: role,
 		RegisteredClaims: jwt.RegisteredClaims{
@@ -43,7 +43,7 @@ func (a AuthService) CreateToken(userId string, role string) (tokenString string
 	return tokenString, err
 }
 
-func ValidateToken(signedToken string) (err error) {
+func MockValidateToken(signedToken string) (err error) {
 	token, err := jwt.ParseWithClaims(signedToken, &CustomClaims{},
 		func(token *jwt.Token) (interface{}, error) {
 

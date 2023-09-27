@@ -26,7 +26,7 @@ func NewAuthHandler(authService *services.AuthService) *Handler {
 // @Failure		 500  {object}	response.ErrorResponseDTO
 // @Router       /auth/login [post]
 func (h *Handler) Login(g *gin.Context) {
-	token, err := h.authService.CreateToken("aaaa-bbbb-cccc-dddd", "admin")
+	token, err := h.authService.MockCreateToken("aaaa-bbbb-cccc-dddd", "admin")
 
 	if err == nil {
 		g.IndentedJSON(http.StatusOK, gin.H{

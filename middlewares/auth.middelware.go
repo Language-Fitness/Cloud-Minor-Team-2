@@ -21,7 +21,7 @@ func Auth() gin.HandlerFunc {
 			return
 		}
 
-		err := services.ValidateToken(bearerToken)
+		err := services.MockValidateToken(bearerToken)
 		if err != nil {
 
 			c.AbortWithStatusJSON(http.StatusForbidden, gin.H{
