@@ -1,7 +1,6 @@
 package middlewares
 
 import (
-	"example/cloud-api/services"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
@@ -21,17 +20,17 @@ func Auth() gin.HandlerFunc {
 			return
 		}
 
-		err := services.ValidateToken(bearerToken)
-		if err != nil {
-
-			c.AbortWithStatusJSON(http.StatusForbidden, gin.H{
-				"statusText": "failed",
-				"statusCode": 403,
-				"errorType":  "ForbiddenException",
-				"error":      "Invalid credentials",
-			})
-			return
-		}
+		//err := services.ValidateToken(bearerToken)
+		//if err != nil {
+		//
+		//	c.AbortWithStatusJSON(http.StatusForbidden, gin.H{
+		//		"statusText": "failed",
+		//		"statusCode": 403,
+		//		"errorType":  "ForbiddenException",
+		//		"error":      "Invalid credentials",
+		//	})
+		//	return
+		//}
 		c.Next()
 	}
 }

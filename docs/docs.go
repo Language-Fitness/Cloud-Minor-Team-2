@@ -503,8 +503,6 @@ var SwaggerInfo = &swag.Spec{
 	Description:      "Api used for the Cloud minor project - Language Fitness controllers..",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
-	LeftDelim:        "{{",
-	RightDelim:       "}}",
 }
 
 func init() {
