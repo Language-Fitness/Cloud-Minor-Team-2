@@ -1,6 +1,6 @@
 module example/cloud-api
 
-go 1.20.9
+go 1.20
 
 require (
 	github.com/gin-gonic/gin v1.9.1
