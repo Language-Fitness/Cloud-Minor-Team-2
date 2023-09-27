@@ -10,8 +10,7 @@ import (
 
 func UserRoutes(r *gin.Engine) {
 
-	userRepository := repositories.NewUserRepository()
-	userService := services.NewUserService(userRepository)
+	userService := services.NewUserService()
 	userHandler := UserHandler.NewUserHandler(userService)
 
 	userRouter := r.Group("/users")
