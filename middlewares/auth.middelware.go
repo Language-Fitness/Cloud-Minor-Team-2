@@ -4,7 +4,6 @@ import (
 	"example/cloud-api/services"
 	"github.com/gin-gonic/gin"
 	"net/http"
-	"strings"
 )
 
 func Auth() gin.HandlerFunc {
@@ -22,8 +21,7 @@ func Auth() gin.HandlerFunc {
 			return
 		}
 
-		accessToken := strings.Split(bearerToken, "Bearer ")[1]
-		err := services.ValidateToken(accessToken)
+		err := services.ValidateToken(bearerToken)
 		if err != nil {
 
 			c.AbortWithStatusJSON(http.StatusForbidden, gin.H{

@@ -44,7 +44,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/domain.LoginDTO"
+                            "$ref": "#/definitions/dto.LoginDTO"
                         }
                     }
                 ],
@@ -94,7 +94,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/domain.UserDTO"
+                                "$ref": "#/definitions/response.UserResponseDTO"
                             }
                         }
                     },
@@ -142,7 +142,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/domain.UserDTO"
+                            "$ref": "#/definitions/dto.UserDTO"
                         }
                     }
                 ],
@@ -150,7 +150,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/domain.UserDTO"
+                            "$ref": "#/definitions/response.UserResponseDTO"
                         }
                     },
                     "400": {
@@ -211,7 +211,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/domain.UserDTO"
+                            "$ref": "#/definitions/response.UserResponseDTO"
                         }
                     },
                     "401": {
@@ -327,7 +327,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/domain.UserDTO"
+                            "$ref": "#/definitions/dto.UserDTO"
                         }
                     }
                 ],
@@ -335,7 +335,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/domain.UserDTO"
+                            "$ref": "#/definitions/response.UserResponseDTO"
                         }
                     },
                     "400": {
@@ -373,7 +373,7 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "domain.LoginDTO": {
+        "dto.LoginDTO": {
             "type": "object",
             "properties": {
                 "email": {
@@ -384,25 +384,16 @@ const docTemplate = `{
                 }
             }
         },
-        "domain.UserDTO": {
+        "dto.UserDTO": {
             "type": "object",
             "properties": {
-                "created_at": {
-                    "type": "string"
-                },
                 "email": {
                     "type": "string"
-                },
-                "id": {
-                    "type": "integer"
                 },
                 "name": {
                     "type": "string"
                 },
                 "password": {
-                    "type": "string"
-                },
-                "ratings": {
                     "type": "string"
                 },
                 "role_id": {
@@ -414,11 +405,11 @@ const docTemplate = `{
                 "settings": {
                     "type": "string"
                 },
-                "soft_deleted": {
-                    "type": "string"
-                },
-                "updated_at": {
-                    "type": "string"
+                "whitelist_module": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
                 }
             }
         },
@@ -446,6 +437,47 @@ const docTemplate = `{
                     "type": "string"
                 }
             }
+        },
+        "response.UserResponseDTO": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "ratings": {
+                    "type": "string"
+                },
+                "role_id": {
+                    "type": "string"
+                },
+                "school_id": {
+                    "type": "string"
+                },
+                "settings": {
+                    "type": "string"
+                },
+                "soft_deleted": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                },
+                "whitelist_module": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                }
+            }
         }
     },
     "securityDefinitions": {
@@ -471,6 +503,8 @@ var SwaggerInfo = &swag.Spec{
 	Description:      "Api used for the Cloud minor project - Language Fitness controllers..",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
+	LeftDelim:        "{{",
+	RightDelim:       "}}",
 }
 
 func init() {

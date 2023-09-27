@@ -12,7 +12,7 @@ import (
 // @Accept       json
 // @Produce      json
 // @Param        id   path      int  true  "User ID"
-// @Success      200  {object}  domain.UserDTO
+// @Success      200  {object}  response.UserResponseDTO
 // @Failure		 401  {object}	response.ErrorResponseDTO
 // @Failure		 403  {object}	response.ErrorResponseDTO
 // @Failure		 404  {object}	response.ErrorResponseDTO
@@ -29,7 +29,7 @@ func GetOne(g *gin.Context) {
 // @Tags         users
 // @Accept       json
 // @Produce      json
-// @Success      200  {array}   domain.UserDTO
+// @Success      200  {array}   response.UserResponseDTO
 // @Failure		 401  {object}	response.ErrorResponseDTO
 // @Failure		 403  {object}	response.ErrorResponseDTO
 // @Failure		 500  {object}	response.ErrorResponseDTO
@@ -45,8 +45,8 @@ func GetAll(g *gin.Context) {
 // @Tags         users
 // @Accept       json
 // @Produce      json
-// @Param        user body domain.UserDTO true "New user data"
-// @Success      200  {object}  domain.UserDTO
+// @Param        user body dto.UserDTO true "New user data"
+// @Success      200  {object}  response.UserResponseDTO
 // @Failure		 400  {object}	response.ErrorResponseDTO
 // @Failure		 401  {object}	response.ErrorResponseDTO
 // @Failure		 403  {object}	response.ErrorResponseDTO
@@ -82,8 +82,8 @@ func Delete(g *gin.Context) {
 // @Accept       json
 // @Produce      json
 // @Param        id   path      int  true  "User ID"
-// @Param        user body domain.UserDTO true "New user data"
-// @Success      200  {object}  domain.UserDTO
+// @Param        user body dto.UserDTO true "New user data"
+// @Success      200  {object}  response.UserResponseDTO
 // @Failure		 400  {object}	response.ErrorResponseDTO
 // @Failure		 401  {object}	response.ErrorResponseDTO
 // @Failure		 403  {object}	response.ErrorResponseDTO

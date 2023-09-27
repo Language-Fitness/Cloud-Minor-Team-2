@@ -1,9 +1,13 @@
 package services
 
 import (
+	"errors"
+	"fmt"
 	"github.com/golang-jwt/jwt/v5"
 	"time"
 )
+
+var mySigningKey = []byte("mySecretKey")
 
 type CustomClaims struct {
 	Role string `json:"role"`
@@ -11,14 +15,34 @@ type CustomClaims struct {
 }
 
 func ValidateToken(signedToken string) (err error) {
-	return
+	token, err := jwt.ParseWithClaims(signedToken, &CustomClaims{},
+		func(token *jwt.Token) (interface{}, error) {
+
+			if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+				return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
+			}
+
+			return mySigningKey, nil
+		},
+	)
+
+	if err != nil {
+		return err
+	}
+
+	if claims, ok := token.Claims.(*CustomClaims); ok && token.Valid {
+		fmt.Printf("%v %v", claims.Role, claims.RegisteredClaims.Issuer)
+		return nil
+	} else {
+		err = errors.New("token expired")
+		return
+	}
 }
 
 func CreateToken(userId string, role string) (tokenString string, err error) {
-	mySigningKey := []byte("mySecretKey")
 
 	claims := CustomClaims{
-		Role: "admin",
+		Role: role,
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(24 * time.Hour)),
 			IssuedAt:  jwt.NewNumericDate(time.Now()),

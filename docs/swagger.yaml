@@ -1,25 +1,19 @@
 basePath: /
 definitions:
-  domain.LoginDTO:
+  dto.LoginDTO:
     properties:
       email:
         type: string
       password:
         type: string
     type: object
-  domain.UserDTO:
+  dto.UserDTO:
     properties:
-      created_at:
-        type: string
       email:
         type: string
-      id:
-        type: integer
       name:
         type: string
       password:
-        type: string
-      ratings:
         type: string
       role_id:
         type: string
@@ -27,10 +21,10 @@ definitions:
         type: string
       settings:
         type: string
-      soft_deleted:
-        type: string
-      updated_at:
-        type: string
+      whitelist_module:
+        items:
+          type: integer
+        type: array
     type: object
   response.ErrorResponseDTO:
     properties:
@@ -47,6 +41,33 @@ definitions:
     properties:
       bearer_token:
         type: string
+    type: object
+  response.UserResponseDTO:
+    properties:
+      created_at:
+        type: string
+      email:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      ratings:
+        type: string
+      role_id:
+        type: string
+      school_id:
+        type: string
+      settings:
+        type: string
+      soft_deleted:
+        type: string
+      updated_at:
+        type: string
+      whitelist_module:
+        items:
+          type: integer
+        type: array
     type: object
 externalDocs:
   description: OpenAPI
@@ -76,7 +97,7 @@ paths:
         name: user
         required: true
         schema:
-          $ref: '#/definitions/domain.LoginDTO'
+          $ref: '#/definitions/dto.LoginDTO'
       produces:
       - application/json
       responses:
@@ -107,7 +128,7 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/domain.UserDTO'
+              $ref: '#/definitions/response.UserResponseDTO'
             type: array
         "401":
           description: Unauthorized
@@ -136,14 +157,14 @@ paths:
         name: user
         required: true
         schema:
-          $ref: '#/definitions/domain.UserDTO'
+          $ref: '#/definitions/dto.UserDTO'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/domain.UserDTO'
+            $ref: '#/definitions/response.UserResponseDTO'
         "400":
           description: Bad Request
           schema:
@@ -218,7 +239,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/domain.UserDTO'
+            $ref: '#/definitions/response.UserResponseDTO'
         "401":
           description: Unauthorized
           schema:
@@ -255,14 +276,14 @@ paths:
         name: user
         required: true
         schema:
-          $ref: '#/definitions/domain.UserDTO'
+          $ref: '#/definitions/dto.UserDTO'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/domain.UserDTO'
+            $ref: '#/definitions/response.UserResponseDTO'
         "400":
           description: Bad Request
           schema:

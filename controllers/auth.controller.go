@@ -12,7 +12,7 @@ import (
 // @Tags         auth
 // @Accept       json
 // @Produce      json
-// @Param        user body domain.LoginDTO true "Login data"
+// @Param        user body dto.LoginDTO true "Login data"
 // @Success      200  {object}  response.LoginResponseDTO
 // @Failure		 400  {object}	response.ErrorResponseDTO
 // @Failure		 500  {object}	response.ErrorResponseDTO

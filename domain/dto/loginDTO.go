@@ -1,4 +1,4 @@
-package domain
+package dto
 
 type LoginDTO struct {
 	Email    string `json:"email"`

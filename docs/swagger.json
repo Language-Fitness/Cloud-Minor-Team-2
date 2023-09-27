@@ -38,7 +38,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/domain.LoginDTO"
+                            "$ref": "#/definitions/dto.LoginDTO"
                         }
                     }
                 ],
@@ -88,7 +88,7 @@
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/domain.UserDTO"
+                                "$ref": "#/definitions/response.UserResponseDTO"
                             }
                         }
                     },
@@ -136,7 +136,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/domain.UserDTO"
+                            "$ref": "#/definitions/dto.UserDTO"
                         }
                     }
                 ],
@@ -144,7 +144,7 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/domain.UserDTO"
+                            "$ref": "#/definitions/response.UserResponseDTO"
                         }
                     },
                     "400": {
@@ -205,7 +205,7 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/domain.UserDTO"
+                            "$ref": "#/definitions/response.UserResponseDTO"
                         }
                     },
                     "401": {
@@ -321,7 +321,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/domain.UserDTO"
+                            "$ref": "#/definitions/dto.UserDTO"
                         }
                     }
                 ],
@@ -329,7 +329,7 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/domain.UserDTO"
+                            "$ref": "#/definitions/response.UserResponseDTO"
                         }
                     },
                     "400": {
@@ -367,7 +367,7 @@
         }
     },
     "definitions": {
-        "domain.LoginDTO": {
+        "dto.LoginDTO": {
             "type": "object",
             "properties": {
                 "email": {
@@ -378,25 +378,16 @@
                 }
             }
         },
-        "domain.UserDTO": {
+        "dto.UserDTO": {
             "type": "object",
             "properties": {
-                "created_at": {
-                    "type": "string"
-                },
                 "email": {
                     "type": "string"
-                },
-                "id": {
-                    "type": "integer"
                 },
                 "name": {
                     "type": "string"
                 },
                 "password": {
-                    "type": "string"
-                },
-                "ratings": {
                     "type": "string"
                 },
                 "role_id": {
@@ -408,11 +399,11 @@
                 "settings": {
                     "type": "string"
                 },
-                "soft_deleted": {
-                    "type": "string"
-                },
-                "updated_at": {
-                    "type": "string"
+                "whitelist_module": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
                 }
             }
         },
@@ -438,6 +429,47 @@
             "properties": {
                 "bearer_token": {
                     "type": "string"
+                }
+            }
+        },
+        "response.UserResponseDTO": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "ratings": {
+                    "type": "string"
+                },
+                "role_id": {
+                    "type": "string"
+                },
+                "school_id": {
+                    "type": "string"
+                },
+                "settings": {
+                    "type": "string"
+                },
+                "soft_deleted": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                },
+                "whitelist_module": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
                 }
             }
         }
