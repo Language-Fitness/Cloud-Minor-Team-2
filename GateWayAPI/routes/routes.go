@@ -4,7 +4,6 @@ import (
 	AuthHandler "example/cloud-api/handlers/auth"
 	UserHandler "example/cloud-api/handlers/user"
 	"example/cloud-api/middlewares"
-	"example/cloud-api/repositories"
 	"example/cloud-api/services"
 	"github.com/gin-gonic/gin"
 )
