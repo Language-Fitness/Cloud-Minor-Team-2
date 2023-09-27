@@ -1,16 +1,14 @@
 package services
 
 import (
-	"example/cloud-api/repositories"
 	"github.com/gin-gonic/gin"
 )
 
 type UserService struct {
-	repository *repositories.UserRepository
 }
 
-func NewUserService(repository *repositories.UserRepository) *UserService {
-	return &UserService{repository: repository}
+func NewUserService() *UserService {
+	return &UserService{}
 }
 
 func (u UserService) GetAllUsers(c *gin.Context) {
