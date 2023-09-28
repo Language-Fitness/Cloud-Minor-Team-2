@@ -2,22 +2,14 @@ package routes
 
 import (
 	AuthHandler "example/cloud-api/handlers/auth"
+	ModuleHandler "example/cloud-api/handlers/module"
+	OpenHandler "example/cloud-api/handlers/open"
+	SchoolHandler "example/cloud-api/handlers/school"
 	UserHandler "example/cloud-api/handlers/user"
 	"example/cloud-api/middlewares"
 	"example/cloud-api/services"
 	"github.com/gin-gonic/gin"
 )
-
-//userRouter := r.Group("/users")
-//{
-//userRouter.Use(middlewares.Auth())
-//
-//userRouter.POST("/", userHandler.CreateUser)
-//userRouter.GET("/", userHandler.GetAllUsers)
-//userRouter.GET("/:id", userHandler.GetUserByID)
-//userRouter.PUT("/:id", userHandler.UpdateUser)
-//userRouter.DELETE("/:id", userHandler.DeleteUser)
-//}
 
 func UserRoutes(r *gin.Engine) {
 
@@ -36,30 +28,30 @@ func UserRoutes(r *gin.Engine) {
 
 func SchoolRoutes(r *gin.Engine) {
 
-	userService := services.NewUserService()
-	userHandler := UserHandler.NewUserHandler(userService)
+	schoolService := services.NewSchoolService()
+	schoolHandler := SchoolHandler.NewSchoolHandler(schoolService)
 
-	userRouter := r.Group("/school")
+	schoolRouter := r.Group("/school")
 	{
-		userRouter.Use(middlewares.Auth())
+		schoolRouter.Use(middlewares.Auth())
 
-		userRouter.GET("/", userHandler.GetAllUsers)
-		userRouter.GET("/:id", userHandler.GetUserByID)
+		schoolRouter.GET("/", schoolHandler.GetAllSchools)
+		schoolRouter.GET("/:id", schoolHandler.GetSchoolByID)
 	}
 }
 
 func ModuleRoutes(r *gin.Engine) {
-	userService := services.NewUserService()
-	userHandler := UserHandler.NewUserHandler(userService)
+	moduleService := services.NewModuleService()
+	moduleHandler := ModuleHandler.NewModuleHandler(moduleService)
 
 	moduleRouter := r.Group("/module/:module_id")
 	{
 		moduleRouter.Use(middlewares.Auth())
 
 		// /module/:module_id/
-		moduleRouter.GET("/", userHandler.GetModuleByID)
+		moduleRouter.GET("/", moduleHandler.GetModuleByID)
 		// /module/:module_id/courses/
-		moduleRouter.GET("/courses", userHandler.GetCoursesForModule)
+		moduleRouter.GET("/courses", moduleHandler.GetAllCourses)
 		// Define a route for "module/:module_id/course/:course_id"
 		courseRouter := moduleRouter.Group("/course/:course_id")
 		{
@@ -67,36 +59,36 @@ func ModuleRoutes(r *gin.Engine) {
 			// courseRouter.Use(middlewares.SomeMiddleware())
 
 			// /module/:module_id/course/:course_id/
-			courseRouter.GET("/", someHandler)
+			courseRouter.GET("/", moduleHandler.GetAllCoursesById)
 			// /module/:module_id/course/:course_id/exercises
-			courseRouter.GET("/exercises", someHandler)
+			courseRouter.GET("/exercises", moduleHandler.GetAllExercises)
 
 			// Define a route for "module/:module_id/course/:course_id/exercise/:exercise_id"
 			exerciseRouter := courseRouter.Group("/exercise/:exercise_id")
 			{
 				// /module/:module_id/course/:course_id/exercise/:exercise_id
-				exerciseRouter.GET("/", someHandler)
+				exerciseRouter.GET("/", moduleHandler.GetExerciseById)
 
-				userRouter := r.Group("/result")
+				resultRouter := exerciseRouter.Group("/result")
 				{
-					userRouter.GET("/", userHandler.GetAllUsers)
-					userRouter.POST("/", userHandler.GetUserByID)
+					resultRouter.GET("/", moduleHandler.GetResultForExercise)
+					resultRouter.POST("/", moduleHandler.CreateResultForExercise)
 				}
 			}
 		}
 	}
 
-	r.GET("/modules", userHandler.GetAllModules)
+	r.GET("/modules", moduleHandler.GetAllModules)
 }
 
 func OpenAiRoutes(r *gin.Engine) {
 
-	userService := services.NewUserService()
-	userHandler := UserHandler.NewUserHandler(userService)
+	openService := services.NewOpenService()
+	openHandler := OpenHandler.NewOpenHandler(openService)
 
-	userRouter := r.Group("/help")
+	openRouter := r.Group("/help")
 	{
-		userRouter.GET("/", userHandler.GetAllUsers)
+		openRouter.GET("/", openHandler.GetFeedback)
 	}
 }
 

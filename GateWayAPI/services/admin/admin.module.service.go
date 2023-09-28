@@ -1,33 +1,33 @@
-package services
+package admin
 
 import (
 	"github.com/gin-gonic/gin"
 )
 
-type AdminModuleService struct {
+type ModuleService struct {
 }
 
-func NewAdminModuleService() *AdminModuleService {
-	return &AdminModuleService{}
+func NewAdminModuleService() *ModuleService {
+	return &ModuleService{}
 }
 
-func (service AdminModuleService) GetAllModules(c *gin.Context) {
+func (service ModuleService) GetAllModules(c *gin.Context) {
 }
 
-func (service AdminModuleService) GetOneModule(c *gin.Context) {
+func (service ModuleService) GetOneModule(c *gin.Context) {
 	//id := c.Param("id")
 	//data, err := u.repository.GetOne(id)
 }
 
-func (service AdminModuleService) CreateModules(c *gin.Context) {
+func (service ModuleService) CreateModules(c *gin.Context) {
 
 }
 
-func (service AdminModuleService) UpdateModules(c *gin.Context) {
+func (service ModuleService) UpdateModules(c *gin.Context) {
 
 }
 
-func (service AdminModuleService) DeleteModules(c *gin.Context) {
+func (service ModuleService) DeleteModules(c *gin.Context) {
 	//id := c.Param("id")
 	//data, err := u.repository.GetOne(id)
 }

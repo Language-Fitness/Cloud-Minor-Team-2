@@ -14,20 +14,30 @@ func NewModuleService() *ModuleService {
 func (service ModuleService) GetAllModules(c *gin.Context) {
 }
 
-func (service ModuleService) GetOneModules(c *gin.Context) {
-	//id := c.Param("id")
-	//data, err := u.repository.GetOne(id)
-}
-
-func (service ModuleService) CreateModules(c *gin.Context) {
+func (service ModuleService) GetResultForExercise(context *gin.Context) {
 
 }
 
-func (service ModuleService) UpdateModules(c *gin.Context) {
+func (service ModuleService) CreateResultForExercise(context *gin.Context) {
 
 }
 
-func (service ModuleService) DeleteModules(c *gin.Context) {
-	//id := c.Param("id")
-	//data, err := u.repository.GetOne(id)
+func (service ModuleService) GetExerciseById(context *gin.Context) {
+
+}
+
+func (service ModuleService) GetAllExercises(context *gin.Context) {
+
+}
+
+func (service ModuleService) GetAllCourses(context *gin.Context) {
+
+}
+
+func (service ModuleService) GetAllCoursesById(context *gin.Context) {
+
+}
+
+func (service ModuleService) GetModuleByID(context *gin.Context) {
+
 }
