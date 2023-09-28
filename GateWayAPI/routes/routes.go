@@ -29,6 +29,7 @@ func UserRoutes(r *gin.Engine) {
 		userRouter.Use(middlewares.Auth())
 
 		userRouter.GET("/", userHandler.GetAllUsers)
+		userRouter.GET("/leaderboard", userHandler.GetAllUsers)
 		userRouter.GET("/:id", userHandler.GetUserByID)
 	}
 }
