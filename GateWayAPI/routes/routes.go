@@ -8,6 +8,17 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+//userRouter := r.Group("/users")
+//{
+//userRouter.Use(middlewares.Auth())
+//
+//userRouter.POST("/", userHandler.CreateUser)
+//userRouter.GET("/", userHandler.GetAllUsers)
+//userRouter.GET("/:id", userHandler.GetUserByID)
+//userRouter.PUT("/:id", userHandler.UpdateUser)
+//userRouter.DELETE("/:id", userHandler.DeleteUser)
+//}
+
 func UserRoutes(r *gin.Engine) {
 
 	userService := services.NewUserService()
@@ -17,11 +28,8 @@ func UserRoutes(r *gin.Engine) {
 	{
 		userRouter.Use(middlewares.Auth())
 
-		userRouter.POST("/", userHandler.CreateUser)
 		userRouter.GET("/", userHandler.GetAllUsers)
 		userRouter.GET("/:id", userHandler.GetUserByID)
-		userRouter.PUT("/:id", userHandler.UpdateUser)
-		userRouter.DELETE("/:id", userHandler.DeleteUser)
 	}
 }
 
