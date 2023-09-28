@@ -23,6 +23,22 @@ func UserRoutes(r *gin.Engine) {
 	}
 }
 
+func SchoolRoutes(r *gin.Engine) {
+
+}
+
+func ModuleRoutes(r *gin.Engine) {
+
+}
+
+func ResultRoutes(r *gin.Engine) {
+
+}
+
+func OpenAiRoutes(r *gin.Engine) {
+
+}
+
 func AuthRoutes(r *gin.Engine) {
 
 	authService := services.NewAuthService()
