@@ -67,6 +67,12 @@ func ModuleRoutes(r *gin.Engine) {
 			{
 				// /module/:module_id/course/:course_id/exercise/:exercise_id
 				exerciseRouter.GET("/", someHandler)
+
+				userRouter := r.Group("/result")
+				{
+					userRouter.GET("/", userHandler.GetAllUsers)
+					userRouter.POST("/", userHandler.GetUserByID)
+				}
 			}
 		}
 	}
@@ -74,12 +80,15 @@ func ModuleRoutes(r *gin.Engine) {
 	r.GET("/modules", userHandler.GetAllModules)
 }
 
-func ResultRoutes(r *gin.Engine) {
-
-}
-
 func OpenAiRoutes(r *gin.Engine) {
 
+	userService := services.NewUserService()
+	userHandler := UserHandler.NewUserHandler(userService)
+
+	userRouter := r.Group("/help")
+	{
+		userRouter.GET("/", userHandler.GetAllUsers)
+	}
 }
 
 func AuthRoutes(r *gin.Engine) {
