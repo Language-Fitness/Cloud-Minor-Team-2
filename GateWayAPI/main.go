@@ -1,8 +1,8 @@
 package main
 
 import (
-	docs "example/cloud-api/docs"
-	"example/cloud-api/routes"
+	docs "cloud-api/docs"
+	"cloud-api/routes"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	swaggerfiles "github.com/swaggo/files"

@@ -1,4 +1,4 @@
-module example/cloud-api
+module cloud-api
 
 go 1.20
 

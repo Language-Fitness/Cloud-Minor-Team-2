@@ -1,13 +1,13 @@
 package routes
 
 import (
-	AuthHandler "example/cloud-api/handlers/auth"
-	ModuleHandler "example/cloud-api/handlers/module"
-	OpenHandler "example/cloud-api/handlers/open"
-	SchoolHandler "example/cloud-api/handlers/school"
-	UserHandler "example/cloud-api/handlers/user"
-	"example/cloud-api/middlewares"
-	"example/cloud-api/services"
+	AuthHandler "cloud-api/handlers/auth"
+	ModuleHandler "cloud-api/handlers/module"
+	OpenHandler "cloud-api/handlers/open"
+	SchoolHandler "cloud-api/handlers/school"
+	UserHandler "cloud-api/handlers/user"
+	"cloud-api/middlewares"
+	"cloud-api/services"
 	"github.com/gin-gonic/gin"
 )
 

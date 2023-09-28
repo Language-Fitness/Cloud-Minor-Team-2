@@ -1,8 +1,8 @@
 package routes
 
 import (
-	AuthHandler "example/cloud-api/handlers/auth"
-	"example/cloud-api/services"
+	AuthHandler "cloud-api/handlers/auth"
+	"cloud-api/services"
 	"github.com/gin-gonic/gin"
 )
 

@@ -1,7 +1,7 @@
 package open
 
 import (
-	"example/cloud-api/services"
+	"cloud-api/services"
 	"github.com/gin-gonic/gin"
 )
 
