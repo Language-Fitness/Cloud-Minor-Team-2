@@ -78,13 +78,25 @@ type Person struct{}
 type Enemy struct{}
 
 func _() {
-	_ = New(
+	personRepo := New(
 		func() interface{} {
 			return &Person{}
 		})
 
-	_ = New(
+	_, _ = personRepo.Get()
+	_, _ = personRepo.GetOne("uuid")
+	_ = personRepo.Create(Person{})
+	_ = personRepo.Update("uuid", Person{})
+	_ = personRepo.Delete("uuid")
+
+	enemyRepo := New(
 		func() interface{} {
 			return &Enemy{}
 		})
+
+	_, _ = enemyRepo.Get()
+	_, _ = enemyRepo.GetOne("uuid")
+	_ = enemyRepo.Create(Enemy{})
+	_ = enemyRepo.Update("uuid", Enemy{})
+	_ = enemyRepo.Delete("uuid")
 }
