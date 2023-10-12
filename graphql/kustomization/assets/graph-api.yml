@@ -1,22 +1,22 @@
 kind: Deployment
 apiVersion: apps/v1
 metadata:
-  name: "test-bram"
+  name: "graph-api"
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: "test-bram"
+      app: "graph-api"
   template:
     metadata:
       labels:
-        app: "test-bram"
+        app: "graph-api"
     spec:
       containers:
-        - name: "test-bram"
-          image: marbwoulret/testing:latest
+        - name: "graph-api"
+          image: marbwoulret/graph-api:latest
           ports:
-            - containerPort: 8080
+            - containerPort: 8081
           resources:
             limits:
               memory: "20Mi"
@@ -24,29 +24,28 @@ spec:
 kind: Service
 apiVersion: v1
 metadata:
-  name: "test-bram"
+  name: "graph-api"
   annotations:
     description: Exposes and load balances the application pods
   labels:
-    app: "test-bram"
+    app: "graph-api"
 spec:
   ports:
     - name: http
-      port: 8080
-      targetPort: 8080
+      port: 8081
+      targetPort: 8081
   selector:
-    app: "test-bram"
+    app: "graph-api"
 ---
 kind: Route
 apiVersion: route.openshift.io/v1
 metadata:
-  name: "test-bram"
+  name: "graph-api"
   labels:
-    app: "test-bram"
+    app: "graph-api"
 spec:
   port:
-    targetPort: 8080
-  path: "/schools"
+    targetPort: 8081
   to:
     kind: Service
-    name: "test-bram"
+    name: "graph-api"

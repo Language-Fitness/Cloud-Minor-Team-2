@@ -5,8 +5,8 @@ namespace: api-testing
 
 images:
   - name: test-bram
-    newName: marbwoulret/rest-api
+    newName: marbwoulret/graph-api
     newTag: latest
 
 resources:
-  - assets/rest-api.yml
+  - assets/graph-api.yml
