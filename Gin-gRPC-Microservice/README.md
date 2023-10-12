@@ -1,6 +1,3 @@
-Certainly, here's a basic README for your repository:
-
----
 
 # User Management Repository
 
