@@ -44,6 +44,9 @@ metadata:
   labels:
     app: "test-bram"
 spec:
+  port:
+    targetPort: 8080
+  path: "/schools"
   to:
     kind: Service
     name: "test-bram"
