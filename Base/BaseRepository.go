@@ -38,6 +38,14 @@ package Base
 //	return nil
 //}
 
+type IRepository interface {
+	Get() ([]interface{}, error)
+	GetOne(id string) (interface{}, error)
+	Create(obj interface{}) error
+	Update(id string, obj interface{}) error
+	Delete(id string) error
+}
+
 type Repository struct {
 	constructor func() interface{}
 }
