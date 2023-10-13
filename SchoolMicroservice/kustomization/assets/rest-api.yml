@@ -1,19 +1,19 @@
 kind: Deployment
 apiVersion: apps/v1
 metadata:
-  name: "rest-api"
+  name: rest-api
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: "rest-api"
+      app: rest-api
   template:
     metadata:
       labels:
-        app: "rest-api"
+        app: rest-api
     spec:
       containers:
-        - name: "rest-api"
+        - name: rest-api
           image: marbwoulret/rest-api:latest
           ports:
             - containerPort: 8080
@@ -24,29 +24,29 @@ spec:
 kind: Service
 apiVersion: v1
 metadata:
-  name: "rest-api"
+  name: rest-api
   annotations:
     description: Exposes and load balances the application pods
   labels:
-    app: "rest-api"
+    app: rest-api
 spec:
   ports:
     - name: http
       port: 8080
       targetPort: 8080
   selector:
-    app: "rest-api"
+    app: rest-api
 ---
 kind: Route
 apiVersion: route.openshift.io/v1
 metadata:
-  name: "rest-api"
+  name: rest-api
   labels:
-    app: "rest-api"
+    app: rest-api
 spec:
   port:
     targetPort: 8080
   path: "/schools"
   to:
     kind: Service
-    name: "rest-api"
+    name: rest-api

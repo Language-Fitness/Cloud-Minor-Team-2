@@ -7,6 +7,10 @@ images:
   - name: test-bram
     newName: marbwoulret/graph-api
     newTag: latest
+  # - name: mongodb
+  #   newName: mongo
+  #   newTag: latest
 
 resources:
   - assets/graph-api.yml
+  # - assets/mongodb.yml
