@@ -3,6 +3,7 @@ package graph
 import (
 	"Module/graph/model"
 	"Module/internal/repository"
+	"Module/internal/validation"
 )
 
 // This file will not be regenerated automatically.
@@ -11,13 +12,17 @@ import (
 
 func NewResolver() *Resolver {
 	moduleRepository := repository.NewModuleRepository()
+	validator := validation.NewValidator()
+
 	return &Resolver{
 		Modules:    []*model.Module{},
 		Repository: moduleRepository,
+		Validator:  validator,
 	}
 }
 
 type Resolver struct {
 	Modules    []*model.Module
 	Repository *repository.ModuleRepository
+	Validator  *validation.Validator
 }
