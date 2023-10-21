@@ -2,15 +2,21 @@ package repository
 
 import (
 	"Module/graph/model"
+	"Module/internal/database"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
 type ModuleRepository struct {
 	modules []*model.Module
+	client  *mongo.Client
 }
 
 func NewModuleRepository() *ModuleRepository {
+	client, _ := database.GetDBClient()
+
 	return &ModuleRepository{
 		modules: []*model.Module{},
+		client:  client,
 	}
 }
 
