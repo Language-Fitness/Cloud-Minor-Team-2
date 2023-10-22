@@ -4,6 +4,7 @@ import (
 	"context"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
+	"os"
 	"sync"
 )
 
@@ -16,7 +17,7 @@ var (
 func GetDBClient() (*mongo.Client, error) {
 	clientOnce.Do(func() {
 		// Initialize the MongoDB client here.
-		clientOptions := options.Client().ApplyURI("mongodb://root:example@localhost:27017")
+		clientOptions := options.Client().ApplyURI(getDatabaseConnectionString())
 		c, err := mongo.Connect(context.Background(), clientOptions)
 		if err != nil {
 			panic(err)
@@ -25,4 +26,8 @@ func GetDBClient() (*mongo.Client, error) {
 	})
 
 	return client, nil
+}
+
+func getDatabaseConnectionString() string {
+	return os.Getenv("DB_HOST")
 }

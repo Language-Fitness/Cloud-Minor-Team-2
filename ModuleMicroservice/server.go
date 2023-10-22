@@ -2,6 +2,7 @@ package main
 
 import (
 	"Module/graph"
+	"github.com/joho/godotenv"
 	"log"
 	"net/http"
 	"os"
@@ -16,6 +17,10 @@ func main() {
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = defaultPort
+	}
+
+	if err := godotenv.Load(); err != nil {
+		log.Fatal("Error loading .env file")
 	}
 
 	srv := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{Resolvers: graph.NewResolver()}))
