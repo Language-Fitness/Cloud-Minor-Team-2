@@ -84,8 +84,11 @@ func (r *ModuleRepository) ListModules() ([]*model.Module, error) {
 	// Define an empty slice to store the modules.
 	var modules []*model.Module
 
+	ctx, cancel := context.WithTimeout(context.TODO(), time.Second*10) // 10-second timeout
+	defer cancel()
+
 	// Retrieve all modules from MongoDB.
-	cursor, err := r.collection.Find(context.TODO(), bson.D{})
+	cursor, err := r.collection.Find(ctx, bson.D{})
 	if err != nil {
 		return nil, err // Return any MongoDB-related errors.
 	}
@@ -94,9 +97,9 @@ func (r *ModuleRepository) ListModules() ([]*model.Module, error) {
 		if err != nil {
 
 		}
-	}(cursor, context.TODO())
+	}(cursor, ctx)
 
-	for cursor.Next(context.TODO()) {
+	for cursor.Next(ctx) {
 		var module model.Module
 		if err := cursor.Decode(&module); err != nil {
 			return nil, err // Return any decoding errors.
