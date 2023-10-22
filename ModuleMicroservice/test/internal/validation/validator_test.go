@@ -216,33 +216,3 @@ func TestValidator_Length(t *testing.T) {
 		})
 	}
 }
-
-//func TestValidator_Length(t *testing.T) {
-//	validator := validation.NewValidator()
-//
-//	// Test cases
-//	testCases := []struct {
-//		value     string
-//		condition string
-//		expected  bool
-//	}{
-//		{"example", "<5", true},
-//		{"example", "<3", false},
-//		{"example", ">3", true},
-//		{"example", ">7", false},
-//		{"example", "<=7", true},
-//		{"example", ">=7", true},
-//		{"example", "==7", false},
-//		{"example", "!==7", false},
-//		{"example", "invalid-condition", false},
-//	}
-//
-//	for _, tc := range testCases {
-//		t.Run(tc.value+"_"+tc.condition, func(t *testing.T) {
-//			result := validator.Length(tc.value, tc.condition)
-//			if result != tc.expected {
-//				t.Errorf("Length(%s, %s) = %v; expected %v", tc.value, tc.condition, result, tc.expected)
-//			}
-//		})
-//	}
-//}
