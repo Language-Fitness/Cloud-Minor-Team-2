@@ -16,7 +16,7 @@ var (
 func GetDBClient() (*mongo.Client, error) {
 	clientOnce.Do(func() {
 		// Initialize the MongoDB client here.
-		clientOptions := options.Client().ApplyURI("mongodb://localhost:27017")
+		clientOptions := options.Client().ApplyURI("mongodb://root:example@localhost:27017")
 		c, err := mongo.Connect(context.Background(), clientOptions)
 		if err != nil {
 			panic(err)
