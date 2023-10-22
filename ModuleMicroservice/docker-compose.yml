@@ -1,0 +1,10 @@
+services:
+  api:
+    container_name: go-api
+    restart: always
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: graph-api
+    ports:
+      - "8080:8080"

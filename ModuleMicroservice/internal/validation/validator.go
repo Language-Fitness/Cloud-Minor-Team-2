@@ -86,8 +86,6 @@ func (v *Validator) ArrayType(input interface{}, expectedType string) bool {
 
 func (v *Validator) Length(value string, condition string) bool {
 	operator, lengthValue := SplitCondition(condition)
-	fmt.Printf("Operator: %s, Value: %s\n", operator, value)
-	fmt.Printf(string(rune(len(value))), lengthValue)
 
 	switch operator {
 	case "<":
