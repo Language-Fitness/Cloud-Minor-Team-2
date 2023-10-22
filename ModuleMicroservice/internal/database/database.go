@@ -28,6 +28,26 @@ func GetDBClient() (*mongo.Client, error) {
 	return client, nil
 }
 
+func GetDatabase() (*mongo.Database, error) {
+	client, _ := GetDBClient()
+
+	return client.Database(getDatabaseName()), nil
+}
+
+func GetCollection() (*mongo.Collection, error) {
+	database, _ := GetDatabase()
+
+	return database.Collection(getCollectionName()), nil
+}
+
 func getDatabaseConnectionString() string {
 	return os.Getenv("DB_HOST")
+}
+
+func getDatabaseName() string {
+	return os.Getenv("DB_NAME")
+}
+
+func getCollectionName() string {
+	return os.Getenv("DB_COLLECTION")
 }

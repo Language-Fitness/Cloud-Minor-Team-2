@@ -3,28 +3,35 @@ package repository
 import (
 	"Module/graph/model"
 	"Module/internal/database"
+	"context"
 	"go.mongodb.org/mongo-driver/mongo"
+	"time"
 )
 
 type ModuleRepository struct {
-	modules []*model.Module
-	client  *mongo.Client
+	modules    []*model.Module
+	collection *mongo.Collection
 }
 
 func NewModuleRepository() *ModuleRepository {
-	client, _ := database.GetDBClient()
+	collection, _ := database.GetCollection()
 
 	return &ModuleRepository{
-		modules: []*model.Module{},
-		client:  client,
+		modules:    []*model.Module{},
+		collection: collection,
 	}
 }
 
 func (r *ModuleRepository) CreateModule(newModule *model.Module) error {
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10) // 10-second timeout
+	defer cancel()
 
-	println(newModule.Name)
+	println("test")
 
-	r.modules = append(r.modules, newModule)
+	_, err := r.collection.InsertOne(ctx, newModule)
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
