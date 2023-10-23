@@ -12,7 +12,7 @@ import (
 
 func NewResolver() *Resolver {
 	moduleRepository := repository.NewModuleRepository()
-	validator := validation.NewValidator()
+	validator := validation.NewRules()
 
 	return &Resolver{
 		Modules:    []*model.Module{},
@@ -24,5 +24,5 @@ func NewResolver() *Resolver {
 type Resolver struct {
 	Modules    []*model.Module
 	Repository *repository.ModuleRepository
-	Validator  *validation.Validator
+	Validator  *validation.Rules
 }
