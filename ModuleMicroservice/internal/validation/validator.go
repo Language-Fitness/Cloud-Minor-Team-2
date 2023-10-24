@@ -21,7 +21,7 @@ func NewValidator() *Validator {
 	// Should map to the functions and input set values
 */
 
-func (v *Validator) Validate(input string, arr []string) {
+func (v *Validator) Validate(input interface{}, arr []string) {
 	rules := NewRules()
 
 	// Create a map where keys are strings (function names) and values are function pointers
