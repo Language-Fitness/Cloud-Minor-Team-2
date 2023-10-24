@@ -23,6 +23,11 @@ func main() {
 		log.Fatal("Error loading .env file")
 	}
 
+	err := CreateNewKeyCloakUser()
+	if err != nil {
+		return
+	}
+
 	srv := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{Resolvers: graph.NewResolver()}))
 
 	http.Handle("/", playground.Handler("GraphQL playground", "/query"))
