@@ -21,10 +21,10 @@ type ModuleService struct {
 	repo      *repository.ModuleRepository
 }
 
-func NewModuleService(repository *repository.ModuleRepository) *ModuleService {
+func NewModuleService() *ModuleService {
 	return &ModuleService{
 		validator: validation.NewValidator(),
-		repo:      repository,
+		repo:      repository.NewModuleRepository(),
 	}
 }
 

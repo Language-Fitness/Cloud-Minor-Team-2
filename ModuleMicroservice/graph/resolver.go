@@ -2,8 +2,7 @@ package graph
 
 import (
 	"Module/graph/model"
-	"Module/internal/repository"
-	"Module/internal/validation"
+	"Module/internal/service"
 )
 
 // This file will not be regenerated automatically.
@@ -11,18 +10,13 @@ import (
 // It serves as dependency injection for your app, add any dependencies you require here.
 
 func NewResolver() *Resolver {
-	moduleRepository := repository.NewModuleRepository()
-	validator := validation.NewRules()
-
 	return &Resolver{
-		Modules:    []*model.Module{},
-		Repository: moduleRepository,
-		Validator:  validator,
+		Service: service.NewModuleService(),
+		Modules: []*model.Module{},
 	}
 }
 
 type Resolver struct {
-	Modules    []*model.Module
-	Repository *repository.ModuleRepository
-	Validator  *validation.Rules
+	Service *service.ModuleService
+	Modules []*model.Module
 }

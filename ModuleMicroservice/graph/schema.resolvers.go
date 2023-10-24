@@ -7,36 +7,11 @@ package graph
 import (
 	"Module/graph/model"
 	"context"
-	"github.com/google/uuid"
-	"time"
 )
-
-func generateUniqueID() string {
-	return uuid.New().String()
-}
-
-func currentTime() *string {
-	currentTime := time.Now().Format(time.RFC3339)
-	return &currentTime
-}
 
 // CreateModule is the resolver for the createModule field.
 func (r *mutationResolver) CreateModule(ctx context.Context, input model.ModuleInput) (*model.Module, error) {
-
-	newModule := &model.Module{
-		ID:          generateUniqueID(), // You need to implement a function to generate a unique ID.
-		Name:        input.Name,
-		Description: input.Description,
-		Difficulty:  input.Difficulty,
-		Category:    input.Category,
-		MadeBy:      input.MadeBy,
-		Private:     input.Private,
-		Key:         input.Key,
-		CreatedAt:   currentTime(), // You can use a function to get the current time.
-	}
-
-	// Save the newModule to your data source using the repository.
-	err := r.Repository.CreateModule(newModule)
+	module, err := r.Service.CreateModule(input)
 	if err != nil {
 		return nil, err
 	}
@@ -46,38 +21,21 @@ func (r *mutationResolver) CreateModule(ctx context.Context, input model.ModuleI
 
 // UpdateModule is the resolver for the updateModule field.
 func (r *mutationResolver) UpdateModule(ctx context.Context, id string, input model.ModuleInput) (*model.Module, error) {
+	module, err = r.Service.UpdateModule(input)
 
-	existingModule, err := r.Repository.GetModuleByID(id)
-	if err != nil {
-		return nil, err
-	}
-
-	// Save the updated module to your data source using the repository.
-	err = r.Repository.UpdateModule(existingModule)
-	if err != nil {
-		return nil, err
-	}
-
-	return existingModule, nil
+	return module, nil
 }
 
 // DeleteModule is the resolver for the deleteModule field.
 func (r *mutationResolver) DeleteModule(ctx context.Context, id string) (*string, error) {
-	err := r.Repository.DeleteModuleByID(id)
-	if err != nil {
-		return nil, err
-	}
+	err := r.Service.DeleteModule(id)
 
 	return &id, nil
 }
 
 // GetModule is the resolver for the getModule field.
 func (r *queryResolver) GetModule(ctx context.Context, id string) (*model.Module, error) {
-	// Fetch the module by ID using the repository.
-	module, err := r.Repository.GetModuleByID(id)
-	if err != nil {
-		return nil, err
-	}
+	module, err := r.Service.GetModuleById(id)
 
 	return module, nil
 }
@@ -85,10 +43,7 @@ func (r *queryResolver) GetModule(ctx context.Context, id string) (*model.Module
 // ListModules is the resolver for the listModules field.
 func (r *queryResolver) ListModules(ctx context.Context) ([]*model.Module, error) {
 	// Retrieve a list of all modules using the repository.
-	modules, err := r.Repository.ListModules()
-	if err != nil {
-		return nil, err
-	}
+	modules, err := r.Service.ListModules()
 
 	return modules, nil
 }
