@@ -6,6 +6,7 @@ import (
 	"context"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 	"time"
 )
 
@@ -31,33 +32,50 @@ func NewModuleRepository() *ModuleRepository {
 	}
 }
 
-func (r *ModuleRepository) CreateModule(newModule *model.Module) error {
+func (r *ModuleRepository) CreateModule(newModule model.ModuleInput) (*model.Module, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10) // 10-second timeout
 	defer cancel()
 
-	_, err := r.collection.InsertOne(ctx, newModule)
+	result, err := r.collection.InsertOne(ctx, newModule)
 	if err != nil {
-		return err
+		return nil, err
 	}
-	return nil
+
+	insertedId := result.InsertedID
+
+	filter := bson.M{"id": insertedId}
+	var fetchedModule model.Module
+
+	err = r.collection.FindOne(ctx, filter).Decode(&fetchedModule)
+	if err != nil {
+		return nil, err
+	}
+
+	return &fetchedModule, nil
 }
 
-func (r *ModuleRepository) UpdateModule(updatedModule *model.Module) error {
+func (r *ModuleRepository) UpdateModule(id string, updatedModule model.ModuleInput) (*model.Module, error) {
 	// Check if the module exists in MongoDB.
-	_, err := r.GetModuleByID(updatedModule.ID)
+	_, err := r.GetModuleByID(id)
 	if err != nil {
-		return err // Return the error if it doesn't exist in MongoDB.
+		return nil, err // Return the error if it doesn't exist in MongoDB.
 	}
 
 	// If the module exists in MongoDB, update it in MongoDB.
-	filter := bson.M{"id": updatedModule.ID}
+	filter := bson.M{"id": id}
 	update := bson.M{"$set": updatedModule}
-	_, err = r.collection.UpdateOne(context.TODO(), filter, update)
+	var result model.Module
+
+	err = r.collection.FindOneAndUpdate(
+		context.TODO(),
+		filter,
+		update,
+		options.FindOneAndUpdate().SetReturnDocument(options.After)).Decode(&result)
 	if err != nil {
-		return err // Return any MongoDB-related errors.
+		return nil, err // Return any MongoDB-related errors.
 	}
 
-	return nil
+	return &result, nil
 }
 
 func (r *ModuleRepository) DeleteModuleByID(id string) error {

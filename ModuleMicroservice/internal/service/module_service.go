@@ -28,42 +28,42 @@ func NewModuleService() *ModuleService {
 	}
 }
 
-func (m *ModuleService) CreateModule(newModule *model.Module) error {
+func (m *ModuleService) CreateModule(newModule model.ModuleInput) (*model.Module, error) {
 
-	m.ValidateModule(newModule)
+	m.ValidateModuleInput(newModule)
 
 	validationErrors := m.validator.GetErrors()
 	if len(validationErrors) > 0 {
 		errorMessage := "Validation errors: " + strings.Join(validationErrors, ", ")
-		return errors.New(errorMessage)
+		return nil, errors.New(errorMessage)
 	}
 
-	err := m.repo.CreateModule(newModule)
+	result, err := m.repo.CreateModule(newModule)
 
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	return nil
+	return result, nil
 }
 
-func (m *ModuleService) UpdateModule(updatedModule *model.Module) error {
+func (m *ModuleService) UpdateModule(id string, updatedModule model.ModuleInput) (*model.Module, error) {
 
-	m.ValidateModule(updatedModule)
+	m.ValidateModuleInput(updatedModule)
 
 	validationErrors := m.validator.GetErrors()
 	if len(validationErrors) > 0 {
 		errorMessage := "Validation errors: " + strings.Join(validationErrors, ", ")
-		return errors.New(errorMessage)
+		return nil, errors.New(errorMessage)
 	}
 
-	err := m.repo.UpdateModule(updatedModule)
+	result, err := m.repo.UpdateModule(id, updatedModule)
 
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	return nil
+	return result, nil
 }
 
 func (m *ModuleService) DeleteModule(id string) error {
@@ -112,8 +112,7 @@ func (m *ModuleService) ListModules() ([]*model.Module, error) {
 	return modules, nil
 }
 
-func (m *ModuleService) ValidateModule(module *model.Module) {
-	m.validator.Validate(module.ID, []string{"IsUUID"})
+func (m *ModuleService) ValidateModuleInput(module model.ModuleInput) {
 	m.validator.Validate(module.Name, []string{"IsString", "Length:<25"})
 	m.validator.Validate(*module.Description, []string{"IsString", "Length:<50"})
 	m.validator.Validate(*module.Difficulty, []string{"IsInt"})
@@ -121,7 +120,4 @@ func (m *ModuleService) ValidateModule(module *model.Module) {
 	m.validator.Validate(*module.MadeBy, []string{"IsString", "Length:<25"})
 	m.validator.Validate(*module.Private, []string{"IsBoolean"})
 	m.validator.Validate(*module.Key, []string{"IsString", "Length:<30"})
-	m.validator.Validate(*module.CreatedAt, []string{"IsDatetime"})
-	m.validator.Validate(*module.UpdatedAt, []string{"IsDatetime"})
-	m.validator.Validate(*module.SoftDeleted, []string{"IsBoolean"})
 }

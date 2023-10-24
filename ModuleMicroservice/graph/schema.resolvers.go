@@ -16,12 +16,15 @@ func (r *mutationResolver) CreateModule(ctx context.Context, input model.ModuleI
 		return nil, err
 	}
 
-	return newModule, nil
+	return module, nil
 }
 
 // UpdateModule is the resolver for the updateModule field.
 func (r *mutationResolver) UpdateModule(ctx context.Context, id string, input model.ModuleInput) (*model.Module, error) {
-	module, err = r.Service.UpdateModule(input)
+	module, err := r.Service.UpdateModule(id, input)
+	if err != nil {
+		return nil, err
+	}
 
 	return module, nil
 }
@@ -29,6 +32,9 @@ func (r *mutationResolver) UpdateModule(ctx context.Context, id string, input mo
 // DeleteModule is the resolver for the deleteModule field.
 func (r *mutationResolver) DeleteModule(ctx context.Context, id string) (*string, error) {
 	err := r.Service.DeleteModule(id)
+	if err != nil {
+		return nil, err
+	}
 
 	return &id, nil
 }
@@ -36,6 +42,9 @@ func (r *mutationResolver) DeleteModule(ctx context.Context, id string) (*string
 // GetModule is the resolver for the getModule field.
 func (r *queryResolver) GetModule(ctx context.Context, id string) (*model.Module, error) {
 	module, err := r.Service.GetModuleById(id)
+	if err != nil {
+		return nil, err
+	}
 
 	return module, nil
 }
@@ -44,6 +53,9 @@ func (r *queryResolver) GetModule(ctx context.Context, id string) (*model.Module
 func (r *queryResolver) ListModules(ctx context.Context) ([]*model.Module, error) {
 	// Retrieve a list of all modules using the repository.
 	modules, err := r.Service.ListModules()
+	if err != nil {
+		return nil, err
+	}
 
 	return modules, nil
 }
