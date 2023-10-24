@@ -146,6 +146,13 @@ func (v *Rules) Length(s interface{}, condition string) bool {
 	operator, lengthValue := SplitCondition(condition)
 
 	switch operator {
+	case "=":
+		if len(value) == lengthValue {
+			return true
+		} else {
+			v.AddError(fmt.Sprintf("String length should be the same as %d", lengthValue))
+			return false
+		}
 	case "<":
 		if len(value) < lengthValue {
 			return true
