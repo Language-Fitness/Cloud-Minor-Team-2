@@ -9,6 +9,14 @@ import (
 	"time"
 )
 
+type IModuleRepository interface {
+	CreateModule(newModule *model.Module) error
+	UpdateModule(updatedModule *model.Module) error
+	DeleteModuleByID(id string) error
+	GetModuleByID(id string) (*model.Module, error)
+	ListModules() ([]*model.Module, error)
+}
+
 type ModuleRepository struct {
 	modules    []*model.Module
 	collection *mongo.Collection
