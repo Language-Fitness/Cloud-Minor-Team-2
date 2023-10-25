@@ -5,21 +5,24 @@ import (
 	"strings"
 )
 
+// IValidator GOLANG INTERFACE
+// Implements a method for validating input with Validate and to get all the errors with GetErrors.
+type IValidator interface {
+	Validate(input interface{}, arr []string)
+	GetErrors() []string
+}
+
+// Validator GOLANG STRUCT
+// Contains a list of type string errors which contains all errors.
 type Validator struct {
 	errors []string
 }
 
-func NewValidator() *Validator {
+// NewValidator GOLANG FACTORY
+// Returns a Validator implementing IValidator.
+func NewValidator() IValidator {
 	return &Validator{}
 }
-
-/*
-	Validate("name", ["IsString", "Length:<5"])
-	Validate(9, ["IsInt"])
-	Validate("["apple, "banana"]", ["IsArray", "ArrayType:string"])
-
-	// Should map to the functions and input set values
-*/
 
 func (v *Validator) Validate(input interface{}, arr []string) {
 	rules := NewRules()

@@ -9,11 +9,31 @@ import (
 	"time"
 )
 
+// IRules GOLANG INTERFACE
+// Implements functions for validation input.
+type IRules interface {
+	AddError(message string)
+	ClearErrors()
+	GetErrors() []string
+	IsInt(s interface{}) bool
+	IsString(s interface{}) bool
+	IsUUID(s interface{}) bool
+	IsBoolean(value interface{}) bool
+	IsDatetime(s interface{}) bool
+	IsArray(value interface{}) bool
+	ArrayType(input interface{}, expectedType string) bool
+	Length(s interface{}, condition string) bool
+}
+
+// Rules GOLANG STRUCT
+// Contains a list of type string errors which contains all errors.
 type Rules struct {
 	Errors []string
 }
 
-func NewRules() *Rules {
+// NewRules GOLANG FACTORY
+// Returns a Rules implementing IRules.
+func NewRules() IRules {
 	return &Rules{}
 }
 

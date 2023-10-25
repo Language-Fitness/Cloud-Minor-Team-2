@@ -17,6 +17,6 @@ func NewResolver() *Resolver {
 }
 
 type Resolver struct {
-	Service *service.ModuleService
+	Service service.IModuleService
 	Modules []*model.Module
 }

@@ -10,20 +10,26 @@ import (
 	"time"
 )
 
+// IModuleRepository GOLANG INTERFACE
+// Implements five CRUD methods for query's and mutations on Module.
 type IModuleRepository interface {
-	CreateModule(newModule *model.Module) error
-	UpdateModule(updatedModule *model.Module) error
+	CreateModule(newModule *model.Module) (*model.Module, error)
+	UpdateModule(id string, updatedModule model.ModuleInput) (*model.Module, error)
 	DeleteModuleByID(id string) error
 	GetModuleByID(id string) (*model.Module, error)
 	ListModules() ([]*model.Module, error)
 }
 
+// ModuleRepository GOLANG STRUCT
+// Contains a model.Module list and a mongo.Collection.
 type ModuleRepository struct {
 	modules    []*model.Module
 	collection *mongo.Collection
 }
 
-func NewModuleRepository() *ModuleRepository {
+// NewModuleRepository GOLANG FACTORY
+// Returns a ModuleRepository implementing IModuleRepository.
+func NewModuleRepository() IModuleRepository {
 	collection, _ := database.GetCollection()
 
 	return &ModuleRepository{

@@ -10,31 +10,36 @@ import (
 	"time"
 )
 
+// IModuleService GOLANG INTERFACE
+// Implements five CRUD methods for query's and mutations on Module.
 type IModuleService interface {
-	CreateModule(newModule *model.Module) error
-	UpdateModule(updatedModule *model.Module) error
+	CreateModule(newModule model.ModuleInput) (*model.Module, error)
+	UpdateModule(id string, updatedModule model.ModuleInput) (*model.Module, error)
 	DeleteModule(id string) error
 	GetModuleById(id string) (*model.Module, error)
 	ListModules() ([]*model.Module, error)
 }
 
+// ModuleService GOLANG STRUCT
+// Contains two interfaces for a Validator and a Repo.
 type ModuleService struct {
-	validator *validation.Validator
-	repo      *repository.ModuleRepository
+	Validator validation.IValidator
+	Repo      repository.IModuleRepository
 }
 
-func NewModuleService() *ModuleService {
+// NewModuleService GOLANG FACTORY
+// Returns a ModuleService implementing IModuleService.
+func NewModuleService() IModuleService {
 	return &ModuleService{
-		validator: validation.NewValidator(),
-		repo:      repository.NewModuleRepository(),
+		Validator: validation.NewValidator(),
+		Repo:      repository.NewModuleRepository(),
 	}
 }
 
 func (m *ModuleService) CreateModule(newModule model.ModuleInput) (*model.Module, error) {
-
 	m.ValidateModuleInput(newModule)
 
-	validationErrors := m.validator.GetErrors()
+	validationErrors := m.Validator.GetErrors()
 	if len(validationErrors) > 0 {
 		errorMessage := "Validation errors: " + strings.Join(validationErrors, ", ")
 		return nil, errors.New(errorMessage)
@@ -54,7 +59,7 @@ func (m *ModuleService) CreateModule(newModule model.ModuleInput) (*model.Module
 		CreatedAt:   &timestamp,
 		SoftDeleted: &softDeleted,
 	}
-	result, err := m.repo.CreateModule(moduleToInsert)
+	result, err := m.Repo.CreateModule(moduleToInsert)
 
 	if err != nil {
 		return nil, err
@@ -64,16 +69,15 @@ func (m *ModuleService) CreateModule(newModule model.ModuleInput) (*model.Module
 }
 
 func (m *ModuleService) UpdateModule(id string, updatedModule model.ModuleInput) (*model.Module, error) {
-
 	m.ValidateModuleInput(updatedModule)
 
-	validationErrors := m.validator.GetErrors()
+	validationErrors := m.Validator.GetErrors()
 	if len(validationErrors) > 0 {
 		errorMessage := "Validation errors: " + strings.Join(validationErrors, ", ")
 		return nil, errors.New(errorMessage)
 	}
 
-	result, err := m.repo.UpdateModule(id, updatedModule)
+	result, err := m.Repo.UpdateModule(id, updatedModule)
 
 	if err != nil {
 		return nil, err
@@ -83,16 +87,15 @@ func (m *ModuleService) UpdateModule(id string, updatedModule model.ModuleInput)
 }
 
 func (m *ModuleService) DeleteModule(id string) error {
+	m.Validator.Validate(id, []string{"IsUUID"})
 
-	m.validator.Validate(id, []string{"IsUUID"})
-
-	validationErrors := m.validator.GetErrors()
+	validationErrors := m.Validator.GetErrors()
 	if len(validationErrors) > 0 {
 		errorMessage := "Validation errors: " + strings.Join(validationErrors, ", ")
 		return errors.New(errorMessage)
 	}
 
-	err := m.repo.DeleteModuleByID(id)
+	err := m.Repo.DeleteModuleByID(id)
 	if err != nil {
 		return err
 	}
@@ -101,16 +104,15 @@ func (m *ModuleService) DeleteModule(id string) error {
 }
 
 func (m *ModuleService) GetModuleById(id string) (*model.Module, error) {
+	m.Validator.Validate(id, []string{"IsUUID"})
 
-	m.validator.Validate(id, []string{"IsUUID"})
-
-	validationErrors := m.validator.GetErrors()
+	validationErrors := m.Validator.GetErrors()
 	if len(validationErrors) > 0 {
 		errorMessage := "Validation errors: " + strings.Join(validationErrors, ", ")
 		return nil, errors.New(errorMessage)
 	}
 
-	module, err := m.repo.GetModuleByID(id)
+	module, err := m.Repo.GetModuleByID(id)
 	if err != nil {
 		return nil, err
 	}
@@ -119,7 +121,7 @@ func (m *ModuleService) GetModuleById(id string) (*model.Module, error) {
 }
 
 func (m *ModuleService) ListModules() ([]*model.Module, error) {
-	modules, err := m.repo.ListModules()
+	modules, err := m.Repo.ListModules()
 
 	if err != nil {
 		return nil, err
@@ -129,11 +131,11 @@ func (m *ModuleService) ListModules() ([]*model.Module, error) {
 }
 
 func (m *ModuleService) ValidateModuleInput(module model.ModuleInput) {
-	m.validator.Validate(module.Name, []string{"IsString", "Length:<25"})
-	m.validator.Validate(*module.Description, []string{"IsString", "Length:<50"})
-	m.validator.Validate(*module.Difficulty, []string{"IsInt"})
-	m.validator.Validate(*module.Category, []string{"IsString"})
-	m.validator.Validate(*module.MadeBy, []string{"IsString", "Length:<25"})
-	m.validator.Validate(*module.Private, []string{"IsBoolean"})
-	m.validator.Validate(*module.Key, []string{"IsString", "Length:<30"})
+	m.Validator.Validate(module.Name, []string{"IsString", "Length:<25"})
+	m.Validator.Validate(*module.Description, []string{"IsString", "Length:<50"})
+	m.Validator.Validate(*module.Difficulty, []string{"IsInt"})
+	m.Validator.Validate(*module.Category, []string{"IsString"})
+	m.Validator.Validate(*module.MadeBy, []string{"IsUUID"})
+	m.Validator.Validate(*module.Private, []string{"IsBoolean"})
+	m.Validator.Validate(*module.Key, []string{"IsString", "Length:<30"})
 }
