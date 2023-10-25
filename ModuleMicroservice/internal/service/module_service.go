@@ -5,7 +5,9 @@ import (
 	"Module/internal/repository"
 	"Module/internal/validation"
 	"errors"
+	"github.com/google/uuid"
 	"strings"
+	"time"
 )
 
 type IModuleService interface {
@@ -38,7 +40,21 @@ func (m *ModuleService) CreateModule(newModule model.ModuleInput) (*model.Module
 		return nil, errors.New(errorMessage)
 	}
 
-	result, err := m.repo.CreateModule(newModule)
+	timestamp := time.Now().String()
+	softDeleted := false
+
+	moduleToInsert := &model.Module{
+		ID:          uuid.New().String(),
+		Name:        newModule.Name,
+		Description: newModule.Description,
+		Difficulty:  newModule.Difficulty,
+		Category:    newModule.Category,
+		MadeBy:      newModule.MadeBy,
+		Private:     newModule.Private,
+		CreatedAt:   &timestamp,
+		SoftDeleted: &softDeleted,
+	}
+	result, err := m.repo.CreateModule(moduleToInsert)
 
 	if err != nil {
 		return nil, err

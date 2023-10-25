@@ -32,18 +32,16 @@ func NewModuleRepository() *ModuleRepository {
 	}
 }
 
-func (r *ModuleRepository) CreateModule(newModule model.ModuleInput) (*model.Module, error) {
+func (r *ModuleRepository) CreateModule(newModule *model.Module) (*model.Module, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10) // 10-second timeout
 	defer cancel()
 
-	result, err := r.collection.InsertOne(ctx, newModule)
+	_, err := r.collection.InsertOne(ctx, newModule)
 	if err != nil {
 		return nil, err
 	}
 
-	insertedId := result.InsertedID
-
-	filter := bson.M{"id": insertedId}
+	filter := bson.M{"id": newModule.ID}
 	var fetchedModule model.Module
 
 	err = r.collection.FindOne(ctx, filter).Decode(&fetchedModule)
