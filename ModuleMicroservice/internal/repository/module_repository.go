@@ -2,7 +2,6 @@ package repository
 
 import (
 	"Module/graph/model"
-	"Module/internal/database"
 	"context"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -29,9 +28,7 @@ type ModuleRepository struct {
 
 // NewModuleRepository GOLANG FACTORY
 // Returns a ModuleRepository implementing IModuleRepository.
-func NewModuleRepository() IModuleRepository {
-	collection, _ := database.GetCollection()
-
+func NewModuleRepository(collection *mongo.Collection) IModuleRepository {
 	return &ModuleRepository{
 		modules:    []*model.Module{},
 		collection: collection,

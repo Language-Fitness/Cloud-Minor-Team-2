@@ -1,6 +1,7 @@
 package service
 
 import (
+	"Module/graph"
 	"Module/graph/model"
 	"Module/internal/repository"
 	"Module/internal/validation"
@@ -29,10 +30,10 @@ type ModuleService struct {
 
 // NewModuleService GOLANG FACTORY
 // Returns a ModuleService implementing IModuleService.
-func NewModuleService() IModuleService {
+func NewModuleService(config *graph.AppConfig) IModuleService {
 	return &ModuleService{
 		Validator: validation.NewValidator(),
-		Repo:      repository.NewModuleRepository(),
+		Repo:      repository.NewModuleRepository(config.Collection),
 	}
 }
 
