@@ -4,11 +4,14 @@ import (
 	"Module/graph/model"
 	"Module/internal/repository"
 	database "Module/test/internal/helpers"
+	"fmt"
 	"testing"
 )
 
 func TestCreateModule(t *testing.T) {
 	// Get the MongoDB collection for testing.
+	fmt.Println("Starting")
+
 	collection, err := database.GetTestCollection()
 	if err != nil {
 		t.Fatalf("Failed to get the test collection: %v", err)

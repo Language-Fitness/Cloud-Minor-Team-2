@@ -2,6 +2,7 @@ package database
 
 import (
 	"context"
+	"fmt"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"os"
@@ -18,7 +19,11 @@ func GetDBClient() (*mongo.Client, error) {
 	clientOnce.Do(func() {
 		// Initialize the MongoDB client here.
 		clientOptions := options.Client().ApplyURI(getDatabaseConnectionString())
+		fmt.Println(getDatabaseConnectionString())
+		fmt.Println("test")
+
 		c, err := mongo.Connect(context.Background(), clientOptions)
+
 		if err != nil {
 			panic(err)
 		}
