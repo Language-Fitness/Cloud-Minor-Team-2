@@ -4,8 +4,12 @@ import (
 	"Module/graph/model"
 	"Module/internal/repository"
 	database "Module/test/internal/helpers"
+	"context"
 	"fmt"
+	"go.mongodb.org/mongo-driver/bson"
+	"reflect"
 	"testing"
+	"time"
 )
 
 func TestCreateModule(t *testing.T) {
@@ -44,12 +48,26 @@ func TestCreateModule(t *testing.T) {
 	}
 
 	// Call the method you want to test.
-	result, err := repo.CreateModule(newModule)
+	_, err = repo.CreateModule(newModule)
 
 	// Assert the result and error as needed.
 	if err != nil {
 		t.Errorf("Error creating module: %v", err)
 	}
 
-	println(result.ID)
+	ctx, cancel := context.WithTimeout(context.TODO(), time.Second*10) // 10-second timeout
+	defer cancel()
+	// Attempt to fetch the module from MongoDB.
+	filter := bson.M{"id": "123"}
+	var databaseModule model.Module
+
+	err = collection.FindOne(ctx, filter).Decode(&databaseModule)
+
+	if err != nil {
+		t.Errorf("Error fetching module from MongoDB: %v", err)
+	}
+
+	if !reflect.DeepEqual(newModule, &databaseModule) {
+		t.Errorf("Retrieved module does not match the expected module")
+	}
 }
