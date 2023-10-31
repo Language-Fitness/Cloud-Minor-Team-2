@@ -20,5 +20,7 @@ npm run build
 npm run lint
 ```
 
+![Image](Images/img.png)
+
 ### Customize configuration
 See [Configuration Reference](https://cli.vuejs.org/config/).
