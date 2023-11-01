@@ -1,0 +1,40 @@
+syntax = "proto3";
+
+package proto;
+option go_package= "/pb";
+
+// Define gRPC User Service
+service gRPC_User_Server {
+  // RPC method to get user information
+  rpc GetUser (GetUserRequest) returns (UserResponse);
+}
+
+// Request message for getting a user
+message GetUserRequest {
+  string user_id = 1;
+}
+
+// Response message for getting a user
+message UserResponse {
+  string user_id = 1;
+  string name = 2;
+  string last_name = 3;
+  int32 age = 4;
+}
+
+// Define gRPC Address Service
+service gRPC_Address_Server {
+  // RPC method to get user address
+  rpc GetUserAddress (GetUserAddressRequest) returns (AddressResponse);
+}
+
+// Request message for getting a user's address
+message GetUserAddressRequest {
+  string user_id = 1;
+}
+
+// Response message for getting a user's address
+message AddressResponse {
+  string user_id = 1;
+  string address = 2;
+}
