@@ -13,7 +13,7 @@ import (
 // Implements five CRUD methods for query's and mutations on Module.
 type IModuleRepository interface {
 	CreateModule(newModule *model.Module) (*model.Module, error)
-	UpdateModule(id string, updatedModule model.ModuleInput) (*model.Module, error)
+	UpdateModule(id string, updatedModule model.Module) (*model.Module, error)
 	DeleteModuleByID(id string) error
 	GetModuleByID(id string) (*model.Module, error)
 	ListModules() ([]*model.Module, error)
@@ -55,20 +55,21 @@ func (r *ModuleRepository) CreateModule(newModule *model.Module) (*model.Module,
 	return &fetchedModule, nil
 }
 
-func (r *ModuleRepository) UpdateModule(id string, updatedModule model.ModuleInput) (*model.Module, error) {
-	// Check if the module exists in MongoDB.
+func (r *ModuleRepository) UpdateModule(id string, updatedModule model.Module) (*model.Module, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10) // 10-second timeout
+	defer cancel()
+
 	_, err := r.GetModuleByID(id)
 	if err != nil {
 		return nil, err // Return the error if it doesn't exist in MongoDB.
 	}
 
-	// If the module exists in MongoDB, update it in MongoDB.
 	filter := bson.M{"id": id}
 	update := bson.M{"$set": updatedModule}
 	var result model.Module
 
 	err = r.collection.FindOneAndUpdate(
-		context.TODO(),
+		ctx,
 		filter,
 		update,
 		options.FindOneAndUpdate().SetReturnDocument(options.After)).Decode(&result)
@@ -80,15 +81,17 @@ func (r *ModuleRepository) UpdateModule(id string, updatedModule model.ModuleInp
 }
 
 func (r *ModuleRepository) DeleteModuleByID(id string) error {
-	// Check if the module exists in MongoDB.
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10) // 10-second timeout
+	defer cancel()
+
 	_, err := r.GetModuleByID(id)
 	if err != nil {
 		return err // Return the error if it exists in MongoDB.
 	}
 
-	// If the module exists in MongoDB, delete it from MongoDB.
 	filter := bson.M{"id": id}
-	_, err = r.collection.DeleteOne(context.TODO(), filter)
+
+	_, err = r.collection.DeleteOne(ctx, filter)
 	if err != nil {
 		return err // Return any MongoDB-related errors.
 	}
@@ -99,24 +102,24 @@ func (r *ModuleRepository) DeleteModuleByID(id string) error {
 func (r *ModuleRepository) GetModuleByID(id string) (*model.Module, error) {
 	ctx, cancel := context.WithTimeout(context.TODO(), time.Second*10) // 10-second timeout
 	defer cancel()
-	// Attempt to fetch the module from MongoDB.
+
 	filter := bson.M{"id": id}
 	var result model.Module
+
 	err := r.collection.FindOne(ctx, filter).Decode(&result)
 	if err != nil {
 		return nil, err
 	}
+
 	return &result, nil
 }
 
 func (r *ModuleRepository) ListModules() ([]*model.Module, error) {
-	// Define an empty slice to store the modules.
-	var modules []*model.Module
-
 	ctx, cancel := context.WithTimeout(context.TODO(), time.Second*10) // 10-second timeout
 	defer cancel()
 
-	// Retrieve all modules from MongoDB.
+	var modules []*model.Module
+
 	cursor, err := r.collection.Find(ctx, bson.D{})
 	if err != nil {
 		return nil, err // Return any MongoDB-related errors.

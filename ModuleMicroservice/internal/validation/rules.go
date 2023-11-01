@@ -126,7 +126,6 @@ func (v *Rules) ArrayType(input interface{}, expectedType string) bool {
 	for i := 0; i < sliceValue.Len(); i++ {
 		element := sliceValue.Index(i).Interface()
 
-		// Perform type-specific validation based on expectedType
 		switch expectedType {
 		case "string":
 			if !v.IsString(element) {
@@ -202,7 +201,6 @@ func (v *Rules) Length(s interface{}, condition string) bool {
 			return false
 		}
 	default:
-		// Handle invalid operator
 		v.AddError("Invalid length condition")
 		return false
 	}

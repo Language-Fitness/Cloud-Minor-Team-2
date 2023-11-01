@@ -10,6 +10,7 @@ import (
 type IValidator interface {
 	Validate(input interface{}, arr []string)
 	GetErrors() []string
+	ClearErrors()
 }
 
 // Validator GOLANG STRUCT
@@ -27,7 +28,6 @@ func NewValidator() IValidator {
 func (v *Validator) Validate(input interface{}, arr []string) {
 	rules := NewRules()
 
-	// Create a map where keys are strings (function names) and values are function pointers
 	functionMap := map[string]any{
 		"IsInt":      func(input interface{}, params string) { rules.IsInt(input) },
 		"IsString":   func(input interface{}, params string) { rules.IsString(input) },
@@ -50,7 +50,7 @@ func (v *Validator) Validate(input interface{}, arr []string) {
 
 	for _, value := range arr {
 
-		functionName := value // Initialize functionName with the original value
+		functionName := value
 
 		// Check if value contains a colon and extract the part before it
 		if parts := strings.Split(value, ":"); len(parts) > 1 {
@@ -69,4 +69,8 @@ func (v *Validator) Validate(input interface{}, arr []string) {
 
 func (v *Validator) GetErrors() []string {
 	return v.errors
+}
+
+func (v *Validator) ClearErrors() {
+	v.ClearErrors()
 }
