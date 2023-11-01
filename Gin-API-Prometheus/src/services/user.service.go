@@ -8,7 +8,7 @@ import (
 var mockUsers = []dtos.UserDto{
 	{ID: 1, Name: "John Doe", Email: "john@example.com"},
 	{ID: 2, Name: "Jane Smith", Email: "jane@example.com"},
-	// Add more mock users as needed
+	// Add more mocks users as needed
 }
 
 func GetAllUsers() ([]dtos.UserDto, error) {

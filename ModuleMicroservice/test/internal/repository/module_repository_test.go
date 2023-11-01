@@ -103,7 +103,7 @@ func TestUpdateModule(t *testing.T) {
 	}
 
 	// Define the updates you want to apply to the module.
-	updatedModuleInput := model.ModuleInput{
+	updatedModuleInput := model.Module{
 		Name: "Updated Test Module",
 		// Define other fields you want to update.
 	}
