@@ -1,10 +1,10 @@
 package service
 
 import (
-	"Module/graph/model"
 	service2 "Module/internal/service"
 	"Module/test/mocks"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 	"testing"
 )
 
@@ -13,19 +13,31 @@ func TestService_CreateModule(t *testing.T) {
 	mockValidator := new(mocks.MockValidator)
 	service := &service2.ModuleService{Validator: mockValidator, Repo: mockRepo}
 
-	newModule := model.ModuleInput{
-		Name: "Test Module",
-	}
-	result, err := service.CreateModule(newModule)
+	mockValidator.On("GetErrors").Return([]string{})
+	mockRepo.On("CreateModule", mock.AnythingOfType("*model.Module")).Return(&mocks.MockCreatedModule, nil)
 
-	// Assert that there's no error
+	result, err := service.CreateModule(mocks.MockNewModule)
+
 	assert.Nil(t, err)
-
-	// Add assertions to verify that the result matches your expectations
 	assert.NotNil(t, result)
-	assert.Equal(t, "test-module-id", result.ID)
+	assert.Equal(t, "3a3bd756-6353-4e29-8aba-5b3531bdb9ed", result.ID)
 
-	// Assert that the expected functions were called on the mocks
 	mockValidator.AssertExpectations(t)
 	mockRepo.AssertExpectations(t)
+}
+
+func TestService_CreateModule_GetErrors(t *testing.T) {
+	mockRepo := new(mocks.MockRepository)
+	mockValidator := new(mocks.MockValidator)
+	service := &service2.ModuleService{Validator: mockValidator, Repo: mockRepo}
+
+	mockValidator.On("GetErrors").Return([]string{"error1"})
+
+	result, err := service.CreateModule(mocks.MockNewModule)
+
+	assert.NotNil(t, err)
+	assert.Nil(t, result)
+	assert.Equal(t, "Validation errors: error1", err.Error())
+
+	mockValidator.AssertExpectations(t)
 }

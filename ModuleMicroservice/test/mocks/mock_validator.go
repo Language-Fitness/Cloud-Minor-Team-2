@@ -14,7 +14,6 @@ func (m *MockValidator) Validate(input interface{}, arr []string) {
 }
 
 func (m *MockValidator) GetErrors() []string {
-	//args := m.Called()
-	//return args.Get(0).([]string)
-	return nil
+	args := m.Called()
+	return args.Get(0).([]string)
 }
