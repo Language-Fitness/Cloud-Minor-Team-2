@@ -1,54 +1,91 @@
 package Saga
 
 import (
-	"fmt"
+	"Saga_orchestrator/src/Repository"
+	"Saga_orchestrator/src/Steps"
+	"Saga_orchestrator/src/models"
+	"github.com/google/uuid"
 	"sync"
 )
 
-var sagaStore = make(map[string]SagaInstance)
 var mu sync.Mutex
 
-func CreateSaga(steps ...SagaStep) string {
+func CreateSaga(steps ...models.SagaStep) (string, error) {
 	mu.Lock()
 	defer mu.Unlock()
 
-	sagaID := fmt.Sprintf("saga-%d", len(sagaStore)+1)
-	saga := SagaInstance{
+	// Create a new UUID for the Saga ID
+	sagaID := uuid.New().String()
+
+	// Create the SagaInstance with an initial state of "NotStarted"
+	newSaga := &models.SagaInstance{
 		ID:          sagaID,
 		CurrentStep: 0,
+		State:       models.NotStarted,
 		Steps:       steps,
 	}
 
-	sagaStore[sagaID] = saga
+	if err := Repository.CreateSagaInMongoDB(newSaga); err != nil {
+		return "", err
+	}
 
-	return sagaID
+	return sagaID, nil
 }
 
 func ExecuteSaga(sagaID string) error {
 	mu.Lock()
 	defer mu.Unlock()
 
-	saga, exists := sagaStore[sagaID]
-	if !exists {
-		return fmt.Errorf("Saga not found")
+	// Retrieve the saga state from MongoDB
+	saga, err := Repository.GetSagaFromMongoDB(sagaID)
+	if err != nil {
+		return err
 	}
+
+	// Update the state to "InProgress"
+	saga.State = models.InProgress
+	if err := Repository.UpdateSagaInMongoDB(saga); err != nil {
+		return err
+	}
+
+	compensate := false // Track whether compensation is needed
 
 	for i := saga.CurrentStep; i < len(saga.Steps); i++ {
 		step := saga.Steps[i]
-		if err := step.Execute(); err != nil {
-			// Handle step failure by initiating compensating actions
-			for j := i; j >= 0; j-- {
-				compensateErr := step.Compensate()
-				if compensateErr != nil {
-					return fmt.Errorf("Saga compensation error: %s", compensateErr)
-				}
+		Execute := Steps.MapExecuteFuncName(step)
+		if Execute != nil {
+			if err := Execute(step.ExecuteParams); err != nil {
+				// Handle step failure
+				saga.State = models.Failed
+				compensate = true // Set the compensation flag
+				break             // Exit the loop on step failure
 			}
-			return fmt.Errorf("Saga step failed: %s", err)
+
+			saga.CurrentStep = i + 1
+			// If all steps are successfully completed, set the state to "Completed"
+			if saga.CurrentStep == len(saga.Steps) {
+				saga.State = models.Completed
+			}
+
+			// Update the saga state in MongoDB after each step
+			if err := Repository.UpdateSagaInMongoDB(saga); err != nil {
+				return err
+			}
 		}
-		saga.CurrentStep = i + 1
 	}
 
-	// Saga completed successfully
-	delete(sagaStore, sagaID)
+	if compensate {
+		// If compensation is needed, execute compensation steps
+		for j := saga.CurrentStep - 1; j >= 0; j-- {
+			step := saga.Steps[j]
+			Compensation := Steps.MapCompensationFuncName(step)
+			if Compensation != nil {
+				if err := Compensation(); err != nil {
+					return err
+				}
+			}
+		}
+	}
+
 	return nil
 }
