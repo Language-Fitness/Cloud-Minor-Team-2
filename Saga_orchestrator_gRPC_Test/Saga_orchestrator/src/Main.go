@@ -1,31 +1,38 @@
 package main
 
 import (
-	AddressSteps "Saga_orchestrator/src/AddressSteps"
+	"Saga_orchestrator/src/Repository"
 	"Saga_orchestrator/src/Saga"
-	"Saga_orchestrator/src/UserSteps"
+	"Saga_orchestrator/src/Steps/AddressSteps"
+	"Saga_orchestrator/src/Steps/UserSteps"
+	"Saga_orchestrator/src/models"
+	_ "github.com/google/uuid"
 	"log"
 )
 
 func main() {
+	// Init database
+	Repository.InitMongoDB()
 
-	step1 := Saga.SagaStep{
-		Name: "Step1",
-		Execute: func() error {
-			return UserSteps.Step1Execute("1")
-		},
-		Compensate: UserSteps.Step1Compensate,
+	step1 := models.SagaStep{
+		Name:          "Step1 get user",
+		Execute:       UserSteps.UserStep1Execute,
+		Compensate:    UserSteps.UserStep1Compensate,
+		ExecuteParams: []string{"1"},
 	}
 
-	step2 := Saga.SagaStep{
-		Name: "Step2",
-		Execute: func() error {
-			return AddressSteps.Step1Execute("1")
-		},
-		Compensate: AddressSteps.Step1Compensate,
+	step2 := models.SagaStep{
+		Name:          "Step2 get address",
+		Execute:       AddressSteps.AddressStep1Execute,
+		Compensate:    AddressSteps.AddressStep1Compensate,
+		ExecuteParams: []string{"1"},
 	}
+
 	// Create a new saga
-	sagaID := Saga.CreateSaga(step1, step2)
+	sagaID, err := Saga.CreateSaga(step1, step2)
+	if err != nil {
+		log.Fatalf("Failed to create saga: %v\n", err)
+	}
 
 	// Execute the saga
 	if err := Saga.ExecuteSaga(sagaID); err != nil {

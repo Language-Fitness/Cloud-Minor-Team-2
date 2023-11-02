@@ -7,7 +7,12 @@ import (
 	"log"
 )
 
-func Step1Execute(id string) error {
+const (
+	UserStep1Execute    = "UserStep1Execute"
+	UserStep1Compensate = "UserStep1Compensate"
+)
+
+func Step1Execute(Params []string) error {
 	// Connect to gRPC service 1 and make a call
 	client, conn, err := gRPCClient.GetUserClient()
 	if err != nil {
@@ -15,7 +20,7 @@ func Step1Execute(id string) error {
 	}
 	defer conn.Close()
 
-	req := &pb.GetUserRequest{UserId: id}
+	req := &pb.GetUserRequest{UserId: Params[0]}
 	user, err := client.GetUser(context.Background(), req)
 	if err != nil {
 		return err
@@ -27,6 +32,6 @@ func Step1Execute(id string) error {
 
 func Step1Compensate() error {
 	// Implement the compensation logic for Step1
-	log.Printf("Compensating Step1, failed to get user")
+	log.Printf("Compensating Step, failed to get user")
 	return nil
 }
