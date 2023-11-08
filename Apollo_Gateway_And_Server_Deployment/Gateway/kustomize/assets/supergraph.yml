@@ -15,17 +15,6 @@ spec:
       containers:
         - name: supergraph
           image: marbwoulret/apollo-supergraph:latest
-          volumeMounts:
-            - name: app-code
-              mountPath: /app
-          ports:
-            - containerPort: 4000
-          resources:
-            limits:
-              memory: "100Mi"
-      initContainers:
-        - name: install-deps
-          image: node:20-alpine
           command: [ "npm", "install" ]
           securityContext:
             runAsNonRoot: true
@@ -33,6 +22,11 @@ spec:
             - name: app-code
               mountPath: /app
           workingDir: /app
+          ports:
+            - containerPort: 4000
+          resources:
+            limits:
+              memory: "100Mi"
       volumes:
         - name: app-code
           emptyDir: { }
