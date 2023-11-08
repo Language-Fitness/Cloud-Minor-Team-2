@@ -4,7 +4,7 @@ WORKDIR /app
 
 COPY supergraph/package*.json ./
 
-RUN npm install
+#RUN npm install
 
 COPY supergraph/ .
 
