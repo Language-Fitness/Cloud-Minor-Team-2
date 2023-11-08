@@ -27,6 +27,8 @@ spec:
         - name: install-deps
           image: node:20-alpine
           command: [ "npm", "install" ]
+          securityContext:
+            runAsNonRoot: true
           volumeMounts:
             - name: app-code
               mountPath: /app
