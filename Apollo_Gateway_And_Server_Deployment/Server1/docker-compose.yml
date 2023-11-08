@@ -1,0 +1,10 @@
+services:
+  api:
+    container_name: server1
+    restart: always
+    build:
+      context: .
+      dockerfile: subgraph/Dockerfile
+    image: apollo-subgraph-products
+    ports:
+      - "8080:8080"

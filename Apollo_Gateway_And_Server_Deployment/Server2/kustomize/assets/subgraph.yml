@@ -1,0 +1,51 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: subgraph-customers
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: subgraph-customers
+  template:
+    metadata:
+      labels:
+        app: subgraph-customers
+    spec:
+      containers:
+        - name: subgraph-customers
+          image: marbwoulret/apollo-subgraph-customers:latest
+          ports:
+            - containerPort: 8081
+          resources:
+            limits:
+              memory: "30Mi"
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: subgraph-customers-service
+  annotations:
+    description: Exposes and load balances the application pods
+  labels:
+    app: subgraph-customers
+spec:
+  ports:
+    - name: http
+      port: 8081
+      targetPort: 8081
+  selector:
+    app: subgraph-customers
+---
+kind: Route
+apiVersion: route.openshift.io/v1
+metadata:
+  name: subgraph-customers-route
+  labels:
+    app: subgraph-customers
+spec:
+  port:
+    targetPort: 8081
+  to:
+    kind: Service
+    name: subgraph-customers-service

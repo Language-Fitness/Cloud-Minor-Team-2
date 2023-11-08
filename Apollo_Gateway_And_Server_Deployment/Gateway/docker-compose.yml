@@ -1,0 +1,10 @@
+services:
+  api:
+    container_name: supergraph
+    restart: always
+    build:
+      context: .
+      dockerfile: supergraph/Dockerfile
+    image: apollo-supergraph
+    ports:
+      - "4000:4000"

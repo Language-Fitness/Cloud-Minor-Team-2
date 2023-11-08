@@ -1,0 +1,13 @@
+# GraphQL schema example
+#
+# https://gqlgen.com/getting-started/
+
+type Query {
+  topCustomers(first: Int = 5): [Customer]
+}
+
+type Customer {
+  id: String!
+  name: String!
+  email: String!
+}

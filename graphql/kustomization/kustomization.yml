@@ -1,7 +1,7 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
-namespace: api-testing
+namespace: apollo-testing
 
 images:
   - name: test-bram

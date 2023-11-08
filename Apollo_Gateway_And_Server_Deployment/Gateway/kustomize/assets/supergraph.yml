@@ -1,0 +1,55 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: supergraph
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: supergraph
+  template:
+    metadata:
+      labels:
+        app: supergraph
+    spec:
+      containers:
+        - name: supergraph
+          image: marbwoulret/apollo-supergraph:latest
+          ports:
+            - containerPort: 4000
+          resources:
+            limits:
+              memory: "100Mi"
+          command: [ "sh", "-c" ]
+#          args:
+#            - |
+#              chmod 777 /.npm
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: supergraph-service
+  annotations:
+    description: Exposes and load balances the application pods
+  labels:
+    app: supergraph
+spec:
+  ports:
+    - name: http
+      port: 4000
+      targetPort: 4000
+  selector:
+    app: supergraph
+---
+kind: Route
+apiVersion: route.openshift.io/v1
+metadata:
+  name: supergraph-route
+  labels:
+    app: supergraph
+spec:
+  port:
+    targetPort: 4000
+  to:
+    kind: Service
+    name: supergraph-service

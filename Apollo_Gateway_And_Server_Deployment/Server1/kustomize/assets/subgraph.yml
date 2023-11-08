@@ -1,0 +1,51 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: subgraph-products
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: subgraph-products
+  template:
+    metadata:
+      labels:
+        app: subgraph-products
+    spec:
+      containers:
+        - name: subgraph-products
+          image: marbwoulret/apollo-subgraph-products:latest
+          ports:
+            - containerPort: 8080
+          resources:
+            limits:
+              memory: "30Mi"
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: subgraph-products-service
+  annotations:
+    description: Exposes and load balances the application pods
+  labels:
+    app: subgraph-products
+spec:
+  ports:
+    - name: http
+      port: 8080
+      targetPort: 8080
+  selector:
+    app: subgraph-products
+---
+kind: Route
+apiVersion: route.openshift.io/v1
+metadata:
+  name: subgraph-products-route
+  labels:
+    app: subgraph-products
+spec:
+  port:
+    targetPort: 8080
+  to:
+    kind: Service
+    name: subgraph-products-service
