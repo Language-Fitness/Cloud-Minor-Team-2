@@ -14,22 +14,22 @@ spec:
     spec:
       containers:
         - name: supergraph
-          image: marbwoulret/apollo-supergraph:latest
-          command: [ "npm", "install" ]
-          securityContext:
-            runAsNonRoot: true
-          volumeMounts:
-            - name: app-code
-              mountPath: /app
-          workingDir: /app
+          image: quay.io/bramterlouw/apollo-supergraph:latest
+#          command: [ "npm", "install" ]
+#          securityContext:
+#            runAsNonRoot: true
+#          volumeMounts:
+#            - name: app-code
+#              mountPath: /app
+#          workingDir: /app
           ports:
             - containerPort: 4000
           resources:
             limits:
               memory: "100Mi"
-      volumes:
-        - name: app-code
-          emptyDir: { }
+#      volumes:
+#        - name: app-code
+#          emptyDir: { }
 ---
 kind: Service
 apiVersion: v1
