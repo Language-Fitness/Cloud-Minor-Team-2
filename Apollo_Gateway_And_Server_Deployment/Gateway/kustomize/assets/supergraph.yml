@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: supergraph
-          image: quay.io/bramterlouw/apollo-supergraph:permissions2
+          image: quay.io/bramterlouw/apollo-supergraph:latest
           ports:
             - containerPort: 4000
           resources:

@@ -21,13 +21,9 @@ directive @link(url: String, as: String, for: link__Purpose, import: [link__Impo
 
 scalar join__FieldSet
 
-#enum join__Graph {
-#    PRODUCTS @join__graph(name: "products", url: "subgraph-service-1-service/query")
-#}
-
 enum join__Graph {
-PRODUCTS @join__graph(name: "products", url: "http://host.docker.internal:8080/query")
-CUSTOMERS @join__graph(name: "customers", url: "http://host.docker.internal:8081/query")
+PRODUCTS @join__graph(name: "products", url: "http://subgraph-products-service:8080/query")
+CUSTOMERS @join__graph(name: "customers", url: "http://subgraph-customers-service:8081/query")
 }
 
 scalar link__Import

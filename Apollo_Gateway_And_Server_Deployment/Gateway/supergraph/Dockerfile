@@ -2,7 +2,9 @@ FROM node:20-alpine
 
 WORKDIR /app
 
-COPY supergraph/package*.json ./
+ENV NPM_CONFIG_CACHE=/app/.npm
+
+COPY package*.json ./
 
 #RUN npm config set cache ./cache
 RUN npm install
@@ -11,7 +13,7 @@ RUN npm install
 #RUN npm cache clean --force
 #RUN npm cache verify
 
-COPY supergraph/ .
+COPY . .
 
 EXPOSE 4000
 

@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: subgraph-products
-          image: marbwoulret/apollo-subgraph-products:latest
+          image: quay.io/bramterlouw/apollo-subgraph-products:latest
           ports:
             - containerPort: 8080
           resources:

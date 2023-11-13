@@ -5,11 +5,13 @@ RUN apk update && apk upgrade && \
 
 WORKDIR /app
 
-COPY subgraph/go.mod subgraph/go.sum ./
+COPY go.mod go.sum ./
+#COPY subgraph/go.mod subgraph/go.sum ./
 
 RUN go mod download
 
-COPY subgraph/ .
+COPY . .
+#COPY subgraph/ .
 
 EXPOSE 8080
 
