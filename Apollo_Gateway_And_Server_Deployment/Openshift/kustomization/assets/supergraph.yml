@@ -19,7 +19,7 @@ spec:
             - containerPort: 4000
           resources:
             limits:
-              memory: "100Mi"
+              memory: "250Mi"
 ---
 kind: HorizontalPodAutoscaler
 apiVersion: autoscaling/v1
