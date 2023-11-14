@@ -1,0 +1,23 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: bramterlouw-dev
+
+resources:
+  - assets/supergraph.yml
+  - assets/subgraph-products.yml
+  - assets/subgraph-customers.yml
+
+images:
+  - name: apollo-supergraph
+    newName: quay.io/bramterlouw/apollo-supergraph
+    newTag: latest
+  - name: apollo-subgraph-products
+    newName: quay.io/bramterlouw/apollo-subgraph-products
+    newTag: latest
+  - name: apollo-subgraph-products
+    newName: quay.io/bramterlouw/apollo-subgraph-customers
+    newTag: latest
+
+#patches:
+#  - assets/nodejs-imagestream-patch.yml

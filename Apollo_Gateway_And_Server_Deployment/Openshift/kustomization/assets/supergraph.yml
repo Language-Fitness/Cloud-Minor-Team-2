@@ -1,19 +1,19 @@
 kind: Deployment
 apiVersion: apps/v1
 metadata:
-  name: supergraph
+  name: apollo-supergraph
 spec:
-  replicas: 1
+  replicas: 2
   selector:
     matchLabels:
-      app: supergraph
+      app: apollo-supergraph
   template:
     metadata:
       labels:
-        app: supergraph
+        app: apollo-supergraph
     spec:
       containers:
-        - name: supergraph
+        - name: apollo-supergraph
           image: quay.io/bramterlouw/apollo-supergraph:latest
           ports:
             - containerPort: 4000
@@ -24,28 +24,28 @@ spec:
 kind: Service
 apiVersion: v1
 metadata:
-  name: supergraph-service
+  name: apollo-supergraph-service
   annotations:
     description: Exposes and load balances the application pods
   labels:
-    app: supergraph
+    app: apollo-supergraph
 spec:
   ports:
     - name: http
       port: 4000
       targetPort: 4000
   selector:
-    app: supergraph
+    app: apollo-supergraph
 ---
 kind: Route
 apiVersion: route.openshift.io/v1
 metadata:
-  name: supergraph-route
+  name: apollo-supergraph-route
   labels:
-    app: supergraph
+    app: apollo-supergraph
 spec:
   port:
     targetPort: 4000
   to:
     kind: Service
-    name: supergraph-service
+    name: apollo-supergraph-service
