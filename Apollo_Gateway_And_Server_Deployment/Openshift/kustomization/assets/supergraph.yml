@@ -21,6 +21,21 @@ spec:
             limits:
               memory: "100Mi"
 ---
+kind: HorizontalPodAutoscaler
+apiVersion: autoscaling/v1
+metadata:
+  labels:
+    app: apollo-supergraph
+  name: apollo-supergraph-hpa
+spec:
+  maxReplicas: 5
+  minReplicas: 2
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: apollo-supergraph
+  targetCPUUtilizationPercentage: 20
+---
 kind: Service
 apiVersion: v1
 metadata:

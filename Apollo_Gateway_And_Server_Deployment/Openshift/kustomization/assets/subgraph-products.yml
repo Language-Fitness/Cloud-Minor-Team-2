@@ -21,6 +21,21 @@ spec:
             limits:
               memory: "30Mi"
 ---
+kind: HorizontalPodAutoscaler
+apiVersion: autoscaling/v1
+metadata:
+  labels:
+    app: apollo-subgraph-products
+  name: apollo-subgraph-products-hpa
+spec:
+  maxReplicas: 2
+  minReplicas: 1
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: apollo-subgraph-products
+  targetCPUUtilizationPercentage: 20
+---
 kind: Service
 apiVersion: v1
 metadata:
