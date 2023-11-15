@@ -6,12 +6,30 @@ package graph
 
 import (
 	"context"
+	"errors"
 	"example/graph/model"
+	"github.com/google/uuid"
+	"time"
 )
 
 // CreateResult is the resolver for the createResult field.
 func (r *mutationResolver) CreateResult(ctx context.Context, input *model.NewResult) (*model.Result, error) {
-	return nil, nil
+
+	newResult := &model.Result{
+		ID:          uuid.New().String(),
+		ExerciseID:  input.ExerciseID,
+		UserID:      input.UserID,
+		ClassID:     input.ClassID,
+		ModuleID:    input.ModuleID,
+		Input:       input.Input,
+		Result:      input.Result,
+		CreatedAt:   time.Now().String(),
+		SoftDeleted: false,
+	}
+
+	r.results = append(r.results, newResult)
+
+	return newResult, nil
 }
 
 // GetModuleByID is the resolver for the getModuleById field.
@@ -20,7 +38,12 @@ func (r *queryResolver) GetModuleByID(ctx context.Context, id string) (*model.Mo
 		r.init()
 	}
 
-	return nil, nil
+	for _, obj := range r.modules {
+		if obj.ID == id {
+			return obj, nil
+		}
+	}
+	return nil, errors.New("no module wound with this id")
 }
 
 // GetAllModules is the resolver for the getAllModules field.
@@ -38,7 +61,12 @@ func (r *queryResolver) GetClassByID(ctx context.Context, id string) (*model.Cla
 		r.init()
 	}
 
-	return nil, nil
+	for _, obj := range r.classes {
+		if obj.ID == id {
+			return obj, nil
+		}
+	}
+	return nil, errors.New("no class wound with this id")
 }
 
 // GetAllClasses is the resolver for the getAllClasses field.
@@ -55,8 +83,12 @@ func (r *queryResolver) GetExerciseByID(ctx context.Context, id string) (*model.
 	if len(r.exercises) == 0 {
 		r.init()
 	}
-
-	return nil, nil
+	for _, obj := range r.exercises {
+		if obj.ID == id {
+			return obj, nil
+		}
+	}
+	return nil, errors.New("no exercise wound with this id")
 }
 
 // GetAllExercises is the resolver for the getAllExercises field.
