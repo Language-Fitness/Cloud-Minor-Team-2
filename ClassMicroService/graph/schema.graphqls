@@ -1,0 +1,32 @@
+# GraphQL schema example
+#
+# https://gqlgen.com/getting-started/
+
+type Class {
+  id: ID!
+  module_Id: ID!
+  name: String!
+  description: String
+  difficulty: Int
+  created_at: String
+  updated_at: String
+  soft_deleted: Boolean
+}
+
+type Query {
+  getClass(id: ID!): Class
+  listClasses: [Class]
+}
+
+type Mutation {
+  createClass(input: ClassInput!): Class
+  updateClass(id: ID!, input: ClassInput!): Class
+  deleteClass(id: ID!): ID
+}
+
+input ClassInput {
+  module_Id: ID!
+  name: String!
+  description: String
+  difficulty: Int
+}
