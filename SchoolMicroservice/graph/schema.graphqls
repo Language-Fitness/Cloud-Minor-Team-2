@@ -1,0 +1,28 @@
+# GraphQL schema example
+#
+# https://gqlgen.com/getting-started/
+
+type School {
+  id: ID!
+  name: String!
+  location: String
+  created_at: String
+  updated_at: String
+  soft_deleted: Boolean
+}
+
+type Query {
+  getSchool(id: ID!): School
+  listSchools: [School]
+}
+
+type Mutation {
+  createSchool(input: SchoolInput!): School
+  updateSchool(id: ID!, input: SchoolInput!): School
+  deleteSchool(id: ID!): ID
+}
+
+input SchoolInput {
+  name: String!
+  location: String
+}
