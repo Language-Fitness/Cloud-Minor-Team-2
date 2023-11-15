@@ -1,0 +1,87 @@
+# GraphQL schema example
+#
+# https://gqlgen.com/getting-started/
+
+type Module {
+  id: ID!
+  name: String!
+  description: String!
+  difficulty: Float!
+  category: String!
+  made_by: ID!
+  private: Boolean!
+  key: String!
+  created_at: String!
+  updated_at: String!
+  soft_deleted: Boolean!
+}
+
+
+type Class {
+  id: ID!
+  module_Id: ID!
+  name: String!
+  description: String!
+  difficulty: Float!
+  created_at: String!
+  updated_at: String!
+  soft_deleted: Boolean!
+}
+
+type Exercise {
+  id: ID!
+  class_Id: ID!
+  name: String!
+  question: String!
+  answer: String!
+  question_type_id: ID!
+  difficulty: Float!
+  created_at: String!
+  updated_at: String!
+  soft_deleted: Boolean!
+}
+
+type Result {
+  id: ID!
+  exercise_id: ID!
+  user_id: ID!
+  class_id: ID!
+  module_id: ID!
+  input: String!
+  result: String!
+  created_at: String!
+  updated_at: String!
+  soft_deleted: Boolean!
+}
+
+type LeaderboardRow {
+  id: ID!
+  name: String!
+  rating: Int!
+  position: Int!
+}
+
+type Query {
+  getModuleById(id: ID!): Module
+  getAllModules: [Module]
+  getClassById(id: ID!): Class
+  getAllClasses: [Class]
+  getExerciseById(id: ID!): Exercise
+  getAllExercises: [Exercise]
+  getAllResults: [Result]
+  getLeaderBord: [LeaderboardRow]
+}
+
+input NewResult {
+  exercise_id: ID!
+  user_id: ID!
+  class_id: ID!
+  module_id: ID!
+  input: String!
+  result: String!
+}
+
+type Mutation {
+  createResult(input: NewResult): Result!
+}
+
