@@ -1,0 +1,36 @@
+# GraphQL schema example
+#
+# https://gqlgen.com/getting-started/
+
+type Result {
+    id: ID!
+    exercise_id: ID!
+    user_id: ID!
+    class_id: ID!
+    module_id: ID!
+    input: String!
+    result: String!
+    created_at: String!
+    updated_at: String!
+    soft_deleted: Boolean!
+}
+
+input InputResult {
+    exercise_id: ID!
+    user_id: ID!
+    class_id: ID!
+    module_id: ID!
+    input: String!
+    result: String!
+}
+
+type Query {
+    GetResultByExercise(exercise_id: ID!): Result
+    GetResultsByClass(class_id: ID!): [Result]
+}
+
+type Mutation {
+    CreateResult(input: InputResult!): Result
+    UpdateResult(id: ID!, input: InputResult!): Result
+    DeleteResult(id: ID!): Result
+}
