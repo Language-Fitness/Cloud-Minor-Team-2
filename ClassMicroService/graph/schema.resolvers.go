@@ -12,7 +12,17 @@ import (
 
 // CreateClass is the resolver for the createClass field.
 func (r *mutationResolver) CreateClass(ctx context.Context, input model.ClassInput) (*model.Class, error) {
-	panic(fmt.Errorf("not implemented: CreateClass - createClass"))
+	//headers := ctx.Value("headers").(http.Header)
+	//
+	//// Access tokens from the headers, e.g., for Bearer token
+	//accessToken := headers.Get("Authorization")
+
+	class, err := r.Service.CreateClass(input)
+	if err != nil {
+		return nil, err
+	}
+
+	return class, nil
 }
 
 // UpdateClass is the resolver for the updateClass field.

@@ -15,7 +15,7 @@ import (
 // Implements five CRUD methods for query's and mutations on Module.
 type IModuleService interface {
 	CreateModule(newModule model.ModuleInput) (*model.Module, error)
-	UpdateModule(id string, updatedModule model.Module) (*model.Module, error)
+	UpdateModule(id string, updateData model.ModuleInput) (*model.Module, error)
 	DeleteModule(id string) error
 	GetModuleById(id string) (*model.Module, error)
 	ListModules() ([]*model.Module, error)
@@ -40,15 +40,13 @@ func NewModuleService() IModuleService {
 }
 
 func (m *ModuleService) CreateModule(newModule model.ModuleInput) (*model.Module, error) {
-	m.ValidateModule(
-		newModule.Name,
-		newModule.Description,
-		newModule.Difficulty,
-		newModule.Category,
-		newModule.MadeBy,
-		newModule.Private,
-		newModule.Key,
-	)
+	m.Validator.Validate(newModule.Name, []string{"IsString", "Length:<25"})
+	m.Validator.Validate(*newModule.Description, []string{"IsString", "Length:<50"})
+	m.Validator.Validate(*newModule.Difficulty, []string{"IsInt"})
+	m.Validator.Validate(*newModule.Category, []string{"IsString"})
+	m.Validator.Validate(*newModule.MadeBy, []string{"IsUUID"})
+	m.Validator.Validate(*newModule.Private, []string{"IsBoolean"})
+	m.Validator.Validate(*newModule.Key, []string{"IsString", "Length:<30"})
 
 	validationErrors := m.Validator.GetErrors()
 	if len(validationErrors) > 0 {
@@ -80,16 +78,14 @@ func (m *ModuleService) CreateModule(newModule model.ModuleInput) (*model.Module
 	return result, nil
 }
 
-func (m *ModuleService) UpdateModule(id string, updatedModule model.Module) (*model.Module, error) {
-	m.ValidateModule(
-		updatedModule.Name,
-		updatedModule.Description,
-		updatedModule.Difficulty,
-		updatedModule.Category,
-		updatedModule.MadeBy,
-		updatedModule.Private,
-		updatedModule.Key,
-	)
+func (m *ModuleService) UpdateModule(id string, updateData model.ModuleInput) (*model.Module, error) {
+	m.Validator.Validate(updateData.Name, []string{"IsString", "Length:<25"})
+	m.Validator.Validate(*updateData.Description, []string{"IsString", "Length:<50"})
+	m.Validator.Validate(*updateData.Difficulty, []string{"IsInt"})
+	m.Validator.Validate(*updateData.Category, []string{"IsString"})
+	m.Validator.Validate(*updateData.MadeBy, []string{"IsUUID"})
+	m.Validator.Validate(*updateData.Private, []string{"IsBoolean"})
+	m.Validator.Validate(*updateData.Key, []string{"IsString", "Length:<30"})
 
 	validationErrors := m.Validator.GetErrors()
 	if len(validationErrors) > 0 {
@@ -97,10 +93,27 @@ func (m *ModuleService) UpdateModule(id string, updatedModule model.Module) (*mo
 		return nil, errors.New(errorMessage)
 	}
 
-	timestamp := time.Now().String()
-	updatedModule.UpdatedAt = &timestamp
+	existingModule, err := m.Repo.GetModuleByID(id)
+	if err != nil {
+		return nil, err
+	}
 
-	result, err := m.Repo.UpdateModule(id, updatedModule)
+	timestamp := time.Now().String()
+	newModule := model.Module{
+		ID:          existingModule.ID,
+		Name:        updateData.Name,
+		Description: updateData.Description,
+		Difficulty:  updateData.Difficulty,
+		Category:    updateData.Category,
+		MadeBy:      updateData.MadeBy,
+		Private:     updateData.Private,
+		Key:         updateData.Key,
+		CreatedAt:   existingModule.CreatedAt,
+		UpdatedAt:   &timestamp,
+		SoftDeleted: existingModule.SoftDeleted,
+	}
+
+	result, err := m.Repo.UpdateModule(id, newModule)
 	if err != nil {
 		return nil, err
 	}
@@ -152,22 +165,4 @@ func (m *ModuleService) ListModules() ([]*model.Module, error) {
 	}
 
 	return modules, nil
-}
-
-func (m *ModuleService) ValidateModule(
-	name string,
-	description *string,
-	difficulty *int,
-	category *string,
-	madeBy *string,
-	private *bool,
-	key *string,
-) {
-	m.Validator.Validate(name, []string{"IsString", "Length:<25"})
-	m.Validator.Validate(description, []string{"IsString", "Length:<50"})
-	m.Validator.Validate(difficulty, []string{"IsInt"})
-	m.Validator.Validate(category, []string{"IsString"})
-	m.Validator.Validate(madeBy, []string{"IsUUID"})
-	m.Validator.Validate(private, []string{"IsBoolean"})
-	m.Validator.Validate(key, []string{"IsString", "Length:<30"})
 }

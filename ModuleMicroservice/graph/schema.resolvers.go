@@ -11,7 +11,6 @@ import (
 
 // CreateModule is the resolver for the createModule field.
 func (r *mutationResolver) CreateModule(ctx context.Context, input model.ModuleInput) (*model.Module, error) {
-
 	//headers := ctx.Value("headers").(http.Header)
 	//
 	//// Access tokens from the headers, e.g., for Bearer token
