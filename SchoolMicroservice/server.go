@@ -2,6 +2,7 @@ package main
 
 import (
 	"example/graph"
+	"github.com/joho/godotenv"
 	"log"
 	"net/http"
 	"os"
@@ -10,7 +11,7 @@ import (
 	"github.com/99designs/gqlgen/graphql/playground"
 )
 
-const defaultPort = "8080"
+const defaultPort = "8083"
 
 func main() {
 	port := os.Getenv("PORT")
@@ -18,7 +19,16 @@ func main() {
 		port = defaultPort
 	}
 
-	srv := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{}}))
+	if err := godotenv.Load(); err != nil {
+		log.Fatal("Error loading .env file")
+	}
+
+	//err := CreateNewKeyCloakUser()
+	//if err != nil {
+	//	return
+	//}
+
+	srv := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{Resolvers: graph.NewResolver()}))
 
 	http.Handle("/", playground.Handler("GraphQL playground", "/query"))
 	http.Handle("/query", srv)

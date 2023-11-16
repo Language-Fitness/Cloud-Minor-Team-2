@@ -7,32 +7,62 @@ package graph
 import (
 	"context"
 	"example/graph/model"
-	"fmt"
 )
 
 // CreateSchool is the resolver for the createSchool field.
 func (r *mutationResolver) CreateSchool(ctx context.Context, input model.SchoolInput) (*model.School, error) {
-	panic(fmt.Errorf("not implemented: CreateSchool - createSchool"))
+	//headers := ctx.Value("headers").(http.Header)
+	//
+	//// Access tokens from the headers, e.g., for Bearer token
+	//accessToken := headers.Get("Authorization")
+
+	school, err := r.Service.CreateSchool(input)
+	if err != nil {
+		return nil, err
+	}
+
+	return school, nil
 }
 
 // UpdateSchool is the resolver for the updateSchool field.
 func (r *mutationResolver) UpdateSchool(ctx context.Context, id string, input model.SchoolInput) (*model.School, error) {
-	panic(fmt.Errorf("not implemented: UpdateSchool - updateSchool"))
+	school, err := r.Service.UpdateSchool(id, input)
+	if err != nil {
+		return nil, err
+	}
+
+	return school, nil
 }
 
 // DeleteSchool is the resolver for the deleteSchool field.
 func (r *mutationResolver) DeleteSchool(ctx context.Context, id string) (*string, error) {
-	panic(fmt.Errorf("not implemented: DeleteSchool - deleteSchool"))
+	err := r.Service.DeleteSchool(id)
+	if err != nil {
+		return nil, err
+	}
+
+	return &id, nil
 }
 
 // GetSchool is the resolver for the getSchool field.
 func (r *queryResolver) GetSchool(ctx context.Context, id string) (*model.School, error) {
-	panic(fmt.Errorf("not implemented: GetSchool - getSchool"))
+	school, err := r.Service.GetSchoolById(id)
+	if err != nil {
+		return nil, err
+	}
+
+	return school, nil
 }
 
 // ListSchools is the resolver for the listSchools field.
 func (r *queryResolver) ListSchools(ctx context.Context) ([]*model.School, error) {
-	panic(fmt.Errorf("not implemented: ListSchools - listSchools"))
+	// Retrieve a list of all modules using the repository.
+	schools, err := r.Service.ListSchools()
+	if err != nil {
+		return nil, err
+	}
+
+	return schools, nil
 }
 
 // Mutation returns MutationResolver implementation.
