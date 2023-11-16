@@ -1,0 +1,37 @@
+# GraphQL schema example
+#
+# https://gqlgen.com/getting-started/
+
+type Exercise {
+  id: ID!
+  class_Id: ID!
+  name: String!
+  question: String!
+  answers: String!
+  pos_correct_answer: Int!
+  question_type_id: ID!
+  difficulty: Float!
+  created_at: String!
+  updated_at: String!
+  soft_deleted: Boolean!
+}
+
+input ExerciseInput {
+  class_Id: ID!
+  name: String!
+  question: String!
+  answers: String!
+  pos_correct_answer: Int!
+  question_type_id: ID!
+  difficulty: Float!
+}
+
+type Query {
+  GetExerciseByModuleId(moduleId: ID!): [Exercise]
+}
+
+type Mutation {
+  AddExercise(exercise: ExerciseInput!): Exercise
+  UpdateExercise(exercise: ExerciseInput!): Exercise
+  DeleteExercise(id: ID!): Exercise
+}
