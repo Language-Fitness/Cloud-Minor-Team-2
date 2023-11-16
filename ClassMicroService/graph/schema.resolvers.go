@@ -7,7 +7,6 @@ package graph
 import (
 	"context"
 	"example/graph/model"
-	"fmt"
 )
 
 // CreateClass is the resolver for the createClass field.
@@ -27,22 +26,43 @@ func (r *mutationResolver) CreateClass(ctx context.Context, input model.ClassInp
 
 // UpdateClass is the resolver for the updateClass field.
 func (r *mutationResolver) UpdateClass(ctx context.Context, id string, input model.ClassInput) (*model.Class, error) {
-	panic(fmt.Errorf("not implemented: UpdateClass - updateClass"))
+	class, err := r.Service.UpdateClass(id, input)
+	if err != nil {
+		return nil, err
+	}
+
+	return class, nil
 }
 
 // DeleteClass is the resolver for the deleteClass field.
 func (r *mutationResolver) DeleteClass(ctx context.Context, id string) (*string, error) {
-	panic(fmt.Errorf("not implemented: DeleteClass - deleteClass"))
+	err := r.Service.DeleteClass(id)
+	if err != nil {
+		return nil, err
+	}
+
+	return &id, nil
 }
 
 // GetClass is the resolver for the getClass field.
 func (r *queryResolver) GetClass(ctx context.Context, id string) (*model.Class, error) {
-	panic(fmt.Errorf("not implemented: GetClass - getClass"))
+	class, err := r.Service.GetClassById(id)
+	if err != nil {
+		return nil, err
+	}
+
+	return class, nil
 }
 
 // ListClasses is the resolver for the listClasses field.
 func (r *queryResolver) ListClasses(ctx context.Context) ([]*model.Class, error) {
-	panic(fmt.Errorf("not implemented: ListClasses - listClasses"))
+	// Retrieve a list of all modules using the repository.
+	classes, err := r.Service.ListClasses()
+	if err != nil {
+		return nil, err
+	}
+
+	return classes, nil
 }
 
 // Mutation returns MutationResolver implementation.

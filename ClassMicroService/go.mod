@@ -5,6 +5,7 @@ go 1.21.0
 require (
 	github.com/99designs/gqlgen v0.17.40
 	github.com/google/uuid v1.3.0
+	github.com/joho/godotenv v1.5.1
 	github.com/vektah/gqlparser/v2 v2.5.10
 	go.mongodb.org/mongo-driver v1.13.0
 )

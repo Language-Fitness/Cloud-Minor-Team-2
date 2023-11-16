@@ -15,7 +15,7 @@ import (
 // Implements five CRUD methods for query's and mutations on Class.
 type IClassService interface {
 	CreateClass(newClass model.ClassInput) (*model.Class, error)
-	UpdateClass(id string, updatedClass model.Class) (*model.Class, error)
+	UpdateClass(id string, updatedData model.ClassInput) (*model.Class, error)
 	DeleteClass(id string) error
 	GetClassById(id string) (*model.Class, error)
 	ListClasses() ([]*model.Class, error)
@@ -40,12 +40,10 @@ func NewClassService() IClassService {
 }
 
 func (c *ClassService) CreateClass(newClass model.ClassInput) (*model.Class, error) {
-	c.ValidateClass(
-		newClass.ModuleID,
-		newClass.Name,
-		newClass.Description,
-		newClass.Difficulty,
-	)
+	c.Validator.Validate(newClass.ModuleID, []string{"isUUID"})
+	c.Validator.Validate(newClass.Name, []string{"IsString", "Length:<25"})
+	c.Validator.Validate(*newClass.Description, []string{"IsString", "Length:<50"})
+	c.Validator.Validate(*newClass.Difficulty, []string{"IsInt"})
 
 	validationErrors := c.Validator.GetErrors()
 	if len(validationErrors) > 0 {
@@ -75,13 +73,11 @@ func (c *ClassService) CreateClass(newClass model.ClassInput) (*model.Class, err
 	return result, nil
 }
 
-func (c *ClassService) UpdateClass(id string, updatedClass model.Class) (*model.Class, error) {
-	c.ValidateClass(
-		updatedClass.ModuleID,
-		updatedClass.Name,
-		updatedClass.Description,
-		updatedClass.Difficulty,
-	)
+func (c *ClassService) UpdateClass(id string, updatedData model.ClassInput) (*model.Class, error) {
+	c.Validator.Validate(updatedData.ModuleID, []string{"isUUID"})
+	c.Validator.Validate(updatedData.Name, []string{"IsString", "Length:<25"})
+	c.Validator.Validate(*updatedData.Description, []string{"IsString", "Length:<50"})
+	c.Validator.Validate(*updatedData.Difficulty, []string{"IsInt"})
 
 	validationErrors := c.Validator.GetErrors()
 	if len(validationErrors) > 0 {
@@ -89,10 +85,24 @@ func (c *ClassService) UpdateClass(id string, updatedClass model.Class) (*model.
 		return nil, errors.New(errorMessage)
 	}
 
-	timestamp := time.Now().String()
-	updatedClass.UpdatedAt = &timestamp
+	existingClass, err := c.Repo.GetClassByID(id)
+	if err != nil {
+		return nil, err
+	}
 
-	result, err := c.Repo.UpdateClass(id, updatedClass)
+	timestamp := time.Now().String()
+	newClass := model.Class{
+		ID:          existingClass.ID,
+		ModuleID:    updatedData.ModuleID,
+		Name:        updatedData.Name,
+		Description: updatedData.Description,
+		Difficulty:  updatedData.Difficulty,
+		CreatedAt:   existingClass.CreatedAt,
+		UpdatedAt:   &timestamp,
+		SoftDeleted: existingClass.SoftDeleted,
+	}
+
+	result, err := c.Repo.UpdateClass(id, newClass)
 	if err != nil {
 		return nil, err
 	}
@@ -144,16 +154,4 @@ func (c *ClassService) ListClasses() ([]*model.Class, error) {
 	}
 
 	return classes, nil
-}
-
-func (c *ClassService) ValidateClass(
-	classId string,
-	name string,
-	description *string,
-	difficulty *int,
-) {
-	c.Validator.Validate(classId, []string{"isUUID"})
-	c.Validator.Validate(name, []string{"IsString", "Length:<25"})
-	c.Validator.Validate(description, []string{"IsString", "Length:<50"})
-	c.Validator.Validate(difficulty, []string{"IsInt"})
 }

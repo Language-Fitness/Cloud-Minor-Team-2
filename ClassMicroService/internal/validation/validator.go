@@ -72,5 +72,5 @@ func (v *Validator) GetErrors() []string {
 }
 
 func (v *Validator) ClearErrors() {
-	v.ClearErrors()
+	v.errors = []string{}
 }
