@@ -140,7 +140,7 @@ func (c *SchoolService) GetSchoolById(id string) (*model.School, error) {
 }
 
 func (c *SchoolService) ListSchools() ([]*model.School, error) {
-	Schools, err := c.Repo.ListSchooles()
+	Schools, err := c.Repo.ListSchools()
 	if err != nil {
 		return nil, err
 	}

@@ -16,7 +16,7 @@ type ISchoolRepository interface {
 	UpdateSchool(id string, updatedSchool model.School) (*model.School, error)
 	DeleteSchoolByID(id string) error
 	GetSchoolByID(id string) (*model.School, error)
-	ListSchooles() ([]*model.School, error)
+	ListSchools() ([]*model.School, error)
 }
 
 // SchoolRepository GOLANG STRUCT
@@ -114,7 +114,7 @@ func (r *SchoolRepository) GetSchoolByID(id string) (*model.School, error) {
 	return &result, nil
 }
 
-func (r *SchoolRepository) ListSchooles() ([]*model.School, error) {
+func (r *SchoolRepository) ListSchools() ([]*model.School, error) {
 	ctx, cancel := context.WithTimeout(context.TODO(), time.Second*10) // 10-second timeout
 	defer cancel()
 
