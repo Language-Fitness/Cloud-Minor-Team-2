@@ -1,4 +1,4 @@
-package custom_erros
+package errors
 
 type ValidationError struct {
 	BaseError
