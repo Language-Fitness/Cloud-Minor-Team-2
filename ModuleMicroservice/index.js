@@ -1,7 +1,7 @@
 const keycloakServer = 'http://localhost:8888';
 const realm = 'master';
 const adminClientId = 'admin-cli';
-const adminClientSecret = 'ZAB5bv3MNozsfqwmQk2SBzW5WJx109zi';
+const adminClientSecret = 'NrOhJkHCMnBIIOLfVJoH3QAhQToZnzkE';
 
 // Token endpoint URL
 const tokenEndpoint = `${keycloakServer}/realms/${realm}/protocol/openid-connect/token`;
@@ -17,19 +17,8 @@ const newClientData = {
     // Add any other client configuration properties as needed
 };
 
-const roleMappings = [
-    {
-        "id": "7ba71403-d558-47f0-99ef-816bea558f6b",
-        "name": "view-authorization",
-        "description": "${role_view-authorization}",
-        "composite": false,
-        "clientRole": true,
-        "containerId": "c54f8d0f-4510-40db-8bac-fb13aef90d74"
-    },
-];
-
 // Make the fetch request
-function loginAsAdminWithTheAdminCli() {
+async function loginAsAdminWithTheAdminCli() {
     const requestData = {
         method: 'POST',
         headers: {
@@ -38,46 +27,30 @@ function loginAsAdminWithTheAdminCli() {
         body: `grant_type=client_credentials&client_id=${adminClientId}&client_secret=${adminClientSecret}`,
     };
 
-    // Return a Promise for the access token
-    return fetch(tokenEndpoint, requestData)
-        .then(response => response.json())
-        .then(data => {
-            return data.access_token;
-        })
-        .catch(error => {
-            // Handle errors
-            console.error('Error:', error);
-            throw error; // Re-throw the error to propagate it to the caller
-        });
+    const response = await fetch(tokenEndpoint, requestData);
+    const data = await response.json();
+    return data.access_token;
 }
+
 
 async function init() {
     const token = await loginAsAdminWithTheAdminCli()
     await createRealm(token, realmName)
     await createClientInRealm(token, realmName, newClientData);
-    const serviceAccount = await getServiceAccountUser(token, realmName, newClientData.clientId)
 
-    // console.log(serviceAccount);
-
-    // return;
-    // await getAllRolesInRealm(token, realmName)
-    const clients = await getAllClientsInRealm(token, realmName)
-
+    const serviceAccount        = await getServiceAccountUser(token, realmName, newClientData.clientId)
+    const clients               = await getAllClientsInRealm(token, realmName)
     const realmManagementClient = clients.find(client => client.clientId === 'realm-management');
-    const roles = await getAllClientRolesInRealm(token, realmName, realmManagementClient.id);
-    const manageUsersRole = roles.find(role => role.name === 'manage-realm');
-    const roleArr = [manageUsersRole]
+    const roles                 = await getAllClientRolesInRealm(token, realmName, realmManagementClient.id);
+    const manageUsersRole       = roles.find(role => role.name === 'manage-realm');
+    const roleArr               = [manageUsersRole]
 
     await addRoleMappingsToUser(token, realmName, serviceAccount.id, realmManagementClient.id, roleArr)
-    // await getAuthenticationConfigDescription(token, realmName)
-    // await getRealmManagementAccessToken(token, realmName)
-
-    // GET /admin/realms/{realm}/clients/{id}/client-secret
 }
 
 init().then(r => console.log('finished'));
 
-function createClientInRealm(accessToken, realmName, newClientData) {
+async function createClientInRealm(accessToken, realmName, newClientData) {
     const adminApiEndpoint = `${keycloakServer}/admin/realms/${realmName}/clients`;
 
     // Request parameters
@@ -91,26 +64,10 @@ function createClientInRealm(accessToken, realmName, newClientData) {
     };
 
     // Return a Promise for the created client data
-    return fetch(adminApiEndpoint, requestData)
-        .then(response => {
-            if (!response.ok) {
-                throw new Error(`Failed to create client: ${response.status} - ${response.statusText}`);
-            }
-            return response.json();
-        })
-        .then(createdClientData => {
-            // Handle the response from the Keycloak Admin REST API
-            console.log('Client Created:', createdClientData);
-            return createdClientData;
-        })
-        .catch(error => {
-            // Handle errors
-            console.error('Error creating client:', error);
-            throw error; // Re-throw the error to propagate it to the caller
-        });
+    await fetch(adminApiEndpoint, requestData)
 }
 
-function createRealm(accessToken, newRealmName) {
+async function createRealm(accessToken, newRealmName) {
     const adminApiEndpoint = `${keycloakServer}/admin/realms`;
 
     // New realm data (adjust as needed)
@@ -130,93 +87,10 @@ function createRealm(accessToken, newRealmName) {
     };
 
     // Return a Promise for the created realm data
-    return fetch(adminApiEndpoint, requestData)
-        .then(response => {
-            if (!response.ok) {
-                throw new Error(`Failed to create realm: ${response.status} - ${response.statusText}`);
-            }
-            return response.json();
-        })
-        .then(createdRealmData => {
-            // Handle the response from the Keycloak Admin REST API
-            console.log('Realm Created:', createdRealmData);
-            return createdRealmData;
-        })
-        .catch(error => {
-            // Handle errors
-            console.error('Error:', error);
-            throw error; // Re-throw the error to propagate it to the caller
-        });
+    await fetch(adminApiEndpoint, requestData)
 }
 
-function getRealmManagementAccessToken(masterAccessToken, targetRealmName) {
-    const tokenEndpoint = `${keycloakServer}/realms/${targetRealmName}/protocol/openid-connect/token`;
-
-    // Request parameters
-    const requestData = {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-            'Authorization': `Bearer ${masterAccessToken}`,
-        },
-        body: `grant_type=client_credentials&client_id=realm-management`,
-    };
-
-    // Return a Promise for the access token
-    return fetch(tokenEndpoint, requestData)
-        .then(response => {
-            if (!response.ok) {
-                throw new Error(`Failed to obtain realm-management access token: ${response.status} - ${response.statusText}`);
-            }
-            return response.json();
-        })
-        .then(data => {
-            // Access token obtained successfully
-            const accessToken = data.access_token;
-
-            // Return the access token
-            return accessToken;
-        })
-        .catch(error => {
-            // Handle errors
-            console.error('Error obtaining realm-management access token:', error);
-            throw error; // Re-throw the error to propagate it to the caller
-        });
-}
-
-function getAuthenticationConfigDescription(adminAccessToken, realmName) {
-    const adminApiEndpoint = `${keycloakServer}/admin/realms/${realmName}/authentication/per-client-config-description`;
-
-    // Request parameters
-    const requestData = {
-        method: 'GET',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${adminAccessToken}`,
-        },
-    };
-
-    // Return a Promise for the response data
-    return fetch(adminApiEndpoint, requestData)
-        .then(response => {
-            if (!response.ok) {
-                throw new Error(`Failed to fetch authentication config description: ${response.status} - ${response.statusText}`);
-            }
-            return response.json();
-        })
-        .then(responseData => {
-            // Handle the response data as needed
-            console.log('Authentication Config Description:', responseData);
-            return responseData;
-        })
-        .catch(error => {
-            // Handle errors
-            console.error('Error fetching authentication config description:', error);
-            throw error; // Re-throw the error to propagate it to the caller
-        });
-}
-
-function getServiceAccountUser(accessToken, realmName, clientId) {
+async function getServiceAccountUser(accessToken, realmName, clientId) {
     const userApiEndpoint = `${keycloakServer}/admin/realms/${realmName}/users`;
 
     // Request parameters
@@ -228,31 +102,14 @@ function getServiceAccountUser(accessToken, realmName, clientId) {
         },
     };
 
-    // Return a Promise for the service account user data
-    return fetch(`${userApiEndpoint}?username=service-account-${clientId}`, requestData)
-        .then(response => {
-            if (!response.ok) {
-                throw new Error(`Failed to get service account user: ${response.status} - ${response.statusText}`);
-            }
-            return response.json();
-        })
-        .then(serviceAccountUserData => {
-            // Handle the response from the Keycloak Admin REST API
-            console.log('Service Account User Data:', serviceAccountUserData);
-            return serviceAccountUserData[0]; // Assuming there is only one user with the given username
-        })
-        .catch(error => {
-            // Handle errors
-            console.error('Error getting service account user:', error);
-            throw error; // Re-throw the error to propagate it to the caller
-        });
+    const response = await fetch(`${userApiEndpoint}?username=service-account-${clientId}`, requestData);
+    const serviceAccountUserData = await response.json();
+    return serviceAccountUserData[0];
 }
 
-function addRoleMappingsToUser(accessToken, realmName, userId, clientId, roleMappings) {
 
+async function addRoleMappingsToUser(accessToken, realmName, userId, clientId, roleMappings) {
     const userRoleMappingApiEndpoint = `${keycloakServer}/admin/realms/${realmName}/users/${userId}/role-mappings/clients/${clientId}`;
-    // /admin/realms/{realm}/users/{id}/role-mappings/clients/{client}
-    // const userRoleMappingApiEndpoint = `${keycloakServer}/admin/realms/${realmName}/users/${userId}/role-mappings/clients/c54f8d0f-4510-40db-8bac-fb13aef90d74`;
 
     // Request parameters for adding role mappings
     const roleMappingRequestData = {
@@ -264,59 +121,11 @@ function addRoleMappingsToUser(accessToken, realmName, userId, clientId, roleMap
         body: JSON.stringify(roleMappings),
     };
 
-    // Return a Promise for the response data
-    return fetch(userRoleMappingApiEndpoint, roleMappingRequestData)
-        .then(response => {
-            if (!response.ok) {
-                throw new Error(`Failed to add role mappings to user: ${response.status} - ${response.statusText}`);
-            }
-            return response.json();
-        })
-        .then(responseData => {
-            // Handle the response from the Keycloak Admin REST API
-            console.log('Role Mappings Added:', responseData);
-            return responseData;
-        })
-        .catch(error => {
-            // Handle errors
-            console.error('Error adding role mappings to user:', error);
-            throw error; // Re-throw the error to propagate it to the caller
-        });
+    const response = await fetch(userRoleMappingApiEndpoint, roleMappingRequestData);
+    return await response.json();
 }
 
-function getAllRolesInRealm(accessToken, realmName) {
-    const rolesApiEndpoint = `${keycloakServer}/admin/realms/${realmName}/roles`;
-
-    // Request parameters for getting all roles
-    const requestData = {
-        method: 'GET',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${accessToken}`,
-        },
-    };
-
-    // Return a Promise for the roles data
-    return fetch(rolesApiEndpoint, requestData)
-        .then(response => {
-            if (!response.ok) {
-                throw new Error(`Failed to get roles in realm: ${response.status} - ${response.statusText}`);
-            }
-            return response.json();
-        })
-        .then(rolesData => {
-            // Handle the response from the Keycloak Admin REST API
-            console.log('Roles in Realm:', rolesData);
-            return rolesData;
-        })
-        .catch(error => {
-            // Handle errors
-            console.error('Error getting roles in realm:', error);
-            throw error; // Re-throw the error to propagate it to the caller
-        });
-}
-
-function getAllClientRolesInRealm(accessToken, realmName, clientId) {
+async function getAllClientRolesInRealm(accessToken, realmName, clientId) {
     const clientRolesApiEndpoint = `${keycloakServer}/admin/realms/${realmName}/clients/${clientId}/roles`;
 
     // Request parameters for getting all client roles
@@ -328,28 +137,11 @@ function getAllClientRolesInRealm(accessToken, realmName, clientId) {
         },
     };
 
-    // Return a Promise for the client roles data
-    return fetch(clientRolesApiEndpoint, requestData)
-        .then(response => {
-            if (!response.ok) {
-                throw new Error(`Failed to get client roles in realm: ${response.status} - ${response.statusText}`);
-            }
-            return response.json();
-        })
-        .then(clientRolesData => {
-            // Handle the response from the Keycloak Admin REST API
-            console.log('Client Roles in Realm:', clientRolesData);
-            return clientRolesData;
-        })
-        .catch(error => {
-            // Handle errors
-            console.error('Error getting client roles in realm:', error);
-            throw error; // Re-throw the error to propagate it to the caller
-        });
+    const response = await fetch(clientRolesApiEndpoint, requestData);
+    return await response.json();
 }
 
-// Function to get all clients in a realm
-function getAllClientsInRealm(accessToken, realmName) {
+async function getAllClientsInRealm(accessToken, realmName) {
     const clientsApiEndpoint = `${keycloakServer}/admin/realms/${realmName}/clients`;
 
     // Request parameters for getting all clients
@@ -361,23 +153,6 @@ function getAllClientsInRealm(accessToken, realmName) {
         },
     };
 
-    // Return a Promise for the clients data
-    return fetch(clientsApiEndpoint, requestData)
-        .then(response => {
-            if (!response.ok) {
-                throw new Error(`Failed to get clients in realm: ${response.status} - ${response.statusText}`);
-            }
-            return response.json();
-        })
-        .then(clientsData => {
-            // Handle the response from the Keycloak Admin REST API
-            console.log('Clients in Realm:', clientsData);
-            return clientsData;
-        })
-        .catch(error => {
-            // Handle errors
-            console.error('Error getting clients in realm:', error);
-            throw error; // Re-throw the error to propagate it to the caller
-        });
+    const response = await fetch(clientsApiEndpoint, requestData);
+    return await response.json();
 }
-
