@@ -6,9 +6,9 @@ import (
 )
 
 func CreateNewKeyCloakUser() error {
-	client := gocloak.NewClient("http://localhost:8080")
+	client := gocloak.NewClient("http://host.docker.internal:8888")
 	ctx := context.Background()
-	token, err := client.LoginAdmin(ctx, "admin", "Pa55w0rd", "master")
+	token, err := client.LoginAdmin(ctx, "admin", "admin", "master")
 	if err != nil {
 		panic(err)
 	}
@@ -21,7 +21,7 @@ func CreateNewKeyCloakUser() error {
 		Username:  gocloak.StringP("CoolGuy"),
 	}
 
-	_, err = client.CreateUser(ctx, token.AccessToken, "realm", user)
+	_, err = client.CreateUser(ctx, token.AccessToken, "master", user)
 	if err != nil {
 		panic("Oh no!, failed to create user :(")
 	}
