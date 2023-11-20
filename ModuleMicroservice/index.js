@@ -1,10 +1,10 @@
-const keycloakServer = 'http://localhost:8888';
-const realm = 'master';
-const adminClientId = 'admin-cli';
+const keycloakServer    = 'http://localhost:8888';
+const realm             = 'master';
+const adminClientId     = 'admin-cli';
 const adminClientSecret = 'NrOhJkHCMnBIIOLfVJoH3QAhQToZnzkE';
+const tokenEndpoint     = `${keycloakServer}/realms/${realm}/protocol/openid-connect/token`;
+const realmName         = 'Test2';
 
-const tokenEndpoint = `${keycloakServer}/realms/${realm}/protocol/openid-connect/token`;
-const realmName = 'Test2';
 const newClientData = {
     clientId: 'demo-client',
     enabled: true,
@@ -14,22 +14,6 @@ const newClientData = {
     serviceAccountsEnabled: true,
     authorizationServicesEnabled: true,
 };
-
-// Make the fetch request
-async function loginAsAdminWithTheAdminCli() {
-    const requestData = {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: `grant_type=client_credentials&client_id=${adminClientId}&client_secret=${adminClientSecret}`,
-    };
-
-    const response = await fetch(tokenEndpoint, requestData);
-    const data = await response.json();
-    return data.access_token;
-}
-
 
 async function init() {
     const token = await loginAsAdminWithTheAdminCli()
@@ -47,6 +31,20 @@ async function init() {
 }
 
 init().then(r => console.log('finished'));
+
+async function loginAsAdminWithTheAdminCli() {
+    const requestData = {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: `grant_type=client_credentials&client_id=${adminClientId}&client_secret=${adminClientSecret}`,
+    };
+
+    const response = await fetch(tokenEndpoint, requestData);
+    const data = await response.json();
+    return data.access_token;
+}
 
 async function createClientInRealm(accessToken, realmName, newClientData) {
     const adminApiEndpoint = `${keycloakServer}/admin/realms/${realmName}/clients`;
