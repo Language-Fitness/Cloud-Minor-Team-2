@@ -1,13 +1,13 @@
 const keycloakServer = 'http://localhost:8888';
 const realm = 'master';
-const clientId = 'admin-cli';
-const clientSecret = 'NrOhJkHCMnBIIOLfVJoH3QAhQToZnzkE';
+const adminClientId = 'admin-cli';
+const adminClientSecret = 'ZAB5bv3MNozsfqwmQk2SBzW5WJx109zi';
 
 // Token endpoint URL
 const tokenEndpoint = `${keycloakServer}/realms/${realm}/protocol/openid-connect/token`;
-const realmName = 'example-realm';
+const realmName = 'Test2';
 const newClientData = {
-    clientId: 'student-client',
+    clientId: 'demo-client',
     enabled: true,
     standardFlowEnabled: false,
     implicitFlowEnabled: false,
@@ -19,8 +19,12 @@ const newClientData = {
 
 const roleMappings = [
     {
-        id: 'dec25575-e443-4e34-8d00-f708c5d58d6b',
-        name: 'manage-users',
+        "id": "7ba71403-d558-47f0-99ef-816bea558f6b",
+        "name": "view-authorization",
+        "description": "${role_view-authorization}",
+        "composite": false,
+        "clientRole": true,
+        "containerId": "c54f8d0f-4510-40db-8bac-fb13aef90d74"
     },
 ];
 
@@ -31,7 +35,7 @@ function loginAsAdminWithTheAdminCli() {
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded',
         },
-        body: `grant_type=client_credentials&client_id=${clientId}&client_secret=${clientSecret}`,
+        body: `grant_type=client_credentials&client_id=${adminClientId}&client_secret=${adminClientSecret}`,
     };
 
     // Return a Promise for the access token
@@ -49,19 +53,22 @@ function loginAsAdminWithTheAdminCli() {
 
 async function init() {
     const token = await loginAsAdminWithTheAdminCli()
-    // await createRealm(token, realmName)
-    // await createClientInRealm(token, realmName, newClientData);
+    await createRealm(token, realmName)
+    await createClientInRealm(token, realmName, newClientData);
     const serviceAccount = await getServiceAccountUser(token, realmName, newClientData.clientId)
 
-    console.log(serviceAccount);
+    // console.log(serviceAccount);
 
     // return;
     // await getAllRolesInRealm(token, realmName)
     const clients = await getAllClientsInRealm(token, realmName)
 
     const realmManagementClient = clients.find(client => client.clientId === 'realm-management');
-    await getAllClientRolesInRealm(token, realmName, realmManagementClient.id)
-    await addRoleMappingsToUser(token, realmName, serviceAccount.id, roleMappings)
+    const roles = await getAllClientRolesInRealm(token, realmName, realmManagementClient.id);
+    const manageUsersRole = roles.find(role => role.name === 'manage-realm');
+    const roleArr = [manageUsersRole]
+
+    await addRoleMappingsToUser(token, realmName, serviceAccount.id, realmManagementClient.id, roleArr)
     // await getAuthenticationConfigDescription(token, realmName)
     // await getRealmManagementAccessToken(token, realmName)
 
@@ -241,10 +248,11 @@ function getServiceAccountUser(accessToken, realmName, clientId) {
         });
 }
 
-function addRoleMappingsToUser(accessToken, realmName, userId, roleMappings) {
+function addRoleMappingsToUser(accessToken, realmName, userId, clientId, roleMappings) {
 
-    const userRoleMappingApiEndpoint = `${keycloakServer}/admin/realms/${realmName}/users/${userId}/role-mappings/clients/${newClientData.clientId}`;
+    const userRoleMappingApiEndpoint = `${keycloakServer}/admin/realms/${realmName}/users/${userId}/role-mappings/clients/${clientId}`;
     // /admin/realms/{realm}/users/{id}/role-mappings/clients/{client}
+    // const userRoleMappingApiEndpoint = `${keycloakServer}/admin/realms/${realmName}/users/${userId}/role-mappings/clients/c54f8d0f-4510-40db-8bac-fb13aef90d74`;
 
     // Request parameters for adding role mappings
     const roleMappingRequestData = {
