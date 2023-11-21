@@ -44,13 +44,13 @@ async function init() {
     const createRealmRole           = adminRoles.find(role => role.name === 'create-realm');
     await addRoleMappingsToUser(adminToken, masterRealm, adminCLIServiceAccount.id, adminCLIClient.id, [createRealmRole])
 
+
+    // PROJECT REALM //
+    // ---------------------------------------------------- //
     // Create a new realm and a new client which is to be used to add new users to the realm
     await createRealm(adminToken, projectRealm)
     await createClientInRealm(adminToken, projectRealm, newClientData);
 
-
-    // PROJECT REALM //
-    // ---------------------------------------------------- //
     // Get the created client and realm management client (to fetch role which is to be assigned to the created client.)
     const clients               = await getAllClientsInRealm(adminToken, projectRealm);
     const realmManagementClient = clients.find(client => client.clientId === 'realm-management');
