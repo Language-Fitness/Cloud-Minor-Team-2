@@ -6,13 +6,15 @@ import {
     newStudentData, newTeacherAttributes,
     newTeacherData
 } from "./generate_data_keycloak.js";
+import * as fs from "fs";
+import * as path from "path";
 
 
 const keycloakServer        = 'http://localhost:8888';
 const masterRealm           = 'master';
 const projectRealm          = 'cloud-project';
 const adminClientId         = 'admin-cli';
-const adminClientSecret     = 'LbB9TqSh9CDaD81pX5gMcre5laxaC6J0';
+const adminClientSecret     = 'sQqUxinSz6JutzdTZw9Lu0m3tniHDdco';
 const adminTokenEndpoint    = `${keycloakServer}/realms/${masterRealm}/protocol/openid-connect/token`;
 const clientTokenEndpoint   = `${keycloakServer}/realms/${projectRealm}/protocol/openid-connect/token`;
 
@@ -58,64 +60,58 @@ async function init() {
     const createdClient         = clients.find(client => client.clientId === newClientData.clientId)
     const serviceAccount        = await getServiceAccountUser(adminToken, projectRealm, newClientData.clientId)
 
-    // Create the roles for teacher, student and admin in the client scope
-    await createRole(adminToken, projectRealm, createdClient.id, 'student')
-    await createRole(adminToken, projectRealm, createdClient.id, 'teacher')
-    await createRole(adminToken, projectRealm, createdClient.id, 'admin')
-    // this should be done with the roles defined in the roles directory
-    // -> looped through files and added to keycloak roles
-
-    // Create groups in the project realm
-    await addNewGroup(adminToken, projectRealm, 'group_students')
-    await addNewGroup(adminToken, projectRealm, 'group_teachers')
-    await addNewGroup(adminToken, projectRealm, 'group_administrators')
-
-    // Fetch all groups to use to assign the roles to.
-    const groups = await getGroups(adminToken, projectRealm);
-    const studentGroup = groups.find(group => group.name === 'group_students')
-    const teacherGroup = groups.find(group => group.name === 'group_teachers')
-    const adminGroup = groups.find(group => group.name === 'group_administrators')
-
     // Get all roles in realm for realm-client, filter for manage-users role, and assign to service account of created client
     const realmManagementRoles  = await getAllClientRolesInRealm(adminToken, projectRealm, realmManagementClient.id);
     const manageUsersRole       = realmManagementRoles.find(role => role.name === 'manage-users');
     await addRoleMappingsToEntity(adminToken, projectRealm, 'users', serviceAccount.id, realmManagementClient.id, [manageUsersRole])
 
-    // Get all roles in realm for created-client, filter for designated roles
-    const userRoles     = await getAllClientRolesInRealm(adminToken, projectRealm, createdClient.id);
-    const studentRole   = userRoles.find(role => role.name === 'student');
-    const teacherRole   = userRoles.find(role => role.name === 'teacher');
-    const adminRole     = userRoles.find(role => role.name === 'admin');
+    // Create groups in the project realm
+    await addNewGroup(adminToken, projectRealm, 'permissions_student')
+    await addNewGroup(adminToken, projectRealm, 'permissions_teacher')
+    await addNewGroup(adminToken, projectRealm, 'permissions_administrator')
 
-    // Add  designated roles to student group
-    await addRoleMappingsToEntity(
-        adminToken,
-        projectRealm,
-        'groups',
-        studentGroup.id,
-        createdClient.id,
-        [studentRole,teacherRole,adminRole]
-    )
+    // Fetch all groups to use to assign the roles to.
+    const groups = await getGroups(adminToken, projectRealm);
+    const studentGroup = groups.find(group => group.name === 'permissions_student')
+    const teacherGroup = groups.find(group => group.name === 'permissions_teacher')
+    const adminGroup = groups.find(group => group.name === 'permissions_administrator')
 
-    // Add  designated roles to teacher group
-    await addRoleMappingsToEntity(
-        adminToken,
-        projectRealm,
-        'groups',
-        teacherGroup.id,
-        createdClient.id,
-        [studentRole,teacherRole,adminRole]
-    )
+    // Loop through all files with roles, create them and assign to designated group
+    try {
+        const files = fs.readdirSync('./roles');
+        for (const file of files) {
+            const filePath = path.join('./roles', file);
+            const contents = fs.readFileSync(filePath, 'utf8');
+            const jsonArr = JSON.parse(contents)
 
-    // Add  designated roles to admin group
-    await addRoleMappingsToEntity(
-        adminToken,
-        projectRealm,
-        'groups',
-        adminGroup.id,
-        createdClient.id,
-        [studentRole,teacherRole,adminRole]
-    )
+            for (const item of jsonArr) {
+                await createRole(adminToken, projectRealm, createdClient.id, item['name'])
+                const createdRole = await getRoleByName(adminToken, projectRealm, createdClient.id, item['name'])
+
+                let id;
+                const group_section = file.split('_')[0];
+
+                if (group_section === 'student') {
+                    id = studentGroup.id;
+                } else if (group_section === 'teacher') {
+                    id = teacherGroup.id;
+                } else {
+                    id = adminGroup.id
+                }
+
+                await addRoleMappingsToEntity(
+                    adminToken,
+                    projectRealm,
+                    'groups',
+                    id,
+                    createdClient.id,
+                    [createdRole]
+                )
+            }
+        }
+    } catch (err) {
+        console.error(err);
+    }
 
     // Log into the created client and get the bearer token. Add new users using this client
     const clientToken = await loginAsClient(createdClient.secret);
@@ -318,6 +314,21 @@ async function getGroups(accessToken, realmName) {
     };
 
     const response = await fetch(getGroupsEndpoint, requestData);
+    return await response.json();
+}
+
+async function getRoleByName(accessToken, realmName, clientId, roleName) {
+    const getRoleEndpoint = `${keycloakServer}/admin/realms/${realmName}/clients/${clientId}/roles/${roleName}`;
+
+    const requestData = {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${accessToken}`,
+        },
+    };
+
+    const response = await fetch(getRoleEndpoint, requestData);
     return await response.json();
 }
 

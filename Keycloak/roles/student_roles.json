@@ -1,0 +1,26 @@
+[
+  {
+    "name": "get_class"
+  },
+  {
+    "name": "get_classes"
+  },
+  {
+    "name": "get_exercise"
+  },
+  {
+    "name": "get_exercises"
+  },
+  {
+    "name": "get_module"
+  },
+  {
+    "name": "get_modules"
+  },
+  {
+    "name": "get_school"
+  },
+  {
+    "name": "get_schools"
+  }
+]
