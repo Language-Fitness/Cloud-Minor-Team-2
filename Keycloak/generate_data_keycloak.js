@@ -9,6 +9,7 @@ export const newStudentData = {
         temporary: false
     }],
     username: 'Merlijn@student.com',
+    groups: ['group_students']
 }
 
 export const newStudentAttributes = {
@@ -35,6 +36,7 @@ export const newTeacherData = {
         temporary: false
     }],
     username: 'bram@teacher.com',
+    groups: ['group_teachers']
 }
 
 export const newTeacherAttributes = {
@@ -61,6 +63,7 @@ export const newAdminData = {
         temporary: false
     }],
     username: 'admin@admin.com',
+    groups: ['group_administrators']
 }
 
 export const newAdminAttributes = {
