@@ -1,0 +1,23 @@
+[
+  {
+    "name": "get_class"
+  },
+  {
+    "name": "get_class_all"
+  },
+  {
+    "name": "create_class"
+  },
+  {
+    "name": "update_class"
+  },
+  {
+    "name": "update_class_all"
+  },
+  {
+    "name": "delete_class"
+  },
+  {
+    "name": "delete_class_all"
+  }
+]

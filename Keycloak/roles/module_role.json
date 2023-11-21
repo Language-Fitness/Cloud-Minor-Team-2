@@ -1,0 +1,23 @@
+[
+  {
+    "name": "get_module"
+  },
+  {
+    "name": "get_module_all"
+  },
+  {
+    "name": "create_module"
+  },
+  {
+    "name": "update_module"
+  },
+  {
+    "name": "update_module_all"
+  },
+  {
+    "name": "delete_module"
+  },
+  {
+    "name": "delete_module_all"
+  }
+]

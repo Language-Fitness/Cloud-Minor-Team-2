@@ -1,0 +1,23 @@
+[
+  {
+    "name": "get_exercise"
+  },
+  {
+    "name": "get_exercise_all"
+  },
+  {
+    "name": "create_exercise"
+  },
+  {
+    "name": "update_exercise"
+  },
+  {
+    "name": "update_exercise_all"
+  },
+  {
+    "name": "delete_exercise"
+  },
+  {
+    "name": "delete_exercise_all"
+  }
+]
