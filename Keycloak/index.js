@@ -1,34 +1,72 @@
-import {newAdminData, newClientData, newStudentData, newTeacherData} from "./generate_data_keycloak.js";
+import {
+    newAdminAttributes,
+    newAdminData,
+    newClientData,
+    newStudentAttributes,
+    newStudentData, newTeacherAttributes,
+    newTeacherData
+} from "./generate_data_keycloak.js";
 
-const keycloakServer    = 'http://localhost:8888';
-const masterRealm             = 'master';
-const projectRealm         = 'Test2';
-const adminClientId     = 'admin-cli';
-const adminClientSecret = 'WQpcgyqH7FTFkFh0iGkQK2LOg430VV7t';
-const adminTokenEndpoint     = `${keycloakServer}/realms/${masterRealm}/protocol/openid-connect/token`;
-const clientTokenEndpoint     = `${keycloakServer}/realms/${projectRealm}/protocol/openid-connect/token`;
+const keycloakServer        = 'http://localhost:8888';
+const masterRealm           = 'master';
+const projectRealm          = 'Test2';
+const adminClientId         = 'admin-cli';
+const adminClientSecret     = 'w9Wxse58YrhGX9VQcb4jFDm2sv43Pyjg';
+const adminTokenEndpoint    = `${keycloakServer}/realms/${masterRealm}/protocol/openid-connect/token`;
+const clientTokenEndpoint   = `${keycloakServer}/realms/${projectRealm}/protocol/openid-connect/token`;
 
 async function init() {
+    // PREREQUISITES //
+    // ---------------------------------------------------- //
+    // After initial build of keycloak:
+    // 1. Log into the admin console
+    // 2. Adjust Capability config -> {
+    //      Client authentication   = On
+    //      Authorization           = On
+    //      Direct access grants    = Unchecked
+    //      }
+    // 3. Give admin-cli the 'admin' role mapping
+    // 4. Copy Client Secret to global variable 'adminClientSecret' in this file
+
+
+    // MASTER REALM //
+    // ---------------------------------------------------- //
+    // Get admin token to perform initial realm setup
     const adminToken = await loginAsAdminWithTheAdminCli()
+
+    // Get admin CLI client and corresponding service account
+    const adminClients              = await getAllClientsInRealm(adminToken, masterRealm);
+    const adminCLIClient            = adminClients.find(client => client.clientId === 'admin-cli')
+    const adminCLIServiceAccount    = await getServiceAccountUser(adminToken, masterRealm, 'admin-cli')
+
+    // Get all roles in realm, filter for create-realm, and assign to service account of admin-cli
+    const adminRoles                = await getAllClientRolesInRealm(adminToken, masterRealm, adminCLIClient.id);
+    const createRealmRole           = adminRoles.find(role => role.name === 'create-realm');
+    await addRoleMappingsToUser(adminToken, masterRealm, adminCLIServiceAccount.id, adminCLIClient.id, [createRealmRole])
+
+    // Create a new realm and a new client which is to be used to add new users to the realm
     await createRealm(adminToken, projectRealm)
     await createClientInRealm(adminToken, projectRealm, newClientData);
 
+
+    // PROJECT REALM //
+    // ---------------------------------------------------- //
+    // Get the created client and realm management client (to fetch role which is to be assigned to the created client.)
+    const clients               = await getAllClientsInRealm(adminToken, projectRealm);
+    const realmManagementClient = clients.find(client => client.clientId === 'realm-management');
+    const createdClient         = clients.find(client => client.clientId === newClientData.clientId)
     const serviceAccount        = await getServiceAccountUser(adminToken, projectRealm, newClientData.clientId)
 
-    const clients               = await getAllClientsInRealm(adminToken, projectRealm);
-    const createdClient         = clients.find(client => client.clientId === newClientData.clientId)
-    const realmManagementClient = clients.find(client => client.clientId === 'realm-management');
-
+    // Get all roles in realm, filter for manage-users role, and assign to service account of created client.
     const roles                 = await getAllClientRolesInRealm(adminToken, projectRealm, realmManagementClient.id);
     const manageUsersRole       = roles.find(role => role.name === 'manage-users');
-    const roleArr               = [manageUsersRole]
+    await addRoleMappingsToUser(adminToken, projectRealm, serviceAccount.id, realmManagementClient.id, [manageUsersRole])
 
-    await addRoleMappingsToUser(adminToken, projectRealm, serviceAccount.id, realmManagementClient.id, roleArr)
-
+    // Log into the created client and get the bearer token. Add new users using this client
     const clientToken = await loginAsClient(createdClient.secret)
-    await addNewUser(clientToken, projectRealm, newStudentData);
-    await addNewUser(clientToken, projectRealm, newTeacherData);
-    await addNewUser(clientToken, projectRealm, newAdminData);
+    await addNewUser(clientToken, projectRealm, newStudentData, newStudentAttributes);
+    await addNewUser(clientToken, projectRealm, newTeacherData, newTeacherAttributes);
+    await addNewUser(clientToken, projectRealm, newAdminData, newAdminAttributes);
 }
 
 init().then(r => console.log('finished'));
@@ -160,8 +198,10 @@ async function getAllClientsInRealm(accessToken, realmName) {
     return await response.json();
 }
 
-async function addNewUser(accessToken, realmName, user) {
+async function addNewUser(accessToken, realmName, user, attributes) {
     const createUserEndpoint = `${keycloakServer}/admin/realms/${realmName}/users`;
+
+    user.attributes = attributes;
 
     const createUserRequestData = {
         method: 'POST',
