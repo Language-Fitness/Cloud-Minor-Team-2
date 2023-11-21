@@ -8,7 +8,7 @@ export const newStudentData = {
         value: 'secret',
         temporary: false
     }],
-    username: 'Merlijn@student.com'
+    username: 'Merlijn@student.com',
 }
 
 export const newStudentAttributes = {
@@ -34,7 +34,7 @@ export const newTeacherData = {
         value: 'secret',
         temporary: false
     }],
-    username: 'bram@teacher.com'
+    username: 'bram@teacher.com',
 }
 
 export const newTeacherAttributes = {
@@ -60,7 +60,7 @@ export const newAdminData = {
         value: 'secret',
         temporary: false
     }],
-    username: 'admin@admin.com'
+    username: 'admin@admin.com',
 }
 
 export const newAdminAttributes = {
@@ -77,7 +77,7 @@ export const newAdminAttributes = {
 }
 
 export const newClientData = {
-    clientId: 'demo-client',
+    clientId: 'user-management-client',
     enabled: true,
     standardFlowEnabled: false,
     implicitFlowEnabled: false,
