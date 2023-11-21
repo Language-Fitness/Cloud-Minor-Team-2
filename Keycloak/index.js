@@ -4,8 +4,9 @@ import {
     newClientData,
     newStudentAttributes,
     newStudentData, newTeacherAttributes,
-    newTeacherData
+    newTeacherData, MicroserviceClients
 } from "./generate_data_keycloak.js";
+
 import * as fs from "fs";
 import * as path from "path";
 
@@ -14,7 +15,7 @@ const keycloakServer        = 'http://localhost:8888';
 const masterRealm           = 'master';
 const projectRealm          = 'cloud-project';
 const adminClientId         = 'admin-cli';
-const adminClientSecret     = 'sQqUxinSz6JutzdTZw9Lu0m3tniHDdco';
+const adminClientSecret     = 'KwJpmg3AXCbrGnPeCD2TvBm9scaUI0e3';
 const adminTokenEndpoint    = `${keycloakServer}/realms/${masterRealm}/protocol/openid-connect/token`;
 const clientTokenEndpoint   = `${keycloakServer}/realms/${projectRealm}/protocol/openid-connect/token`;
 
@@ -53,6 +54,12 @@ async function init() {
     // Create a new realm and a new client which is to be used to add new users to the realm
     await createRealm(adminToken, projectRealm)
     await createClientInRealm(adminToken, projectRealm, newClientData);
+
+    for (const client of MicroserviceClients) {
+        await (async (client) => {
+            await createClientInRealm(adminToken, projectRealm, client);
+        })(client);
+    }
 
     // Get the created client and realm management client (to fetch role which is to be assigned to the created client.)
     const clients               = await getAllClientsInRealm(adminToken, projectRealm);
