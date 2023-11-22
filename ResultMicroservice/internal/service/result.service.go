@@ -40,7 +40,7 @@ func NewResultService() IResultService {
 	}
 }
 
-//TODO: add user id
+// TODO: add user id
 func (r *ResultService) CreateResult(newResult model.InputResult) (*model.Result, error) {
 	r.ValidateResult(&newResult)
 
@@ -73,7 +73,7 @@ func (r *ResultService) CreateResult(newResult model.InputResult) (*model.Result
 	return result, nil
 }
 
-//TODO: add user id
+// TODO: add user id
 func (r *ResultService) UpdateResult(id string, updateData model.InputResult) (*model.Result, error) {
 	r.ValidateResult(&updateData)
 
@@ -112,7 +112,7 @@ func (r *ResultService) UpdateResult(id string, updateData model.InputResult) (*
 	return result, nil
 }
 
-//TODO: add user id
+// TODO: add user id
 func (r *ResultService) DeleteResult(id string) error {
 	r.Validator.Validate(id, []string{"IsUUID"})
 
@@ -131,7 +131,7 @@ func (r *ResultService) DeleteResult(id string) error {
 	return nil
 }
 
-//TODO: add user id
+// TODO: add user id
 func (r *ResultService) GetResultById(id string) (*model.Result, error) {
 	r.Validator.Validate(id, []string{"IsUUID"})
 
@@ -150,7 +150,7 @@ func (r *ResultService) GetResultById(id string) (*model.Result, error) {
 	return result, nil
 }
 
-//TODO: add user id
+// TODO: add user id
 func (r *ResultService) GetResultByExerciseId(id string) (*model.Result, error) {
 	r.Validator.Validate(id, []string{"IsUUID"})
 
@@ -169,7 +169,7 @@ func (r *ResultService) GetResultByExerciseId(id string) (*model.Result, error) 
 	return result, nil
 }
 
-//TODO: add user id
+// TODO: add user id
 func (r *ResultService) GetResultByClassId(id string) ([]*model.Result, error) {
 	r.Validator.Validate(id, []string{"IsUUID"})
 
