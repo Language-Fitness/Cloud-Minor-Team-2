@@ -12,22 +12,42 @@ import (
 
 // CreateResult is the resolver for the CreateResult field.
 func (r *mutationResolver) CreateResult(ctx context.Context, input model.InputResult) (*model.Result, error) {
-	panic(fmt.Errorf("not implemented: CreateResult - CreateResult"))
+	result, err := r.Service.CreateResult(input)
+	if err != nil {
+		return nil, err
+	}
+
+	return result, nil
 }
 
 // UpdateResult is the resolver for the UpdateResult field.
 func (r *mutationResolver) UpdateResult(ctx context.Context, id string, input model.InputResult) (*model.Result, error) {
-	panic(fmt.Errorf("not implemented: UpdateResult - UpdateResult"))
+	result, err := r.Service.UpdateResult(id, input)
+	if err != nil {
+		return nil, err
+	}
+
+	return result, nil
 }
 
 // DeleteResult is the resolver for the DeleteResult field.
-func (r *mutationResolver) DeleteResult(ctx context.Context, id string) (*model.Result, error) {
-	panic(fmt.Errorf("not implemented: DeleteResult - DeleteResult"))
+func (r *mutationResolver) DeleteResult(ctx context.Context, id string) (*string, error) {
+	err := r.Service.DeleteResult(id)
+	if err != nil {
+		return nil, err
+	}
+
+	return &id, nil
 }
 
 // GetResultByExercise is the resolver for the GetResultByExercise field.
 func (r *queryResolver) GetResultByExercise(ctx context.Context, exerciseID string) (*model.Result, error) {
-	panic(fmt.Errorf("not implemented: GetResultByExercise - GetResultByExercise"))
+	results, err := r.Service.GetResultByExerciseId(exerciseID)
+	if err != nil {
+		return nil, err
+	}
+
+	return results, nil
 }
 
 // GetResultsByClass is the resolver for the GetResultsByClass field.
