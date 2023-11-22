@@ -1,0 +1,38 @@
+[
+  {
+    "name": "create_class"
+  },
+  {
+    "name": "update_class"
+  },
+  {
+    "name": "delete_class"
+  },
+  {
+    "name": "create_exercise"
+  },
+  {
+    "name": "update_exercise"
+  },
+  {
+    "name": "delete_exercise"
+  },
+  {
+    "name": "create_module"
+  },
+  {
+    "name": "update_module"
+  },
+  {
+    "name": "delete_module"
+  },
+  {
+    "name": "create_school"
+  },
+  {
+    "name": "update_school"
+  },
+  {
+    "name": "delete_school"
+  }
+]

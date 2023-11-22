@@ -1,0 +1,26 @@
+[
+  {
+    "name": "update_class_all"
+  },
+  {
+    "name": "delete_class_all"
+  },
+  {
+    "name": "update_exercise_all"
+  },
+  {
+    "name": "delete_exercise_all"
+  },
+  {
+    "name": "update_module_all"
+  },
+  {
+    "name": "delete_module_all"
+  },
+  {
+    "name": "update_school_all"
+  },
+  {
+    "name": "delete_school_all"
+  }
+]
