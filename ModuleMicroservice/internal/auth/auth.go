@@ -103,5 +103,5 @@ func getKeycloakClientSecret() string {
 }
 
 func getKeycloakHost() string {
-	return os.Getenv("KEYCLOAK_HOST") + "realms/cloud-project/protocol/openid-connect/token/introspect"
+	return os.Getenv("KEYCLOAK_HOST") + "realms/" + os.Getenv("KEYCLOAK_REALM") + "/protocol/openid-connect/token/introspect"
 }
