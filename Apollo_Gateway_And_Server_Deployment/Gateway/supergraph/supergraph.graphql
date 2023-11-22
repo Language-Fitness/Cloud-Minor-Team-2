@@ -21,6 +21,10 @@ directive @link(url: String, as: String, for: link__Purpose, import: [link__Impo
 
 scalar join__FieldSet
 
+#enum join__Graph {
+#    CLASSES @join__graph(name: "classes", url: "http://class-microservice-service:8082/query")
+#}
+
 enum join__Graph {
 PRODUCTS @join__graph(name: "products", url: "http://apollo-subgraph-products-service:8080/query")
 CUSTOMERS @join__graph(name: "customers", url: "http://apollo-subgraph-customers-service:8081/query")
@@ -63,4 +67,41 @@ type Query
     topProducts(first: Int = 5): [Product] @join__field(graph: PRODUCTS)
     topCustomers(first: Int = 5): [Customer] @join__field(graph: CUSTOMERS)
 }
+
+#type Class
+#@join__type(graph: CLASSES, key: "id")
+#{
+#    id: ID!
+#    module_Id: ID! @join__field(graph: CLASSES)
+#    name: String! @join__field(graph: CLASSES)
+#    description: String @join__field(graph: CLASSES)
+#    difficulty: Int @join__field(graph: CLASSES)
+#    created_at: String @join__field(graph: CLASSES)
+#    updated_at: String @join__field(graph: CLASSES)
+#    soft_deleted: Boolean @join__field(graph: CLASSES)
+#}
+#
+#input ClassInput
+#@join__type(graph: CLASSES)
+#{
+#    module_Id: ID!
+#    name: String!
+#    description: String
+#    difficulty: Int
+#}
+#
+#type Query
+#@join__type(graph: CLASSES)
+#{
+#    getClass(id: ID!): Class @join__field(graph: CLASSES)
+#    listClasses: [Class] @join__field(graph: CLASSES)
+#}
+#
+#type Mutation
+#@join__type(graph: CLASSES)
+#{
+#    createClass(input: ClassInput!): Class @join__field(graph: CLASSES)
+#    updateClass(id: ID!, input: ClassInput!): Class @join__field(graph: CLASSES)
+#    deleteClass(id: ID!): ID @join__field(graph: CLASSES)
+#}
 
