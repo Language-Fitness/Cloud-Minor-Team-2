@@ -18,8 +18,7 @@ go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
 Make sure that $GOBIN and $GOPATH are in your PATH.
 
 Generate Go code from the .proto file:
-bash
-Copy code
+
 ````bash
 
 protoc --proto_path=.<proto dir> --go_out=. --go-grpc_out=.<proto dir> .<proto file path>
