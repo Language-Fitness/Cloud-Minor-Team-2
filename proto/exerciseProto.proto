@@ -1,0 +1,33 @@
+syntax = "proto3";
+option go_package= "/exercise";
+
+message Exercise {
+  string ID = 1;
+  string ClassID = 2;
+  string Name = 3;
+  string Question = 4;
+  string Answers = 5;
+  int32 PosCorrectAnswer = 6;
+  string QuestionTypeID = 7;
+  float Difficulty = 8;
+  string CreatedAt = 9;
+  string UpdatedAt = 10;
+  bool SoftDeleted = 11;
+}
+
+service ExerciseService {
+  rpc Delete(ExerciseRequest) returns (Exercise);
+  rpc SoftDelete(ExerciseRequest) returns (Exercise);
+  rpc DeleteOne(ExerciseOneRequest) returns (Exercise);
+  rpc SoftDeleteOne(ExerciseOneRequest) returns (Exercise);
+}
+
+message ExerciseRequest {
+  string ClassID = 1;
+  string BearerToken = 2;
+}
+
+message ExerciseOneRequest {
+  string ExerciseID = 1;
+  string BearerToken = 2;
+}
