@@ -1,0 +1,25 @@
+syntax = "proto3";
+option go_package= "result";
+
+message Result {
+string ID = 1;
+string ExerciseID = 2;
+string UserID = 3;
+string ClassID = 4;
+string ModuleID = 5;
+string Input = 6;
+string Result = 7;
+string CreatedAt = 8;
+string UpdatedAt = 9;
+bool SoftDeleted = 10;
+}
+
+service MyService {
+rpc Delete(ModuleRequest) returns (Result);
+rpc SoftDelete(ModuleRequest) returns (Result);
+}
+
+message ModuleRequest {
+string ModuleID = 1;
+}
+
