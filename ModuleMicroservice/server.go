@@ -2,6 +2,7 @@ package main
 
 import (
 	"Module/graph"
+	"Module/internal/auth"
 	"github.com/joho/godotenv"
 	"log"
 	"net/http"
@@ -23,15 +24,12 @@ func main() {
 		log.Fatal("Error loading .env file")
 	}
 
-	//err := CreateNewKeyCloakUser()
-	//if err != nil {
-	//	return
-	//}
+	tokenMiddleware := auth.Middleware
 
 	srv := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{Resolvers: graph.NewResolver()}))
 
+	http.Handle("/query", tokenMiddleware(srv))
 	http.Handle("/", playground.Handler("GraphQL playground", "/query"))
-	http.Handle("/query", srv)
 
 	log.Printf("connect to http://localhost:%s/ for GraphQL playground", port)
 	log.Fatal(http.ListenAndServe(":"+port, nil))

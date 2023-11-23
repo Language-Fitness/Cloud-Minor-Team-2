@@ -48,8 +48,8 @@ func (v *Validator) Validate(input interface{}, arr []string) {
 		},
 	}
 
-	fmt.Println("Input received:", input)
-	fmt.Println("Input received:", arr)
+	//fmt.Println("Input received:", input)
+	//fmt.Println("Input received:", arr)
 
 	for _, value := range arr {
 
@@ -64,13 +64,13 @@ func (v *Validator) Validate(input interface{}, arr []string) {
 			if fn, ok := fn.(func(interface{}, string)); ok {
 				fn(input, value)
 
-				fmt.Println(rules.GetErrors())
+				//fmt.Println(rules.GetErrors())
 			}
 		}
 	}
 
 	v.errors = append(rules.GetErrors(), v.errors...)
-	fmt.Println(v.errors)
+	//fmt.Println(v.errors)
 }
 
 func (v *Validator) GetErrors() []string {

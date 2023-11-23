@@ -4,6 +4,8 @@ import (
 	"Module/graph/model"
 	"Module/internal/repository"
 	"context"
+	"errors"
+	"fmt"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
@@ -21,13 +23,39 @@ func NewPolicy(collection *mongo.Collection) *Policy {
 	}
 }
 
-func (p *Policy) CreateModule(ctx context.Context, input model.ModuleInput) (bool, error) {
-	//headers := ctx.Value("headers").(http.Header)
-	//
-	//// Access tokens from the headers, e.g., for Bearer token
-	//accessToken := headers.Get("Authorization")
+func (p *Policy) CreateModule(bearerToken string, input model.ModuleInput) error {
+	token, err := p.Token.IntrospectToken(bearerToken)
+	if err != nil || token == false {
+		return errors.New("invalid token")
+	}
 
-	return true, nil
+	decodeToken, err := p.Token.DecodeToken(bearerToken)
+	if err != nil {
+		return err
+	}
+
+	fmt.Println(decodeToken)
+
+	sub, _ := decodeToken["sub"].(string)
+
+	// Extract 'user-management-client' roles
+	// Note: This assumes 'user-management-client' is always present in the map
+	// and has a 'roles' key with a slice value.
+	var roles []interface{}
+	umcInterface, umcExists := decodeToken["user-management-client"]
+	if umcExists {
+		umc, ok := umcInterface.(map[string]interface{})
+		if ok {
+			rolesInterface, rolesExist := umc["roles"]
+			if rolesExist {
+				roles, _ = rolesInterface.([]interface{})
+			}
+		}
+	}
+
+	fmt.Println(sub, roles)
+
+	return nil
 }
 
 // UpdateModule is the resolver for the updateModule field.
