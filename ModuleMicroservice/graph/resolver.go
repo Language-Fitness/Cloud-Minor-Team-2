@@ -2,6 +2,8 @@ package graph
 
 import (
 	"Module/graph/model"
+	"Module/internal/auth"
+	"Module/internal/database"
 	"Module/internal/service"
 )
 
@@ -12,11 +14,15 @@ import (
 type Resolver struct {
 	Service service.IModuleService
 	Modules []*model.Module
+	Policy  *auth.Policy
 }
 
 func NewResolver() *Resolver {
+	collection, _ := database.GetCollection()
+
 	return &Resolver{
-		Service: service.NewModuleService(),
+		Service: service.NewModuleService(collection),
 		Modules: []*model.Module{},
+		Policy:  auth.NewPolicy(collection),
 	}
 }

@@ -2,12 +2,12 @@ package service
 
 import (
 	"Module/graph/model"
-	"Module/internal/database"
 	"Module/internal/repository"
 	"Module/internal/validation"
 	"errors"
 	"fmt"
 	"github.com/google/uuid"
+	"go.mongodb.org/mongo-driver/mongo"
 	"strings"
 	"time"
 )
@@ -31,9 +31,7 @@ type ModuleService struct {
 
 // NewModuleService GOLANG FACTORY
 // Returns a ModuleService implementing IModuleService.
-func NewModuleService() IModuleService {
-	collection, _ := database.GetCollection()
-
+func NewModuleService(collection *mongo.Collection) IModuleService {
 	return &ModuleService{
 		Validator: validation.NewValidator(),
 		Repo:      repository.NewModuleRepository(collection),
