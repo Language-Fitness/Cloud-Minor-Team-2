@@ -22,6 +22,8 @@ type Validator struct {
 // NewValidator GOLANG FACTORY
 // Returns a Validator implementing IValidator.
 func NewValidator() IValidator {
+	fmt.Println("initilizing validator")
+
 	return &Validator{}
 }
 
@@ -47,6 +49,7 @@ func (v *Validator) Validate(input interface{}, arr []string) {
 	}
 
 	fmt.Println("Input received:", input)
+	fmt.Println("Input received:", arr)
 
 	for _, value := range arr {
 
@@ -60,11 +63,14 @@ func (v *Validator) Validate(input interface{}, arr []string) {
 		if fn, exists := functionMap[functionName]; exists {
 			if fn, ok := fn.(func(interface{}, string)); ok {
 				fn(input, value)
+
+				fmt.Println(rules.GetErrors())
 			}
 		}
 	}
 
-	v.errors = rules.GetErrors()
+	v.errors = append(rules.GetErrors(), v.errors...)
+	fmt.Println(v.errors)
 }
 
 func (v *Validator) GetErrors() []string {

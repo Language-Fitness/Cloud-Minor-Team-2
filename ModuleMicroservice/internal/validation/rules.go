@@ -79,6 +79,7 @@ func (v *Rules) IsUUID(s interface{}) bool {
 
 	_, err := uuid.Parse(strValue)
 	if err != nil {
+		fmt.Println("test")
 		v.AddError(fmt.Sprintf("'%s' is not a valid UUID", strValue))
 		return false
 	}

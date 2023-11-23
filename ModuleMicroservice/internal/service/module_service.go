@@ -6,6 +6,7 @@ import (
 	"Module/internal/repository"
 	"Module/internal/validation"
 	"errors"
+	"fmt"
 	"github.com/google/uuid"
 	"strings"
 	"time"
@@ -49,8 +50,10 @@ func (m *ModuleService) CreateModule(newModule model.ModuleInput) (*model.Module
 	m.Validator.Validate(*newModule.Key, []string{"IsString", "Length:<30"})
 
 	validationErrors := m.Validator.GetErrors()
+	fmt.Println(validationErrors)
 	if len(validationErrors) > 0 {
 		errorMessage := "Validation errors: " + strings.Join(validationErrors, ", ")
+		m.Validator.ClearErrors()
 		return nil, errors.New(errorMessage)
 	}
 
@@ -90,6 +93,7 @@ func (m *ModuleService) UpdateModule(id string, updateData model.ModuleInput) (*
 	validationErrors := m.Validator.GetErrors()
 	if len(validationErrors) > 0 {
 		errorMessage := "Validation errors: " + strings.Join(validationErrors, ", ")
+		m.Validator.ClearErrors()
 		return nil, errors.New(errorMessage)
 	}
 
@@ -128,6 +132,7 @@ func (m *ModuleService) DeleteModule(id string) error {
 	validationErrors := m.Validator.GetErrors()
 	if len(validationErrors) > 0 {
 		errorMessage := "Validation errors: " + strings.Join(validationErrors, ", ")
+		m.Validator.ClearErrors()
 		return errors.New(errorMessage)
 	}
 
@@ -146,6 +151,7 @@ func (m *ModuleService) GetModuleById(id string) (*model.Module, error) {
 	validationErrors := m.Validator.GetErrors()
 	if len(validationErrors) > 0 {
 		errorMessage := "Validation errors: " + strings.Join(validationErrors, ", ")
+		m.Validator.ClearErrors()
 		return nil, errors.New(errorMessage)
 	}
 
