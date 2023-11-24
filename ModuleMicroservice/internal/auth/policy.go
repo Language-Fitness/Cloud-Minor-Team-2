@@ -1,9 +1,7 @@
 package auth
 
 import (
-	"Module/graph/model"
 	"Module/internal/repository"
-	"context"
 	"errors"
 	"go.mongodb.org/mongo-driver/mongo"
 )
@@ -35,28 +33,76 @@ func (p *Policy) CreateModule(bearerToken string) error {
 	return nil
 }
 
-// UpdateModule is the resolver for the updateModule field.
-func (p *Policy) UpdateModule(ctx context.Context, id string, input model.ModuleInput) (bool, error) {
+func (p *Policy) UpdateModule(bearerToken string, id string) error {
+	uuid, roles, err2 := p.getSubAndRoles(bearerToken)
+	if err2 != nil {
+		return err2
+	}
 
-	return true, nil
+	module, err := p.ModuleRepository.GetModuleByID(id)
+	if err != nil {
+		return errors.New("invalid permissions for this action")
+	}
+
+	if hasRole(roles, "update_module") && *module.MadeBy == uuid {
+		return nil
+	}
+
+	if hasRole(roles, "update_module_all") {
+		return nil
+	}
+
+	return errors.New("invalid permissions for this action")
 }
 
-// DeleteModule is the resolver for the deleteModule field.
-func (p *Policy) DeleteModule(ctx context.Context, id string) (bool, error) {
+func (p *Policy) DeleteModule(bearerToken string, id string) error {
+	uuid, roles, err2 := p.getSubAndRoles(bearerToken)
+	if err2 != nil {
+		return err2
+	}
 
-	return true, nil
+	module, err := p.ModuleRepository.GetModuleByID(id)
+	if err != nil {
+		return errors.New("invalid permissions for this action")
+	}
+
+	if hasRole(roles, "delete_module") && *module.MadeBy == uuid {
+		return nil
+	}
+
+	if hasRole(roles, "delete_module_all") {
+		return nil
+	}
+
+	return errors.New("invalid permissions for this action")
 }
 
 // GetModule is the resolver for the getModule field.
-func (p *Policy) GetModule(ctx context.Context, id string) (bool, error) {
+func (p *Policy) GetModule(bearerToken string) error {
+	_, roles, err2 := p.getSubAndRoles(bearerToken)
+	if err2 != nil {
+		return err2
+	}
 
-	return true, nil
+	if !hasRole(roles, "get_module") {
+		return errors.New("invalid permissions for this action")
+	}
+
+	return nil
 }
 
 // ListModules is the resolver for the listModules field.
-func (p *Policy) ListModules(ctx context.Context) (bool, error) {
+func (p *Policy) ListModules(bearerToken string) error {
+	_, roles, err2 := p.getSubAndRoles(bearerToken)
+	if err2 != nil {
+		return err2
+	}
 
-	return true, nil
+	if !hasRole(roles, "get_modules") {
+		return errors.New("invalid permissions for this action")
+	}
+
+	return nil
 }
 
 func (p *Policy) getSubAndRoles(bearerToken string) (string, []interface{}, error) {
@@ -77,13 +123,11 @@ func (p *Policy) getSubAndRoles(bearerToken string) (string, []interface{}, erro
 		return "", nil, errors.New("invalid token")
 	}
 
-	// Access the 'user-management-client' map
 	userManagementClient, ok := resourceAccess["user-management-client"].(map[string]interface{})
 	if !ok {
 		return "", nil, errors.New("invalid token")
 	}
 
-	// Access the 'roles' array within 'user-management-client'
 	roles, ok := userManagementClient["roles"].([]interface{})
 	if !ok {
 		return "", nil, errors.New("invalid token")

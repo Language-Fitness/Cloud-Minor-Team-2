@@ -29,6 +29,10 @@ func (r *mutationResolver) CreateModule(ctx context.Context, input model.ModuleI
 
 // UpdateModule is the resolver for the updateModule field.
 func (r *mutationResolver) UpdateModule(ctx context.Context, id string, input model.ModuleInput) (*model.Module, error) {
+	token := auth.TokenFromContext(ctx)
+
+	err := r.Policy.UpdateModule(token, id)
+
 	module, err := r.Service.UpdateModule(id, input)
 	if err != nil {
 		return nil, err
@@ -39,6 +43,7 @@ func (r *mutationResolver) UpdateModule(ctx context.Context, id string, input mo
 
 // DeleteModule is the resolver for the deleteModule field.
 func (r *mutationResolver) DeleteModule(ctx context.Context, id string) (*string, error) {
+	//@TODO this has to be moved to GRPC
 	err := r.Service.DeleteModule(id)
 	if err != nil {
 		return nil, err
@@ -49,6 +54,10 @@ func (r *mutationResolver) DeleteModule(ctx context.Context, id string) (*string
 
 // GetModule is the resolver for the getModule field.
 func (r *queryResolver) GetModule(ctx context.Context, id string) (*model.Module, error) {
+	token := auth.TokenFromContext(ctx)
+
+	err := r.Policy.GetModule(token)
+
 	module, err := r.Service.GetModuleById(id)
 	if err != nil {
 		return nil, err
@@ -59,7 +68,9 @@ func (r *queryResolver) GetModule(ctx context.Context, id string) (*model.Module
 
 // ListModules is the resolver for the listModules field.
 func (r *queryResolver) ListModules(ctx context.Context) ([]*model.Module, error) {
-	// Retrieve a list of all modules using the repository.
+	token := auth.TokenFromContext(ctx)
+
+	err := r.Policy.ListModules(token)
 	modules, err := r.Service.ListModules()
 	if err != nil {
 		return nil, err
