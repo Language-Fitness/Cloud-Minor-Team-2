@@ -5,6 +5,14 @@
 # GraphQL schema example
 #
 # https://gqlgen.com/getting-started/
+type School {
+  id: ID!
+  name: String!
+  location: String!
+  created_at: String!
+  updated_at: String!
+  soft_deleted: Boolean!
+}
 
 type Module {
   id: ID!
@@ -19,7 +27,6 @@ type Module {
   updated_at: String!
   soft_deleted: Boolean!
 }
-
 
 type Class {
   id: ID!
@@ -67,14 +74,16 @@ type LeaderboardRow {
 }
 
 type Query {
-  getModuleById(id: ID!): Module
-  getAllModules: [Module]
-  getClassById(id: ID!): Class
-  getAllClasses: [Class]
-  getExerciseById(id: ID!): Exercise
-  getAllExercises: [Exercise]
-  getAllResults: [Result]
+  getModule(id: ID!): Module
+  listModules: [Module]
+  getClass(id: ID!): Class
+  listClasses: [Class]
+  getExercise(id: ID!): Exercise
+  listExercises: [Exercise]
+  getResultsByClass(classId: ID!): [Result]
   getLeaderBord: [LeaderboardRow]
+  getSchool(id: ID!): School
+  listSchools: [School]
 }
 
 input NewResult {

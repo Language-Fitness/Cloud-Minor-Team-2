@@ -7,6 +7,7 @@ import "example/graph/model"
 // It serves as dependency injection for your app, add any dependencies you require here.
 
 type Resolver struct {
+	schools     []*model.School
 	modules     []*model.Module
 	classes     []*model.Class
 	exercises   []*model.Exercise
@@ -15,6 +16,16 @@ type Resolver struct {
 }
 
 func (r *Resolver) init() {
+	/// MODULES ///
+	r.schools = append(r.schools, &model.School{
+		ID:          "67bd70b8-8ac8-11ee-b9d1-0242ac120002",
+		Name:        "Inholland",
+		Location:    "Haarlem",
+		CreatedAt:   "2023-01-01T00:00:00Z",
+		UpdatedAt:   "2023-01-01T00:00:00Z",
+		SoftDeleted: false,
+	})
+
 	/// MODULES ///
 	r.modules = append(r.modules, &model.Module{
 		ID:          "e41189cc-83cc-11ee-b962-0242ac120002",

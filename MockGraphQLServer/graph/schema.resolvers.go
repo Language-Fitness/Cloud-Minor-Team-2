@@ -8,13 +8,13 @@ import (
 	"context"
 	"errors"
 	"example/graph/model"
-	"github.com/google/uuid"
 	"time"
+
+	"github.com/google/uuid"
 )
 
 // CreateResult is the resolver for the createResult field.
 func (r *mutationResolver) CreateResult(ctx context.Context, input *model.NewResult) (*model.Result, error) {
-
 	newResult := &model.Result{
 		ID:          uuid.New().String(),
 		ExerciseID:  input.ExerciseID,
@@ -32,8 +32,8 @@ func (r *mutationResolver) CreateResult(ctx context.Context, input *model.NewRes
 	return newResult, nil
 }
 
-// GetModuleByID is the resolver for the getModuleById field.
-func (r *queryResolver) GetModuleByID(ctx context.Context, id string) (*model.Module, error) {
+// GetModule is the resolver for the getModule field.
+func (r *queryResolver) GetModule(ctx context.Context, id string) (*model.Module, error) {
 	if len(r.modules) == 0 {
 		r.init()
 	}
@@ -46,8 +46,8 @@ func (r *queryResolver) GetModuleByID(ctx context.Context, id string) (*model.Mo
 	return nil, errors.New("no module wound with this id")
 }
 
-// GetAllModules is the resolver for the getAllModules field.
-func (r *queryResolver) GetAllModules(ctx context.Context) ([]*model.Module, error) {
+// ListModules is the resolver for the listModules field.
+func (r *queryResolver) ListModules(ctx context.Context) ([]*model.Module, error) {
 	if len(r.modules) == 0 {
 		r.init()
 	}
@@ -55,8 +55,8 @@ func (r *queryResolver) GetAllModules(ctx context.Context) ([]*model.Module, err
 	return r.modules, nil
 }
 
-// GetClassByID is the resolver for the getClassById field.
-func (r *queryResolver) GetClassByID(ctx context.Context, id string) (*model.Class, error) {
+// GetClass is the resolver for the getClass field.
+func (r *queryResolver) GetClass(ctx context.Context, id string) (*model.Class, error) {
 	if len(r.classes) == 0 {
 		r.init()
 	}
@@ -69,8 +69,8 @@ func (r *queryResolver) GetClassByID(ctx context.Context, id string) (*model.Cla
 	return nil, errors.New("no class wound with this id")
 }
 
-// GetAllClasses is the resolver for the getAllClasses field.
-func (r *queryResolver) GetAllClasses(ctx context.Context) ([]*model.Class, error) {
+// ListClasses is the resolver for the listClasses field.
+func (r *queryResolver) ListClasses(ctx context.Context) ([]*model.Class, error) {
 	if len(r.classes) == 0 {
 		r.init()
 	}
@@ -78,8 +78,8 @@ func (r *queryResolver) GetAllClasses(ctx context.Context) ([]*model.Class, erro
 	return r.classes, nil
 }
 
-// GetExerciseByID is the resolver for the getExerciseById field.
-func (r *queryResolver) GetExerciseByID(ctx context.Context, id string) (*model.Exercise, error) {
+// GetExercise is the resolver for the getExercise field.
+func (r *queryResolver) GetExercise(ctx context.Context, id string) (*model.Exercise, error) {
 	if len(r.exercises) == 0 {
 		r.init()
 	}
@@ -91,8 +91,8 @@ func (r *queryResolver) GetExerciseByID(ctx context.Context, id string) (*model.
 	return nil, errors.New("no exercise wound with this id")
 }
 
-// GetAllExercises is the resolver for the getAllExercises field.
-func (r *queryResolver) GetAllExercises(ctx context.Context) ([]*model.Exercise, error) {
+// ListExercises is the resolver for the listExercises field.
+func (r *queryResolver) ListExercises(ctx context.Context) ([]*model.Exercise, error) {
 	if len(r.exercises) == 0 {
 		r.init()
 	}
@@ -100,13 +100,17 @@ func (r *queryResolver) GetAllExercises(ctx context.Context) ([]*model.Exercise,
 	return r.exercises, nil
 }
 
-// GetAllResults is the resolver for the getAllResults field.
-func (r *queryResolver) GetAllResults(ctx context.Context) ([]*model.Result, error) {
-	if len(r.results) == 0 {
+// GetResultsByClass is the resolver for the getResultsByClass field.
+func (r *queryResolver) GetResultsByClass(ctx context.Context, classID string) ([]*model.Result, error) {
+	if len(r.exercises) == 0 {
 		r.init()
 	}
-
-	return r.results, nil
+	for _, obj := range r.results {
+		if obj.ModuleID == classID {
+			return r.results, nil
+		}
+	}
+	return nil, errors.New("no exercise wound with this id")
 }
 
 // GetLeaderBord is the resolver for the getLeaderBord field.
@@ -116,6 +120,28 @@ func (r *queryResolver) GetLeaderBord(ctx context.Context) ([]*model.Leaderboard
 	}
 
 	return r.leaderboard, nil
+}
+
+// GetSchool is the resolver for the getSchool field.
+func (r *queryResolver) GetSchool(ctx context.Context, id string) (*model.School, error) {
+	if len(r.schools) == 0 {
+		r.init()
+	}
+	for _, obj := range r.schools {
+		if obj.ID == id {
+			return obj, nil
+		}
+	}
+	return nil, errors.New("no school wound with this id")
+}
+
+// ListSchools is the resolver for the listSchools field.
+func (r *queryResolver) ListSchools(ctx context.Context) ([]*model.School, error) {
+	if len(r.schools) == 0 {
+		r.init()
+	}
+
+	return r.schools, nil
 }
 
 // Mutation returns MutationResolver implementation.

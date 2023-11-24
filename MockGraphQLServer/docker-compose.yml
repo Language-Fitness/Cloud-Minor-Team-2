@@ -1,0 +1,10 @@
+services:
+  api:
+    container_name: graphql
+    restart: always
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: mockgraphserver
+    ports:
+      - "8080:8080"
