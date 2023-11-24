@@ -5,7 +5,6 @@ import (
 	"Module/internal/repository"
 	"context"
 	"errors"
-	"fmt"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
@@ -23,37 +22,15 @@ func NewPolicy(collection *mongo.Collection) *Policy {
 	}
 }
 
-func (p *Policy) CreateModule(bearerToken string, input model.ModuleInput) error {
-	token, err := p.Token.IntrospectToken(bearerToken)
-	if err != nil || token == false {
-		return errors.New("invalid token")
+func (p *Policy) CreateModule(bearerToken string) error {
+	_, roles, err2 := p.getSubAndRoles(bearerToken)
+	if err2 != nil {
+		return err2
 	}
 
-	decodeToken, err := p.Token.DecodeToken(bearerToken)
-	if err != nil {
-		return err
+	if !hasRole(roles, "create_module") {
+		return errors.New("invalid permissions for this action")
 	}
-
-	fmt.Println(decodeToken)
-
-	sub, _ := decodeToken["sub"].(string)
-
-	// Extract 'user-management-client' roles
-	// Note: This assumes 'user-management-client' is always present in the map
-	// and has a 'roles' key with a slice value.
-	var roles []interface{}
-	umcInterface, umcExists := decodeToken["user-management-client"]
-	if umcExists {
-		umc, ok := umcInterface.(map[string]interface{})
-		if ok {
-			rolesInterface, rolesExist := umc["roles"]
-			if rolesExist {
-				roles, _ = rolesInterface.([]interface{})
-			}
-		}
-	}
-
-	fmt.Println(sub, roles)
 
 	return nil
 }
@@ -80,4 +57,45 @@ func (p *Policy) GetModule(ctx context.Context, id string) (bool, error) {
 func (p *Policy) ListModules(ctx context.Context) (bool, error) {
 
 	return true, nil
+}
+
+func (p *Policy) getSubAndRoles(bearerToken string) (string, []interface{}, error) {
+	token, err := p.Token.IntrospectToken(bearerToken)
+	if err != nil || token == false {
+		return "", nil, errors.New("invalid token")
+	}
+
+	decodeToken, err := p.Token.DecodeToken(bearerToken)
+	if err != nil {
+		return "", nil, err
+	}
+
+	sub, _ := decodeToken["sub"].(string)
+
+	resourceAccess, ok := decodeToken["resource_access"].(map[string]interface{})
+	if !ok {
+		return "", nil, errors.New("invalid token")
+	}
+
+	// Access the 'user-management-client' map
+	userManagementClient, ok := resourceAccess["user-management-client"].(map[string]interface{})
+	if !ok {
+		return "", nil, errors.New("invalid token")
+	}
+
+	// Access the 'roles' array within 'user-management-client'
+	roles, ok := userManagementClient["roles"].([]interface{})
+	if !ok {
+		return "", nil, errors.New("invalid token")
+	}
+	return sub, roles, nil
+}
+
+func hasRole(roles []interface{}, targetRole string) bool {
+	for _, role := range roles {
+		if role == targetRole {
+			return true
+		}
+	}
+	return false
 }

@@ -14,7 +14,7 @@ import (
 func (r *mutationResolver) CreateModule(ctx context.Context, input model.ModuleInput) (*model.Module, error) {
 	token := auth.TokenFromContext(ctx)
 
-	err := r.Policy.CreateModule(token, input)
+	err := r.Policy.CreateModule(token)
 	if err != nil {
 		return nil, err
 	}
