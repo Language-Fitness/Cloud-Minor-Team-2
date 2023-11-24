@@ -27,10 +27,10 @@ func NewToken() *Token {
 	}
 }
 
-func (a *Token) IntrospectToken(token string) (bool, error) {
+func (a *Token) IntrospectToken(bearerToken string) (bool, error) {
 	authHeader := a.generateBasicAuthHeader()
 
-	reqBody := fmt.Sprintf("token_type_hint=requesting_party_token&token=%s", token)
+	reqBody := fmt.Sprintf("token_type_hint=requesting_party_token&token=%s", bearerToken)
 	req, err := http.NewRequest("POST", a.Endpoint, strings.NewReader(reqBody))
 	if err != nil {
 		return false, err

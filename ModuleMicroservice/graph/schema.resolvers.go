@@ -6,15 +6,18 @@ package graph
 
 import (
 	"Module/graph/model"
+	"Module/internal/auth"
 	"context"
 )
 
 // CreateModule is the resolver for the createModule field.
 func (r *mutationResolver) CreateModule(ctx context.Context, input model.ModuleInput) (*model.Module, error) {
-	//headers := ctx.Value("headers").(http.Header)
-	//
-	//// Access tokens from the headers, e.g., for Bearer token
-	//accessToken := headers.Get("Authorization")
+	token := auth.TokenFromContext(ctx)
+
+	err := r.Policy.CreateModule(token, input)
+	if err != nil {
+		return nil, err
+	}
 
 	module, err := r.Service.CreateModule(input)
 	if err != nil {
