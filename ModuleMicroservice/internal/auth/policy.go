@@ -6,6 +6,16 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
+type IPolicy interface {
+	CreateModule(bearerToken string) error
+	UpdateModule(bearerToken string, id string) error
+	DeleteModule(bearerToken string, id string) error
+	GetModule(bearerToken string) error
+	ListModules(bearerToken string) error
+	getSubAndRoles(bearerToken string) (string, []interface{}, error)
+	hasRole(roles []interface{}, targetRole string) bool
+}
+
 type Policy struct {
 	Token            *Token
 	ModuleRepository repository.IModuleRepository
