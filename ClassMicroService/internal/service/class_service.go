@@ -40,14 +40,16 @@ func NewClassService() IClassService {
 }
 
 func (c *ClassService) CreateClass(newClass model.ClassInput) (*model.Class, error) {
-	c.Validator.Validate(newClass.ModuleID, []string{"isUUID"})
+	c.Validator.Validate(newClass.ModuleID, []string{"IsUUID"})
 	c.Validator.Validate(newClass.Name, []string{"IsString", "Length:<25"})
 	c.Validator.Validate(*newClass.Description, []string{"IsString", "Length:<50"})
 	c.Validator.Validate(*newClass.Difficulty, []string{"IsInt"})
 
 	validationErrors := c.Validator.GetErrors()
+
 	if len(validationErrors) > 0 {
 		errorMessage := "Validation errors: " + strings.Join(validationErrors, ", ")
+		c.Validator.ClearErrors()
 		return nil, errors.New(errorMessage)
 	}
 
@@ -74,7 +76,8 @@ func (c *ClassService) CreateClass(newClass model.ClassInput) (*model.Class, err
 }
 
 func (c *ClassService) UpdateClass(id string, updatedData model.ClassInput) (*model.Class, error) {
-	c.Validator.Validate(updatedData.ModuleID, []string{"isUUID"})
+	c.Validator.Validate(id, []string{"IsUUID"})
+	c.Validator.Validate(updatedData.ModuleID, []string{"IsUUID"})
 	c.Validator.Validate(updatedData.Name, []string{"IsString", "Length:<25"})
 	c.Validator.Validate(*updatedData.Description, []string{"IsString", "Length:<50"})
 	c.Validator.Validate(*updatedData.Difficulty, []string{"IsInt"})
@@ -82,6 +85,7 @@ func (c *ClassService) UpdateClass(id string, updatedData model.ClassInput) (*mo
 	validationErrors := c.Validator.GetErrors()
 	if len(validationErrors) > 0 {
 		errorMessage := "Validation errors: " + strings.Join(validationErrors, ", ")
+		c.Validator.ClearErrors()
 		return nil, errors.New(errorMessage)
 	}
 
@@ -117,6 +121,7 @@ func (c *ClassService) DeleteClass(id string) error {
 	validationErrors := c.Validator.GetErrors()
 	if len(validationErrors) > 0 {
 		errorMessage := "Validation errors: " + strings.Join(validationErrors, ", ")
+		c.Validator.ClearErrors()
 		return errors.New(errorMessage)
 	}
 
@@ -135,6 +140,7 @@ func (c *ClassService) GetClassById(id string) (*model.Class, error) {
 	validationErrors := c.Validator.GetErrors()
 	if len(validationErrors) > 0 {
 		errorMessage := "Validation errors: " + strings.Join(validationErrors, ", ")
+		c.Validator.ClearErrors()
 		return nil, errors.New(errorMessage)
 	}
 

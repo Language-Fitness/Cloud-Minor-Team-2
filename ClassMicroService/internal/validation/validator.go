@@ -64,7 +64,7 @@ func (v *Validator) Validate(input interface{}, arr []string) {
 		}
 	}
 
-	v.errors = rules.GetErrors()
+	v.errors = append(v.errors, rules.GetErrors()...)
 }
 
 func (v *Validator) GetErrors() []string {
