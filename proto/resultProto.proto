@@ -15,8 +15,8 @@ message Result {
 }
 
 service GrpcResult  {
-  rpc Delete(ModuleRequest) returns (Result);
-  rpc SoftDelete(ModuleRequest) returns (Result);
+  rpc Delete(ResultRequest) returns (Result);
+  rpc SoftDelete(ResultRequest) returns (Result);
 }
 
 message ResultRequest {
