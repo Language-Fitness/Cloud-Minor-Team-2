@@ -57,7 +57,7 @@ func grpcServer() {
 		log.Fatalf("Failed to listen: %v", err)
 	}
 
-	fmt.Println("Server is listening on port 50051...")
+	fmt.Println("grpc Result Server is listening on port 50051...")
 
 	// Serve the gRPC server
 	if err := server.Serve(lis); err != nil {
