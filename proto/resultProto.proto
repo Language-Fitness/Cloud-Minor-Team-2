@@ -14,7 +14,7 @@ message Result {
   bool SoftDeleted = 10;
 }
 
-service GRPC_Module {
+service GrpcModule {
   rpc Delete(ModuleRequest) returns (Result);
   rpc SoftDelete(ModuleRequest) returns (Result);
 }
