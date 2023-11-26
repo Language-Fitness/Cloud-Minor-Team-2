@@ -14,12 +14,12 @@ message Result {
   bool SoftDeleted = 10;
 }
 
-service GrpcModule {
+service GrpcResult  {
   rpc Delete(ModuleRequest) returns (Result);
   rpc SoftDelete(ModuleRequest) returns (Result);
 }
 
-message ModuleRequest {
+message ResultRequest {
   string ModuleID = 1;
   string BearerToken = 2;
 }
