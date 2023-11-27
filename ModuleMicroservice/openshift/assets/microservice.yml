@@ -1,0 +1,60 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: module-microservice
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: module-microservice
+  template:
+    metadata:
+      labels:
+        app: module-microservice
+    spec:
+      containers:
+        - name: module-microservice
+          image: microservice_image
+          ports:
+            - containerPort: 8081
+          readinessProbe:
+            timeoutSeconds: 3
+            initialDelaySeconds: 5
+            httpGet:
+              path: "/healthz"
+              port: 8081
+          livenessProbe:
+            timeoutSeconds: 3
+            initialDelaySeconds: 30
+            httpGet:
+              path: "/healthz"
+              port: 8081
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: module-microservice-service
+  annotations:
+    description: Exposes and load balances the application pods
+  labels:
+    app: module-microservice
+spec:
+  ports:
+    - name: http
+      port: 8081
+      targetPort: 8081
+  selector:
+    app: module-microservice
+---
+kind: Route
+apiVersion: route.openshift.io/v1
+metadata:
+  name: module-microservice-route
+  labels:
+    app: module-microservice
+spec:
+  port:
+    targetPort: 8081
+  to:
+    kind: Service
+    name: module-microservice-service
