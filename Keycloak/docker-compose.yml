@@ -11,7 +11,7 @@ services:
       - mariadb-data:/var/lib/mysql
 
   keycloak:
-    image: quay.io/keycloak/keycloak:22.0.0
+    image: quay.io/keycloak/keycloak:23.0.0
     environment:
       keycloak.url: http://keycloak:8888
       KC_HOSTNAME: localhost
