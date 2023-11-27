@@ -39,13 +39,14 @@ func NewSchoolService() ISchoolService {
 	}
 }
 
-func (c *SchoolService) CreateSchool(newSchool model.SchoolInput) (*model.School, error) {
-	c.Validator.Validate(newSchool.Name, []string{"IsString", "Length:<25"})
-	c.Validator.Validate(*newSchool.Location, []string{"IsString", "Length:<50"})
+func (s *SchoolService) CreateSchool(newSchool model.SchoolInput) (*model.School, error) {
+	s.Validator.Validate(newSchool.Name, []string{"IsString", "Length:<25"})
+	s.Validator.Validate(*newSchool.Location, []string{"IsString", "Length:<50"})
 
-	validationErrors := c.Validator.GetErrors()
+	validationErrors := s.Validator.GetErrors()
 	if len(validationErrors) > 0 {
 		errorMessage := "Validation errors: " + strings.Join(validationErrors, ", ")
+		s.Validator.ClearErrors()
 		return nil, errors.New(errorMessage)
 	}
 
@@ -60,26 +61,27 @@ func (c *SchoolService) CreateSchool(newSchool model.SchoolInput) (*model.School
 		SoftDeleted: &softDeleted,
 	}
 
-	result, err := c.Repo.CreateSchool(SchoolToInsert)
+	result, err := s.Repo.CreateSchool(SchoolToInsert)
 	if err != nil {
 		return nil, err
 	}
 
-	c.Validator.ClearErrors()
 	return result, nil
 }
 
-func (c *SchoolService) UpdateSchool(id string, updatedData model.SchoolInput) (*model.School, error) {
-	c.Validator.Validate(updatedData.Name, []string{"IsString", "Length:<25"})
-	c.Validator.Validate(*updatedData.Location, []string{"IsString", "Length:<50"})
+func (s *SchoolService) UpdateSchool(id string, updatedData model.SchoolInput) (*model.School, error) {
+	s.Validator.Validate(id, []string{"IsUUID"})
+	s.Validator.Validate(updatedData.Name, []string{"IsString", "Length:<25"})
+	s.Validator.Validate(*updatedData.Location, []string{"IsString", "Length:<50"})
 
-	validationErrors := c.Validator.GetErrors()
+	validationErrors := s.Validator.GetErrors()
 	if len(validationErrors) > 0 {
 		errorMessage := "Validation errors: " + strings.Join(validationErrors, ", ")
+		s.Validator.ClearErrors()
 		return nil, errors.New(errorMessage)
 	}
 
-	existingSchool, err := c.Repo.GetSchoolByID(id)
+	existingSchool, err := s.Repo.GetSchoolByID(id)
 	if err != nil {
 		return nil, err
 	}
@@ -94,53 +96,52 @@ func (c *SchoolService) UpdateSchool(id string, updatedData model.SchoolInput) (
 		SoftDeleted: existingSchool.SoftDeleted,
 	}
 
-	result, err := c.Repo.UpdateSchool(id, newSchool)
+	result, err := s.Repo.UpdateSchool(id, newSchool)
 	if err != nil {
 		return nil, err
 	}
 
-	c.Validator.ClearErrors()
 	return result, nil
 }
 
-func (c *SchoolService) DeleteSchool(id string) error {
-	c.Validator.Validate(id, []string{"IsUUID"})
+func (s *SchoolService) DeleteSchool(id string) error {
+	s.Validator.Validate(id, []string{"IsUUID"})
 
-	validationErrors := c.Validator.GetErrors()
+	validationErrors := s.Validator.GetErrors()
 	if len(validationErrors) > 0 {
 		errorMessage := "Validation errors: " + strings.Join(validationErrors, ", ")
+		s.Validator.ClearErrors()
 		return errors.New(errorMessage)
 	}
 
-	err := c.Repo.DeleteSchoolByID(id)
+	err := s.Repo.DeleteSchoolByID(id)
 	if err != nil {
 		return err
 	}
 
-	c.Validator.ClearErrors()
 	return nil
 }
 
-func (c *SchoolService) GetSchoolById(id string) (*model.School, error) {
-	c.Validator.Validate(id, []string{"IsUUID"})
+func (s *SchoolService) GetSchoolById(id string) (*model.School, error) {
+	s.Validator.Validate(id, []string{"IsUUID"})
 
-	validationErrors := c.Validator.GetErrors()
+	validationErrors := s.Validator.GetErrors()
 	if len(validationErrors) > 0 {
 		errorMessage := "Validation errors: " + strings.Join(validationErrors, ", ")
+		s.Validator.ClearErrors()
 		return nil, errors.New(errorMessage)
 	}
 
-	School, err := c.Repo.GetSchoolByID(id)
+	School, err := s.Repo.GetSchoolByID(id)
 	if err != nil {
 		return nil, err
 	}
 
-	c.Validator.ClearErrors()
 	return School, nil
 }
 
-func (c *SchoolService) ListSchools() ([]*model.School, error) {
-	Schools, err := c.Repo.ListSchools()
+func (s *SchoolService) ListSchools() ([]*model.School, error) {
+	Schools, err := s.Repo.ListSchools()
 	if err != nil {
 		return nil, err
 	}

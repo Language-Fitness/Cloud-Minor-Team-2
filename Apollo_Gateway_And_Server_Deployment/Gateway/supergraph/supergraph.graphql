@@ -23,6 +23,7 @@ scalar join__FieldSet
 
 enum join__Graph {
     CLASSES @join__graph(name: "classes", url: "http://class-microservice-service:8082/query")
+    SCHOOLES @join__graph(name: "schooles", url: "http://school-microservice-service:8083/query")
 }
 
 #enum join__Graph {
@@ -81,6 +82,17 @@ type Class
     soft_deleted: Boolean @join__field(graph: CLASSES)
 }
 
+type School
+@join__type(graph: SCHOOLES, key: "id")
+{
+    id: ID!
+    name: String!
+    location: String
+    created_at: String
+    updated_at: String
+    soft_deleted: Boolean
+}
+
 input ClassInput
 @join__type(graph: CLASSES)
 {
@@ -90,18 +102,31 @@ input ClassInput
     difficulty: Int
 }
 
+input SchoolInput
+@join__type(graph: SCHOOLES)
+{
+    name: String!
+    location: String
+}
+
 type Query
 @join__type(graph: CLASSES)
+@join__type(graph: SCHOOLES)
 {
     getClass(id: ID!): Class @join__field(graph: CLASSES)
     listClasses: [Class] @join__field(graph: CLASSES)
+    getSchool(id: ID!): School @join__field(graph: SCHOOLES)
+    listSchools: [School] @join__field(graph: SCHOOLES)
 }
 
 type Mutation
 @join__type(graph: CLASSES)
+@join__type(graph: SCHOOLES)
 {
     createClass(input: ClassInput!): Class @join__field(graph: CLASSES)
     updateClass(id: ID!, input: ClassInput!): Class @join__field(graph: CLASSES)
     deleteClass(id: ID!): ID @join__field(graph: CLASSES)
+    createSchool(input: SchoolInput!): School @join__field(graph: SCHOOLES)
+    updateSchool(id: ID!, input: SchoolInput!): School @join__field(graph: SCHOOLES)
+    deleteSchool(id: ID!): ID @join__field(graph: SCHOOLES)
 }
-

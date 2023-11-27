@@ -12,8 +12,9 @@ services:
   mongodb:
     container_name: mongodb
     image: mongo
+    command: mongod --port 27018
     ports:
-      - "27017:27017"
+      - "27018:27018"
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: example

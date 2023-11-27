@@ -71,7 +71,6 @@ func (c *ClassService) CreateClass(newClass model.ClassInput) (*model.Class, err
 		return nil, err
 	}
 
-	c.Validator.ClearErrors()
 	return result, nil
 }
 
@@ -111,7 +110,6 @@ func (c *ClassService) UpdateClass(id string, updatedData model.ClassInput) (*mo
 		return nil, err
 	}
 
-	c.Validator.ClearErrors()
 	return result, nil
 }
 
@@ -130,7 +128,6 @@ func (c *ClassService) DeleteClass(id string) error {
 		return err
 	}
 
-	c.Validator.ClearErrors()
 	return nil
 }
 
@@ -149,7 +146,6 @@ func (c *ClassService) GetClassById(id string) (*model.Class, error) {
 		return nil, err
 	}
 
-	c.Validator.ClearErrors()
 	return Class, nil
 }
 

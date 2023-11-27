@@ -5,6 +5,10 @@ RUN apk update && apk upgrade && \
 
 WORKDIR /app
 
+COPY .env .env
+
+RUN export $(cat .env | grep -v ^# | xargs)
+
 COPY go.mod go.sum ./
 
 RUN go mod download
