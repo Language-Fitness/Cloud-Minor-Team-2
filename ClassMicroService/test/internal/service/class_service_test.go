@@ -25,10 +25,10 @@ func TestService_CreateClass(t *testing.T) {
 
 	assert.Nil(t, err)
 	assert.NotNil(t, result)
-	//assert.Equal(t, "3a3bd756-6353-4e29-8aba-5b3531bdb9ed", result.ID)
-	//
-	//mockValidator.AssertExpectations(t)
-	//mockRepo.AssertExpectations(t)
+	assert.Equal(t, "3a3bd756-6353-4e29-8aba-5b3531bdb9ed", result.ID)
+
+	mockValidator.AssertExpectations(t)
+	mockRepo.AssertExpectations(t)
 }
 
 func TestService_CreateClass_CatchValidationErrors(t *testing.T) {

@@ -1,60 +1,60 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: class-microservice
+  name: school-microservice
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: class-microservice
+      app: school-microservice
   template:
     metadata:
       labels:
-        app: class-microservice
+        app: school-microservice
     spec:
       containers:
-        - name: class-microservice
+        - name: school-microservice
           image: microservice_image
           ports:
-            - containerPort: 8082
+            - containerPort: 8083
           readinessProbe:
             timeoutSeconds: 3
-            initialDelaySeconds: 3
+            initialDelaySeconds: 5
             httpGet:
               path: "/healthz"
-              port: 8082
+              port: 8083
           livenessProbe:
             timeoutSeconds: 3
             initialDelaySeconds: 30
             httpGet:
               path: "/healthz"
-              port: 8082
+              port: 8083
 ---
 kind: Service
 apiVersion: v1
 metadata:
-  name: class-microservice-service
+  name: school-microservice-service
   annotations:
     description: Exposes and load balances the application pods
   labels:
-    app: class-microservice
+    app: school-microservice
 spec:
   ports:
     - name: http
-      port: 8082
-      targetPort: 8082
+      port: 8083
+      targetPort: 8083
   selector:
-    app: class-microservice
+    app: school-microservice
 ---
 kind: Route
 apiVersion: route.openshift.io/v1
 metadata:
-  name: class-microservice-route
+  name: school-microservice-route
   labels:
-    app: class-microservice
+    app: school-microservice
 spec:
   port:
-    targetPort: 8082
+    targetPort: 8083
   to:
     kind: Service
-    name: class-microservice-service
+    name: school-microservice-service
