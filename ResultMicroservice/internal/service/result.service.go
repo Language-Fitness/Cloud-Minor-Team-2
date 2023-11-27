@@ -70,7 +70,6 @@ func (r *ResultService) CreateResult(newResult model.InputResult) (*model.Result
 		return nil, err
 	}
 
-	r.Validator.ClearErrors()
 	return result, nil
 }
 
@@ -110,7 +109,6 @@ func (r *ResultService) UpdateResult(id string, updateData model.InputResult) (*
 		return nil, err
 	}
 
-	r.Validator.ClearErrors()
 	return result, nil
 }
 
@@ -130,7 +128,6 @@ func (r *ResultService) DeleteResult(id string) error {
 		return err
 	}
 
-	r.Validator.ClearErrors()
 	return nil
 }
 
@@ -150,7 +147,6 @@ func (r *ResultService) GetResultById(id string) (*model.Result, error) {
 		return nil, err
 	}
 
-	r.Validator.ClearErrors()
 	return result, nil
 }
 
@@ -170,7 +166,6 @@ func (r *ResultService) GetResultByExerciseId(id string) (*model.Result, error) 
 		return nil, err
 	}
 
-	r.Validator.ClearErrors()
 	return result, nil
 }
 
@@ -189,8 +184,7 @@ func (r *ResultService) GetResultByClassId(id string) ([]*model.Result, error) {
 	if err != nil {
 		return nil, err
 	}
-
-	r.Validator.ClearErrors()
+	
 	return result, nil
 }
 
