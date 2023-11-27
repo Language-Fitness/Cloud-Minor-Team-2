@@ -32,6 +32,9 @@ func (r *mutationResolver) UpdateModule(ctx context.Context, id string, input mo
 	token := auth.TokenFromContext(ctx)
 
 	module, err := r.Policy.UpdateModule(token, id)
+	if err != nil {
+		return nil, err
+	}
 
 	updatedModule, err := r.Service.UpdateModule(id, module, input)
 	if err != nil {
@@ -57,6 +60,9 @@ func (r *queryResolver) GetModule(ctx context.Context, id string) (*model.Module
 	token := auth.TokenFromContext(ctx)
 
 	err := r.Policy.GetModule(token)
+	if err != nil {
+		return nil, err
+	}
 
 	module, err := r.Service.GetModuleById(id)
 	if err != nil {
@@ -71,6 +77,10 @@ func (r *queryResolver) ListModules(ctx context.Context) ([]*model.Module, error
 	token := auth.TokenFromContext(ctx)
 
 	err := r.Policy.ListModules(token)
+	if err != nil {
+		return nil, err
+	}
+
 	modules, err := r.Service.ListModules()
 	if err != nil {
 		return nil, err
