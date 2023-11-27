@@ -31,14 +31,14 @@ func (r *mutationResolver) CreateModule(ctx context.Context, input model.ModuleI
 func (r *mutationResolver) UpdateModule(ctx context.Context, id string, input model.ModuleInput) (*model.Module, error) {
 	token := auth.TokenFromContext(ctx)
 
-	err := r.Policy.UpdateModule(token, id)
+	module, err := r.Policy.UpdateModule(token, id)
 
-	module, err := r.Service.UpdateModule(id, input)
+	updatedModule, err := r.Service.UpdateModule(id, module, input)
 	if err != nil {
 		return nil, err
 	}
 
-	return module, nil
+	return updatedModule, nil
 }
 
 // DeleteModule is the resolver for the deleteModule field.

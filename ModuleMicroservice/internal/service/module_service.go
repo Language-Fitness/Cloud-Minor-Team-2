@@ -5,7 +5,6 @@ import (
 	"Module/internal/repository"
 	"Module/internal/validation"
 	"errors"
-	"fmt"
 	"github.com/google/uuid"
 	"go.mongodb.org/mongo-driver/mongo"
 	"strings"
@@ -16,7 +15,7 @@ import (
 // Implements five CRUD methods for query's and mutations on Module.
 type IModuleService interface {
 	CreateModule(newModule model.ModuleInput) (*model.Module, error)
-	UpdateModule(id string, updateData model.ModuleInput) (*model.Module, error)
+	UpdateModule(id string, existingModule *model.Module, updateData model.ModuleInput) (*model.Module, error)
 	DeleteModule(id string) error
 	GetModuleById(id string) (*model.Module, error)
 	ListModules() ([]*model.Module, error)
@@ -48,7 +47,7 @@ func (m *ModuleService) CreateModule(newModule model.ModuleInput) (*model.Module
 	m.Validator.Validate(*newModule.Key, []string{"IsString", "Length:<30"})
 
 	validationErrors := m.Validator.GetErrors()
-	fmt.Println(validationErrors)
+
 	if len(validationErrors) > 0 {
 		errorMessage := "Validation errors: " + strings.Join(validationErrors, ", ")
 		m.Validator.ClearErrors()
@@ -79,7 +78,7 @@ func (m *ModuleService) CreateModule(newModule model.ModuleInput) (*model.Module
 	return result, nil
 }
 
-func (m *ModuleService) UpdateModule(id string, updateData model.ModuleInput) (*model.Module, error) {
+func (m *ModuleService) UpdateModule(id string, existingModule *model.Module, updateData model.ModuleInput) (*model.Module, error) {
 	m.Validator.Validate(updateData.Name, []string{"IsString", "Length:<25"})
 	m.Validator.Validate(*updateData.Description, []string{"IsString", "Length:<50"})
 	m.Validator.Validate(*updateData.Difficulty, []string{"IsInt"})
@@ -95,10 +94,10 @@ func (m *ModuleService) UpdateModule(id string, updateData model.ModuleInput) (*
 		return nil, errors.New(errorMessage)
 	}
 
-	existingModule, err := m.Repo.GetModuleByID(id)
-	if err != nil {
-		return nil, err
-	}
+	//existingModule, err := m.Repo.GetModuleByID(id)
+	//if err != nil {
+	//	return nil, err
+	//}
 
 	timestamp := time.Now().String()
 	newModule := model.Module{

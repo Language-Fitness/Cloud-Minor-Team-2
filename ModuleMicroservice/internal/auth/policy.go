@@ -1,6 +1,7 @@
 package auth
 
 import (
+	"Module/graph/model"
 	"Module/internal/repository"
 	"errors"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -43,26 +44,26 @@ func (p *Policy) CreateModule(bearerToken string) error {
 	return nil
 }
 
-func (p *Policy) UpdateModule(bearerToken string, id string) error {
+func (p *Policy) UpdateModule(bearerToken string, id string) (*model.Module, error) {
 	uuid, roles, err2 := p.getSubAndRoles(bearerToken)
 	if err2 != nil {
-		return err2
+		return nil, err2
 	}
 
 	module, err := p.ModuleRepository.GetModuleByID(id)
 	if err != nil {
-		return errors.New("invalid permissions for this action")
+		return nil, errors.New("invalid permissions for this action")
 	}
 
 	if hasRole(roles, "update_module") && *module.MadeBy == uuid {
-		return nil
+		return module, nil
 	}
 
 	if hasRole(roles, "update_module_all") {
-		return nil
+		return module, nil
 	}
 
-	return errors.New("invalid permissions for this action")
+	return nil, errors.New("invalid permissions for this action")
 }
 
 func (p *Policy) DeleteModule(bearerToken string, id string) error {
