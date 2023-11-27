@@ -47,6 +47,7 @@ func (r *ResultService) CreateResult(newResult model.InputResult) (*model.Result
 	validationErrors := r.Validator.GetErrors()
 	if len(validationErrors) > 0 {
 		errorMessage := "Validation errors: " + strings.Join(validationErrors, ", ")
+		r.Validator.ClearErrors()
 		return nil, errors.New(errorMessage)
 	}
 
@@ -80,6 +81,7 @@ func (r *ResultService) UpdateResult(id string, updateData model.InputResult) (*
 	validationErrors := r.Validator.GetErrors()
 	if len(validationErrors) > 0 {
 		errorMessage := "Validation errors: " + strings.Join(validationErrors, ", ")
+		r.Validator.ClearErrors()
 		return nil, errors.New(errorMessage)
 	}
 
@@ -119,6 +121,7 @@ func (r *ResultService) DeleteResult(id string) error {
 	validationErrors := r.Validator.GetErrors()
 	if len(validationErrors) > 0 {
 		errorMessage := "Validation errors: " + strings.Join(validationErrors, ", ")
+		r.Validator.ClearErrors()
 		return errors.New(errorMessage)
 	}
 
@@ -138,6 +141,7 @@ func (r *ResultService) GetResultById(id string) (*model.Result, error) {
 	validationErrors := r.Validator.GetErrors()
 	if len(validationErrors) > 0 {
 		errorMessage := "Validation errors: " + strings.Join(validationErrors, ", ")
+		r.Validator.ClearErrors()
 		return nil, errors.New(errorMessage)
 	}
 
@@ -157,6 +161,7 @@ func (r *ResultService) GetResultByExerciseId(id string) (*model.Result, error) 
 	validationErrors := r.Validator.GetErrors()
 	if len(validationErrors) > 0 {
 		errorMessage := "Validation errors: " + strings.Join(validationErrors, ", ")
+		r.Validator.ClearErrors()
 		return nil, errors.New(errorMessage)
 	}
 
@@ -176,6 +181,7 @@ func (r *ResultService) GetResultByClassId(id string) ([]*model.Result, error) {
 	validationErrors := r.Validator.GetErrors()
 	if len(validationErrors) > 0 {
 		errorMessage := "Validation errors: " + strings.Join(validationErrors, ", ")
+		r.Validator.ClearErrors()
 		return nil, errors.New(errorMessage)
 	}
 

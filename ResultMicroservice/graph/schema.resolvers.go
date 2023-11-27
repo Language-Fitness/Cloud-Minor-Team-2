@@ -47,7 +47,12 @@ func (r *queryResolver) GetResultByExercise(ctx context.Context, exerciseID stri
 
 // GetResultsByClass is the resolver for the GetResultsByClass field.
 func (r *queryResolver) GetResultsByClass(ctx context.Context, classID string) ([]*model.Result, error) {
-	panic(fmt.Errorf("not implemented: GetResultsByClass - GetResultsByClass"))
+	results, err := r.Service.GetResultByClassId(classID)
+	if err != nil {
+		return nil, err
+	}
+
+	return results, nil
 }
 
 // GetResultsByModule is the resolver for the GetResultsByModule field.
