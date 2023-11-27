@@ -19,16 +19,16 @@ spec:
             - containerPort: 8083
           readinessProbe:
             timeoutSeconds: 3
-            initialDelaySeconds: 3
+            initialDelaySeconds: 5
             httpGet:
               path: "/healthz"
-              port: 8082
+              port: 8083
           livenessProbe:
             timeoutSeconds: 3
             initialDelaySeconds: 30
             httpGet:
               path: "/healthz"
-              port: 8082
+              port: 8083
 ---
 kind: Service
 apiVersion: v1
