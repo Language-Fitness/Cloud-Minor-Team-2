@@ -18,7 +18,7 @@ type IPolicy interface {
 }
 
 type Policy struct {
-	Token            *Token
+	Token            IToken
 	ModuleRepository repository.IModuleRepository
 }
 
