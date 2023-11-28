@@ -14,7 +14,7 @@ import (
 type Resolver struct {
 	Service service.IModuleService
 	Modules []*model.Module
-	Policy  *auth.Policy
+	Policy  auth.IPolicy
 }
 
 func NewResolver() *Resolver {
