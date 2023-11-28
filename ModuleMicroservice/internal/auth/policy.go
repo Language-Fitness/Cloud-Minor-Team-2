@@ -9,7 +9,7 @@ import (
 
 type IPolicy interface {
 	CreateModule(bearerToken string) error
-	UpdateModule(bearerToken string, id string) error
+	UpdateModule(bearerToken string, id string) (*model.Module, error)
 	DeleteModule(bearerToken string, id string) error
 	GetModule(bearerToken string) error
 	ListModules(bearerToken string) error
@@ -22,7 +22,7 @@ type Policy struct {
 	ModuleRepository repository.IModuleRepository
 }
 
-func NewPolicy(collection *mongo.Collection) *Policy {
+func NewPolicy(collection *mongo.Collection) IPolicy {
 	token := NewToken()
 
 	return &Policy{
@@ -37,7 +37,7 @@ func (p *Policy) CreateModule(bearerToken string) error {
 		return err2
 	}
 
-	if !hasRole(roles, "create_module") {
+	if !p.hasRole(roles, "create_module") {
 		return errors.New("invalid permissions for this action")
 	}
 
@@ -55,11 +55,11 @@ func (p *Policy) UpdateModule(bearerToken string, id string) (*model.Module, err
 		return nil, errors.New("invalid permissions for this action")
 	}
 
-	if hasRole(roles, "update_module") && *module.MadeBy == uuid {
+	if p.hasRole(roles, "update_module") && *module.MadeBy == uuid {
 		return module, nil
 	}
 
-	if hasRole(roles, "update_module_all") {
+	if p.hasRole(roles, "update_module_all") {
 		return module, nil
 	}
 
@@ -77,11 +77,11 @@ func (p *Policy) DeleteModule(bearerToken string, id string) error {
 		return errors.New("invalid permissions for this action")
 	}
 
-	if hasRole(roles, "delete_module") && *module.MadeBy == uuid {
+	if p.hasRole(roles, "delete_module") && *module.MadeBy == uuid {
 		return nil
 	}
 
-	if hasRole(roles, "delete_module_all") {
+	if p.hasRole(roles, "delete_module_all") {
 		return nil
 	}
 
@@ -95,7 +95,7 @@ func (p *Policy) GetModule(bearerToken string) error {
 		return err2
 	}
 
-	if !hasRole(roles, "get_module") {
+	if !p.hasRole(roles, "get_module") {
 		return errors.New("invalid permissions for this action")
 	}
 
@@ -109,7 +109,7 @@ func (p *Policy) ListModules(bearerToken string) error {
 		return err2
 	}
 
-	if !hasRole(roles, "get_modules") {
+	if !p.hasRole(roles, "get_modules") {
 		return errors.New("invalid permissions for this action")
 	}
 
@@ -146,7 +146,7 @@ func (p *Policy) getSubAndRoles(bearerToken string) (string, []interface{}, erro
 	return sub, roles, nil
 }
 
-func hasRole(roles []interface{}, targetRole string) bool {
+func (p *Policy) hasRole(roles []interface{}, targetRole string) bool {
 	for _, role := range roles {
 		if role == targetRole {
 			return true
