@@ -27,7 +27,6 @@ input InputResult {
 type Query {
     GetResultByExercise(exercise_id: ID!): Result
     GetResultsByClass(class_id: ID!): [Result]
-    GetResultsByModule(module_id: ID!): [Result]
     GetResultsByUser(user_id: ID!): [Result]
     GetResultsByID(id: ID!): Result
 }

@@ -55,11 +55,6 @@ func (r *queryResolver) GetResultsByClass(ctx context.Context, classID string) (
 	return results, nil
 }
 
-// GetResultsByModule is the resolver for the GetResultsByModule field.
-func (r *queryResolver) GetResultsByModule(ctx context.Context, moduleID string) ([]*model.Result, error) {
-	panic(fmt.Errorf("not implemented: GetResultsByModule - GetResultsByModule"))
-}
-
 // GetResultsByUser is the resolver for the GetResultsByUser field.
 func (r *queryResolver) GetResultsByUser(ctx context.Context, userID string) ([]*model.Result, error) {
 	panic(fmt.Errorf("not implemented: GetResultsByUser - GetResultsByUser"))
