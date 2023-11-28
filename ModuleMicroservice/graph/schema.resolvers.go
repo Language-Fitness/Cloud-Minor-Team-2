@@ -14,12 +14,7 @@ import (
 func (r *mutationResolver) CreateModule(ctx context.Context, input model.ModuleInput) (*model.Module, error) {
 	token := auth.TokenFromContext(ctx)
 
-	err := r.Policy.CreateModule(token)
-	if err != nil {
-		return nil, err
-	}
-
-	module, err := r.Service.CreateModule(input)
+	module, err := r.Service.CreateModule(token, input)
 	if err != nil {
 		return nil, err
 	}
@@ -31,12 +26,7 @@ func (r *mutationResolver) CreateModule(ctx context.Context, input model.ModuleI
 func (r *mutationResolver) UpdateModule(ctx context.Context, id string, input model.ModuleInput) (*model.Module, error) {
 	token := auth.TokenFromContext(ctx)
 
-	module, err := r.Policy.UpdateModule(token, id)
-	if err != nil {
-		return nil, err
-	}
-
-	updatedModule, err := r.Service.UpdateModule(id, module, input)
+	updatedModule, err := r.Service.UpdateModule(token, id, input)
 	if err != nil {
 		return nil, err
 	}
@@ -59,12 +49,7 @@ func (r *mutationResolver) DeleteModule(ctx context.Context, id string) (*string
 func (r *queryResolver) GetModule(ctx context.Context, id string) (*model.Module, error) {
 	token := auth.TokenFromContext(ctx)
 
-	err := r.Policy.GetModule(token)
-	if err != nil {
-		return nil, err
-	}
-
-	module, err := r.Service.GetModuleById(id)
+	module, err := r.Service.GetModuleById(token, id)
 	if err != nil {
 		return nil, err
 	}
@@ -76,12 +61,7 @@ func (r *queryResolver) GetModule(ctx context.Context, id string) (*model.Module
 func (r *queryResolver) ListModules(ctx context.Context) ([]*model.Module, error) {
 	token := auth.TokenFromContext(ctx)
 
-	err := r.Policy.ListModules(token)
-	if err != nil {
-		return nil, err
-	}
-
-	modules, err := r.Service.ListModules()
+	modules, err := r.Service.ListModules(token)
 	if err != nil {
 		return nil, err
 	}
