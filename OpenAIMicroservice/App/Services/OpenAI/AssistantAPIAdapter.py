@@ -55,27 +55,25 @@ class AssistantAPIAdapter:
         return token
 
     def Retrieve_Response(self, token):
-        self.Decode_Token(token)
+        thread_id, assistant_id = self.Decode_Token(token)
 
         messages = self.assistant_manager.retrieve_messages(thread_id)
+
+        self.assistant_manager.delete_thread(thread_id)
+        self.assistant_manager.delete_assistant(assistant_id)
+
         return messages
 
     def Encode_Token(self, thread_id, assistant_id):
-        # Create a dictionary of the IDs
         ids_dict = {'thread_id': thread_id, 'assistant_id': assistant_id}
-        # Convert the dictionary to a JSON string
         ids_json = json.dumps(ids_dict)
-        # Encode the JSON string to bytes
         ids_bytes = ids_json.encode('utf-8')
-        # Base64 encode the bytes
         encoded_ids = base64.b64encode(ids_bytes)
-        # Convert bytes back to a string for easy storage or transmission
+
         return encoded_ids.decode('utf-8')
 
     def Decode_Token(self, token):
-        # Decode the Base64 string to bytes
         ids_bytes = base64.b64decode(token)
-        # Convert bytes back to a JSON string
         ids_json = ids_bytes.decode('utf-8')
-        # Convert the JSON string back to a dictionary
-        return json.loads(ids_json)
+        ids_dict = json.loads(ids_json)
+        return ids_dict['thread_id'], ids_dict['assistant_id']
