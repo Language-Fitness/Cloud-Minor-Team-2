@@ -28,7 +28,7 @@ spec:
               value: keycloak
       volumes:
         - name: cache-volume
-          emptyDir: {}
+          emptyDir: { }
 ---
 apiVersion: v1
 kind: Service

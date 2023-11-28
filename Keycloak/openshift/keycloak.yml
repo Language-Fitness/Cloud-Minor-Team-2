@@ -15,9 +15,5 @@ spec:
       key: password
   http:
     httpEnabled: true
-    httpPort: 8888
   hostname:
-    hostname: my-hostname
-    admin: my-admin-hostname
-    strict: false
-    strictBackchannel: false
+    hostname: test.keycloak.org
