@@ -27,7 +27,7 @@ type IModuleService interface {
 type ModuleService struct {
 	Validator validation.IValidator
 	Repo      repository.IModuleRepository
-	Policy    *auth.Policy
+	Policy    auth.IPolicy
 }
 
 // NewModuleService GOLANG FACTORY

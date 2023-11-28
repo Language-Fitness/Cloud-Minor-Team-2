@@ -13,8 +13,6 @@ type IPolicy interface {
 	DeleteModule(bearerToken string, id string) error
 	GetModule(bearerToken string) error
 	ListModules(bearerToken string) error
-	getSubAndRoles(bearerToken string) (string, []interface{}, error)
-	hasRole(roles []interface{}, targetRole string) bool
 }
 
 type Policy struct {
