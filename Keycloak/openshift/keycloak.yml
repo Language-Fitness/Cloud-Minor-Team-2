@@ -15,5 +15,6 @@ spec:
       key: password
   http:
     httpEnabled: true
+    tlsSecret: example-tls-secret
   hostname:
     hostname: test.keycloak.org

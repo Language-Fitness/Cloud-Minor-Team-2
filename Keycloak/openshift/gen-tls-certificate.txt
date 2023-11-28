@@ -1,0 +1,9 @@
+Download and install openssl Windows Binary: https://slproweb.com/products/Win32OpenSSL.html
+Add C:\path\to\OpenSSL-Win64\bin to PATH environmental variables
+Navigate to folder in which certificates are to be generated
+
+Run following to generate:
+openssl req -subj '/CN=test.keycloak.org/O=Test Keycloak./C=US' -newkey rsa:2048 -nodes -keyout key.pem -x509 -days 365 -out certificate.pem
+
+Run following to create secret in OpenShift
+kubectl create secret tls example-tls-secret --cert certificate.pem --key key.pem
