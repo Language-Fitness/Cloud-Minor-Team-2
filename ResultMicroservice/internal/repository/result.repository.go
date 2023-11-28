@@ -18,6 +18,7 @@ type IResultRepository interface {
 	GetResultByID(id string) (*model.Result, error)
 	GetResultByExerciseId(id string) (*model.Result, error)
 	GetResultByClassId(id string) ([]*model.Result, error)
+	GetResultsByUserID(userID string) ([]*model.Result, error)
 }
 
 // ResultRepository GOLANG STRUCT
@@ -149,4 +150,24 @@ func (r *ResultRepository) GetResultByID(id string) (*model.Result, error) {
 	}
 
 	return &result, nil
+}
+
+func (r *ResultRepository) GetResultsByUserID(userID string) ([]*model.Result, error) {
+	ctx, cancel := context.WithTimeout(context.TODO(), time.Second*10) // 10-second timeout
+	defer cancel()
+
+	filter := bson.M{"user_id": userID}
+	var results []*model.Result
+
+	cursor, err := r.collection.Find(ctx, filter)
+	if err != nil {
+		return nil, err
+	}
+
+	err = cursor.All(ctx, &results)
+	if err != nil {
+		return nil, err
+	}
+
+	return results, nil
 }

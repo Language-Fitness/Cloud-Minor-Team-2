@@ -57,12 +57,22 @@ func (r *queryResolver) GetResultsByClass(ctx context.Context, classID string) (
 
 // GetResultsByUser is the resolver for the GetResultsByUser field.
 func (r *queryResolver) GetResultsByUser(ctx context.Context, userID string) ([]*model.Result, error) {
-	panic(fmt.Errorf("not implemented: GetResultsByUser - GetResultsByUser"))
+	results, err := r.Service.GetResultsByUserID(userID)
+	if err != nil {
+		return nil, err
+	}
+
+	return results, nil
 }
 
 // GetResultsByID is the resolver for the GetResultsByID field.
 func (r *queryResolver) GetResultsByID(ctx context.Context, id string) (*model.Result, error) {
-	panic(fmt.Errorf("not implemented: GetResultsByID - GetResultsByID"))
+	result, err := r.Service.GetResultById(id)
+	if err != nil {
+		return nil, err
+	}
+
+	return result, nil
 }
 
 // Mutation returns MutationResolver implementation.

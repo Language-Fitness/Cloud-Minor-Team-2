@@ -20,6 +20,7 @@ type IResultService interface {
 	GetResultById(id string) (*model.Result, error)
 	GetResultByExerciseId(id string) (*model.Result, error)
 	GetResultByClassId(id string) ([]*model.Result, error)
+	GetResultsByUserID(userID string) ([]*model.Result, error)
 }
 
 // ResultService GOLANG STRUCT
@@ -76,6 +77,7 @@ func (r *ResultService) CreateResult(newResult model.InputResult) (*model.Result
 // TODO: add user id
 func (r *ResultService) UpdateResult(id string, updateData model.InputResult) (*model.Result, error) {
 	r.ValidateResult(&updateData)
+	r.Validator.Validate(id, []string{"IsUUID"})
 
 	validationErrors := r.Validator.GetErrors()
 	if len(validationErrors) > 0 {
@@ -184,8 +186,28 @@ func (r *ResultService) GetResultByClassId(id string) ([]*model.Result, error) {
 	if err != nil {
 		return nil, err
 	}
-	
+
 	return result, nil
+}
+
+// GetResultsByUserID GOLANG METHOD
+// Retrieves results by user ID.
+func (r *ResultService) GetResultsByUserID(userID string) ([]*model.Result, error) {
+	r.Validator.Validate(userID, []string{"IsUUID"})
+
+	validationErrors := r.Validator.GetErrors()
+	if len(validationErrors) > 0 {
+		errorMessage := "Validation errors: " + strings.Join(validationErrors, ", ")
+		r.Validator.ClearErrors()
+		return nil, errors.New(errorMessage)
+	}
+
+	results, err := r.Repo.GetResultsByUserID(userID)
+	if err != nil {
+		return nil, err
+	}
+
+	return results, nil
 }
 
 func (r *ResultService) ValidateResult(result *model.InputResult) {
