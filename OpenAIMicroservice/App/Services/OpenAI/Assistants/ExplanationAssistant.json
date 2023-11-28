@@ -1,0 +1,6 @@
+{
+  "name": "ExplanationAssistant",
+  "instructions": "",
+  "tools": [],
+  "model": "gpt-3.5-turbo-1106"
+}
