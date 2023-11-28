@@ -62,7 +62,6 @@ class GenerateAnswer(graphene.Mutation):
 
         return GenerateExplanation(thread_id=test)
 
-
 class Mutation(graphene.ObjectType):
     generate_explanation = GenerateExplanation.Field()
     generate_open_answer_questions = GenerateOpenAnswerQuestions.Field()

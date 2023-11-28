@@ -58,7 +58,6 @@ class AssistantAPIAdapter:
         thread_id, assistant_id = self.Decode_Token(token)
 
         messages = self.assistant_manager.retrieve_messages(thread_id)
-
         self.assistant_manager.delete_thread(thread_id)
         self.assistant_manager.delete_assistant(assistant_id)
 
