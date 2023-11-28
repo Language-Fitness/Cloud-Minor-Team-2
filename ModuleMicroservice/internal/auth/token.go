@@ -9,26 +9,34 @@ import (
 	"strings"
 )
 
+type IToken interface {
+	IntrospectToken(bearerToken string) (bool, error)
+	DecodeToken(token string) (map[string]interface{}, error)
+	GenerateBasicAuthHeader() string
+}
+
 type Token struct {
 	ClientID     string
 	ClientSecret string
 	Endpoint     string
 }
 
-func NewToken() *Token {
+func NewToken() IToken {
 	clientID := getKeycloakClientId()
 	clientSecret := getKeycloakClientSecret()
 	endpoint := getKeycloakHost()
 
-	return &Token{
+	token := Token{
 		ClientID:     clientID,
 		ClientSecret: clientSecret,
 		Endpoint:     endpoint,
 	}
+
+	return &token
 }
 
 func (a *Token) IntrospectToken(bearerToken string) (bool, error) {
-	authHeader := a.generateBasicAuthHeader()
+	authHeader := a.GenerateBasicAuthHeader()
 
 	reqBody := fmt.Sprintf("token_type_hint=requesting_party_token&token=%s", bearerToken)
 	req, err := http.NewRequest("POST", a.Endpoint, strings.NewReader(reqBody))
@@ -88,7 +96,7 @@ func (a *Token) DecodeToken(token string) (map[string]interface{}, error) {
 	return claims, nil
 }
 
-func (a *Token) generateBasicAuthHeader() string {
+func (a *Token) GenerateBasicAuthHeader() string {
 	authString := fmt.Sprintf("%s:%s", a.ClientID, a.ClientSecret)
 	authHeader := base64.StdEncoding.EncodeToString([]byte(authString))
 	return fmt.Sprintf("Basic %s", authHeader)

@@ -5,13 +5,17 @@ RUN apk update && apk upgrade && \
 
 WORKDIR /app
 
+COPY .env .env
+
+RUN export $(cat .env | grep -v ^# | xargs)
+
 COPY go.mod go.sum ./
 
 RUN go mod download
 
 COPY / .
 
-EXPOSE 8081
+EXPOSE 8082
 
 RUN go build -o main .
 

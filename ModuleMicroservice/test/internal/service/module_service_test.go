@@ -87,7 +87,7 @@ func TestService_UpdateModule(t *testing.T) {
 			mock.AnythingOfType("model.Module")).
 		Return(&mocks.MockUpdatedModule, nil)
 
-	result, err := service.UpdateModule("3a3bd756-6353-4e29-8aba-5b3531bdb9ed", mocks.MockUpdateInput)
+	result, err := service.UpdateModule("3a3bd756-6353-4e29-8aba-5b3531bdb9ed", &mocks.MockModule, mocks.MockUpdateInput)
 
 	assert.Nil(t, err)
 	assert.NotNil(t, result)
@@ -104,7 +104,7 @@ func TestService_UpdateModule_CatchValidationErrors(t *testing.T) {
 
 	mockValidator.On("GetErrors").Return([]string{"validation_error"})
 
-	result, err := service.UpdateModule("3a3bd756-6353-4e29-8aba-5b3531bdb9ed", mocks.MockUpdateInput)
+	result, err := service.UpdateModule("3a3bd756-6353-4e29-8aba-5b3531bdb9ed", &mocks.MockModule, mocks.MockUpdateInput)
 
 	assert.NotNil(t, err)
 	assert.Nil(t, result)
@@ -132,7 +132,7 @@ func TestService_UpdateModule_CatchUpdateError(t *testing.T) {
 			mock.AnythingOfType("model.Module")).
 		Return(&model.Module{}, errors.New("update_error"))
 
-	result, err := service.UpdateModule("3a3bd756-6353-4e29-8aba-5b3531bdb9ed", mocks.MockUpdateInput)
+	result, err := service.UpdateModule("3a3bd756-6353-4e29-8aba-5b3531bdb9ed", &mocks.MockModule, mocks.MockUpdateInput)
 
 	assert.Nil(t, result)
 	assert.NotNil(t, err)
