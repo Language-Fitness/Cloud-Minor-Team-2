@@ -52,6 +52,7 @@ type ComplexityRoot struct {
 		Description func(childComplexity int) int
 		Difficulty  func(childComplexity int) int
 		ID          func(childComplexity int) int
+		MadeBy      func(childComplexity int) int
 		ModuleID    func(childComplexity int) int
 		Name        func(childComplexity int) int
 		SoftDeleted func(childComplexity int) int
@@ -126,6 +127,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Class.ID(childComplexity), true
+
+	case "Class.made_by":
+		if e.complexity.Class.MadeBy == nil {
+			break
+		}
+
+		return e.complexity.Class.MadeBy(childComplexity), true
 
 	case "Class.module_Id":
 		if e.complexity.Class.ModuleID == nil {
@@ -671,6 +679,47 @@ func (ec *executionContext) fieldContext_Class_difficulty(ctx context.Context, f
 	return fc, nil
 }
 
+func (ec *executionContext) _Class_made_by(ctx context.Context, field graphql.CollectedField, obj *model.Class) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Class_made_by(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.MadeBy, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Class_made_by(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Class",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Class_created_at(ctx context.Context, field graphql.CollectedField, obj *model.Class) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Class_created_at(ctx, field)
 	if err != nil {
@@ -840,6 +889,8 @@ func (ec *executionContext) fieldContext_Mutation_createClass(ctx context.Contex
 				return ec.fieldContext_Class_description(ctx, field)
 			case "difficulty":
 				return ec.fieldContext_Class_difficulty(ctx, field)
+			case "made_by":
+				return ec.fieldContext_Class_made_by(ctx, field)
 			case "created_at":
 				return ec.fieldContext_Class_created_at(ctx, field)
 			case "updated_at":
@@ -910,6 +961,8 @@ func (ec *executionContext) fieldContext_Mutation_updateClass(ctx context.Contex
 				return ec.fieldContext_Class_description(ctx, field)
 			case "difficulty":
 				return ec.fieldContext_Class_difficulty(ctx, field)
+			case "made_by":
+				return ec.fieldContext_Class_made_by(ctx, field)
 			case "created_at":
 				return ec.fieldContext_Class_created_at(ctx, field)
 			case "updated_at":
@@ -1032,6 +1085,8 @@ func (ec *executionContext) fieldContext_Query_getClass(ctx context.Context, fie
 				return ec.fieldContext_Class_description(ctx, field)
 			case "difficulty":
 				return ec.fieldContext_Class_difficulty(ctx, field)
+			case "made_by":
+				return ec.fieldContext_Class_made_by(ctx, field)
 			case "created_at":
 				return ec.fieldContext_Class_created_at(ctx, field)
 			case "updated_at":
@@ -1102,6 +1157,8 @@ func (ec *executionContext) fieldContext_Query_listClasses(ctx context.Context, 
 				return ec.fieldContext_Class_description(ctx, field)
 			case "difficulty":
 				return ec.fieldContext_Class_difficulty(ctx, field)
+			case "made_by":
+				return ec.fieldContext_Class_made_by(ctx, field)
 			case "created_at":
 				return ec.fieldContext_Class_created_at(ctx, field)
 			case "updated_at":
@@ -3024,7 +3081,7 @@ func (ec *executionContext) unmarshalInputClassInput(ctx context.Context, obj in
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"module_Id", "name", "description", "difficulty"}
+	fieldsInOrder := [...]string{"module_Id", "name", "description", "difficulty", "made_by"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -3067,6 +3124,15 @@ func (ec *executionContext) unmarshalInputClassInput(ctx context.Context, obj in
 				return it, err
 			}
 			it.Difficulty = data
+		case "made_by":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("made_by"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.MadeBy = data
 		}
 	}
 
@@ -3111,6 +3177,8 @@ func (ec *executionContext) _Class(ctx context.Context, sel ast.SelectionSet, ob
 			out.Values[i] = ec._Class_description(ctx, field, obj)
 		case "difficulty":
 			out.Values[i] = ec._Class_difficulty(ctx, field, obj)
+		case "made_by":
+			out.Values[i] = ec._Class_made_by(ctx, field, obj)
 		case "created_at":
 			out.Values[i] = ec._Class_created_at(ctx, field, obj)
 		case "updated_at":

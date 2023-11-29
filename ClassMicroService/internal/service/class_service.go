@@ -44,6 +44,7 @@ func (c *ClassService) CreateClass(newClass model.ClassInput) (*model.Class, err
 	c.Validator.Validate(newClass.Name, []string{"IsString", "Length:<25"})
 	c.Validator.Validate(*newClass.Description, []string{"IsString", "Length:<50"})
 	c.Validator.Validate(*newClass.Difficulty, []string{"IsInt"})
+	c.Validator.Validate(*newClass.MadeBy, []string{"IsUUID"})
 
 	validationErrors := c.Validator.GetErrors()
 
@@ -80,6 +81,7 @@ func (c *ClassService) UpdateClass(id string, updatedData model.ClassInput) (*mo
 	c.Validator.Validate(updatedData.Name, []string{"IsString", "Length:<25"})
 	c.Validator.Validate(*updatedData.Description, []string{"IsString", "Length:<50"})
 	c.Validator.Validate(*updatedData.Difficulty, []string{"IsInt"})
+	c.Validator.Validate(*updatedData.MadeBy, []string{"IsUUID"})
 
 	validationErrors := c.Validator.GetErrors()
 	if len(validationErrors) > 0 {

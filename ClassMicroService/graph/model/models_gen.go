@@ -8,6 +8,7 @@ type Class struct {
 	Name        string  `json:"name"`
 	Description *string `json:"description,omitempty"`
 	Difficulty  *int    `json:"difficulty,omitempty"`
+	MadeBy      *string `json:"made_by,omitempty"`
 	CreatedAt   *string `json:"created_at,omitempty"`
 	UpdatedAt   *string `json:"updated_at,omitempty"`
 	SoftDeleted *bool   `json:"soft_deleted,omitempty"`
@@ -18,4 +19,5 @@ type ClassInput struct {
 	Name        string  `json:"name"`
 	Description *string `json:"description,omitempty"`
 	Difficulty  *int    `json:"difficulty,omitempty"`
+	MadeBy      *string `json:"made_by,omitempty"`
 }
