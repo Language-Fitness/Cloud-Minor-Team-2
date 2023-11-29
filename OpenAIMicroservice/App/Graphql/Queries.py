@@ -14,6 +14,7 @@ class Query(ObjectType):
         adapter = AssistantAPIAdapter()
         response = adapter.Retrieve_Response(token)
         return response
+
     async def resolve_retrieve_open_answer_questions(self, info, token):
         adapter = AssistantAPIAdapter()
         response = adapter.Retrieve_Response(token)
@@ -23,6 +24,7 @@ class Query(ObjectType):
         adapter = AssistantAPIAdapter()
         response = adapter.Retrieve_Response(token)
         return response
+
     async def resolve_retrieve_answer(self, info, token):
         adapter = AssistantAPIAdapter()
         response = adapter.Retrieve_Response(token)

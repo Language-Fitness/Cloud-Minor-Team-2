@@ -1,8 +1,6 @@
 import base64
 import json
-
 from App.Services.OpenAI.OpenAIAssistantManager import OpenAIAssistantManager
-
 
 class AssistantAPIAdapter:
     def __init__(self):
@@ -54,7 +52,7 @@ class AssistantAPIAdapter:
         token = self.Encode_Token(run.thread_id, run.assistant_id)
         return token
 
-    def retrieve_response(self, token):
+    def retrieve_multiple_choice_questions(self, token):
         thread_id, assistant_id = self.Decode_Token(token)
 
         messages = self.assistant_manager.retrieve_messages(thread_id)
@@ -62,14 +60,22 @@ class AssistantAPIAdapter:
         self.assistant_manager.delete_assistant(assistant_id)
 
         return messages
+    def retrieve_open_answer_questions(self, token):
+        thread_id, assistant_id = self.Decode_Token(token)
 
+        messages = self.assistant_manager.retrieve_messages(thread_id)
+        self.assistant_manager.delete_thread(thread_id)
+        self.assistant_manager.delete_assistant(assistant_id)
 
-    def retrieve_multiple_choice_questions(self):
+        return messages
+    def retrieve_explanation_questions(self, token):
+        thread_id, assistant_id = self.Decode_Token(token)
 
-    def retrieve_open_answer_questions(self):
+        messages = self.assistant_manager.retrieve_messages(thread_id)
+        self.assistant_manager.delete_thread(thread_id)
+        self.assistant_manager.delete_assistant(assistant_id)
 
-    def retrieve_explanation_questions(self):
-
+        return messages
 
     def encode_token(self, thread_id, assistant_id):
         ids_dict = {'thread_id': thread_id, 'assistant_id': assistant_id}
