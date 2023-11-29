@@ -12,20 +12,20 @@ class Query(ObjectType):
 
     async def resolve_retrieve_multiple_choice_questions(self, info, token):
         adapter = AssistantAPIAdapter()
-        response = adapter.Retrieve_Response(token)
+        response = adapter.retrieve_multiple_choice_questions(token)
         return response
 
     async def resolve_retrieve_open_answer_questions(self, info, token):
         adapter = AssistantAPIAdapter()
-        response = adapter.Retrieve_Response(token)
+        response = adapter.retrieve_open_answer_questions(token)
         return response
 
     async def resolve_retrieve_explanation(self, info, token):
         adapter = AssistantAPIAdapter()
-        response = adapter.Retrieve_Response(token)
+        response = adapter.retrieve_explanation_questions(token)
         return response
 
     async def resolve_retrieve_answer(self, info, token):
         adapter = AssistantAPIAdapter()
-        response = adapter.Retrieve_Response(token)
+        response = adapter.retrieve_answer(token)
         return response
