@@ -8,7 +8,7 @@ class AssistantAPIAdapter:
     def __init__(self):
         self.assistant_manager = OpenAIAssistantManager()
 
-    def Generate_Open_Answer_Questions(self, subject, amount_questions):
+    def generate_open_answer_questions(self, subject, amount_questions):
         assistant_json = self.assistant_manager.load_assistant(
             "Services/OpenAI/Assistants/OpenAnswerQuestionsAssistant.json")
         assistant = self.assistant_manager.create_assistant(assistant_json)
@@ -20,7 +20,7 @@ class AssistantAPIAdapter:
         token = self.Encode_Token(run.thread_id, run.assistant_id)
         return token
 
-    def Generate_Multiple_Choice_Questions(self, subject, amount_questions):
+    def generate_multiple_choice_questions(self, subject, amount_questions):
         assistant_json = self.assistant_manager.load_assistant(
             "Services/OpenAI/Assistants/MultipleChoiceQuestionAssistant.json")
         assistant = self.assistant_manager.create_assistant(assistant_json)
@@ -32,7 +32,7 @@ class AssistantAPIAdapter:
         token = self.Encode_Token(run.thread_id, run.assistant_id)
         return token
 
-    def Generate_Explanation(self, question, given_answer):
+    def generate_explanation(self, question, given_answer):
         assistant_json = self.assistant_manager.load_assistant("Services/OpenAI/Assistants/ExplanationAssistant.json")
         assistant = self.assistant_manager.create_assistant(assistant_json)
 
@@ -43,7 +43,7 @@ class AssistantAPIAdapter:
         token = self.Encode_Token(run.thread_id, run.assistant_id)
         return token
 
-    def Generate_Answer(self, question, question_info):
+    def generate_answer(self, question, question_info):
         assistant_json = self.assistant_manager.load_assistant("Services/OpenAI/Assistants/AnswerAssistant.json")
         assistant = self.assistant_manager.create_assistant(assistant_json)
 
@@ -54,7 +54,7 @@ class AssistantAPIAdapter:
         token = self.Encode_Token(run.thread_id, run.assistant_id)
         return token
 
-    def Retrieve_Response(self, token):
+    def retrieve_response(self, token):
         thread_id, assistant_id = self.Decode_Token(token)
 
         messages = self.assistant_manager.retrieve_messages(thread_id)
@@ -63,7 +63,15 @@ class AssistantAPIAdapter:
 
         return messages
 
-    def Encode_Token(self, thread_id, assistant_id):
+
+    def retrieve_multiple_choice_questions(self):
+
+    def retrieve_open_answer_questions(self):
+
+    def retrieve_explanation_questions(self):
+
+
+    def encode_token(self, thread_id, assistant_id):
         ids_dict = {'thread_id': thread_id, 'assistant_id': assistant_id}
         ids_json = json.dumps(ids_dict)
         ids_bytes = ids_json.encode('utf-8')
@@ -71,7 +79,7 @@ class AssistantAPIAdapter:
 
         return encoded_ids.decode('utf-8')
 
-    def Decode_Token(self, token):
+    def decode_token(self, token):
         ids_bytes = base64.b64decode(token)
         ids_json = ids_bytes.decode('utf-8')
         ids_dict = json.loads(ids_json)
