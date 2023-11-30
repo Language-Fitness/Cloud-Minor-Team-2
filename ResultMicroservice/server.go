@@ -2,8 +2,8 @@ package main
 
 import (
 	"ResultMicroservice/graph"
-	"ResultMicroservice/grpcServers"
 	"ResultMicroservice/proto/result"
+	"ResultMicroservice/rpc"
 	"fmt"
 	"google.golang.org/grpc"
 	"log"
@@ -49,7 +49,7 @@ func grpcServer() {
 	server := grpc.NewServer()
 
 	// Register the server with the generated protobuf code
-	result.RegisterGrpcResultServer(server, &grpcServers.ResultServer{})
+	result.RegisterGrpcResultServer(server, &rpc.ResultServer{})
 
 	// Create a listener on a specific port
 	lis, err := net.Listen("tcp", ":50051")
