@@ -2,6 +2,7 @@ import base64
 import json
 from App.Services.OpenAI.OpenAIAssistantManager import OpenAIAssistantManager
 
+
 class AssistantAPIAdapter:
     def __init__(self):
         self.assistant_manager = OpenAIAssistantManager()
@@ -15,7 +16,7 @@ class AssistantAPIAdapter:
         messsage = self.assistant_manager.create_message(thread.id, "test")
 
         run = self.assistant_manager.run_thread(thread.id, assistant.id)
-        token = self.Encode_Token(run.thread_id, run.assistant_id)
+        token = self.encode_token(run.thread_id, run.assistant_id)
         return token
 
     def generate_multiple_choice_questions(self, subject, amount_questions):
@@ -27,7 +28,7 @@ class AssistantAPIAdapter:
         messsage = self.assistant_manager.create_message(thread.id, "test")
 
         run = self.assistant_manager.run_thread(thread.id, assistant.id)
-        token = self.Encode_Token(run.thread_id, run.assistant_id)
+        token = self.encode_token(run.thread_id, run.assistant_id)
         return token
 
     def generate_explanation(self, question, given_answer):
@@ -38,7 +39,7 @@ class AssistantAPIAdapter:
         messsage = self.assistant_manager.create_message(thread.id, "test")
 
         run = self.assistant_manager.run_thread(thread.id, assistant.id)
-        token = self.Encode_Token(run.thread_id, run.assistant_id)
+        token = self.encode_token(run.thread_id, run.assistant_id)
         return token
 
     def generate_answer(self, question, question_info):
@@ -49,27 +50,38 @@ class AssistantAPIAdapter:
         messsage = self.assistant_manager.create_message(thread.id, "test")
 
         run = self.assistant_manager.run_thread(thread.id, assistant.id)
-        token = self.Encode_Token(run.thread_id, run.assistant_id)
+        token = self.encode_token(run.thread_id, run.assistant_id)
         return token
 
     def retrieve_multiple_choice_questions(self, token):
-        thread_id, assistant_id = self.Decode_Token(token)
+        thread_id, assistant_id = self.decode_token(token)
 
         messages = self.assistant_manager.retrieve_messages(thread_id)
         self.assistant_manager.delete_thread(thread_id)
         self.assistant_manager.delete_assistant(assistant_id)
 
         return messages
+
     def retrieve_open_answer_questions(self, token):
-        thread_id, assistant_id = self.Decode_Token(token)
+        thread_id, assistant_id = self.decode_token(token)
 
         messages = self.assistant_manager.retrieve_messages(thread_id)
         self.assistant_manager.delete_thread(thread_id)
         self.assistant_manager.delete_assistant(assistant_id)
 
         return messages
+
     def retrieve_explanation_questions(self, token):
-        thread_id, assistant_id = self.Decode_Token(token)
+        thread_id, assistant_id = self.decode_token(token)
+
+        messages = self.assistant_manager.retrieve_messages(thread_id)
+        self.assistant_manager.delete_thread(thread_id)
+        self.assistant_manager.delete_assistant(assistant_id)
+
+        return messages
+
+    def retrieve_answer(self, token):
+        thread_id, assistant_id = self.decode_token(token)
 
         messages = self.assistant_manager.retrieve_messages(thread_id)
         self.assistant_manager.delete_thread(thread_id)

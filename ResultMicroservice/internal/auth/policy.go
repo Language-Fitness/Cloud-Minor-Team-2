@@ -14,7 +14,8 @@ type IResultPolicy interface {
 	GetResultByExercise(bearerToken string, exerciseID string) error
 	GetResultsByClass(bearerToken string, classID string) error
 	GetResultsByUser(bearerToken string, userID string) error
-	GetResultByID(bearerToken string, id string) (*model.Result, error)
+	GetResultByID(bearerToken string, id string) error
+	DeleteResultByClass(bearerToken string, classID string) (*string, error)
 }
 
 type ResultPolicy struct {
@@ -94,7 +95,6 @@ func (p *ResultPolicy) GetResultByExercise(bearerToken string, exerciseID string
 		return err2
 	}
 
-	//TODO add repository check
 	if !p.hasRole(roles, "get_result_by_exercise") {
 		return errors.New("invalid permissions for this action")
 	}
@@ -108,7 +108,6 @@ func (p *ResultPolicy) GetResultsByClass(bearerToken string, classID string) err
 		return err2
 	}
 
-	//TODO add repository check
 	if !p.hasRole(roles, "get_results_by_class") {
 		return errors.New("invalid permissions for this action")
 	}
@@ -122,7 +121,6 @@ func (p *ResultPolicy) GetResultsByUser(bearerToken string, userID string) error
 		return err2
 	}
 
-	//TODO add repository check
 	if !p.hasRole(roles, "get_results_by_user") {
 		return errors.New("invalid permissions for this action")
 	}
@@ -130,26 +128,30 @@ func (p *ResultPolicy) GetResultsByUser(bearerToken string, userID string) error
 	return nil
 }
 
-func (p *ResultPolicy) GetResultByID(bearerToken string, id string) (*model.Result, error) {
+func (p *ResultPolicy) GetResultByID(bearerToken string, id string) error {
 	_, roles, err2 := p.getSubAndRoles(bearerToken)
 	if err2 != nil {
-		return nil, err2
+		return err2
 	}
 
-	result, err := p.ResultRepository.GetResultByID(id)
+	if !p.hasRole(roles, "get_result_by_id") {
+		return errors.New("invalid permissions for this action")
+	}
+
+	return nil
+}
+
+func (p *ResultPolicy) DeleteResultByClass(bearerToken string, classID string) (*string, error) {
+	uuid, roles, err := p.getSubAndRoles(bearerToken)
 	if err != nil {
+		return nil, err
+	}
+
+	if !p.hasRole(roles, "delete_result_by_class") {
 		return nil, errors.New("invalid permissions for this action")
 	}
 
-	if p.hasRole(roles, "get_result_by_id") && result.UserID == id {
-		return result, nil
-	}
-
-	if p.hasRole(roles, "get_result_by_id_all") {
-		return result, nil
-	}
-
-	return nil, errors.New("invalid permissions for this action")
+	return &uuid, nil
 }
 
 func (p *ResultPolicy) getSubAndRoles(bearerToken string) (string, []interface{}, error) {

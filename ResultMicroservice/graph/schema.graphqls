@@ -35,6 +35,7 @@ type Mutation {
     CreateResult(input: InputResult!): Result
     UpdateResult(id: ID!, input: InputResult!): Result
     DeleteResult(id: ID!): Result
+    DeleteResultsByClass(class_id: ID!): [Result]
 }
 
 #go mod init example

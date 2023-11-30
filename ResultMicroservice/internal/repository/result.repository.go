@@ -19,6 +19,7 @@ type IResultRepository interface {
 	GetResultByExerciseId(id string) (*model.Result, error)
 	GetResultByClassId(id string) ([]*model.Result, error)
 	GetResultsByUserID(userID string) ([]*model.Result, error)
+	DeleteResultByClassID(classID string, userID string) error
 }
 
 // ResultRepository GOLANG STRUCT
@@ -101,6 +102,23 @@ func (r *ResultRepository) DeleteResultByID(id string) error {
 	return nil
 }
 
+func (r *ResultRepository) DeleteResultByClassID(classID string, userID string) error {
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10) // 10-second timeout
+	defer cancel()
+
+	filter := bson.M{
+		"class_id": classID,
+		"user_id":  userID, // Add filter for user_id
+	}
+
+	_, err := r.collection.DeleteMany(ctx, filter)
+	if err != nil {
+		return err // Return any MongoDB-related errors.
+	}
+
+	return nil
+}
+
 func (r *ResultRepository) GetResultByExerciseId(id string) (*model.Result, error) {
 	ctx, cancel := context.WithTimeout(context.TODO(), time.Second*10) // 10-second timeout
 	defer cancel()
@@ -116,7 +134,6 @@ func (r *ResultRepository) GetResultByExerciseId(id string) (*model.Result, erro
 	return &result, nil
 }
 
-// TODO: add user id
 func (r *ResultRepository) GetResultByClassId(id string) ([]*model.Result, error) {
 	ctx, cancel := context.WithTimeout(context.TODO(), time.Second*10) // 10-second timeout
 	defer cancel()
