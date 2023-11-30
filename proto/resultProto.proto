@@ -1,5 +1,5 @@
 syntax = "proto3";
-option go_package = "/result";
+option go_package = "/result_pb";
 
 message Result {
   string ID = 1;
@@ -15,11 +15,25 @@ message Result {
 }
 
 service GrpcResult  {
-  rpc Delete(ResultRequest) returns (Result);
-  rpc SoftDelete(ResultRequest) returns (Result);
+  rpc DeleteByModule(DeleteByModuleRequest) returns (Result);
+  rpc SoftDeleteByModule(DeleteByModuleRequest) returns (Result);
+  rpc DeleteByClass(DeleteByClassRequest) returns (Result);
+  rpc SoftDeleteByClass(DeleteByClassRequest) returns (Result);
+  rpc DeleteByUser(DeleteByUserRequest) returns (Result);
+  rpc SoftDeleteByUser(DeleteByUserRequest) returns (Result);
 }
 
-message ResultRequest {
+message DeleteByUserRequest {
+  string UserID = 1;
+  string BearerToken = 2;
+}
+
+message DeleteByClassRequest {
+  string ClassID = 1;
+  string BearerToken = 2;
+}
+
+message DeleteByModuleRequest {
   string ModuleID = 1;
   string BearerToken = 2;
 }
