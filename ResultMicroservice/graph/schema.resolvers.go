@@ -6,13 +6,15 @@ package graph
 
 import (
 	"ResultMicroservice/graph/model"
+	"ResultMicroservice/internal/auth"
 	"context"
-	"fmt"
 )
 
 // CreateResult is the resolver for the CreateResult field.
 func (r *mutationResolver) CreateResult(ctx context.Context, input model.InputResult) (*model.Result, error) {
-	result, err := r.Service.CreateResult(input)
+	token := auth.TokenFromContext(ctx)
+
+	result, err := r.Service.CreateResult(token, input)
 	if err != nil {
 		return nil, err
 	}
@@ -22,7 +24,9 @@ func (r *mutationResolver) CreateResult(ctx context.Context, input model.InputRe
 
 // UpdateResult is the resolver for the UpdateResult field.
 func (r *mutationResolver) UpdateResult(ctx context.Context, id string, input model.InputResult) (*model.Result, error) {
-	result, err := r.Service.UpdateResult(id, input)
+	token := auth.TokenFromContext(ctx)
+
+	result, err := r.Service.UpdateResult(token, id, input)
 	if err != nil {
 		return nil, err
 	}
@@ -31,13 +35,29 @@ func (r *mutationResolver) UpdateResult(ctx context.Context, id string, input mo
 }
 
 // DeleteResult is the resolver for the DeleteResult field.
+// Deleting one of your own results is allowed, and does not need SAGA.
 func (r *mutationResolver) DeleteResult(ctx context.Context, id string) (*model.Result, error) {
-	panic(fmt.Errorf("not implemented: DeleteResult - DeleteResult"))
+	token := auth.TokenFromContext(ctx)
+
+	result, err := r.Service.GetResultById(token, id)
+	if err != nil {
+		return nil, err
+	}
+
+	//TODO fix this, it should be done in the service
+	err2 := r.Service.DeleteResult(token, id)
+	if err2 != nil {
+		return nil, err2
+	}
+
+	return result, nil
 }
 
 // GetResultByExercise is the resolver for the GetResultByExercise field.
 func (r *queryResolver) GetResultByExercise(ctx context.Context, exerciseID string) (*model.Result, error) {
-	results, err := r.Service.GetResultByExerciseId(exerciseID)
+	token := auth.TokenFromContext(ctx)
+
+	results, err := r.Service.GetResultByExerciseId(token, exerciseID)
 	if err != nil {
 		return nil, err
 	}
@@ -47,7 +67,9 @@ func (r *queryResolver) GetResultByExercise(ctx context.Context, exerciseID stri
 
 // GetResultsByClass is the resolver for the GetResultsByClass field.
 func (r *queryResolver) GetResultsByClass(ctx context.Context, classID string) ([]*model.Result, error) {
-	results, err := r.Service.GetResultByClassId(classID)
+	token := auth.TokenFromContext(ctx)
+
+	results, err := r.Service.GetResultByClassId(token, classID)
 	if err != nil {
 		return nil, err
 	}
@@ -57,7 +79,9 @@ func (r *queryResolver) GetResultsByClass(ctx context.Context, classID string) (
 
 // GetResultsByUser is the resolver for the GetResultsByUser field.
 func (r *queryResolver) GetResultsByUser(ctx context.Context, userID string) ([]*model.Result, error) {
-	results, err := r.Service.GetResultsByUserID(userID)
+	token := auth.TokenFromContext(ctx)
+
+	results, err := r.Service.GetResultsByUserID(token, userID)
 	if err != nil {
 		return nil, err
 	}
@@ -67,7 +91,9 @@ func (r *queryResolver) GetResultsByUser(ctx context.Context, userID string) ([]
 
 // GetResultsByID is the resolver for the GetResultsByID field.
 func (r *queryResolver) GetResultsByID(ctx context.Context, id string) (*model.Result, error) {
-	result, err := r.Service.GetResultById(id)
+	token := auth.TokenFromContext(ctx)
+
+	result, err := r.Service.GetResultById(token, id)
 	if err != nil {
 		return nil, err
 	}
