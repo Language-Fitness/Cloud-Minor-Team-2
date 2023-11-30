@@ -39,18 +39,36 @@ func (r *mutationResolver) UpdateResult(ctx context.Context, id string, input mo
 func (r *mutationResolver) DeleteResult(ctx context.Context, id string) (*model.Result, error) {
 	token := auth.TokenFromContext(ctx)
 
+	//TODO fix this, it should be done in the service
 	result, err := r.Service.GetResultById(token, id)
 	if err != nil {
 		return nil, err
 	}
 
-	//TODO fix this, it should be done in the service
 	err2 := r.Service.DeleteResult(token, id)
 	if err2 != nil {
 		return nil, err2
 	}
 
 	return result, nil
+}
+
+// DeleteResultsByClass is the resolver for the DeleteResultsByClass field.
+func (r *mutationResolver) DeleteResultsByClass(ctx context.Context, classID string) ([]*model.Result, error) {
+	token := auth.TokenFromContext(ctx)
+
+	//TODO fix this, it should be done in the service
+	results, err := r.Service.GetResultByClassId(token, classID)
+	if err != nil {
+		return nil, err
+	}
+
+	err2 := r.Service.DeleteResultByClassID(token, classID)
+	if err2 != nil {
+		return nil, err2
+	}
+
+	return results, nil
 }
 
 // GetResultByExercise is the resolver for the GetResultByExercise field.

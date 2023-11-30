@@ -26,6 +26,7 @@ type IResultService interface {
 	GetResultByExerciseId(bearerToken string, id string) (*model.Result, error)
 	GetResultByClassId(bearerToken string, id string) ([]*model.Result, error)
 	GetResultsByUserID(bearerToken string, userID string) ([]*model.Result, error)
+	DeleteResultByClassID(bearerToken string, classID string) error
 }
 
 // ResultService GOLANG STRUCT
@@ -239,6 +240,29 @@ func (r *ResultService) GetResultsByUserID(bearerToken string, userID string) ([
 	}
 
 	return results, nil
+}
+
+func (r *ResultService) DeleteResultByClassID(bearerToken string, classID string) error {
+	uuid, err := r.ResultPolicy.DeleteResultByClass(bearerToken, classID)
+	if err != nil {
+		return err
+	}
+
+	r.Validator.Validate(classID, []string{"IsUUID"})
+
+	validationErrors := r.Validator.GetErrors()
+	if len(validationErrors) > 0 {
+		errorMessage := valErrorBase + strings.Join(validationErrors, ", ")
+		r.Validator.ClearErrors()
+		return errors.New(errorMessage)
+	}
+
+	err2 := r.Repo.DeleteResultByClassID(classID, *uuid)
+	if err2 != nil {
+		return err2
+	}
+
+	return nil
 }
 
 func (r *ResultService) ValidateResult(result *model.InputResult) {

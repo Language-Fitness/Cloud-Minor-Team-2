@@ -15,6 +15,7 @@ type IResultPolicy interface {
 	GetResultsByClass(bearerToken string, classID string) error
 	GetResultsByUser(bearerToken string, userID string) error
 	GetResultByID(bearerToken string, id string) error
+	DeleteResultByClass(bearerToken string, classID string) (*string, error)
 }
 
 type ResultPolicy struct {
@@ -138,6 +139,19 @@ func (p *ResultPolicy) GetResultByID(bearerToken string, id string) error {
 	}
 
 	return nil
+}
+
+func (p *ResultPolicy) DeleteResultByClass(bearerToken string, classID string) (*string, error) {
+	uuid, roles, err := p.getSubAndRoles(bearerToken)
+	if err != nil {
+		return nil, err
+	}
+
+	if !p.hasRole(roles, "delete_result_by_class") {
+		return nil, errors.New("invalid permissions for this action")
+	}
+
+	return &uuid, nil
 }
 
 func (p *ResultPolicy) getSubAndRoles(bearerToken string) (string, []interface{}, error) {
