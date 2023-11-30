@@ -41,7 +41,6 @@ class GenerateExplanation(graphene.Mutation):
 
     thread_id = graphene.String()
 
-
     def mutate(self, info, question, given_answer):
         adapter = AssistantAPIAdapter()
         test = adapter.Generate_Explanation(question, given_answer)
