@@ -2,6 +2,7 @@ import base64
 import json
 from App.Services.OpenAI.OpenAIAssistantManager import OpenAIAssistantManager
 
+
 class AssistantAPIAdapter:
     def __init__(self):
         self.assistant_manager = OpenAIAssistantManager()
@@ -60,6 +61,7 @@ class AssistantAPIAdapter:
         self.assistant_manager.delete_assistant(assistant_id)
 
         return messages
+
     def retrieve_open_answer_questions(self, token):
         thread_id, assistant_id = self.decode_token(token)
 
@@ -68,6 +70,7 @@ class AssistantAPIAdapter:
         self.assistant_manager.delete_assistant(assistant_id)
 
         return messages
+
     def retrieve_explanation_questions(self, token):
         thread_id, assistant_id = self.decode_token(token)
 
