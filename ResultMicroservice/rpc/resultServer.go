@@ -1,4 +1,4 @@
-package grpcServers
+package rpc
 
 import (
 	"ResultMicroservice/proto/result_pb"
