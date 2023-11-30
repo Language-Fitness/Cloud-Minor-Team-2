@@ -25,14 +25,5 @@
   },
   {
     "name": "delete_module"
-  },
-  {
-    "name": "create_school"
-  },
-  {
-    "name": "update_school"
-  },
-  {
-    "name": "delete_school"
   }
 ]

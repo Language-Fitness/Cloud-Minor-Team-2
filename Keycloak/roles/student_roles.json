@@ -16,11 +16,5 @@
   },
   {
     "name": "get_modules"
-  },
-  {
-    "name": "get_school"
-  },
-  {
-    "name": "get_schools"
   }
 ]

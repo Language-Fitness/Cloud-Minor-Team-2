@@ -8,6 +8,7 @@ import (
 var Description = "This is a sample class."
 var UpdatedDescription = "This is an updated sample class."
 var Difficulty = 1
+var MadeBy = "3a3bd756-6353-4e29-8aba-5b3531bdb9ee"
 var Timestamp = time.Now().String()
 var SoftDeleted = false
 
@@ -16,6 +17,7 @@ var MockCreateInput = model.ClassInput{
 	Name:        "Sample Class",
 	Description: &Description,
 	Difficulty:  &Difficulty,
+	MadeBy:      &MadeBy,
 }
 
 var MockUpdateInput = model.ClassInput{
@@ -23,6 +25,7 @@ var MockUpdateInput = model.ClassInput{
 	Name:        "Sample Class",
 	Description: &UpdatedDescription,
 	Difficulty:  &Difficulty,
+	MadeBy:      &MadeBy,
 }
 
 var MockClass = model.Class{
@@ -33,6 +36,7 @@ var MockClass = model.Class{
 	Difficulty:  &Difficulty,
 	CreatedAt:   &Timestamp,
 	SoftDeleted: &SoftDeleted,
+	MadeBy:      &MadeBy,
 }
 
 var MockUpdatedClass = model.Class{

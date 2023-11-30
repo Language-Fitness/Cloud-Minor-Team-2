@@ -7,16 +7,14 @@ package graph
 import (
 	"context"
 	"example/graph/model"
+	"example/internal/auth"
 )
 
 // CreateClass is the resolver for the createClass field.
 func (r *mutationResolver) CreateClass(ctx context.Context, input model.ClassInput) (*model.Class, error) {
-	//headers := ctx.Value("headers").(http.Header)
-	//
-	//// Access tokens from the headers, e.g., for Bearer token
-	//accessToken := headers.Get("Authorization")
+	token := auth.TokenFromContext(ctx)
 
-	class, err := r.Service.CreateClass(input)
+	class, err := r.Service.CreateClass(token, input)
 	if err != nil {
 		return nil, err
 	}
@@ -26,7 +24,9 @@ func (r *mutationResolver) CreateClass(ctx context.Context, input model.ClassInp
 
 // UpdateClass is the resolver for the updateClass field.
 func (r *mutationResolver) UpdateClass(ctx context.Context, id string, input model.ClassInput) (*model.Class, error) {
-	class, err := r.Service.UpdateClass(id, input)
+	token := auth.TokenFromContext(ctx)
+
+	class, err := r.Service.UpdateClass(token, id, input)
 	if err != nil {
 		return nil, err
 	}
@@ -36,7 +36,9 @@ func (r *mutationResolver) UpdateClass(ctx context.Context, id string, input mod
 
 // DeleteClass is the resolver for the deleteClass field.
 func (r *mutationResolver) DeleteClass(ctx context.Context, id string) (*string, error) {
-	err := r.Service.DeleteClass(id)
+	token := auth.TokenFromContext(ctx)
+
+	err := r.Service.DeleteClass(token, id)
 	if err != nil {
 		return nil, err
 	}
@@ -46,7 +48,9 @@ func (r *mutationResolver) DeleteClass(ctx context.Context, id string) (*string,
 
 // GetClass is the resolver for the getClass field.
 func (r *queryResolver) GetClass(ctx context.Context, id string) (*model.Class, error) {
-	class, err := r.Service.GetClassById(id)
+	token := auth.TokenFromContext(ctx)
+
+	class, err := r.Service.GetClassById(token, id)
 	if err != nil {
 		return nil, err
 	}
@@ -56,8 +60,9 @@ func (r *queryResolver) GetClass(ctx context.Context, id string) (*model.Class, 
 
 // ListClasses is the resolver for the listClasses field.
 func (r *queryResolver) ListClasses(ctx context.Context) ([]*model.Class, error) {
-	// Retrieve a list of all modules using the repository.
-	classes, err := r.Service.ListClasses()
+	token := auth.TokenFromContext(ctx)
+
+	classes, err := r.Service.ListClasses(token)
 	if err != nil {
 		return nil, err
 	}

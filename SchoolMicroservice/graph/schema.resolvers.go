@@ -7,16 +7,14 @@ package graph
 import (
 	"context"
 	"example/graph/model"
+	"example/internal/auth"
 )
 
 // CreateSchool is the resolver for the createSchool field.
 func (r *mutationResolver) CreateSchool(ctx context.Context, input model.SchoolInput) (*model.School, error) {
-	//headers := ctx.Value("headers").(http.Header)
-	//
-	//// Access tokens from the headers, e.g., for Bearer token
-	//accessToken := headers.Get("Authorization")
+	token := auth.TokenFromContext(ctx)
 
-	school, err := r.Service.CreateSchool(input)
+	school, err := r.Service.CreateSchool(token, input)
 	if err != nil {
 		return nil, err
 	}
@@ -26,7 +24,9 @@ func (r *mutationResolver) CreateSchool(ctx context.Context, input model.SchoolI
 
 // UpdateSchool is the resolver for the updateSchool field.
 func (r *mutationResolver) UpdateSchool(ctx context.Context, id string, input model.SchoolInput) (*model.School, error) {
-	school, err := r.Service.UpdateSchool(id, input)
+	token := auth.TokenFromContext(ctx)
+
+	school, err := r.Service.UpdateSchool(token, id, input)
 	if err != nil {
 		return nil, err
 	}
@@ -36,7 +36,9 @@ func (r *mutationResolver) UpdateSchool(ctx context.Context, id string, input mo
 
 // DeleteSchool is the resolver for the deleteSchool field.
 func (r *mutationResolver) DeleteSchool(ctx context.Context, id string) (*string, error) {
-	err := r.Service.DeleteSchool(id)
+	token := auth.TokenFromContext(ctx)
+
+	err := r.Service.DeleteSchool(token, id)
 	if err != nil {
 		return nil, err
 	}
@@ -46,7 +48,9 @@ func (r *mutationResolver) DeleteSchool(ctx context.Context, id string) (*string
 
 // GetSchool is the resolver for the getSchool field.
 func (r *queryResolver) GetSchool(ctx context.Context, id string) (*model.School, error) {
-	school, err := r.Service.GetSchoolById(id)
+	token := auth.TokenFromContext(ctx)
+
+	school, err := r.Service.GetSchoolById(token, id)
 	if err != nil {
 		return nil, err
 	}
@@ -56,8 +60,9 @@ func (r *queryResolver) GetSchool(ctx context.Context, id string) (*model.School
 
 // ListSchools is the resolver for the listSchools field.
 func (r *queryResolver) ListSchools(ctx context.Context) ([]*model.School, error) {
-	// Retrieve a list of all modules using the repository.
-	schools, err := r.Service.ListSchools()
+	token := auth.TokenFromContext(ctx)
+
+	schools, err := r.Service.ListSchools(token)
 	if err != nil {
 		return nil, err
 	}

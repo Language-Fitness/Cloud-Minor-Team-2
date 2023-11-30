@@ -22,5 +22,20 @@
   },
   {
     "name": "delete_school_all"
+  },
+  {
+    "name": "get_school"
+  },
+  {
+    "name": "get_schools"
+  },
+  {
+    "name": "create_school"
+  },
+  {
+    "name": "update_school"
+  },
+  {
+    "name": "delete_school"
   }
 ]

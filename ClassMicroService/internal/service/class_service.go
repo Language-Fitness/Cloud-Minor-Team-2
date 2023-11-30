@@ -3,6 +3,7 @@ package service
 import (
 	"errors"
 	"example/graph/model"
+	"example/internal/auth"
 	"example/internal/database"
 	"example/internal/repository"
 	"example/internal/validation"
@@ -14,11 +15,11 @@ import (
 // IClassService GOLANG INTERFACE
 // Implements five CRUD methods for query's and mutations on Class.
 type IClassService interface {
-	CreateClass(newClass model.ClassInput) (*model.Class, error)
-	UpdateClass(id string, updatedData model.ClassInput) (*model.Class, error)
-	DeleteClass(id string) error
-	GetClassById(id string) (*model.Class, error)
-	ListClasses() ([]*model.Class, error)
+	CreateClass(token string, newClass model.ClassInput) (*model.Class, error)
+	UpdateClass(token string, id string, updatedData model.ClassInput) (*model.Class, error)
+	DeleteClass(token string, id string) error
+	GetClassById(token string, id string) (*model.Class, error)
+	ListClasses(token string) ([]*model.Class, error)
 }
 
 // ClassService GOLANG STRUCT
@@ -26,6 +27,7 @@ type IClassService interface {
 type ClassService struct {
 	Validator validation.IValidator
 	Repo      repository.IClassRepository
+	Policy    auth.IPolicy
 }
 
 // NewClassService GOLANG FACTORY
@@ -36,10 +38,16 @@ func NewClassService() IClassService {
 	return &ClassService{
 		Validator: validation.NewValidator(),
 		Repo:      repository.NewClassRepository(collection),
+		Policy:    auth.NewPolicy(collection),
 	}
 }
 
-func (c *ClassService) CreateClass(newClass model.ClassInput) (*model.Class, error) {
+func (c *ClassService) CreateClass(token string, newClass model.ClassInput) (*model.Class, error) {
+	err := c.Policy.CreateClass(token)
+	if err != nil {
+		return nil, err
+	}
+
 	c.Validator.Validate(newClass.ModuleID, []string{"IsUUID"})
 	c.Validator.Validate(newClass.Name, []string{"IsString", "Length:<25"})
 	c.Validator.Validate(*newClass.Description, []string{"IsString", "Length:<50"})
@@ -75,7 +83,12 @@ func (c *ClassService) CreateClass(newClass model.ClassInput) (*model.Class, err
 	return result, nil
 }
 
-func (c *ClassService) UpdateClass(id string, updatedData model.ClassInput) (*model.Class, error) {
+func (c *ClassService) UpdateClass(token string, id string, updatedData model.ClassInput) (*model.Class, error) {
+	existingClass, err := c.Policy.UpdateClass(token, id)
+	if err != nil {
+		return nil, err
+	}
+
 	c.Validator.Validate(id, []string{"IsUUID"})
 	c.Validator.Validate(updatedData.ModuleID, []string{"IsUUID"})
 	c.Validator.Validate(updatedData.Name, []string{"IsString", "Length:<25"})
@@ -88,11 +101,6 @@ func (c *ClassService) UpdateClass(id string, updatedData model.ClassInput) (*mo
 		errorMessage := "Validation errors: " + strings.Join(validationErrors, ", ")
 		c.Validator.ClearErrors()
 		return nil, errors.New(errorMessage)
-	}
-
-	existingClass, err := c.Repo.GetClassByID(id)
-	if err != nil {
-		return nil, err
 	}
 
 	timestamp := time.Now().String()
@@ -115,7 +123,7 @@ func (c *ClassService) UpdateClass(id string, updatedData model.ClassInput) (*mo
 	return result, nil
 }
 
-func (c *ClassService) DeleteClass(id string) error {
+func (c *ClassService) DeleteClass(token string, id string) error {
 	c.Validator.Validate(id, []string{"IsUUID"})
 
 	validationErrors := c.Validator.GetErrors()
@@ -133,7 +141,12 @@ func (c *ClassService) DeleteClass(id string) error {
 	return nil
 }
 
-func (c *ClassService) GetClassById(id string) (*model.Class, error) {
+func (c *ClassService) GetClassById(token string, id string) (*model.Class, error) {
+	err := c.Policy.GetClass(token)
+	if err != nil {
+		return nil, err
+	}
+
 	c.Validator.Validate(id, []string{"IsUUID"})
 
 	validationErrors := c.Validator.GetErrors()
@@ -151,7 +164,12 @@ func (c *ClassService) GetClassById(id string) (*model.Class, error) {
 	return Class, nil
 }
 
-func (c *ClassService) ListClasses() ([]*model.Class, error) {
+func (c *ClassService) ListClasses(token string) ([]*model.Class, error) {
+	err := c.Policy.ListClasses(token)
+	if err != nil {
+		return nil, err
+	}
+
 	classes, err := c.Repo.ListClasses()
 	if err != nil {
 		return nil, err
