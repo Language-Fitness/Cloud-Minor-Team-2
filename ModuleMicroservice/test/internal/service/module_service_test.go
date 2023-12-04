@@ -156,64 +156,89 @@ func TestService_UpdateModule_CatchUpdateError(t *testing.T) {
 	mockValidator.AssertExpectations(t)
 }
 
-func TestService_DeleteModule(t *testing.T) {
+func TestService_SoftDeleteClassWithoutAdminToken(t *testing.T) {
 	mockRepo := new(mocks.MockRepository)
 	mockValidator := new(mocks.MockValidator)
 	mockPolicy := new(mocks.MockPolicy)
 	service := &service2.ModuleService{Validator: mockValidator, Repo: mockRepo, Policy: mockPolicy}
 
-	mockValidator.On("GetErrors").Return([]string{})
+	mockPolicy.On("DeleteModule", mock.AnythingOfType("string"), mock.AnythingOfType("string")).
+		Return(false, &mocks.MockModule, nil)
 
 	mockRepo.
 		On(
-			"DeleteModuleByID",
-			"3a3bd756-6353-4e29-8aba-5b3531bdb9ed").
+			"SoftDeleteModuleByID",
+			"3a3bd756-6353-4e29-8aba-5b3531bdb9ed", mock.AnythingOfType("model.Module")).
 		Return(nil)
 
-	err := service.DeleteModule("3a3bd756-6353-4e29-8aba-5b3531bdb9ed")
+	err := service.DeleteModule(adminToken, "3a3bd756-6353-4e29-8aba-5b3531bdb9ed", nil)
 
 	assert.Nil(t, err)
 
-	mockValidator.AssertExpectations(t)
+	mockPolicy.AssertExpectations(t)
 	mockRepo.AssertExpectations(t)
 }
 
-func TestService_DeleteModule_CatchValidationError(t *testing.T) {
+func TestService_SoftDeleteClass_CatchDeleteError_WithoutAdminToken_AlreadySoftDeleted(t *testing.T) {
 	mockRepo := new(mocks.MockRepository)
 	mockValidator := new(mocks.MockValidator)
 	mockPolicy := new(mocks.MockPolicy)
 	service := &service2.ModuleService{Validator: mockValidator, Repo: mockRepo, Policy: mockPolicy}
 
-	mockValidator.On("GetErrors").Return([]string{"validation_error"})
+	mockPolicy.On("DeleteModule", mock.AnythingOfType("string"), mock.AnythingOfType("string")).
+		Return(false, &mocks.SoftDeletedMockModule, nil)
 
-	err := service.DeleteModule("3a3bd756-6353-4e29-8aba-5b3531bdb9ed")
+	err := service.DeleteModule(adminToken, "3a3bd756-6353-4e29-8aba-5b3531bdb9ed", nil)
 
 	assert.NotNil(t, err)
-	assert.Equal(t, "Validation errors: validation_error", err.Error())
+	assert.Equal(t, "module could not be deleted", err.Error())
 
-	mockValidator.AssertExpectations(t)
+	mockPolicy.AssertExpectations(t)
+	mockRepo.AssertExpectations(t)
 }
 
-func TestService_DeleteModule_CatchDeleteError(t *testing.T) {
+func TestService_SoftDeleteClass_CatchDeleteError_WithAdminToken_AlreadySoftDeleted_NoFilter(t *testing.T) {
 	mockRepo := new(mocks.MockRepository)
 	mockValidator := new(mocks.MockValidator)
 	mockPolicy := new(mocks.MockPolicy)
 	service := &service2.ModuleService{Validator: mockValidator, Repo: mockRepo, Policy: mockPolicy}
 
-	mockValidator.On("GetErrors").Return([]string{})
+	mockPolicy.On("DeleteModule", mock.AnythingOfType("string"), mock.AnythingOfType("string")).
+		Return(true, &mocks.SoftDeletedMockModule, nil)
+
+	isSoftDeleted := true
+	filter := model.Filter{SoftDelete: &isSoftDeleted}
+	err := service.DeleteModule(adminToken, "3a3bd756-6353-4e29-8aba-5b3531bdb9ed", &filter)
+
+	assert.NotNil(t, err)
+	assert.Equal(t, "module could not be deleted", err.Error())
+
+	mockPolicy.AssertExpectations(t)
+	mockRepo.AssertExpectations(t)
+}
+
+func TestService_HardDeleteClass_WithAdminToken_AlreadySoftDeleted_WithFilter(t *testing.T) {
+	mockRepo := new(mocks.MockRepository)
+	mockValidator := new(mocks.MockValidator)
+	mockPolicy := new(mocks.MockPolicy)
+	service := &service2.ModuleService{Validator: mockValidator, Repo: mockRepo, Policy: mockPolicy}
+
+	mockPolicy.On("DeleteModule", mock.AnythingOfType("string"), mock.AnythingOfType("string")).
+		Return(true, &mocks.SoftDeletedMockModule, nil)
 
 	mockRepo.
 		On(
-			"DeleteModuleByID",
+			"HardDeleteModuleByID",
 			"3a3bd756-6353-4e29-8aba-5b3531bdb9ed").
-		Return(errors.New("deletion_error"))
+		Return(nil)
 
-	err := service.DeleteModule("3a3bd756-6353-4e29-8aba-5b3531bdb9ed")
+	isSoftDeleted := false
+	filter := model.Filter{SoftDelete: &isSoftDeleted}
+	err := service.DeleteModule(adminToken, "3a3bd756-6353-4e29-8aba-5b3531bdb9ed", &filter)
 
-	assert.NotNil(t, err)
-	assert.Equal(t, "deletion_error", err.Error())
+	assert.Nil(t, err)
 
-	mockValidator.AssertExpectations(t)
+	mockPolicy.AssertExpectations(t)
 	mockRepo.AssertExpectations(t)
 }
 
@@ -223,15 +248,7 @@ func TestService_GetModuleByID(t *testing.T) {
 	mockPolicy := new(mocks.MockPolicy)
 	service := &service2.ModuleService{Validator: mockValidator, Repo: mockRepo, Policy: mockPolicy}
 
-	mockPolicy.On("GetModule", mock.AnythingOfType("string")).
-		Return(nil)
-
-	mockValidator.On("GetErrors").Return([]string{})
-
-	mockRepo.
-		On(
-			"GetModuleByID",
-			"3a3bd756-6353-4e29-8aba-5b3531bdb9ed").
+	mockPolicy.On("GetModule", mock.AnythingOfType("string"), mock.AnythingOfType("string")).
 		Return(&mocks.MockModule, nil)
 
 	result, err := service.GetModuleById(adminToken, "3a3bd756-6353-4e29-8aba-5b3531bdb9ed")
@@ -240,55 +257,7 @@ func TestService_GetModuleByID(t *testing.T) {
 	assert.NotNil(t, result)
 	assert.Equal(t, "3a3bd756-6353-4e29-8aba-5b3531bdb9ed", result.ID)
 
-	mockValidator.AssertExpectations(t)
-	mockRepo.AssertExpectations(t)
-}
-
-func TestService_GetModuleByID_CatchValidationError(t *testing.T) {
-	mockRepo := new(mocks.MockRepository)
-	mockValidator := new(mocks.MockValidator)
-	mockPolicy := new(mocks.MockPolicy)
-	service := &service2.ModuleService{Validator: mockValidator, Repo: mockRepo, Policy: mockPolicy}
-
-	mockPolicy.On("GetModule", mock.AnythingOfType("string")).
-		Return(nil)
-
-	mockValidator.On("GetErrors").Return([]string{"validation_error"})
-
-	result, err := service.GetModuleById(adminToken, "3a3bd756-6353-4e29-8aba-5b3531bdb9ed")
-
-	assert.Nil(t, result)
-	assert.NotNil(t, err)
-	assert.Equal(t, "Validation errors: validation_error", err.Error())
-
-	mockValidator.AssertExpectations(t)
-}
-
-func TestService_GetModuleByID_CatchRetrieveError(t *testing.T) {
-	mockRepo := new(mocks.MockRepository)
-	mockValidator := new(mocks.MockValidator)
-	mockPolicy := new(mocks.MockPolicy)
-	service := &service2.ModuleService{Validator: mockValidator, Repo: mockRepo, Policy: mockPolicy}
-
-	mockPolicy.On("GetModule", mock.AnythingOfType("string")).
-		Return(nil)
-
-	mockValidator.On("GetErrors").Return([]string{})
-
-	mockRepo.
-		On(
-			"GetModuleByID",
-			"3a3bd756-6353-4e29-8aba-5b3531bdb9ed").
-		Return(&model.Module{}, errors.New("retrieval_error"))
-
-	result, err := service.GetModuleById(adminToken, "3a3bd756-6353-4e29-8aba-5b3531bdb9ed")
-
-	assert.Nil(t, result)
-	assert.NotNil(t, err)
-	assert.Equal(t, "retrieval_error", err.Error())
-
-	mockValidator.AssertExpectations(t)
-	mockRepo.AssertExpectations(t)
+	mockPolicy.AssertExpectations(t)
 }
 
 func TestService_ListModules(t *testing.T) {
@@ -310,6 +279,7 @@ func TestService_ListModules(t *testing.T) {
 	assert.IsType(t, &model.ModuleInfo{}, result[0])
 	assert.Equal(t, "3a3bd756-6353-4e29-8aba-5b3531bdb9ed", result[0].ID)
 
+	mockPolicy.AssertExpectations(t)
 	mockValidator.AssertExpectations(t)
 	mockRepo.AssertExpectations(t)
 }
@@ -330,4 +300,6 @@ func TestService_ListModules_CatchRetrieveError(t *testing.T) {
 	assert.Nil(t, result)
 	assert.NotNil(t, err)
 	assert.Equal(t, "retrieval_error", err.Error())
+
+	mockPolicy.AssertExpectations(t)
 }

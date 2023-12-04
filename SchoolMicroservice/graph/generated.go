@@ -49,7 +49,7 @@ type DirectiveRoot struct {
 type ComplexityRoot struct {
 	Mutation struct {
 		CreateSchool func(childComplexity int, input model.SchoolInput) int
-		DeleteSchool func(childComplexity int, id string) int
+		DeleteSchool func(childComplexity int, id string, filter *model.Filter) int
 		UpdateSchool func(childComplexity int, id string, input model.SchoolInput) int
 	}
 
@@ -62,6 +62,7 @@ type ComplexityRoot struct {
 		CreatedAt   func(childComplexity int) int
 		ID          func(childComplexity int) int
 		Location    func(childComplexity int) int
+		MadeBy      func(childComplexity int) int
 		Name        func(childComplexity int) int
 		SoftDeleted func(childComplexity int) int
 		UpdatedAt   func(childComplexity int) int
@@ -70,6 +71,7 @@ type ComplexityRoot struct {
 	SchoolInfo struct {
 		ID       func(childComplexity int) int
 		Location func(childComplexity int) int
+		MadeBy   func(childComplexity int) int
 		Name     func(childComplexity int) int
 	}
 }
@@ -77,7 +79,7 @@ type ComplexityRoot struct {
 type MutationResolver interface {
 	CreateSchool(ctx context.Context, input model.SchoolInput) (*model.School, error)
 	UpdateSchool(ctx context.Context, id string, input model.SchoolInput) (*model.School, error)
-	DeleteSchool(ctx context.Context, id string) (*string, error)
+	DeleteSchool(ctx context.Context, id string, filter *model.Filter) (*string, error)
 }
 type QueryResolver interface {
 	GetSchool(ctx context.Context, id string) (*model.School, error)
@@ -125,7 +127,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.DeleteSchool(childComplexity, args["id"].(string)), true
+		return e.complexity.Mutation.DeleteSchool(childComplexity, args["id"].(string), args["filter"].(*model.Filter)), true
 
 	case "Mutation.updateSchool":
 		if e.complexity.Mutation.UpdateSchool == nil {
@@ -179,6 +181,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.School.Location(childComplexity), true
 
+	case "School.made_by":
+		if e.complexity.School.MadeBy == nil {
+			break
+		}
+
+		return e.complexity.School.MadeBy(childComplexity), true
+
 	case "School.name":
 		if e.complexity.School.Name == nil {
 			break
@@ -214,6 +223,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.SchoolInfo.Location(childComplexity), true
 
+	case "SchoolInfo.made_by":
+		if e.complexity.SchoolInfo.MadeBy == nil {
+			break
+		}
+
+		return e.complexity.SchoolInfo.MadeBy(childComplexity), true
+
 	case "SchoolInfo.name":
 		if e.complexity.SchoolInfo.Name == nil {
 			break
@@ -229,6 +245,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 	rc := graphql.GetOperationContext(ctx)
 	ec := executionContext{rc, e, 0, 0, make(chan graphql.DeferredResult)}
 	inputUnmarshalMap := graphql.BuildUnmarshalerMap(
+		ec.unmarshalInputFilter,
 		ec.unmarshalInputSchoolInput,
 	)
 	first := true
@@ -373,6 +390,15 @@ func (ec *executionContext) field_Mutation_deleteSchool_args(ctx context.Context
 		}
 	}
 	args["id"] = arg0
+	var arg1 *model.Filter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg1, err = ec.unmarshalOFilter2ᚖexampleᚋgraphᚋmodelᚐFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg1
 	return args, nil
 }
 
@@ -510,6 +536,8 @@ func (ec *executionContext) fieldContext_Mutation_createSchool(ctx context.Conte
 				return ec.fieldContext_School_name(ctx, field)
 			case "location":
 				return ec.fieldContext_School_location(ctx, field)
+			case "made_by":
+				return ec.fieldContext_School_made_by(ctx, field)
 			case "created_at":
 				return ec.fieldContext_School_created_at(ctx, field)
 			case "updated_at":
@@ -576,6 +604,8 @@ func (ec *executionContext) fieldContext_Mutation_updateSchool(ctx context.Conte
 				return ec.fieldContext_School_name(ctx, field)
 			case "location":
 				return ec.fieldContext_School_location(ctx, field)
+			case "made_by":
+				return ec.fieldContext_School_made_by(ctx, field)
 			case "created_at":
 				return ec.fieldContext_School_created_at(ctx, field)
 			case "updated_at":
@@ -614,7 +644,7 @@ func (ec *executionContext) _Mutation_deleteSchool(ctx context.Context, field gr
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().DeleteSchool(rctx, fc.Args["id"].(string))
+		return ec.resolvers.Mutation().DeleteSchool(rctx, fc.Args["id"].(string), fc.Args["filter"].(*model.Filter))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -694,6 +724,8 @@ func (ec *executionContext) fieldContext_Query_getSchool(ctx context.Context, fi
 				return ec.fieldContext_School_name(ctx, field)
 			case "location":
 				return ec.fieldContext_School_location(ctx, field)
+			case "made_by":
+				return ec.fieldContext_School_made_by(ctx, field)
 			case "created_at":
 				return ec.fieldContext_School_created_at(ctx, field)
 			case "updated_at":
@@ -760,6 +792,8 @@ func (ec *executionContext) fieldContext_Query_listSchools(ctx context.Context, 
 				return ec.fieldContext_SchoolInfo_name(ctx, field)
 			case "location":
 				return ec.fieldContext_SchoolInfo_location(ctx, field)
+			case "made_by":
+				return ec.fieldContext_SchoolInfo_made_by(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type SchoolInfo", field.Name)
 		},
@@ -1028,6 +1062,50 @@ func (ec *executionContext) fieldContext_School_location(ctx context.Context, fi
 	return fc, nil
 }
 
+func (ec *executionContext) _School_made_by(ctx context.Context, field graphql.CollectedField, obj *model.School) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_School_made_by(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.MadeBy, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNID2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_School_made_by(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "School",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ID does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _School_created_at(ctx context.Context, field graphql.CollectedField, obj *model.School) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_School_created_at(ctx, field)
 	if err != nil {
@@ -1278,6 +1356,50 @@ func (ec *executionContext) fieldContext_SchoolInfo_location(ctx context.Context
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _SchoolInfo_made_by(ctx context.Context, field graphql.CollectedField, obj *model.SchoolInfo) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_SchoolInfo_made_by(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.MadeBy, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNID2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_SchoolInfo_made_by(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "SchoolInfo",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ID does not have child fields")
 		},
 	}
 	return fc, nil
@@ -3056,6 +3178,35 @@ func (ec *executionContext) fieldContext___Type_specifiedByURL(ctx context.Conte
 
 // region    **************************** input.gotpl *****************************
 
+func (ec *executionContext) unmarshalInputFilter(ctx context.Context, obj interface{}) (model.Filter, error) {
+	var it model.Filter
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"softDelete"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "softDelete":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("softDelete"))
+			data, err := ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.SoftDelete = data
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputSchoolInput(ctx context.Context, obj interface{}) (model.SchoolInput, error) {
 	var it model.SchoolInput
 	asMap := map[string]interface{}{}
@@ -3063,7 +3214,7 @@ func (ec *executionContext) unmarshalInputSchoolInput(ctx context.Context, obj i
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"name", "location"}
+	fieldsInOrder := [...]string{"name", "location", "made_by"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -3088,6 +3239,15 @@ func (ec *executionContext) unmarshalInputSchoolInput(ctx context.Context, obj i
 				return it, err
 			}
 			it.Location = data
+		case "made_by":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("made_by"))
+			data, err := ec.unmarshalNID2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.MadeBy = data
 		}
 	}
 
@@ -3270,6 +3430,11 @@ func (ec *executionContext) _School(ctx context.Context, sel ast.SelectionSet, o
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
+		case "made_by":
+			out.Values[i] = ec._School_made_by(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
 		case "created_at":
 			out.Values[i] = ec._School_created_at(ctx, field, obj)
 		case "updated_at":
@@ -3322,6 +3487,11 @@ func (ec *executionContext) _SchoolInfo(ctx context.Context, sel ast.SelectionSe
 			}
 		case "location":
 			out.Values[i] = ec._SchoolInfo_location(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "made_by":
+			out.Values[i] = ec._SchoolInfo_made_by(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
@@ -4001,6 +4171,14 @@ func (ec *executionContext) marshalOBoolean2ᚖbool(ctx context.Context, sel ast
 	}
 	res := graphql.MarshalBoolean(*v)
 	return res
+}
+
+func (ec *executionContext) unmarshalOFilter2ᚖexampleᚋgraphᚋmodelᚐFilter(ctx context.Context, v interface{}) (*model.Filter, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputFilter(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) unmarshalOID2ᚖstring(ctx context.Context, v interface{}) (*string, error) {

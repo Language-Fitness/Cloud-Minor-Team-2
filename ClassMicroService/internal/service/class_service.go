@@ -17,7 +17,7 @@ import (
 type IClassService interface {
 	CreateClass(token string, newClass model.ClassInput) (*model.Class, error)
 	UpdateClass(token string, id string, updatedData model.ClassInput) (*model.Class, error)
-	DeleteClass(token string, id string) error
+	DeleteClass(token string, id string, filter *model.Filter) error
 	GetClassById(token string, id string) (*model.Class, error)
 	ListClasses(token string) ([]*model.ClassInfo, error)
 }
@@ -89,7 +89,6 @@ func (c *ClassService) UpdateClass(token string, id string, updatedData model.Cl
 		return nil, err
 	}
 
-	c.Validator.Validate(id, []string{"IsUUID"})
 	c.Validator.Validate(updatedData.ModuleID, []string{"IsUUID"})
 	c.Validator.Validate(updatedData.Name, []string{"IsString", "Length:<25"})
 	c.Validator.Validate(updatedData.Description, []string{"IsString", "Length:<50"})
@@ -123,45 +122,41 @@ func (c *ClassService) UpdateClass(token string, id string, updatedData model.Cl
 	return result, nil
 }
 
-func (c *ClassService) DeleteClass(token string, id string) error {
-	c.Validator.Validate(id, []string{"IsUUID"})
-
-	validationErrors := c.Validator.GetErrors()
-	if len(validationErrors) > 0 {
-		errorMessage := "Validation errors: " + strings.Join(validationErrors, ", ")
-		c.Validator.ClearErrors()
-		return errors.New(errorMessage)
-	}
-
-	err := c.Repo.DeleteClassByID(id)
+func (c *ClassService) DeleteClass(token string, id string, filter *model.Filter) error {
+	isAdmin, existingClass, err := c.Policy.DeleteClass(token, id)
 	if err != nil {
 		return err
 	}
 
-	return nil
+	if !*existingClass.SoftDeleted {
+		softDelete := true
+		existingClass.SoftDeleted = &softDelete
+
+		err := c.Repo.SoftDeleteClassByID(id, *existingClass)
+		if err != nil {
+			return err
+		}
+		return nil
+	}
+
+	if isAdmin && filter != nil && !*filter.SoftDelete {
+		err := c.Repo.HardDeleteClassByID(id)
+		if err != nil {
+			return err
+		}
+		return nil
+	}
+
+	return errors.New("class could not be deleted")
 }
 
 func (c *ClassService) GetClassById(token string, id string) (*model.Class, error) {
-	err := c.Policy.GetClass(token)
+	existingClass, err := c.Policy.GetClass(token, id)
 	if err != nil {
 		return nil, err
 	}
 
-	c.Validator.Validate(id, []string{"IsUUID"})
-
-	validationErrors := c.Validator.GetErrors()
-	if len(validationErrors) > 0 {
-		errorMessage := "Validation errors: " + strings.Join(validationErrors, ", ")
-		c.Validator.ClearErrors()
-		return nil, errors.New(errorMessage)
-	}
-
-	Class, err := c.Repo.GetClassByID(id)
-	if err != nil {
-		return nil, err
-	}
-
-	return Class, nil
+	return existingClass, nil
 }
 
 func (c *ClassService) ListClasses(token string) ([]*model.ClassInfo, error) {

@@ -13,9 +13,9 @@ type MockPolicy struct {
 	SchoolRepository repository.ISchoolRepository
 }
 
-func (m *MockPolicy) CreateSchool(bearerToken string) error {
+func (m *MockPolicy) CreateSchool(bearerToken string) (string, error) {
 	args := m.Called(bearerToken)
-	return args.Error(0)
+	return args.Get(0).(string), args.Error(1)
 }
 
 func (m *MockPolicy) UpdateSchool(bearerToken string, id string) (*model.School, error) {
@@ -23,14 +23,14 @@ func (m *MockPolicy) UpdateSchool(bearerToken string, id string) (*model.School,
 	return args.Get(0).(*model.School), args.Error(1)
 }
 
-func (m *MockPolicy) DeleteSchool(bearerToken string, id string) error {
+func (m *MockPolicy) DeleteSchool(bearerToken string, id string) (*model.School, error) {
 	args := m.Called(bearerToken, id)
-	return args.Error(0)
+	return args.Get(0).(*model.School), args.Error(1)
 }
 
-func (m *MockPolicy) GetSchool(bearerToken string) error {
+func (m *MockPolicy) GetSchool(bearerToken string, id string) (*model.School, error) {
 	args := m.Called(bearerToken)
-	return args.Error(0)
+	return args.Get(0).(*model.School), args.Error(1)
 }
 
 func (m *MockPolicy) ListSchools(bearerToken string) error {

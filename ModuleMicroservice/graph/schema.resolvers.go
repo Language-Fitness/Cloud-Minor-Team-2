@@ -35,9 +35,10 @@ func (r *mutationResolver) UpdateModule(ctx context.Context, id string, input mo
 }
 
 // DeleteModule is the resolver for the deleteModule field.
-func (r *mutationResolver) DeleteModule(ctx context.Context, id string) (*string, error) {
-	//@TODO this has to be moved to GRPC
-	err := r.Service.DeleteModule(id)
+func (r *mutationResolver) DeleteModule(ctx context.Context, id string, filter *model.Filter) (*string, error) {
+	token := auth.TokenFromContext(ctx)
+
+	err := r.Service.DeleteModule(token, id, filter)
 	if err != nil {
 		return nil, err
 	}

@@ -14,7 +14,8 @@ import (
 type ISchoolRepository interface {
 	CreateSchool(newSchool *model.School) (*model.School, error)
 	UpdateSchool(id string, updatedSchool model.School) (*model.School, error)
-	DeleteSchoolByID(id string) error
+	SoftDeleteSchoolByID(id string, existingSchool model.School) error
+	HardDeleteSchoolByID(id string) error
 	GetSchoolByID(id string) (*model.School, error)
 	ListSchools() ([]*model.SchoolInfo, error)
 }
@@ -59,16 +60,11 @@ func (r *SchoolRepository) UpdateSchool(id string, updatedSchool model.School) (
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10) // 10-second timeout
 	defer cancel()
 
-	_, err := r.GetSchoolByID(id)
-	if err != nil {
-		return nil, err // Return the error if it doesn't exist in MongoDB.
-	}
-
 	filter := bson.M{"id": id}
 	update := bson.M{"$set": updatedSchool}
 	var result model.School
 
-	err = r.collection.FindOneAndUpdate(
+	err := r.collection.FindOneAndUpdate(
 		ctx,
 		filter,
 		update,
@@ -80,18 +76,33 @@ func (r *SchoolRepository) UpdateSchool(id string, updatedSchool model.School) (
 	return &result, nil
 }
 
-func (r *SchoolRepository) DeleteSchoolByID(id string) error {
+func (r *SchoolRepository) SoftDeleteSchoolByID(id string, existingSchool model.School) error {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10) // 10-second timeout
 	defer cancel()
 
-	_, err := r.GetSchoolByID(id)
+	filter := bson.M{"id": id}
+	update := bson.M{"$set": existingSchool}
+	var result model.School
+
+	err := r.collection.FindOneAndUpdate(
+		ctx,
+		filter,
+		update,
+		options.FindOneAndUpdate().SetReturnDocument(options.After)).Decode(&result)
 	if err != nil {
-		return err // Return the error if it exists in MongoDB.
+		return err
 	}
+
+	return nil
+}
+
+func (r *SchoolRepository) HardDeleteSchoolByID(id string) error {
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10) // 10-second timeout
+	defer cancel()
 
 	filter := bson.M{"id": id}
 
-	_, err = r.collection.DeleteOne(ctx, filter)
+	_, err := r.collection.DeleteOne(ctx, filter)
 	if err != nil {
 		return err // Return any MongoDB-related errors.
 	}

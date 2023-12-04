@@ -73,7 +73,7 @@ type ComplexityRoot struct {
 
 	Mutation struct {
 		CreateModule func(childComplexity int, input model.ModuleInput) int
-		DeleteModule func(childComplexity int, id string) int
+		DeleteModule func(childComplexity int, id string, filter *model.Filter) int
 		UpdateModule func(childComplexity int, id string, input model.ModuleInput) int
 	}
 
@@ -86,7 +86,7 @@ type ComplexityRoot struct {
 type MutationResolver interface {
 	CreateModule(ctx context.Context, input model.ModuleInput) (*model.Module, error)
 	UpdateModule(ctx context.Context, id string, input model.ModuleInput) (*model.Module, error)
-	DeleteModule(ctx context.Context, id string) (*string, error)
+	DeleteModule(ctx context.Context, id string, filter *model.Filter) (*string, error)
 }
 type QueryResolver interface {
 	GetModule(ctx context.Context, id string) (*model.Module, error)
@@ -260,7 +260,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.DeleteModule(childComplexity, args["id"].(string)), true
+		return e.complexity.Mutation.DeleteModule(childComplexity, args["id"].(string), args["filter"].(*model.Filter)), true
 
 	case "Mutation.updateModule":
 		if e.complexity.Mutation.UpdateModule == nil {
@@ -301,6 +301,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 	rc := graphql.GetOperationContext(ctx)
 	ec := executionContext{rc, e, 0, 0, make(chan graphql.DeferredResult)}
 	inputUnmarshalMap := graphql.BuildUnmarshalerMap(
+		ec.unmarshalInputFilter,
 		ec.unmarshalInputModuleInput,
 	)
 	first := true
@@ -445,6 +446,15 @@ func (ec *executionContext) field_Mutation_deleteModule_args(ctx context.Context
 		}
 	}
 	args["id"] = arg0
+	var arg1 *model.Filter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg1, err = ec.unmarshalOFilter2ᚖModuleᚋgraphᚋmodelᚐFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg1
 	return args, nil
 }
 
@@ -1486,7 +1496,7 @@ func (ec *executionContext) _Mutation_deleteModule(ctx context.Context, field gr
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().DeleteModule(rctx, fc.Args["id"].(string))
+		return ec.resolvers.Mutation().DeleteModule(rctx, fc.Args["id"].(string), fc.Args["filter"].(*model.Filter))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -3559,6 +3569,35 @@ func (ec *executionContext) fieldContext___Type_specifiedByURL(ctx context.Conte
 
 // region    **************************** input.gotpl *****************************
 
+func (ec *executionContext) unmarshalInputFilter(ctx context.Context, obj interface{}) (model.Filter, error) {
+	var it model.Filter
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"softDelete"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "softDelete":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("softDelete"))
+			data, err := ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.SoftDelete = data
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputModuleInput(ctx context.Context, obj interface{}) (model.ModuleInput, error) {
 	var it model.ModuleInput
 	asMap := map[string]interface{}{}
@@ -4597,6 +4636,14 @@ func (ec *executionContext) marshalOBoolean2ᚖbool(ctx context.Context, sel ast
 	}
 	res := graphql.MarshalBoolean(*v)
 	return res
+}
+
+func (ec *executionContext) unmarshalOFilter2ᚖModuleᚋgraphᚋmodelᚐFilter(ctx context.Context, v interface{}) (*model.Filter, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputFilter(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) unmarshalOID2ᚖstring(ctx context.Context, v interface{}) (*string, error) {

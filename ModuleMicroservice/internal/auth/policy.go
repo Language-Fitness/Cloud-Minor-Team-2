@@ -10,8 +10,8 @@ import (
 type IPolicy interface {
 	CreateModule(bearerToken string) (string, error)
 	UpdateModule(bearerToken string, id string) (*model.Module, error)
-	DeleteModule(bearerToken string, id string) error
-	GetModule(bearerToken string) error
+	DeleteModule(bearerToken string, id string) (bool, *model.Module, error)
+	GetModule(bearerToken string, id string) (*model.Module, error)
 	ListModules(bearerToken string) error
 }
 
@@ -64,40 +64,45 @@ func (p *Policy) UpdateModule(bearerToken string, id string) (*model.Module, err
 	return nil, errors.New("invalid permissions for this action")
 }
 
-func (p *Policy) DeleteModule(bearerToken string, id string) error {
+func (p *Policy) DeleteModule(bearerToken string, id string) (bool, *model.Module, error) {
 	uuid, roles, err2 := p.getSubAndRoles(bearerToken)
 	if err2 != nil {
-		return err2
+		return false, nil, err2
 	}
 
 	module, err := p.ModuleRepository.GetModuleByID(id)
 	if err != nil {
-		return errors.New("invalid permissions for this action")
-	}
-
-	if p.hasRole(roles, "delete_module") && module.MadeBy == uuid {
-		return nil
+		return false, nil, errors.New("invalid permissions for this action")
 	}
 
 	if p.hasRole(roles, "delete_module_all") {
-		return nil
+		return true, module, nil
 	}
 
-	return errors.New("invalid permissions for this action")
+	if p.hasRole(roles, "delete_module") && module.MadeBy == uuid {
+		return false, module, nil
+	}
+
+	return false, nil, errors.New("invalid permissions for this action")
 }
 
 // GetModule is the resolver for the getModule field.
-func (p *Policy) GetModule(bearerToken string) error {
+func (p *Policy) GetModule(bearerToken string, id string) (*model.Module, error) {
 	_, roles, err2 := p.getSubAndRoles(bearerToken)
 	if err2 != nil {
-		return err2
+		return nil, err2
 	}
 
-	if !p.hasRole(roles, "get_module") {
-		return errors.New("invalid permissions for this action")
+	module, err := p.ModuleRepository.GetModuleByID(id)
+	if err != nil {
+		return nil, errors.New("invalid permissions for this action")
 	}
 
-	return nil
+	if p.hasRole(roles, "get_module") {
+		return module, nil
+	}
+
+	return nil, errors.New("invalid permissions for this action")
 }
 
 // ListModules is the resolver for the listModules field.

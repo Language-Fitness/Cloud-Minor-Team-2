@@ -14,7 +14,8 @@ import (
 type IClassRepository interface {
 	CreateClass(newClass *model.Class) (*model.Class, error)
 	UpdateClass(id string, updatedClass model.Class) (*model.Class, error)
-	DeleteClassByID(id string) error
+	SoftDeleteClassByID(id string, existingClass model.Class) error
+	HardDeleteClassByID(id string) error
 	GetClassByID(id string) (*model.Class, error)
 	ListClasses() ([]*model.ClassInfo, error)
 }
@@ -59,16 +60,11 @@ func (r *ClassRepository) UpdateClass(id string, updatedClass model.Class) (*mod
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10) // 10-second timeout
 	defer cancel()
 
-	_, err := r.GetClassByID(id)
-	if err != nil {
-		return nil, err // Return the error if it doesn't exist in MongoDB.
-	}
-
 	filter := bson.M{"id": id}
 	update := bson.M{"$set": updatedClass}
 	var result model.Class
 
-	err = r.collection.FindOneAndUpdate(
+	err := r.collection.FindOneAndUpdate(
 		ctx,
 		filter,
 		update,
@@ -80,18 +76,33 @@ func (r *ClassRepository) UpdateClass(id string, updatedClass model.Class) (*mod
 	return &result, nil
 }
 
-func (r *ClassRepository) DeleteClassByID(id string) error {
+func (r *ClassRepository) SoftDeleteClassByID(id string, existingClass model.Class) error {
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
+	defer cancel()
+
+	filter := bson.M{"id": id}
+	update := bson.M{"$set": existingClass}
+	var result model.Class
+
+	err := r.collection.FindOneAndUpdate(
+		ctx,
+		filter,
+		update,
+		options.FindOneAndUpdate().SetReturnDocument(options.After)).Decode(&result)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (r *ClassRepository) HardDeleteClassByID(id string) error {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10) // 10-second timeout
 	defer cancel()
 
-	_, err := r.GetClassByID(id)
-	if err != nil {
-		return err // Return the error if it exists in MongoDB.
-	}
-
 	filter := bson.M{"id": id}
 
-	_, err = r.collection.DeleteOne(ctx, filter)
+	_, err := r.collection.DeleteOne(ctx, filter)
 	if err != nil {
 		return err // Return any MongoDB-related errors.
 	}

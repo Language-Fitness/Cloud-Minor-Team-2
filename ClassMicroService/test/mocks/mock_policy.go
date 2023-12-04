@@ -23,14 +23,14 @@ func (m *MockPolicy) UpdateClass(bearerToken string, id string) (*model.Class, e
 	return args.Get(0).(*model.Class), args.Error(1)
 }
 
-func (m *MockPolicy) DeleteClass(bearerToken string, id string) error {
+func (m *MockPolicy) DeleteClass(bearerToken string, id string) (bool, *model.Class, error) {
 	args := m.Called(bearerToken, id)
-	return args.Error(0)
+	return args.Get(0).(bool), args.Get(1).(*model.Class), args.Error(2)
 }
 
-func (m *MockPolicy) GetClass(bearerToken string) error {
-	args := m.Called(bearerToken)
-	return args.Error(0)
+func (m *MockPolicy) GetClass(bearerToken string, id string) (*model.Class, error) {
+	args := m.Called(bearerToken, id)
+	return args.Get(0).(*model.Class), args.Error(1)
 }
 
 func (m *MockPolicy) ListClasses(bearerToken string) error {

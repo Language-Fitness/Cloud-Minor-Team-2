@@ -10,8 +10,8 @@ import (
 type IPolicy interface {
 	CreateClass(bearerToken string) (string, error)
 	UpdateClass(bearerToken string, id string) (*model.Class, error)
-	DeleteClass(bearerToken string, id string) error
-	GetClass(bearerToken string) error
+	DeleteClass(bearerToken string, id string) (bool, *model.Class, error)
+	GetClass(bearerToken string, id string) (*model.Class, error)
 	ListClasses(bearerToken string) error
 }
 
@@ -64,39 +64,44 @@ func (p *Policy) UpdateClass(bearerToken string, id string) (*model.Class, error
 	return nil, errors.New("invalid permissions for this action")
 }
 
-func (p *Policy) DeleteClass(bearerToken string, id string) error {
+func (p *Policy) DeleteClass(bearerToken string, id string) (bool, *model.Class, error) {
 	uuid, roles, err2 := p.getSubAndRoles(bearerToken)
 	if err2 != nil {
-		return err2
+		return false, nil, err2
 	}
 
 	class, err := p.ClassRepository.GetClassByID(id)
 	if err != nil {
-		return errors.New("invalid permissions for this action")
-	}
-
-	if p.hasRole(roles, "delete_class") && class.MadeBy == uuid {
-		return nil
+		return false, nil, errors.New("invalid permissions for this action")
 	}
 
 	if p.hasRole(roles, "delete_class_all") {
-		return nil
+		return true, class, nil
 	}
 
-	return errors.New("invalid permissions for this action")
+	if p.hasRole(roles, "delete_class") && class.MadeBy == uuid {
+		return false, class, nil
+	}
+
+	return false, nil, errors.New("invalid permissions for this action")
 }
 
-func (p *Policy) GetClass(bearerToken string) error {
+func (p *Policy) GetClass(bearerToken string, id string) (*model.Class, error) {
 	_, roles, err2 := p.getSubAndRoles(bearerToken)
 	if err2 != nil {
-		return err2
+		return nil, err2
 	}
 
-	if !p.hasRole(roles, "get_class") {
-		return errors.New("invalid permissions for this action")
+	class, err := p.ClassRepository.GetClassByID(id)
+	if err != nil {
+		return nil, errors.New("invalid permissions for this action")
 	}
 
-	return nil
+	if p.hasRole(roles, "get_class") {
+		return class, nil
+	}
+
+	return nil, errors.New("invalid permissions for this action")
 }
 
 func (p *Policy) ListClasses(bearerToken string) error {

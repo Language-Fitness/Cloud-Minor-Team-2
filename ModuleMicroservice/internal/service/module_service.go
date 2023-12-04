@@ -17,7 +17,7 @@ import (
 type IModuleService interface {
 	CreateModule(token string, newModule model.ModuleInput) (*model.Module, error)
 	UpdateModule(token string, id string, updateData model.ModuleInput) (*model.Module, error)
-	DeleteModule(id string) error
+	DeleteModule(token string, id string, filter *model.Filter) error
 	GetModuleById(token string, id string) (*model.Module, error)
 	ListModules(token string) ([]*model.ModuleInfo, error)
 }
@@ -140,47 +140,41 @@ func (m *ModuleService) UpdateModule(token string, id string, updateData model.M
 	return result, nil
 }
 
-func (m *ModuleService) DeleteModule(id string) error {
-	m.Validator.Validate(id, []string{"IsUUID"})
-
-	validationErrors := m.Validator.GetErrors()
-	if len(validationErrors) > 0 {
-		errorMessage := "Validation errors: " + strings.Join(validationErrors, ", ")
-		m.Validator.ClearErrors()
-		return errors.New(errorMessage)
-	}
-
-	err := m.Repo.DeleteModuleByID(id)
+func (m *ModuleService) DeleteModule(token string, id string, filter *model.Filter) error {
+	isAdmin, existingModule, err := m.Policy.DeleteModule(token, id)
 	if err != nil {
 		return err
 	}
 
-	m.Validator.ClearErrors()
-	return nil
+	if !*existingModule.SoftDeleted {
+		softDelete := true
+		existingModule.SoftDeleted = &softDelete
+
+		err := m.Repo.SoftDeleteModuleByID(id, *existingModule)
+		if err != nil {
+			return err
+		}
+		return nil
+	}
+
+	if isAdmin && filter != nil && !*filter.SoftDelete {
+		err := m.Repo.HardDeleteModuleByID(id)
+		if err != nil {
+			return err
+		}
+		return nil
+	}
+
+	return errors.New("module could not be deleted")
 }
 
 func (m *ModuleService) GetModuleById(token string, id string) (*model.Module, error) {
-	err := m.Policy.GetModule(token)
+	existingModule, err := m.Policy.GetModule(token, id)
 	if err != nil {
 		return nil, err
 	}
 
-	m.Validator.Validate(id, []string{"IsUUID"})
-
-	validationErrors := m.Validator.GetErrors()
-	if len(validationErrors) > 0 {
-		errorMessage := "Validation errors: " + strings.Join(validationErrors, ", ")
-		m.Validator.ClearErrors()
-		return nil, errors.New(errorMessage)
-	}
-
-	module, err := m.Repo.GetModuleByID(id)
-	if err != nil {
-		return nil, err
-	}
-
-	m.Validator.ClearErrors()
-	return module, nil
+	return existingModule, nil
 }
 
 func (m *ModuleService) ListModules(token string) ([]*model.ModuleInfo, error) {

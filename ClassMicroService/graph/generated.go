@@ -70,7 +70,7 @@ type ComplexityRoot struct {
 
 	Mutation struct {
 		CreateClass func(childComplexity int, input model.ClassInput) int
-		DeleteClass func(childComplexity int, id string) int
+		DeleteClass func(childComplexity int, id string, filter *model.Filter) int
 		UpdateClass func(childComplexity int, id string, input model.ClassInput) int
 	}
 
@@ -83,7 +83,7 @@ type ComplexityRoot struct {
 type MutationResolver interface {
 	CreateClass(ctx context.Context, input model.ClassInput) (*model.Class, error)
 	UpdateClass(ctx context.Context, id string, input model.ClassInput) (*model.Class, error)
-	DeleteClass(ctx context.Context, id string) (*string, error)
+	DeleteClass(ctx context.Context, id string, filter *model.Filter) (*string, error)
 }
 type QueryResolver interface {
 	GetClass(ctx context.Context, id string) (*model.Class, error)
@@ -236,7 +236,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.DeleteClass(childComplexity, args["id"].(string)), true
+		return e.complexity.Mutation.DeleteClass(childComplexity, args["id"].(string), args["filter"].(*model.Filter)), true
 
 	case "Mutation.updateClass":
 		if e.complexity.Mutation.UpdateClass == nil {
@@ -278,6 +278,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 	ec := executionContext{rc, e, 0, 0, make(chan graphql.DeferredResult)}
 	inputUnmarshalMap := graphql.BuildUnmarshalerMap(
 		ec.unmarshalInputClassInput,
+		ec.unmarshalInputFilter,
 	)
 	first := true
 
@@ -421,6 +422,15 @@ func (ec *executionContext) field_Mutation_deleteClass_args(ctx context.Context,
 		}
 	}
 	args["id"] = arg0
+	var arg1 *model.Filter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg1, err = ec.unmarshalOFilter2ᚖexampleᚋgraphᚋmodelᚐFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg1
 	return args, nil
 }
 
@@ -1325,7 +1335,7 @@ func (ec *executionContext) _Mutation_deleteClass(ctx context.Context, field gra
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().DeleteClass(rctx, fc.Args["id"].(string))
+		return ec.resolvers.Mutation().DeleteClass(rctx, fc.Args["id"].(string), fc.Args["filter"].(*model.Filter))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -3448,6 +3458,35 @@ func (ec *executionContext) unmarshalInputClassInput(ctx context.Context, obj in
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputFilter(ctx context.Context, obj interface{}) (model.Filter, error) {
+	var it model.Filter
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"softDelete"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "softDelete":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("softDelete"))
+			data, err := ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.SoftDelete = data
+		}
+	}
+
+	return it, nil
+}
+
 // endregion **************************** input.gotpl *****************************
 
 // region    ************************** interface.gotpl ***************************
@@ -4455,6 +4494,14 @@ func (ec *executionContext) marshalOClassInfo2ᚖexampleᚋgraphᚋmodelᚐClass
 		return graphql.Null
 	}
 	return ec._ClassInfo(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalOFilter2ᚖexampleᚋgraphᚋmodelᚐFilter(ctx context.Context, v interface{}) (*model.Filter, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputFilter(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) unmarshalOID2ᚖstring(ctx context.Context, v interface{}) (*string, error) {

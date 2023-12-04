@@ -8,10 +8,10 @@ import (
 )
 
 type IPolicy interface {
-	CreateSchool(bearerToken string) error
+	CreateSchool(bearerToken string) (string, error)
 	UpdateSchool(bearerToken string, id string) (*model.School, error)
-	DeleteSchool(bearerToken string, id string) error
-	GetSchool(bearerToken string) error
+	DeleteSchool(bearerToken string, id string) (*model.School, error)
+	GetSchool(bearerToken string, id string) (*model.School, error)
 	ListSchools(bearerToken string) error
 }
 
@@ -29,20 +29,42 @@ func NewPolicy(collection *mongo.Collection) IPolicy {
 	}
 }
 
-func (p *Policy) CreateSchool(bearerToken string) error {
-	_, roles, err2 := p.getSubAndRoles(bearerToken)
+func (p *Policy) CreateSchool(bearerToken string) (string, error) {
+	uuid, roles, err2 := p.getSubAndRoles(bearerToken)
 	if err2 != nil {
-		return err2
+		return "", err2
 	}
 
 	if !p.hasRole(roles, "create_school") {
-		return errors.New("invalid permissions for this action")
+		return "", errors.New("invalid permissions for this action")
 	}
 
-	return nil
+	return uuid, nil
 }
 
 func (p *Policy) UpdateSchool(bearerToken string, id string) (*model.School, error) {
+	uuid, roles, err2 := p.getSubAndRoles(bearerToken)
+	if err2 != nil {
+		return nil, err2
+	}
+
+	school, err := p.SchoolRepository.GetSchoolByID(id)
+	if err != nil {
+		return nil, errors.New("invalid permissions for this action")
+	}
+
+	if p.hasRole(roles, "update_school") && school.MadeBy == uuid {
+		return school, nil
+	}
+
+	if p.hasRole(roles, "update_school_all") {
+		return school, nil
+	}
+
+	return nil, errors.New("invalid permissions for this action")
+}
+
+func (p *Policy) DeleteSchool(bearerToken string, id string) (*model.School, error) {
 	_, roles, err2 := p.getSubAndRoles(bearerToken)
 	if err2 != nil {
 		return nil, err2
@@ -53,42 +75,29 @@ func (p *Policy) UpdateSchool(bearerToken string, id string) (*model.School, err
 		return nil, errors.New("invalid permissions for this action")
 	}
 
-	if p.hasRole(roles, "update_school_all") {
+	if p.hasRole(roles, "delete_school_all") {
 		return school, nil
 	}
 
 	return nil, errors.New("invalid permissions for this action")
 }
 
-func (p *Policy) DeleteSchool(bearerToken string, id string) error {
+func (p *Policy) GetSchool(bearerToken string, id string) (*model.School, error) {
 	_, roles, err2 := p.getSubAndRoles(bearerToken)
 	if err2 != nil {
-		return err2
+		return nil, err2
 	}
 
-	_, err := p.SchoolRepository.GetSchoolByID(id)
+	school, err := p.SchoolRepository.GetSchoolByID(id)
 	if err != nil {
-		return errors.New("invalid permissions for this action")
+		return nil, errors.New("invalid permissions for this action")
 	}
 
-	if p.hasRole(roles, "delete_school_all") {
-		return nil
+	if p.hasRole(roles, "get_school") {
+		return school, nil
 	}
 
-	return errors.New("invalid permissions for this action")
-}
-
-func (p *Policy) GetSchool(bearerToken string) error {
-	_, roles, err2 := p.getSubAndRoles(bearerToken)
-	if err2 != nil {
-		return err2
-	}
-
-	if !p.hasRole(roles, "get_school") {
-		return errors.New("invalid permissions for this action")
-	}
-
-	return nil
+	return nil, errors.New("invalid permissions for this action")
 }
 
 func (p *Policy) ListSchools(bearerToken string) error {

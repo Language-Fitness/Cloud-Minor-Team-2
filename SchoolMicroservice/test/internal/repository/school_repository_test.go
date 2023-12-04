@@ -126,6 +126,70 @@ func TestUpdateSchool(t *testing.T) {
 	// Add similar assertions for other fields you updated.
 }
 
+func TestSoftDeleteSchool(t *testing.T) {
+	collection, err := database.GetTestCollection()
+	if err != nil {
+		t.Fatalf("Failed to get the test collection: %v", err)
+	}
+
+	err = clearCollection(collection)
+	if err != nil {
+		log.Fatalf("Failed to clear the test collection: %v", err)
+	}
+
+	// Create a new SchoolRepository using the test collection.
+	repo := repository.NewSchoolRepository(collection)
+
+	// Define your test data for an existing school.
+	isNotSoftDelete := false
+	existingSchool := &model.School{
+		ID:          "123",
+		Name:        "Test School",
+		SoftDeleted: &isNotSoftDelete,
+		// Initialize other fields as needed for the existing School.
+	}
+
+	// Insert the existing school into MongoDB.
+	_, err = repo.CreateSchool(existingSchool)
+	if err != nil {
+		t.Errorf("Error creating the existing school: %v", err)
+	}
+
+	// Define the updates you want to apply to the school.
+	updatedSchoolInput := model.School{
+		ID:          "123",
+		Name:        "Updated Test School",
+		SoftDeleted: &isNotSoftDelete,
+		// Define other fields you want to update.
+	}
+
+	// Call the method you want to test.
+	updatedSchool, err := repo.UpdateSchool("123", updatedSchoolInput)
+
+	// Assert the result and error as needed.
+	if err != nil {
+		t.Errorf("Error updating school: %v", err)
+	}
+
+	ctx, cancel := context.WithTimeout(context.TODO(), time.Second*10) // 10-second timeout
+	defer cancel()
+	// Attempt to fetch the updated school from MongoDB.
+	filter := bson.M{"id": "123"}
+	var databaseSchool model.School
+
+	err = collection.FindOne(ctx, filter).Decode(&databaseSchool)
+
+	if err != nil {
+		t.Errorf("Error fetching updated school from MongoDB: %v", err)
+	}
+
+	// Assert that the updated school fields match the expected updates.
+	if *updatedSchool.SoftDeleted != *updatedSchoolInput.SoftDeleted {
+		t.Errorf("Updated school name does not match the expected value")
+	}
+	// Add similar assertions for other fields you updated.
+}
+
 func TestDeleteSchoolByID(t *testing.T) {
 	collection, err := database.GetTestCollection()
 	if err != nil {
@@ -154,7 +218,7 @@ func TestDeleteSchoolByID(t *testing.T) {
 	}
 
 	// Call the method you want to test.
-	err = repo.DeleteSchoolByID("123")
+	err = repo.HardDeleteSchoolByID("123")
 
 	// Assert the error as needed.
 	if err != nil {

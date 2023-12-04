@@ -171,7 +171,7 @@ func TestDeleteModuleWithAdminToken(t *testing.T) {
 			"3a3bd756-6353-4e29-8aba-5b3531bdb9ed").
 		Return(&mocks.MockModule, nil)
 
-	err := modulePolicy.DeleteModule(adminToken, "3a3bd756-6353-4e29-8aba-5b3531bdb9ed")
+	_, _, err := modulePolicy.DeleteModule(adminToken, "3a3bd756-6353-4e29-8aba-5b3531bdb9ed")
 
 	assert.Nil(t, err)
 	mockToken.AssertExpectations(t)
@@ -197,7 +197,7 @@ func TestDeleteModuleWithTeacherToken(t *testing.T) {
 		On("IntrospectToken", mock.AnythingOfType("string")).
 		Return(true, nil)
 
-	err := modulePolicy.DeleteModule(teacherToken, "3a3bd756-6353-4e29-8aba-5b3531bdb9ed")
+	_, _, err := modulePolicy.DeleteModule(teacherToken, "3a3bd756-6353-4e29-8aba-5b3531bdb9ed")
 
 	assert.NotNil(t, err)
 	//TODO
@@ -228,7 +228,7 @@ func TestDeleteModuleWithTeacherTokenAndWrongUUID(t *testing.T) {
 		On("IntrospectToken", mock.AnythingOfType("string")).
 		Return(true, nil)
 
-	err := modulePolicy.DeleteModule(teacherToken, "3a3bd756-6353-4e29-8aba-5b3531bdb9ed")
+	_, _, err := modulePolicy.DeleteModule(teacherToken, "3a3bd756-6353-4e29-8aba-5b3531bdb9ed")
 
 	assert.Nil(t, err)
 	mockToken.AssertExpectations(t)
@@ -254,7 +254,7 @@ func TestDeleteModuleWithStudentToken(t *testing.T) {
 		On("IntrospectToken", mock.AnythingOfType("string")).
 		Return(true, nil)
 
-	err := modulePolicy.DeleteModule(studentToken, "3a3bd756-6353-4e29-8aba-5b3531bdb9ed")
+	_, _, err := modulePolicy.DeleteModule(studentToken, "3a3bd756-6353-4e29-8aba-5b3531bdb9ed")
 
 	assert.NotNil(t, err)
 	assert.Equal(t, "invalid permissions for this action", err.Error())
@@ -275,7 +275,13 @@ func TestGetModuleWithAdminToken(t *testing.T) {
 		On("IntrospectToken", mock.AnythingOfType("string")).
 		Return(true, nil)
 
-	err := modulePolicy.GetModule(adminToken)
+	mockRepo.
+		On(
+			"GetModuleByID",
+			"3a3bd756-6353-4e29-8aba-5b3531bdb9ed").
+		Return(&mocks.MockModule, nil)
+
+	_, err := modulePolicy.GetModule(adminToken, "3a3bd756-6353-4e29-8aba-5b3531bdb9ed")
 
 	assert.Nil(t, err)
 	mockToken.AssertExpectations(t)
@@ -295,7 +301,13 @@ func TestGetModuleWithStudentTeacherToken(t *testing.T) {
 		On("IntrospectToken", mock.AnythingOfType("string")).
 		Return(true, nil)
 
-	err := modulePolicy.GetModule(teacherToken)
+	mockRepo.
+		On(
+			"GetModuleByID",
+			"3a3bd756-6353-4e29-8aba-5b3531bdb9ed").
+		Return(&mocks.MockModule, nil)
+
+	_, err := modulePolicy.GetModule(teacherToken, "3a3bd756-6353-4e29-8aba-5b3531bdb9ed")
 
 	assert.Nil(t, err)
 	mockToken.AssertExpectations(t)
@@ -315,7 +327,13 @@ func TestGetModuleWithStudentToken(t *testing.T) {
 		On("IntrospectToken", mock.AnythingOfType("string")).
 		Return(true, nil)
 
-	err := modulePolicy.GetModule(studentToken)
+	mockRepo.
+		On(
+			"GetModuleByID",
+			"3a3bd756-6353-4e29-8aba-5b3531bdb9ed").
+		Return(&mocks.MockModule, nil)
+
+	_, err := modulePolicy.GetModule(studentToken, "3a3bd756-6353-4e29-8aba-5b3531bdb9ed")
 
 	assert.Nil(t, err)
 	mockToken.AssertExpectations(t)
@@ -355,7 +373,7 @@ func TestListModulesWithStudentTeacherToken(t *testing.T) {
 		On("IntrospectToken", mock.AnythingOfType("string")).
 		Return(true, nil)
 
-	err := modulePolicy.GetModule(teacherToken)
+	err := modulePolicy.ListModules(teacherToken)
 
 	assert.Nil(t, err)
 	mockToken.AssertExpectations(t)
@@ -375,7 +393,7 @@ func TestListModulesWithStudentToken(t *testing.T) {
 		On("IntrospectToken", mock.AnythingOfType("string")).
 		Return(true, nil)
 
-	err := modulePolicy.GetModule(studentToken)
+	err := modulePolicy.ListModules(studentToken)
 
 	assert.Nil(t, err)
 	mockToken.AssertExpectations(t)

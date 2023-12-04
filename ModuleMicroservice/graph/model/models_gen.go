@@ -2,6 +2,10 @@
 
 package model
 
+type Filter struct {
+	SoftDelete *bool `json:"softDelete,omitempty"`
+}
+
 type Module struct {
 	ID          string  `json:"id"`
 	Name        string  `json:"name"`

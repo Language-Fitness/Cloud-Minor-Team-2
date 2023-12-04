@@ -29,3 +29,7 @@ type ClassInput struct {
 	Description string `json:"description"`
 	Difficulty  int    `json:"difficulty"`
 }
+
+type Filter struct {
+	SoftDelete *bool `json:"softDelete,omitempty"`
+}

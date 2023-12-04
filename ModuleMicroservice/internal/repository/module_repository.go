@@ -14,7 +14,8 @@ import (
 type IModuleRepository interface {
 	CreateModule(newModule *model.Module) (*model.Module, error)
 	UpdateModule(id string, updatedModule model.Module) (*model.Module, error)
-	DeleteModuleByID(id string) error
+	SoftDeleteModuleByID(id string, existingModule model.Module) error
+	HardDeleteModuleByID(id string) error
 	GetModuleByID(id string) (*model.Module, error)
 	ListModules() ([]*model.ModuleInfo, error)
 }
@@ -59,16 +60,11 @@ func (r *ModuleRepository) UpdateModule(id string, updatedModule model.Module) (
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10) // 10-second timeout
 	defer cancel()
 
-	_, err := r.GetModuleByID(id)
-	if err != nil {
-		return nil, err // Return the error if it doesn't exist in MongoDB.
-	}
-
 	filter := bson.M{"id": id}
 	update := bson.M{"$set": updatedModule}
 	var result model.Module
 
-	err = r.collection.FindOneAndUpdate(
+	err := r.collection.FindOneAndUpdate(
 		ctx,
 		filter,
 		update,
@@ -80,18 +76,33 @@ func (r *ModuleRepository) UpdateModule(id string, updatedModule model.Module) (
 	return &result, nil
 }
 
-func (r *ModuleRepository) DeleteModuleByID(id string) error {
+func (r *ModuleRepository) SoftDeleteModuleByID(id string, existingModule model.Module) error {
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
+	defer cancel()
+
+	filter := bson.M{"id": id}
+	update := bson.M{"$set": existingModule}
+	var result model.Module
+
+	err := r.collection.FindOneAndUpdate(
+		ctx,
+		filter,
+		update,
+		options.FindOneAndUpdate().SetReturnDocument(options.After)).Decode(&result)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (r *ModuleRepository) HardDeleteModuleByID(id string) error {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10) // 10-second timeout
 	defer cancel()
 
-	_, err := r.GetModuleByID(id)
-	if err != nil {
-		return err // Return the error if it exists in MongoDB.
-	}
-
 	filter := bson.M{"id": id}
 
-	_, err = r.collection.DeleteOne(ctx, filter)
+	_, err := r.collection.DeleteOne(ctx, filter)
 	if err != nil {
 		return err // Return any MongoDB-related errors.
 	}

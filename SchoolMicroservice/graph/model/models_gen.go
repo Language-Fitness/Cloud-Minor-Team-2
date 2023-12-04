@@ -2,10 +2,15 @@
 
 package model
 
+type Filter struct {
+	SoftDelete *bool `json:"softDelete,omitempty"`
+}
+
 type School struct {
 	ID          string  `json:"id"`
 	Name        string  `json:"name"`
 	Location    string  `json:"location"`
+	MadeBy      string  `json:"made_by"`
 	CreatedAt   *string `json:"created_at,omitempty"`
 	UpdatedAt   *string `json:"updated_at,omitempty"`
 	SoftDeleted *bool   `json:"soft_deleted,omitempty"`
@@ -15,9 +20,11 @@ type SchoolInfo struct {
 	ID       string `json:"id"`
 	Name     string `json:"name"`
 	Location string `json:"location"`
+	MadeBy   string `json:"made_by"`
 }
 
 type SchoolInput struct {
 	Name     string `json:"name"`
 	Location string `json:"location"`
+	MadeBy   string `json:"made_by"`
 }

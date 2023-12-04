@@ -11,6 +11,7 @@ var Difficulty = 1
 var MadeBy = "3a3bd756-6353-4e29-8aba-5b3531bdb9ee"
 var Timestamp = time.Now().String()
 var SoftDeleted = false
+var IsSoftDeleted = true
 
 var MockCreateInput = model.ClassInput{
 	ModuleID:    "module-id",
@@ -35,6 +36,17 @@ var MockClass = model.Class{
 	MadeBy:      MadeBy,
 	CreatedAt:   &Timestamp,
 	SoftDeleted: &SoftDeleted,
+}
+
+var SoftDeletedMockClass = model.Class{
+	ID:          "3a3bd756-6353-4e29-8aba-5b3531bdb9ed",
+	ModuleID:    "module-id",
+	Name:        "Sample Class",
+	Description: Description,
+	Difficulty:  Difficulty,
+	MadeBy:      MadeBy,
+	CreatedAt:   &Timestamp,
+	SoftDeleted: &IsSoftDeleted,
 }
 
 var MockClassInfo = model.ClassInfo{

@@ -34,7 +34,7 @@ type Query {
 type Mutation {
   createModule(input: ModuleInput!): Module
   updateModule(id: ID!, input: ModuleInput!): Module
-  deleteModule(id: ID!): ID
+  deleteModule(id: ID!, filter: Filter): ID
 }
 
 input ModuleInput {
@@ -44,5 +44,9 @@ input ModuleInput {
   category: String!
   private: Boolean!
   key: String
+}
+
+input Filter {
+  softDelete: Boolean
 }
 

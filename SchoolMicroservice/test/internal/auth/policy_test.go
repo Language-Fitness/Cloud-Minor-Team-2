@@ -25,7 +25,7 @@ func TestCreateSchoolWithAdminToken(t *testing.T) {
 		On("IntrospectToken", mock.AnythingOfType("string")).
 		Return(true, nil)
 
-	err := schoolPolicy.CreateSchool(adminToken)
+	_, err := schoolPolicy.CreateSchool(adminToken)
 
 	assert.Nil(t, err)
 	mockToken.AssertExpectations(t)
@@ -45,7 +45,7 @@ func TestCreateSchoolWithTeacherToken(t *testing.T) {
 		On("IntrospectToken", mock.AnythingOfType("string")).
 		Return(true, nil)
 
-	err := schoolPolicy.CreateSchool(teacherToken)
+	_, err := schoolPolicy.CreateSchool(teacherToken)
 
 	assert.Nil(t, err)
 	mockToken.AssertExpectations(t)
@@ -65,7 +65,7 @@ func TestCreateSchoolWithStudentToken(t *testing.T) {
 		On("IntrospectToken", mock.AnythingOfType("string")).
 		Return(true, nil)
 
-	err := schoolPolicy.CreateSchool(studentToken)
+	_, err := schoolPolicy.CreateSchool(studentToken)
 
 	assert.NotNil(t, err)
 	assert.Equal(t, "invalid permissions for this action", err.Error())
@@ -171,7 +171,7 @@ func TestDeleteSchoolWithAdminToken(t *testing.T) {
 			"3a3bd756-6353-4e29-8aba-5b3531bdb9ed").
 		Return(&mocks.MockSchool, nil)
 
-	err := schoolPolicy.DeleteSchool(adminToken, "3a3bd756-6353-4e29-8aba-5b3531bdb9ed")
+	_, err := schoolPolicy.DeleteSchool(adminToken, "3a3bd756-6353-4e29-8aba-5b3531bdb9ed")
 
 	assert.Nil(t, err)
 	mockToken.AssertExpectations(t)
@@ -197,7 +197,7 @@ func TestDeleteSchoolWithTeacherToken(t *testing.T) {
 		On("IntrospectToken", mock.AnythingOfType("string")).
 		Return(true, nil)
 
-	err := schoolPolicy.DeleteSchool(teacherToken, "3a3bd756-6353-4e29-8aba-5b3531bdb9ed")
+	_, err := schoolPolicy.DeleteSchool(teacherToken, "3a3bd756-6353-4e29-8aba-5b3531bdb9ed")
 
 	assert.NotNil(t, err)
 	//TODO
@@ -224,7 +224,7 @@ func TestDeleteSchoolWithStudentToken(t *testing.T) {
 		On("IntrospectToken", mock.AnythingOfType("string")).
 		Return(true, nil)
 
-	err := schoolPolicy.DeleteSchool(studentToken, "3a3bd756-6353-4e29-8aba-5b3531bdb9ed")
+	_, err := schoolPolicy.DeleteSchool(studentToken, "3a3bd756-6353-4e29-8aba-5b3531bdb9ed")
 
 	assert.NotNil(t, err)
 	assert.Equal(t, "invalid permissions for this action", err.Error())
@@ -245,7 +245,13 @@ func TestGetSchoolWithAdminToken(t *testing.T) {
 		On("IntrospectToken", mock.AnythingOfType("string")).
 		Return(true, nil)
 
-	err := schoolPolicy.GetSchool(adminToken)
+	mockRepo.
+		On(
+			"GetSchoolByID",
+			"3a3bd756-6353-4e29-8aba-5b3531bdb9ed").
+		Return(&mocks.MockSchool, nil)
+
+	_, err := schoolPolicy.GetSchool(adminToken, "3a3bd756-6353-4e29-8aba-5b3531bdb9ed")
 
 	assert.Nil(t, err)
 	mockToken.AssertExpectations(t)
@@ -265,7 +271,13 @@ func TestGetSchoolWithStudentTeacherToken(t *testing.T) {
 		On("IntrospectToken", mock.AnythingOfType("string")).
 		Return(true, nil)
 
-	err := schoolPolicy.GetSchool(teacherToken)
+	mockRepo.
+		On(
+			"GetSchoolByID",
+			"3a3bd756-6353-4e29-8aba-5b3531bdb9ed").
+		Return(&mocks.MockSchool, nil)
+
+	_, err := schoolPolicy.GetSchool(teacherToken, "3a3bd756-6353-4e29-8aba-5b3531bdb9ed")
 
 	assert.Nil(t, err)
 	mockToken.AssertExpectations(t)
@@ -285,7 +297,13 @@ func TestGetSchoolWithStudentToken(t *testing.T) {
 		On("IntrospectToken", mock.AnythingOfType("string")).
 		Return(true, nil)
 
-	err := schoolPolicy.GetSchool(studentToken)
+	mockRepo.
+		On(
+			"GetSchoolByID",
+			"3a3bd756-6353-4e29-8aba-5b3531bdb9ed").
+		Return(&mocks.MockSchool, nil)
+
+	_, err := schoolPolicy.GetSchool(studentToken, "3a3bd756-6353-4e29-8aba-5b3531bdb9ed")
 
 	assert.Nil(t, err)
 	mockToken.AssertExpectations(t)
@@ -325,7 +343,7 @@ func TestListSchoolsWithStudentTeacherToken(t *testing.T) {
 		On("IntrospectToken", mock.AnythingOfType("string")).
 		Return(true, nil)
 
-	err := schoolPolicy.GetSchool(teacherToken)
+	err := schoolPolicy.ListSchools(teacherToken)
 
 	assert.Nil(t, err)
 	mockToken.AssertExpectations(t)
@@ -345,7 +363,7 @@ func TestListSchoolsWithStudentToken(t *testing.T) {
 		On("IntrospectToken", mock.AnythingOfType("string")).
 		Return(true, nil)
 
-	err := schoolPolicy.GetSchool(studentToken)
+	err := schoolPolicy.ListSchools(teacherToken)
 
 	assert.Nil(t, err)
 	mockToken.AssertExpectations(t)

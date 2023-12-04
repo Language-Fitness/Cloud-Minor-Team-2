@@ -17,7 +17,7 @@ import (
 type ISchoolService interface {
 	CreateSchool(token string, School model.SchoolInput) (*model.School, error)
 	UpdateSchool(token string, id string, updatedData model.SchoolInput) (*model.School, error)
-	DeleteSchool(token string, id string) error
+	DeleteSchool(token string, id string, filter *model.Filter) error
 	GetSchoolById(token string, id string) (*model.School, error)
 	ListSchools(token string) ([]*model.SchoolInfo, error)
 }
@@ -43,12 +43,13 @@ func NewSchoolService() ISchoolService {
 }
 
 func (s *SchoolService) CreateSchool(token string, newSchool model.SchoolInput) (*model.School, error) {
-	err := s.Policy.CreateSchool(token)
+	sub, err := s.Policy.CreateSchool(token)
 	if err != nil {
 		return nil, err
 	}
 
 	s.Validator.Validate(newSchool.Name, []string{"IsString", "Length:<25"})
+	s.Validator.Validate(newSchool.Location, []string{"IsString", "Length:<50"})
 	s.Validator.Validate(newSchool.Location, []string{"IsString", "Length:<50"})
 
 	validationErrors := s.Validator.GetErrors()
@@ -65,6 +66,7 @@ func (s *SchoolService) CreateSchool(token string, newSchool model.SchoolInput) 
 		ID:          uuid.New().String(),
 		Name:        newSchool.Name,
 		Location:    newSchool.Location,
+		MadeBy:      sub,
 		CreatedAt:   &timestamp,
 		SoftDeleted: &softDeleted,
 	}
@@ -99,6 +101,7 @@ func (s *SchoolService) UpdateSchool(token string, id string, updatedData model.
 		ID:          existingSchool.ID,
 		Name:        updatedData.Name,
 		Location:    updatedData.Location,
+		MadeBy:      existingSchool.MadeBy,
 		CreatedAt:   existingSchool.CreatedAt,
 		UpdatedAt:   &timestamp,
 		SoftDeleted: existingSchool.SoftDeleted,
@@ -112,45 +115,41 @@ func (s *SchoolService) UpdateSchool(token string, id string, updatedData model.
 	return result, nil
 }
 
-func (s *SchoolService) DeleteSchool(token string, id string) error {
-	s.Validator.Validate(id, []string{"IsUUID"})
-
-	validationErrors := s.Validator.GetErrors()
-	if len(validationErrors) > 0 {
-		errorMessage := "Validation errors: " + strings.Join(validationErrors, ", ")
-		s.Validator.ClearErrors()
-		return errors.New(errorMessage)
-	}
-
-	err := s.Repo.DeleteSchoolByID(id)
+func (s *SchoolService) DeleteSchool(token string, id string, filter *model.Filter) error {
+	existingSchool, err := s.Policy.DeleteSchool(token, id)
 	if err != nil {
 		return err
 	}
 
-	return nil
+	if !*existingSchool.SoftDeleted {
+		softDelete := true
+		existingSchool.SoftDeleted = &softDelete
+
+		err := s.Repo.SoftDeleteSchoolByID(id, *existingSchool)
+		if err != nil {
+			return err
+		}
+		return nil
+	}
+
+	if filter != nil && !*filter.SoftDelete {
+		err := s.Repo.HardDeleteSchoolByID(id)
+		if err != nil {
+			return err
+		}
+		return nil
+	}
+
+	return errors.New("school could not be deleted")
 }
 
 func (s *SchoolService) GetSchoolById(token string, id string) (*model.School, error) {
-	err := s.Policy.GetSchool(token)
+	existingSchool, err := s.Policy.GetSchool(token, id)
 	if err != nil {
 		return nil, err
 	}
 
-	s.Validator.Validate(id, []string{"IsUUID"})
-
-	validationErrors := s.Validator.GetErrors()
-	if len(validationErrors) > 0 {
-		errorMessage := "Validation errors: " + strings.Join(validationErrors, ", ")
-		s.Validator.ClearErrors()
-		return nil, errors.New(errorMessage)
-	}
-
-	School, err := s.Repo.GetSchoolByID(id)
-	if err != nil {
-		return nil, err
-	}
-
-	return School, nil
+	return existingSchool, nil
 }
 
 func (s *SchoolService) ListSchools(token string) ([]*model.SchoolInfo, error) {
