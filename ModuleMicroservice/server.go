@@ -4,6 +4,7 @@ import (
 	"Module/graph"
 	"Module/internal/auth"
 	"github.com/joho/godotenv"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"log"
 	"net/http"
 	"os"
@@ -28,8 +29,9 @@ func main() {
 
 	srv := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{Resolvers: graph.NewResolver()}))
 
+	http.Handle("/metrics", promhttp.Handler())
 	http.Handle("/query", tokenMiddleware(srv))
-	http.Handle("/", playground.Handler("GraphQL playground", "/query"))
+	http.Handle("/playground", playground.Handler("GraphQL playground", "/query"))
 
 	log.Printf("connect to http://localhost:%s/ for GraphQL playground", port)
 	log.Fatal(http.ListenAndServe(":"+port, nil))
