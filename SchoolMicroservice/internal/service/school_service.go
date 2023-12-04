@@ -17,7 +17,7 @@ import (
 type ISchoolService interface {
 	CreateSchool(token string, School model.SchoolInput) (*model.School, error)
 	UpdateSchool(token string, id string, updatedData model.SchoolInput) (*model.School, error)
-	DeleteSchool(id string) error
+	DeleteSchool(token string, id string) error
 	GetSchoolById(token string, id string) (*model.School, error)
 	ListSchools(token string) ([]*model.School, error)
 }
@@ -112,7 +112,7 @@ func (s *SchoolService) UpdateSchool(token string, id string, updatedData model.
 	return result, nil
 }
 
-func (s *SchoolService) DeleteSchool(id string) error {
+func (s *SchoolService) DeleteSchool(token string, id string) error {
 	s.Validator.Validate(id, []string{"IsUUID"})
 
 	validationErrors := s.Validator.GetErrors()

@@ -71,6 +71,7 @@ func (c *ClassService) CreateClass(token string, newClass model.ClassInput) (*mo
 		Name:        newClass.Name,
 		Description: newClass.Description,
 		Difficulty:  newClass.Difficulty,
+		MadeBy:      newClass.MadeBy,
 		CreatedAt:   &timestamp,
 		SoftDeleted: &softDeleted,
 	}
@@ -110,6 +111,7 @@ func (c *ClassService) UpdateClass(token string, id string, updatedData model.Cl
 		Name:        updatedData.Name,
 		Description: updatedData.Description,
 		Difficulty:  updatedData.Difficulty,
+		MadeBy:      existingClass.MadeBy,
 		CreatedAt:   existingClass.CreatedAt,
 		UpdatedAt:   &timestamp,
 		SoftDeleted: existingClass.SoftDeleted,
