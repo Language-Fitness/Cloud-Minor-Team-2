@@ -16,13 +16,13 @@ type ISchoolRepository interface {
 	UpdateSchool(id string, updatedSchool model.School) (*model.School, error)
 	DeleteSchoolByID(id string) error
 	GetSchoolByID(id string) (*model.School, error)
-	ListSchools() ([]*model.School, error)
+	ListSchools() ([]*model.SchoolInfo, error)
 }
 
 // SchoolRepository GOLANG STRUCT
 // Contains a model.School list and a mongo.Collection.
 type SchoolRepository struct {
-	Schooles   []*model.School
+	Schools    []*model.School
 	collection *mongo.Collection
 }
 
@@ -30,7 +30,7 @@ type SchoolRepository struct {
 // Returns a SchoolRepository implementing ISchoolRepository.
 func NewSchoolRepository(collection *mongo.Collection) ISchoolRepository {
 	return &SchoolRepository{
-		Schooles:   []*model.School{},
+		Schools:    []*model.School{},
 		collection: collection,
 	}
 }
@@ -114,11 +114,11 @@ func (r *SchoolRepository) GetSchoolByID(id string) (*model.School, error) {
 	return &result, nil
 }
 
-func (r *SchoolRepository) ListSchools() ([]*model.School, error) {
+func (r *SchoolRepository) ListSchools() ([]*model.SchoolInfo, error) {
 	ctx, cancel := context.WithTimeout(context.TODO(), time.Second*10) // 10-second timeout
 	defer cancel()
 
-	var Schooles []*model.School
+	var Schools []*model.SchoolInfo
 
 	cursor, err := r.collection.Find(ctx, bson.D{})
 	if err != nil {
@@ -132,12 +132,12 @@ func (r *SchoolRepository) ListSchools() ([]*model.School, error) {
 	}(cursor, ctx)
 
 	for cursor.Next(ctx) {
-		var School model.School
+		var School model.SchoolInfo
 		if err := cursor.Decode(&School); err != nil {
 			return nil, err // Return any decoding errors.
 		}
-		Schooles = append(Schooles, &School)
+		Schools = append(Schools, &School)
 	}
 
-	return Schooles, nil
+	return Schools, nil
 }

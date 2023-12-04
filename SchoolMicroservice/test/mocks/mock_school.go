@@ -12,26 +12,32 @@ var SoftDeleted = false
 
 var MockCreateInput = model.SchoolInput{
 	Name:     "Sample School",
-	Location: &Location,
+	Location: Location,
 }
 
 var MockUpdateInput = model.SchoolInput{
 	Name:     "Sample School",
-	Location: &UpdatedLocation,
+	Location: UpdatedLocation,
 }
 
 var MockSchool = model.School{
 	ID:          "3a3bd756-6353-4e29-8aba-5b3531bdb9ed",
 	Name:        "Sample School",
-	Location:    &Location,
+	Location:    Location,
 	CreatedAt:   &Timestamp,
 	SoftDeleted: &SoftDeleted,
+}
+
+var MockSchoolInfo = model.SchoolInfo{
+	ID:       "3a3bd756-6353-4e29-8aba-5b3531bdb9ed",
+	Name:     "Sample School",
+	Location: Location,
 }
 
 var MockUpdatedSchool = model.School{
 	ID:          "3a3bd756-6353-4e29-8aba-5b3531bdb9ed",
 	Name:        "Sample School",
-	Location:    &UpdatedLocation,
+	Location:    UpdatedLocation,
 	CreatedAt:   &Timestamp,
 	UpdatedAt:   &Timestamp,
 	SoftDeleted: &SoftDeleted,

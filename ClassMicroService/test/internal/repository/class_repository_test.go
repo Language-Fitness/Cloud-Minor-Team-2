@@ -37,8 +37,8 @@ func TestCreateClass(t *testing.T) {
 		ID:          "123",
 		ModuleID:    "Test module-id",
 		Name:        "Test Class",
-		Description: &description,
-		Difficulty:  &difficulty,
+		Description: description,
+		Difficulty:  difficulty,
 		CreatedAt:   &timestamp,
 		SoftDeleted: &softDeleted,
 	}

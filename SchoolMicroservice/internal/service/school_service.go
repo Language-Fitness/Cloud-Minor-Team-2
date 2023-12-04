@@ -19,7 +19,7 @@ type ISchoolService interface {
 	UpdateSchool(token string, id string, updatedData model.SchoolInput) (*model.School, error)
 	DeleteSchool(token string, id string) error
 	GetSchoolById(token string, id string) (*model.School, error)
-	ListSchools(token string) ([]*model.School, error)
+	ListSchools(token string) ([]*model.SchoolInfo, error)
 }
 
 // SchoolService GOLANG STRUCT
@@ -49,7 +49,7 @@ func (s *SchoolService) CreateSchool(token string, newSchool model.SchoolInput) 
 	}
 
 	s.Validator.Validate(newSchool.Name, []string{"IsString", "Length:<25"})
-	s.Validator.Validate(*newSchool.Location, []string{"IsString", "Length:<50"})
+	s.Validator.Validate(newSchool.Location, []string{"IsString", "Length:<50"})
 
 	validationErrors := s.Validator.GetErrors()
 	if len(validationErrors) > 0 {
@@ -85,7 +85,7 @@ func (s *SchoolService) UpdateSchool(token string, id string, updatedData model.
 
 	s.Validator.Validate(id, []string{"IsUUID"})
 	s.Validator.Validate(updatedData.Name, []string{"IsString", "Length:<25"})
-	s.Validator.Validate(*updatedData.Location, []string{"IsString", "Length:<50"})
+	s.Validator.Validate(updatedData.Location, []string{"IsString", "Length:<50"})
 
 	validationErrors := s.Validator.GetErrors()
 	if len(validationErrors) > 0 {
@@ -153,7 +153,7 @@ func (s *SchoolService) GetSchoolById(token string, id string) (*model.School, e
 	return School, nil
 }
 
-func (s *SchoolService) ListSchools(token string) ([]*model.School, error) {
+func (s *SchoolService) ListSchools(token string) ([]*model.SchoolInfo, error) {
 	err := s.Policy.ListSchools(token)
 	if err != nil {
 		return nil, err

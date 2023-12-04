@@ -25,7 +25,7 @@ func TestCreateClassWithAdminToken(t *testing.T) {
 		On("IntrospectToken", mock.AnythingOfType("string")).
 		Return(true, nil)
 
-	err := classPolicy.CreateClass(adminToken)
+	_, err := classPolicy.CreateClass(adminToken)
 
 	assert.Nil(t, err)
 	mockToken.AssertExpectations(t)
@@ -45,7 +45,7 @@ func TestCreateClassWithTeacherToken(t *testing.T) {
 		On("IntrospectToken", mock.AnythingOfType("string")).
 		Return(true, nil)
 
-	err := classPolicy.CreateClass(teacherToken)
+	_, err := classPolicy.CreateClass(teacherToken)
 
 	assert.Nil(t, err)
 	mockToken.AssertExpectations(t)
@@ -65,7 +65,7 @@ func TestCreateClassWithStudentToken(t *testing.T) {
 		On("IntrospectToken", mock.AnythingOfType("string")).
 		Return(true, nil)
 
-	err := classPolicy.CreateClass(studentToken)
+	_, err := classPolicy.CreateClass(studentToken)
 
 	assert.NotNil(t, err)
 	assert.Equal(t, "invalid permissions for this action", err.Error())
@@ -216,7 +216,7 @@ func TestDeleteClassWithTeacherTokenAndWrongUUID(t *testing.T) {
 
 	sub := "401927fd-13ae-4e0a-aec9-be64b9c93883"
 	mockClassWithValidUUID := mocks.MockClass
-	mockClassWithValidUUID.MadeBy = &sub
+	mockClassWithValidUUID.MadeBy = sub
 
 	mockRepo.
 		On(

@@ -5,20 +5,30 @@
 type Module {
   id: ID!
   name: String!
-  description: String
-  difficulty: Int
-  category: String
-  made_by: String
-  private: Boolean
+  description: String!
+  difficulty: Int!
+  category: String!
+  made_by: String!
+  private: Boolean!
   key: String
   created_at: String
   updated_at: String
   soft_deleted: Boolean
 }
 
+type ModuleInfo {
+  id: ID!
+  name: String!
+  description: String!
+  difficulty: Int!
+  category: String!
+  made_by: String!
+  private: Boolean!
+}
+
 type Query {
   getModule(id: ID!): Module
-  listModules: [Module]
+  listModules: [ModuleInfo]
 }
 
 type Mutation {
@@ -29,11 +39,10 @@ type Mutation {
 
 input ModuleInput {
   name: String!
-  description: String
-  difficulty: Int
-  category: String
-  made_by: String
-  private: Boolean
+  description: String!
+  difficulty: Int!
+  category: String!
+  private: Boolean!
   key: String
 }
 

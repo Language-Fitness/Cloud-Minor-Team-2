@@ -19,7 +19,7 @@ type IModuleService interface {
 	UpdateModule(token string, id string, updateData model.ModuleInput) (*model.Module, error)
 	DeleteModule(id string) error
 	GetModuleById(token string, id string) (*model.Module, error)
-	ListModules(token string) ([]*model.Module, error)
+	ListModules(token string) ([]*model.ModuleInfo, error)
 }
 
 // ModuleService GOLANG STRUCT
@@ -41,18 +41,19 @@ func NewModuleService(collection *mongo.Collection) IModuleService {
 }
 
 func (m *ModuleService) CreateModule(token string, newModule model.ModuleInput) (*model.Module, error) {
-	err := m.Policy.CreateModule(token)
+	sub, err := m.Policy.CreateModule(token)
 	if err != nil {
 		return nil, err
 	}
 
 	m.Validator.Validate(newModule.Name, []string{"IsString", "Length:<25"})
-	m.Validator.Validate(*newModule.Description, []string{"IsString", "Length:<50"})
-	m.Validator.Validate(*newModule.Difficulty, []string{"IsInt"})
-	m.Validator.Validate(*newModule.Category, []string{"IsString"})
-	m.Validator.Validate(*newModule.MadeBy, []string{"IsUUID"})
-	m.Validator.Validate(*newModule.Private, []string{"IsBoolean"})
-	m.Validator.Validate(*newModule.Key, []string{"IsString", "Length:<30"})
+	m.Validator.Validate(newModule.Description, []string{"IsString", "Length:<50"})
+	m.Validator.Validate(newModule.Difficulty, []string{"IsInt"})
+	m.Validator.Validate(newModule.Category, []string{"IsString"})
+	m.Validator.Validate(newModule.Private, []string{"IsBoolean"})
+	if newModule.Private {
+		m.Validator.Validate(*newModule.Key, []string{"IsString", "Length:<30"})
+	}
 
 	validationErrors := m.Validator.GetErrors()
 
@@ -71,10 +72,14 @@ func (m *ModuleService) CreateModule(token string, newModule model.ModuleInput) 
 		Description: newModule.Description,
 		Difficulty:  newModule.Difficulty,
 		Category:    newModule.Category,
-		MadeBy:      newModule.MadeBy,
+		MadeBy:      sub,
 		Private:     newModule.Private,
 		CreatedAt:   &timestamp,
 		SoftDeleted: &softDeleted,
+	}
+
+	if newModule.Private {
+		moduleToInsert.Key = newModule.Key
 	}
 
 	result, err := m.Repo.CreateModule(moduleToInsert)
@@ -93,12 +98,13 @@ func (m *ModuleService) UpdateModule(token string, id string, updateData model.M
 	}
 
 	m.Validator.Validate(updateData.Name, []string{"IsString", "Length:<25"})
-	m.Validator.Validate(*updateData.Description, []string{"IsString", "Length:<50"})
-	m.Validator.Validate(*updateData.Difficulty, []string{"IsInt"})
-	m.Validator.Validate(*updateData.Category, []string{"IsString"})
-	m.Validator.Validate(*updateData.MadeBy, []string{"IsUUID"})
-	m.Validator.Validate(*updateData.Private, []string{"IsBoolean"})
-	m.Validator.Validate(*updateData.Key, []string{"IsString", "Length:<30"})
+	m.Validator.Validate(updateData.Description, []string{"IsString", "Length:<50"})
+	m.Validator.Validate(updateData.Difficulty, []string{"IsInt"})
+	m.Validator.Validate(updateData.Category, []string{"IsString"})
+	m.Validator.Validate(updateData.Private, []string{"IsBoolean"})
+	if updateData.Private {
+		m.Validator.Validate(*updateData.Key, []string{"IsString", "Length:<30"})
+	}
 
 	validationErrors := m.Validator.GetErrors()
 	if len(validationErrors) > 0 {
@@ -114,12 +120,15 @@ func (m *ModuleService) UpdateModule(token string, id string, updateData model.M
 		Description: updateData.Description,
 		Difficulty:  updateData.Difficulty,
 		Category:    updateData.Category,
-		MadeBy:      updateData.MadeBy,
+		MadeBy:      existingModule.MadeBy,
 		Private:     updateData.Private,
-		Key:         updateData.Key,
 		CreatedAt:   existingModule.CreatedAt,
 		UpdatedAt:   &timestamp,
 		SoftDeleted: existingModule.SoftDeleted,
+	}
+
+	if updateData.Private {
+		newModule.Key = updateData.Key
 	}
 
 	result, err := m.Repo.UpdateModule(id, newModule)
@@ -174,7 +183,7 @@ func (m *ModuleService) GetModuleById(token string, id string) (*model.Module, e
 	return module, nil
 }
 
-func (m *ModuleService) ListModules(token string) ([]*model.Module, error) {
+func (m *ModuleService) ListModules(token string) ([]*model.ModuleInfo, error) {
 	err := m.Policy.ListModules(token)
 	if err != nil {
 		return nil, err

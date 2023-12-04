@@ -59,6 +59,15 @@ type ComplexityRoot struct {
 		UpdatedAt   func(childComplexity int) int
 	}
 
+	ClassInfo struct {
+		Description func(childComplexity int) int
+		Difficulty  func(childComplexity int) int
+		ID          func(childComplexity int) int
+		MadeBy      func(childComplexity int) int
+		ModuleID    func(childComplexity int) int
+		Name        func(childComplexity int) int
+	}
+
 	Mutation struct {
 		CreateClass func(childComplexity int, input model.ClassInput) int
 		DeleteClass func(childComplexity int, id string) int
@@ -78,7 +87,7 @@ type MutationResolver interface {
 }
 type QueryResolver interface {
 	GetClass(ctx context.Context, id string) (*model.Class, error)
-	ListClasses(ctx context.Context) ([]*model.Class, error)
+	ListClasses(ctx context.Context) ([]*model.ClassInfo, error)
 }
 
 type executableSchema struct {
@@ -162,6 +171,48 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Class.UpdatedAt(childComplexity), true
+
+	case "ClassInfo.description":
+		if e.complexity.ClassInfo.Description == nil {
+			break
+		}
+
+		return e.complexity.ClassInfo.Description(childComplexity), true
+
+	case "ClassInfo.difficulty":
+		if e.complexity.ClassInfo.Difficulty == nil {
+			break
+		}
+
+		return e.complexity.ClassInfo.Difficulty(childComplexity), true
+
+	case "ClassInfo.id":
+		if e.complexity.ClassInfo.ID == nil {
+			break
+		}
+
+		return e.complexity.ClassInfo.ID(childComplexity), true
+
+	case "ClassInfo.made_by":
+		if e.complexity.ClassInfo.MadeBy == nil {
+			break
+		}
+
+		return e.complexity.ClassInfo.MadeBy(childComplexity), true
+
+	case "ClassInfo.module_Id":
+		if e.complexity.ClassInfo.ModuleID == nil {
+			break
+		}
+
+		return e.complexity.ClassInfo.ModuleID(childComplexity), true
+
+	case "ClassInfo.name":
+		if e.complexity.ClassInfo.Name == nil {
+			break
+		}
+
+		return e.complexity.ClassInfo.Name(childComplexity), true
 
 	case "Mutation.createClass":
 		if e.complexity.Mutation.CreateClass == nil {
@@ -618,11 +669,14 @@ func (ec *executionContext) _Class_description(ctx context.Context, field graphq
 		return graphql.Null
 	}
 	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
 		return graphql.Null
 	}
-	res := resTmp.(*string)
+	res := resTmp.(string)
 	fc.Result = res
-	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Class_description(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -659,11 +713,14 @@ func (ec *executionContext) _Class_difficulty(ctx context.Context, field graphql
 		return graphql.Null
 	}
 	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
 		return graphql.Null
 	}
-	res := resTmp.(*int)
+	res := resTmp.(int)
 	fc.Result = res
-	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
+	return ec.marshalNInt2int(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Class_difficulty(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -700,11 +757,14 @@ func (ec *executionContext) _Class_made_by(ctx context.Context, field graphql.Co
 		return graphql.Null
 	}
 	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
 		return graphql.Null
 	}
-	res := resTmp.(*string)
+	res := resTmp.(string)
 	fc.Result = res
-	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Class_made_by(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -838,6 +898,270 @@ func (ec *executionContext) fieldContext_Class_soft_deleted(ctx context.Context,
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ClassInfo_id(ctx context.Context, field graphql.CollectedField, obj *model.ClassInfo) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ClassInfo_id(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNID2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ClassInfo_id(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ClassInfo",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ID does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ClassInfo_module_Id(ctx context.Context, field graphql.CollectedField, obj *model.ClassInfo) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ClassInfo_module_Id(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ModuleID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNID2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ClassInfo_module_Id(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ClassInfo",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ID does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ClassInfo_name(ctx context.Context, field graphql.CollectedField, obj *model.ClassInfo) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ClassInfo_name(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Name, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ClassInfo_name(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ClassInfo",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ClassInfo_description(ctx context.Context, field graphql.CollectedField, obj *model.ClassInfo) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ClassInfo_description(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Description, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ClassInfo_description(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ClassInfo",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ClassInfo_difficulty(ctx context.Context, field graphql.CollectedField, obj *model.ClassInfo) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ClassInfo_difficulty(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Difficulty, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ClassInfo_difficulty(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ClassInfo",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ClassInfo_made_by(ctx context.Context, field graphql.CollectedField, obj *model.ClassInfo) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ClassInfo_made_by(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.MadeBy, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ClassInfo_made_by(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ClassInfo",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
 		},
 	}
 	return fc, nil
@@ -1134,9 +1458,9 @@ func (ec *executionContext) _Query_listClasses(ctx context.Context, field graphq
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.([]*model.Class)
+	res := resTmp.([]*model.ClassInfo)
 	fc.Result = res
-	return ec.marshalOClass2ᚕᚖexampleᚋgraphᚋmodelᚐClass(ctx, field.Selections, res)
+	return ec.marshalOClassInfo2ᚕᚖexampleᚋgraphᚋmodelᚐClassInfo(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Query_listClasses(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -1148,25 +1472,19 @@ func (ec *executionContext) fieldContext_Query_listClasses(ctx context.Context, 
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
 			case "id":
-				return ec.fieldContext_Class_id(ctx, field)
+				return ec.fieldContext_ClassInfo_id(ctx, field)
 			case "module_Id":
-				return ec.fieldContext_Class_module_Id(ctx, field)
+				return ec.fieldContext_ClassInfo_module_Id(ctx, field)
 			case "name":
-				return ec.fieldContext_Class_name(ctx, field)
+				return ec.fieldContext_ClassInfo_name(ctx, field)
 			case "description":
-				return ec.fieldContext_Class_description(ctx, field)
+				return ec.fieldContext_ClassInfo_description(ctx, field)
 			case "difficulty":
-				return ec.fieldContext_Class_difficulty(ctx, field)
+				return ec.fieldContext_ClassInfo_difficulty(ctx, field)
 			case "made_by":
-				return ec.fieldContext_Class_made_by(ctx, field)
-			case "created_at":
-				return ec.fieldContext_Class_created_at(ctx, field)
-			case "updated_at":
-				return ec.fieldContext_Class_updated_at(ctx, field)
-			case "soft_deleted":
-				return ec.fieldContext_Class_soft_deleted(ctx, field)
+				return ec.fieldContext_ClassInfo_made_by(ctx, field)
 			}
-			return nil, fmt.Errorf("no field named %q was found under type Class", field.Name)
+			return nil, fmt.Errorf("no field named %q was found under type ClassInfo", field.Name)
 		},
 	}
 	return fc, nil
@@ -3081,7 +3399,7 @@ func (ec *executionContext) unmarshalInputClassInput(ctx context.Context, obj in
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"module_Id", "name", "description", "difficulty", "made_by"}
+	fieldsInOrder := [...]string{"module_Id", "name", "description", "difficulty"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -3110,7 +3428,7 @@ func (ec *executionContext) unmarshalInputClassInput(ctx context.Context, obj in
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("description"))
-			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalNString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -3119,20 +3437,11 @@ func (ec *executionContext) unmarshalInputClassInput(ctx context.Context, obj in
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("difficulty"))
-			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
+			data, err := ec.unmarshalNInt2int(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.Difficulty = data
-		case "made_by":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("made_by"))
-			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.MadeBy = data
 		}
 	}
 
@@ -3175,16 +3484,89 @@ func (ec *executionContext) _Class(ctx context.Context, sel ast.SelectionSet, ob
 			}
 		case "description":
 			out.Values[i] = ec._Class_description(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
 		case "difficulty":
 			out.Values[i] = ec._Class_difficulty(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
 		case "made_by":
 			out.Values[i] = ec._Class_made_by(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
 		case "created_at":
 			out.Values[i] = ec._Class_created_at(ctx, field, obj)
 		case "updated_at":
 			out.Values[i] = ec._Class_updated_at(ctx, field, obj)
 		case "soft_deleted":
 			out.Values[i] = ec._Class_soft_deleted(ctx, field, obj)
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var classInfoImplementors = []string{"ClassInfo"}
+
+func (ec *executionContext) _ClassInfo(ctx context.Context, sel ast.SelectionSet, obj *model.ClassInfo) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, classInfoImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("ClassInfo")
+		case "id":
+			out.Values[i] = ec._ClassInfo_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "module_Id":
+			out.Values[i] = ec._ClassInfo_module_Id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "name":
+			out.Values[i] = ec._ClassInfo_name(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "description":
+			out.Values[i] = ec._ClassInfo_description(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "difficulty":
+			out.Values[i] = ec._ClassInfo_difficulty(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "made_by":
+			out.Values[i] = ec._ClassInfo_made_by(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -3711,6 +4093,21 @@ func (ec *executionContext) marshalNID2string(ctx context.Context, sel ast.Selec
 	return res
 }
 
+func (ec *executionContext) unmarshalNInt2int(ctx context.Context, v interface{}) (int, error) {
+	res, err := graphql.UnmarshalInt(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNInt2int(ctx context.Context, sel ast.SelectionSet, v int) graphql.Marshaler {
+	res := graphql.MarshalInt(v)
+	if res == graphql.Null {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+	}
+	return res
+}
+
 func (ec *executionContext) unmarshalNString2string(ctx context.Context, v interface{}) (string, error) {
 	res, err := graphql.UnmarshalString(v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -4005,7 +4402,14 @@ func (ec *executionContext) marshalOBoolean2ᚖbool(ctx context.Context, sel ast
 	return res
 }
 
-func (ec *executionContext) marshalOClass2ᚕᚖexampleᚋgraphᚋmodelᚐClass(ctx context.Context, sel ast.SelectionSet, v []*model.Class) graphql.Marshaler {
+func (ec *executionContext) marshalOClass2ᚖexampleᚋgraphᚋmodelᚐClass(ctx context.Context, sel ast.SelectionSet, v *model.Class) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._Class(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalOClassInfo2ᚕᚖexampleᚋgraphᚋmodelᚐClassInfo(ctx context.Context, sel ast.SelectionSet, v []*model.ClassInfo) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
@@ -4032,7 +4436,7 @@ func (ec *executionContext) marshalOClass2ᚕᚖexampleᚋgraphᚋmodelᚐClass(
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalOClass2ᚖexampleᚋgraphᚋmodelᚐClass(ctx, sel, v[i])
+			ret[i] = ec.marshalOClassInfo2ᚖexampleᚋgraphᚋmodelᚐClassInfo(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -4046,11 +4450,11 @@ func (ec *executionContext) marshalOClass2ᚕᚖexampleᚋgraphᚋmodelᚐClass(
 	return ret
 }
 
-func (ec *executionContext) marshalOClass2ᚖexampleᚋgraphᚋmodelᚐClass(ctx context.Context, sel ast.SelectionSet, v *model.Class) graphql.Marshaler {
+func (ec *executionContext) marshalOClassInfo2ᚖexampleᚋgraphᚋmodelᚐClassInfo(ctx context.Context, sel ast.SelectionSet, v *model.ClassInfo) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
-	return ec._Class(ctx, sel, v)
+	return ec._ClassInfo(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalOID2ᚖstring(ctx context.Context, v interface{}) (*string, error) {
@@ -4066,22 +4470,6 @@ func (ec *executionContext) marshalOID2ᚖstring(ctx context.Context, sel ast.Se
 		return graphql.Null
 	}
 	res := graphql.MarshalID(*v)
-	return res
-}
-
-func (ec *executionContext) unmarshalOInt2ᚖint(ctx context.Context, v interface{}) (*int, error) {
-	if v == nil {
-		return nil, nil
-	}
-	res, err := graphql.UnmarshalInt(v)
-	return &res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) marshalOInt2ᚖint(ctx context.Context, sel ast.SelectionSet, v *int) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	res := graphql.MarshalInt(*v)
 	return res
 }
 

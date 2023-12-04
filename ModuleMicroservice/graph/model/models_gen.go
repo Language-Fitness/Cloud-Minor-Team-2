@@ -5,23 +5,32 @@ package model
 type Module struct {
 	ID          string  `json:"id"`
 	Name        string  `json:"name"`
-	Description *string `json:"description,omitempty"`
-	Difficulty  *int    `json:"difficulty,omitempty"`
-	Category    *string `json:"category,omitempty"`
-	MadeBy      *string `json:"made_by,omitempty"`
-	Private     *bool   `json:"private,omitempty"`
+	Description string  `json:"description"`
+	Difficulty  int     `json:"difficulty"`
+	Category    string  `json:"category"`
+	MadeBy      string  `json:"made_by"`
+	Private     bool    `json:"private"`
 	Key         *string `json:"key,omitempty"`
 	CreatedAt   *string `json:"created_at,omitempty"`
 	UpdatedAt   *string `json:"updated_at,omitempty"`
 	SoftDeleted *bool   `json:"soft_deleted,omitempty"`
 }
 
+type ModuleInfo struct {
+	ID          string `json:"id"`
+	Name        string `json:"name"`
+	Description string `json:"description"`
+	Difficulty  int    `json:"difficulty"`
+	Category    string `json:"category"`
+	MadeBy      string `json:"made_by"`
+	Private     bool   `json:"private"`
+}
+
 type ModuleInput struct {
 	Name        string  `json:"name"`
-	Description *string `json:"description,omitempty"`
-	Difficulty  *int    `json:"difficulty,omitempty"`
-	Category    *string `json:"category,omitempty"`
-	MadeBy      *string `json:"made_by,omitempty"`
-	Private     *bool   `json:"private,omitempty"`
+	Description string  `json:"description"`
+	Difficulty  int     `json:"difficulty"`
+	Category    string  `json:"category"`
+	Private     bool    `json:"private"`
 	Key         *string `json:"key,omitempty"`
 }

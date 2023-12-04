@@ -8,7 +8,7 @@ import (
 )
 
 type IPolicy interface {
-	CreateClass(bearerToken string) error
+	CreateClass(bearerToken string) (string, error)
 	UpdateClass(bearerToken string, id string) (*model.Class, error)
 	DeleteClass(bearerToken string, id string) error
 	GetClass(bearerToken string) error
@@ -29,17 +29,17 @@ func NewPolicy(collection *mongo.Collection) IPolicy {
 	}
 }
 
-func (p *Policy) CreateClass(bearerToken string) error {
-	_, roles, err2 := p.getSubAndRoles(bearerToken)
+func (p *Policy) CreateClass(bearerToken string) (string, error) {
+	uuid, roles, err2 := p.getSubAndRoles(bearerToken)
 	if err2 != nil {
-		return err2
+		return "", err2
 	}
 
 	if !p.hasRole(roles, "create_class") {
-		return errors.New("invalid permissions for this action")
+		return "", errors.New("invalid permissions for this action")
 	}
 
-	return nil
+	return uuid, nil
 }
 
 func (p *Policy) UpdateClass(bearerToken string, id string) (*model.Class, error) {
@@ -53,7 +53,7 @@ func (p *Policy) UpdateClass(bearerToken string, id string) (*model.Class, error
 		return nil, errors.New("invalid permissions for this action")
 	}
 
-	if p.hasRole(roles, "update_class") && *class.MadeBy == uuid {
+	if p.hasRole(roles, "update_class") && class.MadeBy == uuid {
 		return class, nil
 	}
 
@@ -75,7 +75,7 @@ func (p *Policy) DeleteClass(bearerToken string, id string) error {
 		return errors.New("invalid permissions for this action")
 	}
 
-	if p.hasRole(roles, "delete_class") && *class.MadeBy == uuid {
+	if p.hasRole(roles, "delete_class") && class.MadeBy == uuid {
 		return nil
 	}
 

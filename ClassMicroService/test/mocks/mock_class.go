@@ -15,36 +15,44 @@ var SoftDeleted = false
 var MockCreateInput = model.ClassInput{
 	ModuleID:    "module-id",
 	Name:        "Sample Class",
-	Description: &Description,
-	Difficulty:  &Difficulty,
-	MadeBy:      &MadeBy,
+	Description: Description,
+	Difficulty:  Difficulty,
 }
 
 var MockUpdateInput = model.ClassInput{
 	ModuleID:    "module-id",
 	Name:        "Sample Class",
-	Description: &UpdatedDescription,
-	Difficulty:  &Difficulty,
-	MadeBy:      &MadeBy,
+	Description: UpdatedDescription,
+	Difficulty:  Difficulty,
 }
 
 var MockClass = model.Class{
 	ID:          "3a3bd756-6353-4e29-8aba-5b3531bdb9ed",
 	ModuleID:    "module-id",
 	Name:        "Sample Class",
-	Description: &Description,
-	Difficulty:  &Difficulty,
+	Description: Description,
+	Difficulty:  Difficulty,
+	MadeBy:      MadeBy,
 	CreatedAt:   &Timestamp,
 	SoftDeleted: &SoftDeleted,
-	MadeBy:      &MadeBy,
+}
+
+var MockClassInfo = model.ClassInfo{
+	ID:          "3a3bd756-6353-4e29-8aba-5b3531bdb9ed",
+	ModuleID:    "module-id",
+	Name:        "Sample Class",
+	Description: Description,
+	Difficulty:  Difficulty,
+	MadeBy:      MadeBy,
 }
 
 var MockUpdatedClass = model.Class{
 	ID:          "3a3bd756-6353-4e29-8aba-5b3531bdb9ed",
 	ModuleID:    "module-id",
 	Name:        "Sample Class",
-	Description: &UpdatedDescription,
-	Difficulty:  &Difficulty,
+	Description: UpdatedDescription,
+	Difficulty:  Difficulty,
+	MadeBy:      MadeBy,
 	CreatedAt:   &Timestamp,
 	UpdatedAt:   &Timestamp,
 	SoftDeleted: &SoftDeleted,

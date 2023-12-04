@@ -13,9 +13,9 @@ type MockPolicy struct {
 	ClassRepository repository.IClassRepository
 }
 
-func (m *MockPolicy) CreateClass(bearerToken string) error {
+func (m *MockPolicy) CreateClass(bearerToken string) (string, error) {
 	args := m.Called(bearerToken)
-	return args.Error(0)
+	return args.Get(0).(string), args.Error(1)
 }
 
 func (m *MockPolicy) UpdateClass(bearerToken string, id string) (*model.Class, error) {

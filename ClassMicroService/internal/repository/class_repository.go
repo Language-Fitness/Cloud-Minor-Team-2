@@ -16,7 +16,7 @@ type IClassRepository interface {
 	UpdateClass(id string, updatedClass model.Class) (*model.Class, error)
 	DeleteClassByID(id string) error
 	GetClassByID(id string) (*model.Class, error)
-	ListClasses() ([]*model.Class, error)
+	ListClasses() ([]*model.ClassInfo, error)
 }
 
 // ClassRepository GOLANG STRUCT
@@ -114,11 +114,11 @@ func (r *ClassRepository) GetClassByID(id string) (*model.Class, error) {
 	return &result, nil
 }
 
-func (r *ClassRepository) ListClasses() ([]*model.Class, error) {
+func (r *ClassRepository) ListClasses() ([]*model.ClassInfo, error) {
 	ctx, cancel := context.WithTimeout(context.TODO(), time.Second*10) // 10-second timeout
 	defer cancel()
 
-	var classes []*model.Class
+	var classes []*model.ClassInfo
 
 	cursor, err := r.collection.Find(ctx, bson.D{})
 	if err != nil {
@@ -132,7 +132,7 @@ func (r *ClassRepository) ListClasses() ([]*model.Class, error) {
 	}(cursor, ctx)
 
 	for cursor.Next(ctx) {
-		var Class model.Class
+		var Class model.ClassInfo
 		if err := cursor.Decode(&Class); err != nil {
 			return nil, err // Return any decoding errors.
 		}

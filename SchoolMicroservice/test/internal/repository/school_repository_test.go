@@ -35,7 +35,7 @@ func TestCreateSchool(t *testing.T) {
 	newSchool := &model.School{
 		ID:          "123",
 		Name:        "Test School",
-		Location:    &location,
+		Location:    location,
 		CreatedAt:   &timestamp,
 		SoftDeleted: &softDeleted,
 	}

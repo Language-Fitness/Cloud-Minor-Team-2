@@ -18,7 +18,7 @@ func TestService_CreateClass(t *testing.T) {
 	mockPolicy := new(mocks.MockPolicy)
 	service := &service2.ClassService{Validator: mockValidator, Repo: mockRepo, Policy: mockPolicy}
 
-	mockPolicy.On("CreateClass", mock.AnythingOfType("string")).Return(nil)
+	mockPolicy.On("CreateClass", mock.AnythingOfType("string")).Return("", nil)
 
 	mockValidator.On("GetErrors").Return([]string{})
 
@@ -42,7 +42,7 @@ func TestService_CreateClass_CatchValidationErrors(t *testing.T) {
 	mockPolicy := new(mocks.MockPolicy)
 	service := &service2.ClassService{Validator: mockValidator, Repo: mockRepo, Policy: mockPolicy}
 
-	mockPolicy.On("CreateClass", mock.AnythingOfType("string")).Return(nil)
+	mockPolicy.On("CreateClass", mock.AnythingOfType("string")).Return("", nil)
 
 	mockValidator.On("GetErrors").Return([]string{"validation_error"})
 
@@ -61,7 +61,7 @@ func TestService_CreateClass_CatchInsertError(t *testing.T) {
 	mockPolicy := new(mocks.MockPolicy)
 	service := &service2.ClassService{Validator: mockValidator, Repo: mockRepo, Policy: mockPolicy}
 
-	mockPolicy.On("CreateClass", mock.AnythingOfType("string")).Return(nil)
+	mockPolicy.On("CreateClass", mock.AnythingOfType("string")).Return("", nil)
 
 	mockValidator.On("GetErrors").Return([]string{})
 
@@ -292,14 +292,14 @@ func TestService_ListClasses(t *testing.T) {
 
 	mockPolicy.On("ListClasses", mock.AnythingOfType("string")).Return(nil)
 
-	mockRepo.On("ListClasses").Return([]*model.Class{&mocks.MockClass}, nil)
+	mockRepo.On("ListClasses").Return([]*model.ClassInfo{&mocks.MockClassInfo}, nil)
 
 	result, err := service.ListClasses(adminToken)
 
 	assert.Nil(t, err)
 	assert.NotNil(t, result)
 	assert.Len(t, result, 1)
-	assert.IsType(t, &model.Class{}, result[0])
+	assert.IsType(t, &model.ClassInfo{}, result[0])
 	assert.Equal(t, "3a3bd756-6353-4e29-8aba-5b3531bdb9ed", result[0].ID)
 
 	mockValidator.AssertExpectations(t)
@@ -314,7 +314,7 @@ func TestService_ListClasses_CatchRetrieveError(t *testing.T) {
 
 	mockPolicy.On("ListClasses", mock.AnythingOfType("string")).Return(nil)
 
-	mockRepo.On("ListClasses").Return([]*model.Class{}, errors.New("retrieval_error"))
+	mockRepo.On("ListClasses").Return([]*model.ClassInfo{}, errors.New("retrieval_error"))
 
 	result, err := service.ListClasses(adminToken)
 

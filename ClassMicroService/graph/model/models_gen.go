@@ -6,18 +6,26 @@ type Class struct {
 	ID          string  `json:"id"`
 	ModuleID    string  `json:"module_Id"`
 	Name        string  `json:"name"`
-	Description *string `json:"description,omitempty"`
-	Difficulty  *int    `json:"difficulty,omitempty"`
-	MadeBy      *string `json:"made_by,omitempty"`
+	Description string  `json:"description"`
+	Difficulty  int     `json:"difficulty"`
+	MadeBy      string  `json:"made_by"`
 	CreatedAt   *string `json:"created_at,omitempty"`
 	UpdatedAt   *string `json:"updated_at,omitempty"`
 	SoftDeleted *bool   `json:"soft_deleted,omitempty"`
 }
 
+type ClassInfo struct {
+	ID          string `json:"id"`
+	ModuleID    string `json:"module_Id"`
+	Name        string `json:"name"`
+	Description string `json:"description"`
+	Difficulty  int    `json:"difficulty"`
+	MadeBy      string `json:"made_by"`
+}
+
 type ClassInput struct {
-	ModuleID    string  `json:"module_Id"`
-	Name        string  `json:"name"`
-	Description *string `json:"description,omitempty"`
-	Difficulty  *int    `json:"difficulty,omitempty"`
-	MadeBy      *string `json:"made_by,omitempty"`
+	ModuleID    string `json:"module_Id"`
+	Name        string `json:"name"`
+	Description string `json:"description"`
+	Difficulty  int    `json:"difficulty"`
 }

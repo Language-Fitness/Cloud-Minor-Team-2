@@ -32,7 +32,7 @@ func (m *MockRepository) GetModuleByID(id string) (*model.Module, error) {
 	return args.Get(0).(*model.Module), args.Error(1)
 }
 
-func (m *MockRepository) ListModules() ([]*model.Module, error) {
+func (m *MockRepository) ListModules() ([]*model.ModuleInfo, error) {
 	args := m.Called()
-	return args.Get(0).([]*model.Module), args.Error(1)
+	return args.Get(0).([]*model.ModuleInfo), args.Error(1)
 }

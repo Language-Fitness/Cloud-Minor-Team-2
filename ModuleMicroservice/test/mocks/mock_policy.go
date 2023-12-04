@@ -13,9 +13,9 @@ type MockPolicy struct {
 	ModuleRepository repository.IModuleRepository
 }
 
-func (m *MockPolicy) CreateModule(bearerToken string) error {
+func (m *MockPolicy) CreateModule(bearerToken string) (string, error) {
 	args := m.Called(bearerToken)
-	return args.Error(0)
+	return args.Get(0).(string), args.Error(1)
 }
 
 func (m *MockPolicy) UpdateModule(bearerToken string, id string) (*model.Module, error) {

@@ -19,7 +19,7 @@ type IClassService interface {
 	UpdateClass(token string, id string, updatedData model.ClassInput) (*model.Class, error)
 	DeleteClass(token string, id string) error
 	GetClassById(token string, id string) (*model.Class, error)
-	ListClasses(token string) ([]*model.Class, error)
+	ListClasses(token string) ([]*model.ClassInfo, error)
 }
 
 // ClassService GOLANG STRUCT
@@ -43,16 +43,15 @@ func NewClassService() IClassService {
 }
 
 func (c *ClassService) CreateClass(token string, newClass model.ClassInput) (*model.Class, error) {
-	err := c.Policy.CreateClass(token)
+	sub, err := c.Policy.CreateClass(token)
 	if err != nil {
 		return nil, err
 	}
 
 	c.Validator.Validate(newClass.ModuleID, []string{"IsUUID"})
 	c.Validator.Validate(newClass.Name, []string{"IsString", "Length:<25"})
-	c.Validator.Validate(*newClass.Description, []string{"IsString", "Length:<50"})
-	c.Validator.Validate(*newClass.Difficulty, []string{"IsInt"})
-	c.Validator.Validate(*newClass.MadeBy, []string{"IsUUID"})
+	c.Validator.Validate(newClass.Description, []string{"IsString", "Length:<50"})
+	c.Validator.Validate(newClass.Difficulty, []string{"IsInt"})
 
 	validationErrors := c.Validator.GetErrors()
 
@@ -71,7 +70,7 @@ func (c *ClassService) CreateClass(token string, newClass model.ClassInput) (*mo
 		Name:        newClass.Name,
 		Description: newClass.Description,
 		Difficulty:  newClass.Difficulty,
-		MadeBy:      newClass.MadeBy,
+		MadeBy:      sub,
 		CreatedAt:   &timestamp,
 		SoftDeleted: &softDeleted,
 	}
@@ -93,9 +92,8 @@ func (c *ClassService) UpdateClass(token string, id string, updatedData model.Cl
 	c.Validator.Validate(id, []string{"IsUUID"})
 	c.Validator.Validate(updatedData.ModuleID, []string{"IsUUID"})
 	c.Validator.Validate(updatedData.Name, []string{"IsString", "Length:<25"})
-	c.Validator.Validate(*updatedData.Description, []string{"IsString", "Length:<50"})
-	c.Validator.Validate(*updatedData.Difficulty, []string{"IsInt"})
-	c.Validator.Validate(*updatedData.MadeBy, []string{"IsUUID"})
+	c.Validator.Validate(updatedData.Description, []string{"IsString", "Length:<50"})
+	c.Validator.Validate(updatedData.Difficulty, []string{"IsInt"})
 
 	validationErrors := c.Validator.GetErrors()
 	if len(validationErrors) > 0 {
@@ -166,7 +164,7 @@ func (c *ClassService) GetClassById(token string, id string) (*model.Class, erro
 	return Class, nil
 }
 
-func (c *ClassService) ListClasses(token string) ([]*model.Class, error) {
+func (c *ClassService) ListClasses(token string) ([]*model.ClassInfo, error) {
 	err := c.Policy.ListClasses(token)
 	if err != nil {
 		return nil, err

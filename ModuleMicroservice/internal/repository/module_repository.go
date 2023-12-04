@@ -16,7 +16,7 @@ type IModuleRepository interface {
 	UpdateModule(id string, updatedModule model.Module) (*model.Module, error)
 	DeleteModuleByID(id string) error
 	GetModuleByID(id string) (*model.Module, error)
-	ListModules() ([]*model.Module, error)
+	ListModules() ([]*model.ModuleInfo, error)
 }
 
 // ModuleRepository GOLANG STRUCT
@@ -114,11 +114,11 @@ func (r *ModuleRepository) GetModuleByID(id string) (*model.Module, error) {
 	return &result, nil
 }
 
-func (r *ModuleRepository) ListModules() ([]*model.Module, error) {
+func (r *ModuleRepository) ListModules() ([]*model.ModuleInfo, error) {
 	ctx, cancel := context.WithTimeout(context.TODO(), time.Second*10) // 10-second timeout
 	defer cancel()
 
-	var modules []*model.Module
+	var modules []*model.ModuleInfo
 
 	cursor, err := r.collection.Find(ctx, bson.D{})
 	if err != nil {
@@ -132,7 +132,7 @@ func (r *ModuleRepository) ListModules() ([]*model.Module, error) {
 	}(cursor, ctx)
 
 	for cursor.Next(ctx) {
-		var module model.Module
+		var module model.ModuleInfo
 		if err := cursor.Decode(&module); err != nil {
 			return nil, err // Return any decoding errors.
 		}

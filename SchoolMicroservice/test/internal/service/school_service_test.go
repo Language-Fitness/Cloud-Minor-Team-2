@@ -166,7 +166,7 @@ func TestService_DeleteSchool(t *testing.T) {
 			"3a3bd756-6353-4e29-8aba-5b3531bdb9ed").
 		Return(nil)
 
-	err := service.DeleteSchool("3a3bd756-6353-4e29-8aba-5b3531bdb9ed")
+	err := service.DeleteSchool(adminToken, "3a3bd756-6353-4e29-8aba-5b3531bdb9ed")
 
 	assert.Nil(t, err)
 
@@ -182,7 +182,7 @@ func TestService_DeleteSchool_CatchValidationError(t *testing.T) {
 
 	mockValidator.On("GetErrors").Return([]string{"validation_error"})
 
-	err := service.DeleteSchool("3a3bd756-6353-4e29-8aba-5b3531bdb9ed")
+	err := service.DeleteSchool(adminToken, "3a3bd756-6353-4e29-8aba-5b3531bdb9ed")
 
 	assert.NotNil(t, err)
 	assert.Equal(t, "Validation errors: validation_error", err.Error())
@@ -204,7 +204,7 @@ func TestService_DeleteSchool_CatchDeleteError(t *testing.T) {
 			"3a3bd756-6353-4e29-8aba-5b3531bdb9ed").
 		Return(errors.New("deletion_error"))
 
-	err := service.DeleteSchool("3a3bd756-6353-4e29-8aba-5b3531bdb9ed")
+	err := service.DeleteSchool(adminToken, "3a3bd756-6353-4e29-8aba-5b3531bdb9ed")
 
 	assert.NotNil(t, err)
 	assert.Equal(t, "deletion_error", err.Error())
@@ -292,14 +292,14 @@ func TestService_ListSchools(t *testing.T) {
 
 	mockPolicy.On("ListSchools", mock.AnythingOfType("string")).Return(nil)
 
-	mockRepo.On("ListSchools").Return([]*model.School{&mocks.MockSchool}, nil)
+	mockRepo.On("ListSchools").Return([]*model.SchoolInfo{&mocks.MockSchoolInfo}, nil)
 
 	result, err := service.ListSchools(adminToken)
 
 	assert.Nil(t, err)
 	assert.NotNil(t, result)
 	assert.Len(t, result, 1)
-	assert.IsType(t, &model.School{}, result[0])
+	assert.IsType(t, &model.SchoolInfo{}, result[0])
 	assert.Equal(t, "3a3bd756-6353-4e29-8aba-5b3531bdb9ed", result[0].ID)
 
 	mockValidator.AssertExpectations(t)
@@ -314,7 +314,7 @@ func TestService_ListSchools_CatchRetrieveError(t *testing.T) {
 
 	mockPolicy.On("ListSchools", mock.AnythingOfType("string")).Return(nil)
 
-	mockRepo.On("ListSchools").Return([]*model.School{}, errors.New("retrieval_error"))
+	mockRepo.On("ListSchools").Return([]*model.SchoolInfo{}, errors.New("retrieval_error"))
 
 	result, err := service.ListSchools(adminToken)
 

@@ -5,13 +5,19 @@ package model
 type School struct {
 	ID          string  `json:"id"`
 	Name        string  `json:"name"`
-	Location    *string `json:"location,omitempty"`
+	Location    string  `json:"location"`
 	CreatedAt   *string `json:"created_at,omitempty"`
 	UpdatedAt   *string `json:"updated_at,omitempty"`
 	SoftDeleted *bool   `json:"soft_deleted,omitempty"`
 }
 
+type SchoolInfo struct {
+	ID       string `json:"id"`
+	Name     string `json:"name"`
+	Location string `json:"location"`
+}
+
 type SchoolInput struct {
-	Name     string  `json:"name"`
-	Location *string `json:"location,omitempty"`
+	Name     string `json:"name"`
+	Location string `json:"location"`
 }

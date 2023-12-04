@@ -32,7 +32,7 @@ func (m *MockRepository) GetSchoolByID(id string) (*model.School, error) {
 	return args.Get(0).(*model.School), args.Error(1)
 }
 
-func (m *MockRepository) ListSchools() ([]*model.School, error) {
+func (m *MockRepository) ListSchools() ([]*model.SchoolInfo, error) {
 	args := m.Called()
-	return args.Get(0).([]*model.School), args.Error(1)
+	return args.Get(0).([]*model.SchoolInfo), args.Error(1)
 }

@@ -18,7 +18,7 @@ func TestService_CreateModule(t *testing.T) {
 	mockPolicy := new(mocks.MockPolicy)
 	service := &service2.ModuleService{Validator: mockValidator, Repo: mockRepo, Policy: mockPolicy}
 
-	mockPolicy.On("CreateModule", mock.AnythingOfType("string")).Return(nil)
+	mockPolicy.On("CreateModule", mock.AnythingOfType("string")).Return("", nil)
 
 	mockValidator.On("GetErrors").Return([]string{})
 
@@ -43,7 +43,7 @@ func TestService_CreateModule_CatchValidationErrors(t *testing.T) {
 	mockPolicy := new(mocks.MockPolicy)
 	service := &service2.ModuleService{Validator: mockValidator, Repo: mockRepo, Policy: mockPolicy}
 
-	mockPolicy.On("CreateModule", mock.AnythingOfType("string")).Return(nil)
+	mockPolicy.On("CreateModule", mock.AnythingOfType("string")).Return("", nil)
 
 	mockValidator.On("GetErrors").Return([]string{"validation_error"})
 
@@ -63,7 +63,7 @@ func TestService_CreateModule_CatchInsertError(t *testing.T) {
 	mockPolicy := new(mocks.MockPolicy)
 	service := &service2.ModuleService{Validator: mockValidator, Repo: mockRepo, Policy: mockPolicy}
 
-	mockPolicy.On("CreateModule", mock.AnythingOfType("string")).Return(nil)
+	mockPolicy.On("CreateModule", mock.AnythingOfType("string")).Return("", nil)
 
 	mockValidator.On("GetErrors").Return([]string{})
 
@@ -300,14 +300,14 @@ func TestService_ListModules(t *testing.T) {
 	mockPolicy.On("ListModules", mock.AnythingOfType("string")).
 		Return(nil)
 
-	mockRepo.On("ListModules").Return([]*model.Module{&mocks.MockModule}, nil)
+	mockRepo.On("ListModules").Return([]*model.ModuleInfo{&mocks.MockModuleInfo}, nil)
 
 	result, err := service.ListModules(adminToken)
 
 	assert.Nil(t, err)
 	assert.NotNil(t, result)
 	assert.Len(t, result, 1)
-	assert.IsType(t, &model.Module{}, result[0])
+	assert.IsType(t, &model.ModuleInfo{}, result[0])
 	assert.Equal(t, "3a3bd756-6353-4e29-8aba-5b3531bdb9ed", result[0].ID)
 
 	mockValidator.AssertExpectations(t)
@@ -323,7 +323,7 @@ func TestService_ListModules_CatchRetrieveError(t *testing.T) {
 	mockPolicy.On("ListModules", mock.AnythingOfType("string")).
 		Return(nil)
 
-	mockRepo.On("ListModules").Return([]*model.Module{}, errors.New("retrieval_error"))
+	mockRepo.On("ListModules").Return([]*model.ModuleInfo{}, errors.New("retrieval_error"))
 
 	result, err := service.ListModules(adminToken)
 

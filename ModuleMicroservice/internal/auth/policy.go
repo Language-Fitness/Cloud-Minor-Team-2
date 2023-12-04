@@ -8,7 +8,7 @@ import (
 )
 
 type IPolicy interface {
-	CreateModule(bearerToken string) error
+	CreateModule(bearerToken string) (string, error)
 	UpdateModule(bearerToken string, id string) (*model.Module, error)
 	DeleteModule(bearerToken string, id string) error
 	GetModule(bearerToken string) error
@@ -29,17 +29,17 @@ func NewPolicy(collection *mongo.Collection) IPolicy {
 	}
 }
 
-func (p *Policy) CreateModule(bearerToken string) error {
-	_, roles, err2 := p.getSubAndRoles(bearerToken)
+func (p *Policy) CreateModule(bearerToken string) (string, error) {
+	uuid, roles, err2 := p.getSubAndRoles(bearerToken)
 	if err2 != nil {
-		return err2
+		return "", err2
 	}
 
 	if !p.hasRole(roles, "create_module") {
-		return errors.New("invalid permissions for this action")
+		return "", errors.New("invalid permissions for this action")
 	}
 
-	return nil
+	return uuid, nil
 }
 
 func (p *Policy) UpdateModule(bearerToken string, id string) (*model.Module, error) {
@@ -53,7 +53,7 @@ func (p *Policy) UpdateModule(bearerToken string, id string) (*model.Module, err
 		return nil, errors.New("invalid permissions for this action")
 	}
 
-	if p.hasRole(roles, "update_module") && *module.MadeBy == uuid {
+	if p.hasRole(roles, "update_module") && module.MadeBy == uuid {
 		return module, nil
 	}
 
@@ -75,7 +75,7 @@ func (p *Policy) DeleteModule(bearerToken string, id string) error {
 		return errors.New("invalid permissions for this action")
 	}
 
-	if p.hasRole(roles, "delete_module") && *module.MadeBy == uuid {
+	if p.hasRole(roles, "delete_module") && module.MadeBy == uuid {
 		return nil
 	}
 

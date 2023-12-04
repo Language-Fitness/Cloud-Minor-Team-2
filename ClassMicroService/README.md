@@ -2,15 +2,16 @@
 ```graphql
 mutation CreateClass {
     createClass(input: {
-        module_Id: "module-id"
+        module_Id: "c0c60670-9293-11ee-b9d1-0242ac120002"
         name: "Sample Class",
-        description: "This is a sample class.",
+        description: "sample description"
         difficulty: 1,
     }) {
         id
         name
         description
         difficulty
+        made_by
         created_at
         updated_at
         soft_deleted
@@ -27,6 +28,7 @@ query GetClass {
         name
         description
         difficulty
+        made_by
         created_at
         updated_at
         soft_deleted
@@ -39,12 +41,11 @@ query GetClass {
 query ListClasses {
     listClasses {
         id
+        module_Id
         name
         description
         difficulty
-        created_at
-        updated_at
-        soft_deleted
+        made_by
     }
 }
 ```
@@ -55,8 +56,8 @@ mutation UpdateClass {
     updateClass(
         id: "your-class-id-to-update",
         input: {
-            module_Id: "updated class-id"
-            name: "Updated Class Name",
+            module_Id: "c0c60670-9293-11ee-b9d1-0242ac120002"
+            name: "Updated Module Name",
             description: "Updated description",
             difficulty: 2,
         }
@@ -66,6 +67,7 @@ mutation UpdateClass {
         name
         description
         difficulty
+        made_by
         created_at
         updated_at
         soft_deleted
@@ -76,6 +78,6 @@ mutation UpdateClass {
 ## Delete a class
 ```graphql
 mutation DeleteClass {
-    deleteClass(id: "your-class-id")
+    deleteClass(id: "your-class-id-to-delete")
 }
 ```

@@ -59,7 +59,7 @@ func (r *queryResolver) GetSchool(ctx context.Context, id string) (*model.School
 }
 
 // ListSchools is the resolver for the listSchools field.
-func (r *queryResolver) ListSchools(ctx context.Context) ([]*model.School, error) {
+func (r *queryResolver) ListSchools(ctx context.Context) ([]*model.SchoolInfo, error) {
 	token := auth.TokenFromContext(ctx)
 
 	schools, err := r.Service.ListSchools(token)

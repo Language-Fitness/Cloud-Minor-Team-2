@@ -25,7 +25,7 @@ func TestCreateModuleWithAdminToken(t *testing.T) {
 		On("IntrospectToken", mock.AnythingOfType("string")).
 		Return(true, nil)
 
-	err := modulePolicy.CreateModule(adminToken)
+	_, err := modulePolicy.CreateModule(adminToken)
 
 	assert.Nil(t, err)
 	mockToken.AssertExpectations(t)
@@ -45,7 +45,7 @@ func TestCreateModuleWithTeacherToken(t *testing.T) {
 		On("IntrospectToken", mock.AnythingOfType("string")).
 		Return(true, nil)
 
-	err := modulePolicy.CreateModule(teacherToken)
+	_, err := modulePolicy.CreateModule(teacherToken)
 
 	assert.Nil(t, err)
 	mockToken.AssertExpectations(t)
@@ -65,7 +65,7 @@ func TestCreateModuleWithStudentToken(t *testing.T) {
 		On("IntrospectToken", mock.AnythingOfType("string")).
 		Return(true, nil)
 
-	err := modulePolicy.CreateModule(studentToken)
+	_, err := modulePolicy.CreateModule(studentToken)
 
 	assert.NotNil(t, err)
 	assert.Equal(t, "invalid permissions for this action", err.Error())
@@ -216,7 +216,7 @@ func TestDeleteModuleWithTeacherTokenAndWrongUUID(t *testing.T) {
 
 	sub := "401927fd-13ae-4e0a-aec9-be64b9c93883"
 	mockModuleWithValidUUID := mocks.MockModule
-	mockModuleWithValidUUID.MadeBy = &sub
+	mockModuleWithValidUUID.MadeBy = sub
 
 	mockRepo.
 		On(

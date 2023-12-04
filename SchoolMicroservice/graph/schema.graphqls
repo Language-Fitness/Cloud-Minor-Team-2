@@ -5,15 +5,21 @@
 type School {
   id: ID!
   name: String!
-  location: String
+  location: String!
   created_at: String
   updated_at: String
   soft_deleted: Boolean
 }
 
+type SchoolInfo {
+  id: ID!
+  name: String!
+  location: String!
+}
+
 type Query {
   getSchool(id: ID!): School
-  listSchools: [School]
+  listSchools: [SchoolInfo]
 }
 
 type Mutation {
@@ -24,5 +30,5 @@ type Mutation {
 
 input SchoolInput {
   name: String!
-  location: String
+  location: String!
 }

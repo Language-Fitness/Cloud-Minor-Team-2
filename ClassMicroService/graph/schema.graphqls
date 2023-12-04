@@ -6,17 +6,26 @@ type Class {
   id: ID!
   module_Id: ID!
   name: String!
-  description: String
-  difficulty: Int
-  made_by: String
+  description: String!
+  difficulty: Int!
+  made_by: String!
   created_at: String
   updated_at: String
   soft_deleted: Boolean
 }
 
+type ClassInfo {
+  id: ID!
+  module_Id: ID!
+  name: String!
+  description: String!
+  difficulty: Int!
+  made_by: String!
+}
+
 type Query {
   getClass(id: ID!): Class
-  listClasses: [Class]
+  listClasses: [ClassInfo]
 }
 
 type Mutation {
@@ -28,7 +37,6 @@ type Mutation {
 input ClassInput {
   module_Id: ID!
   name: String!
-  description: String
-  difficulty: Int
-  made_by: String
+  description: String!
+  difficulty: Int!
 }

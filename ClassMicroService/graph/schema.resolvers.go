@@ -59,7 +59,7 @@ func (r *queryResolver) GetClass(ctx context.Context, id string) (*model.Class, 
 }
 
 // ListClasses is the resolver for the listClasses field.
-func (r *queryResolver) ListClasses(ctx context.Context) ([]*model.Class, error) {
+func (r *queryResolver) ListClasses(ctx context.Context) ([]*model.ClassInfo, error) {
 	token := auth.TokenFromContext(ctx)
 
 	classes, err := r.Service.ListClasses(token)
