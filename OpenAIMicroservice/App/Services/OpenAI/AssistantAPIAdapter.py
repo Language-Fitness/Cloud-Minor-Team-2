@@ -12,12 +12,12 @@ class AssistantAPIAdapter:
     def __init__(self):
         self.assistant_manager = OpenAIAssistantManager()
 
-    def generate_open_answer_questions(self, subject, amount_questions):
+    def generate_open_answer_questions(self, subject, level, amount_questions):
         assistant_json = self.assistant_manager.load_assistant(
             "Services/OpenAI/Assistants/OpenAnswerQuestionsAssistant.json")
         assistant = self.assistant_manager.create_assistant(assistant_json)
 
-        request = f"onderwerp: {subject}, aantal vragen: {amount_questions}"
+        request = f"onderwerp: {subject}, nederlands niveau: {level}, aantal vragen: {amount_questions}"
 
         thread = self.assistant_manager.create_thread()
         messsage = self.assistant_manager.create_message(thread.id, request)
@@ -26,12 +26,12 @@ class AssistantAPIAdapter:
         token = self.encode_token(run.thread_id, run.assistant_id)
         return token
 
-    def generate_multiple_choice_questions(self, subject, amount_questions):
+    def generate_multiple_choice_questions(self, subject, level, amount_questions):
         assistant_json = self.assistant_manager.load_assistant(
             "Services/OpenAI/Assistants/MultipleChoiceQuestionAssistant.json")
         assistant = self.assistant_manager.create_assistant(assistant_json)
 
-        request = f"onderwerp: {subject}, aantal vragen: {amount_questions}"
+        request = f"onderwerp: {subject}, nederlands niveau: {level}, aantal vragen: {amount_questions}"
 
         thread = self.assistant_manager.create_thread()
         messsage = self.assistant_manager.create_message(thread.id, request)
