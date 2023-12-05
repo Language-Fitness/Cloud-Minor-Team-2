@@ -1,0 +1,51 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: vue-cloud-cms
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: vue-cloud-cms
+  template:
+    metadata:
+      labels:
+        app: vue-cloud-cms
+    spec:
+      containers:
+        - name: vue-cloud-cms-container
+          image: cloud-cms
+          ports:
+            - containerPort: 8080
+          resources:
+            limits:
+              memory: "250Mi"
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: vue-cloud-cms-service
+  annotations:
+    description: Exposes and load balances the application pods
+  labels:
+    app: vue-cloud-cms
+spec:
+  ports:
+    - name: http
+      port: 8080
+      targetPort: 8080
+  selector:
+    app: vue-cloud-cms
+---
+kind: Route
+apiVersion: route.openshift.io/v1
+metadata:
+  name: vue-cloud-cms-route
+  labels:
+    app: vue-cloud-cms
+spec:
+  port:
+    targetPort: 8080
+  to:
+    kind: Service
+    name: vue-cloud-cms-service
