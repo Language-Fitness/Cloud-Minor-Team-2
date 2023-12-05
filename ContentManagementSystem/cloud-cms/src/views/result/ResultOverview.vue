@@ -1,16 +1,10 @@
 <script setup>
+import TabsTop from "@/components/nav/tabs-top.vue";
 </script>
 
 <template>
-  <main>
-    <p>Result</p>
-  </main>
+  <tabs-top></tabs-top>
 </template>
 
 <style>
-  main {
-    width: 85%;
-    border: 1px solid black;
-    background-color: lightgray;
-  }
 </style>
