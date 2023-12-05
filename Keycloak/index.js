@@ -1,3 +1,6 @@
+process.env["NODE_TLS_REJECT_UNAUTHORIZED"] = 0;
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
+
 import {
     newAdminAttributes,
     newAdminData,
@@ -11,11 +14,11 @@ import * as fs from "fs";
 import * as path from "path";
 
 
-const keycloakServer        = 'http://localhost:8888';
+const keycloakServer        = 'https://example-kc-bramterlouw-dev.apps.ocp2-inholland.joran-bergfeld.com';
 const masterRealm           = 'master';
 const projectRealm          = 'cloud-project';
 const adminClientId         = 'admin-cli';
-const adminClientSecret     = 'deCEIv8Slq5GUeSWUZWShRvSyd5VhGsA';
+const adminClientSecret     = 'khvMZZL8TH781UUWvNM5FDslu4xEhgpi';
 const adminTokenEndpoint    = `${keycloakServer}/realms/${masterRealm}/protocol/openid-connect/token`;
 const clientTokenEndpoint   = `${keycloakServer}/realms/${projectRealm}/protocol/openid-connect/token`;
 
