@@ -24,7 +24,10 @@ class OpenAIAssistantManager:
         )
 
     def delete_assistant(self, assistant_id):
-        self.client.beta.assistants.delete(assistant_id)
+        try:
+            self.client.beta.assistants.delete(assistant_id)
+        except Exception as e:
+            print("Assistant already deleted")
 
     def create_thread(self):
         return self.client.beta.threads.create()

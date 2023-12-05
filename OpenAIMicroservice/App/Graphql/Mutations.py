@@ -11,7 +11,7 @@ class GenerateOpenAnswerQuestions(graphene.Mutation):
 
     def mutate(self, info, subject, amount_questions):
         adapter = AssistantAPIAdapter()
-        token = adapter.generate_multiple_choice_questions(subject, amount_questions)
+        token = adapter.generate_open_answer_questions(subject, amount_questions)
 
         return GenerateOpenAnswerQuestions(token=token)
 

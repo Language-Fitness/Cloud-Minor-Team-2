@@ -69,57 +69,63 @@ class AssistantAPIAdapter:
             messages = self.assistant_manager.retrieve_messages(thread_id)
 
             json_data = self.get_last_message(messages)
+            json_data = json_data.replace('```json', '').replace('```', '')
 
             json_data_dict = json.loads(json_data)
-            return ResponseMultipleChoiceQuestion(
-                status=json_data_dict.get("status"),
-                questions=[
-                    MultipleChoiceQuestion(
-                        type=item["type"],
-                        question_info=item["question_info"],
-                        question_text=item["question_text"],
-                        options=item["options"],
-                        answer=item["answer"]
-                    )
-                    for item in json_data_dict["questions"]
-                ]
-            )
+
+            self.assistant_manager.delete_assistant(assistant_id)
+
+            return json_data_dict
         except Exception as e:
             raise GraphQLError(str(e))
 
-
-
-            # self.assistant_manager.delete_thread(thread_id)
-        # self.assistant_manager.delete_assistant(assistant_id)
-
-
     def retrieve_open_answer_questions(self, token):
-        thread_id, assistant_id = self.decode_token(token)
 
-        messages = self.assistant_manager.retrieve_messages(thread_id)
-        # self.assistant_manager.delete_thread(thread_id)
-        # self.assistant_manager.delete_assistant(assistant_id)
-
-        return messages
-
-    def retrieve_explanation_questions(self, token):
-        thread_id, assistant_id = self.decode_token(token)
-
-        messages = self.assistant_manager.retrieve_messages(thread_id)
-        self.assistant_manager.delete_thread(thread_id)
-        self.assistant_manager.delete_assistant(assistant_id)
-
-        return messages
-
-    def retrieve_answer(self, token):
-
+        try:
             thread_id, assistant_id = self.decode_token(token)
-
             messages = self.assistant_manager.retrieve_messages(thread_id)
-            self.assistant_manager.delete_thread(thread_id)
+
+            json_data = self.get_last_message(messages)
+            json_data = json_data.replace('```json', '').replace('```', '')
+
+            json_data_dict = json.loads(json_data)
+
             self.assistant_manager.delete_assistant(assistant_id)
 
-            return messages
+            return json_data_dict
+        except Exception as e:
+            raise GraphQLError(str(e))
+
+    def retrieve_explanation_questions(self, token):
+
+        try:
+            thread_id, assistant_id = self.decode_token(token)
+            messages = self.assistant_manager.retrieve_messages(thread_id)
+
+            json_data = self.get_last_message(messages)
+
+            json_data_dict = json.loads(json_data)
+
+            self.assistant_manager.delete_assistant(assistant_id)
+
+            return json_data_dict
+        except Exception as e:
+            raise GraphQLError(str(e))
+
+    def retrieve_answer(self, token):
+        try:
+            thread_id, assistant_id = self.decode_token(token)
+            messages = self.assistant_manager.retrieve_messages(thread_id)
+
+            json_data = self.get_last_message(messages)
+
+            json_data_dict = json.loads(json_data)
+
+            self.assistant_manager.delete_assistant(assistant_id)
+
+            return json_data_dict
+        except Exception as e:
+            raise GraphQLError(str(e))
 
     def encode_token(self, thread_id, assistant_id):
         try:
@@ -170,6 +176,6 @@ class AssistantAPIAdapter:
                 # Now you can use `last_assistant_message_content` as the last message said by the assistant.
                 return last_assistant_message_content
             else:
-                raise Exception("No assistant message found in the list of messages.")
+                raise Exception("Response still pending, please wait.")
         else:
-            raise Exception("The list of messages is empty.")
+            raise Exception("Please use a valid token!")
