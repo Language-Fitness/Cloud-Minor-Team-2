@@ -1,7 +1,8 @@
 from graphene import ObjectType, String, Field
 from graphql import GraphQLError
-from .Types import ResponseExplanation, ResponseAnswer, ResponseOpenAnswerQuestion,ResponseMultipleChoiceQuestion
+from .Types import ResponseExplanation, ResponseAnswer, ResponseOpenAnswerQuestion, ResponseMultipleChoiceQuestion
 from App.Services.OpenAI.AssistantAPIAdapter import AssistantAPIAdapter
+
 
 class Query(ObjectType):
     retrieve_multiple_choice_questions = Field(ResponseMultipleChoiceQuestion, token=String(required=True))
@@ -11,36 +12,40 @@ class Query(ObjectType):
 
     async def resolve_retrieve_multiple_choice_questions(self, info, token):
         adapter = AssistantAPIAdapter()
-        response = adapter.retrieve_multiple_choice_questions(token)
 
-        #if 'error' in response:
-         #   raise GraphQLError(response['error'])
-
-        return response
+        try:
+            response = adapter.retrieve_multiple_choice_questions(token)
+            return response
+        except Exception as e:
+            raise GraphQLError(str(e))
 
     async def resolve_retrieve_open_answer_questions(self, info, token):
-        adapter = AssistantAPIAdapter()
-        response = adapter.retrieve_open_answer_questions(token)
+        try:
 
-        if 'error' in response:
-            raise GraphQLError(response['error'])
+            adapter = AssistantAPIAdapter()
+            response = adapter.retrieve_open_answer_questions(token)
 
-        return response
+            return response
+        except ValueError as e:
+            raise GraphQLError(str(e))
 
     async def resolve_retrieve_explanation(self, info, token):
-        adapter = AssistantAPIAdapter()
-        response = adapter.retrieve_explanation_questions(token)
+        try:
 
-        if 'error' in response:
-            raise GraphQLError(response['error'])
+            adapter = AssistantAPIAdapter()
+            response = adapter.retrieve_explanation_questions(token)
 
-        return response
+            return response
+        except Exception as e:
+            raise GraphQLError(str(e))
 
     async def resolve_retrieve_answer(self, info, token):
-        adapter = AssistantAPIAdapter()
-        response = adapter.retrieve_answer(token)
 
-        if 'error' in response:
-            raise GraphQLError(response['error'])
+        try:
 
-        return response
+            adapter = AssistantAPIAdapter()
+            response = adapter.retrieve_answer(token)
+
+            return response
+        except ValueError as e:
+            raise GraphQLError(str(e))

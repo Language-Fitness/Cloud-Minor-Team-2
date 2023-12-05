@@ -1,6 +1,9 @@
 import base64
 import json
 import re
+
+from graphql import GraphQLError
+
 from App.Graphql.Types import ResponseMultipleChoiceQuestion, MultipleChoiceQuestion
 from App.Services.OpenAI.OpenAIAssistantManager import OpenAIAssistantManager
 
@@ -60,13 +63,13 @@ class AssistantAPIAdapter:
         return token
 
     def retrieve_multiple_choice_questions(self, token):
-        thread_id, assistant_id = self.decode_token(token)
-
-        messages = self.assistant_manager.retrieve_messages(thread_id)
-
-        json_data = self.get_last_message(messages)
 
         try:
+            thread_id, assistant_id = self.decode_token(token)
+            messages = self.assistant_manager.retrieve_messages(thread_id)
+
+            json_data = self.get_last_message(messages)
+
             json_data_dict = json.loads(json_data)
             return ResponseMultipleChoiceQuestion(
                 status=json_data_dict.get("status"),
@@ -81,10 +84,9 @@ class AssistantAPIAdapter:
                     for item in json_data_dict["questions"]
                 ]
             )
-        except json.JSONDecodeError as e:
-            # Handle JSON decoding error
-            print(f"Error decoding JSON: {e}")
-            return None
+        except Exception as e:
+            raise GraphQLError(str(e))
+
 
 
             # self.assistant_manager.delete_thread(thread_id)
@@ -110,7 +112,7 @@ class AssistantAPIAdapter:
         return messages
 
     def retrieve_answer(self, token):
-        try:
+
             thread_id, assistant_id = self.decode_token(token)
 
             messages = self.assistant_manager.retrieve_messages(thread_id)
@@ -118,9 +120,6 @@ class AssistantAPIAdapter:
             self.assistant_manager.delete_assistant(assistant_id)
 
             return messages
-
-        except ValueError as e:
-            return {'error': str(e)}
 
     def encode_token(self, thread_id, assistant_id):
         try:
@@ -131,11 +130,11 @@ class AssistantAPIAdapter:
 
             return encoded_ids.decode('utf-8')
         except Exception as e:
-            raise ValueError(f"Token decoding error: {e}")
+            raise Exception(f"Token decoding error: {e}")
 
     def decode_token(self, token):
         if not self.is_valid_base64(token):
-            raise ValueError("Token decoding error: Invalid Base64 encoding")
+            raise Exception("Token decoding error: Invalid Base64 encoding")
 
         try:
             ids_bytes = base64.b64decode(token)
@@ -144,7 +143,7 @@ class AssistantAPIAdapter:
 
             return ids_dict['thread_id'], ids_dict['assistant_id']
         except Exception as e:
-            raise ValueError(f"Token decoding error: {e}")
+            raise Exception(f"Token decoding error: {e}")
 
     def is_valid_base64(self, token):
         if not token or len(token) % 4 != 0:
@@ -171,6 +170,6 @@ class AssistantAPIAdapter:
                 # Now you can use `last_assistant_message_content` as the last message said by the assistant.
                 return last_assistant_message_content
             else:
-                print("No assistant message found in the list of messages.")
+                raise Exception("No assistant message found in the list of messages.")
         else:
-            print("The list of messages is empty.")
+            raise Exception("The list of messages is empty.")
