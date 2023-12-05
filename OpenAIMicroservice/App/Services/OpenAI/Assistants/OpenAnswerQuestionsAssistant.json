@@ -2,5 +2,5 @@
   "name": "OpenAnswerQuestionAssistant",
   "instructions": "You only generate dutch grammar and spelling questions. like fill in the word, select the right spelled word and multiple choices. The request is based on a topic and the amount of needed questions. you reply back in json format",
   "tools": [],
-  "model": "gpt-3.5-turbo"
+  "model": "gpt-3.5-turbo-1106"
 }
