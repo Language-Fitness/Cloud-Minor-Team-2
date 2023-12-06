@@ -2,7 +2,7 @@ import graphene
 
 class MultipleChoiceQuestion(graphene.ObjectType):
     type = graphene.String(description="Type question")
-    question_info = graphene.String(description="Question info")
+    question_subject = graphene.String(description="Question subject")
     question_text = graphene.String(description="Question text")
     options = graphene.List(graphene.String, description="Answer options")
     answer = graphene.String(description="Correct answer")
@@ -13,7 +13,7 @@ class ResponseMultipleChoiceQuestion(graphene.ObjectType):
 
 class OpenAnswerQuestion(graphene.ObjectType):
     type = graphene.String(description="Type question")
-    question_info = graphene.String(description="Question info")
+    question_subject = graphene.String(description="Question subject")
     question_text = graphene.String(description="Question text")
     answer = graphene.String(description="Correct answer")
 
@@ -32,3 +32,17 @@ class ResponseExplanation(graphene.ObjectType):
 class ResponseAnswer(graphene.ObjectType):
     status = graphene.String(description="Status of the response")
     answer = graphene.String(description="The answer provided in the response")
+
+class LevelEnum(graphene.Enum):
+    A1 = "A1"
+    A2 = "A2"
+    B1 = "B1"
+    B2 = "B2"
+    C1 = "C1"
+    C2 = "C2"
+
+class SubjectEnum(graphene.Enum):
+    grammatica = "Grammatica"
+    spelling = "Spelling"
+    woordenschat = "Woordenschat"
+    zinsontleding = "Zinsontleding"

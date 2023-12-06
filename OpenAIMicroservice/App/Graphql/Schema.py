@@ -1,5 +1,4 @@
 import graphene
-# from .Mutations import Mutation
 from .Queries import Query
 from .Mutations import Mutation
 

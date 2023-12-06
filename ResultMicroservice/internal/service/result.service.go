@@ -27,6 +27,13 @@ type IResultService interface {
 	GetResultByClassId(bearerToken string, id string) ([]*model.Result, error)
 	GetResultsByUserID(bearerToken string, userID string) ([]*model.Result, error)
 	DeleteResultByClassID(bearerToken string, classID string) error
+	// Saga methods
+	SoftDeleteByUser(bearerToken string, userID string) error
+	SoftDeleteByClass(bearerToken string, classID string) error
+	SoftDeleteByModule(bearerToken string, moduleID string) error
+	DeleteByUser(bearerToken string, userID string) error
+	DeleteByClass(bearerToken string, classID string) error
+	DeleteByModule(bearerToken string, moduleID string) error
 }
 
 // ResultService GOLANG STRUCT
@@ -257,12 +264,122 @@ func (r *ResultService) DeleteResultByClassID(bearerToken string, classID string
 		return errors.New(errorMessage)
 	}
 
-	err2 := r.Repo.DeleteResultByClassID(classID, *uuid)
+	err2 := r.Repo.DeleteResultByClassAndUserID(classID, *uuid)
 	if err2 != nil {
 		return err2
 	}
 
 	return nil
+}
+
+// Saga grpc methods
+
+func (r *ResultService) SoftDeleteByUser(bearerToken string, userID string) error {
+	err := r.ResultPolicy.SoftDeleteByUser(bearerToken, userID)
+	if err != nil {
+		return err
+	}
+
+	r.Validator.Validate(userID, []string{"IsUUID"})
+
+	validationErrors := r.Validator.GetErrors()
+	if len(validationErrors) > 0 {
+		errorMessage := valErrorBase + strings.Join(validationErrors, ", ")
+		r.Validator.ClearErrors()
+		return errors.New(errorMessage)
+	}
+
+	return r.Repo.SoftDeleteByUser(userID)
+}
+
+func (r *ResultService) SoftDeleteByClass(bearerToken string, classID string) error {
+	err := r.ResultPolicy.SoftDeleteByClass(bearerToken, classID)
+	if err != nil {
+		return err
+	}
+
+	r.Validator.Validate(classID, []string{"IsUUID"})
+
+	validationErrors := r.Validator.GetErrors()
+	if len(validationErrors) > 0 {
+		errorMessage := valErrorBase + strings.Join(validationErrors, ", ")
+		r.Validator.ClearErrors()
+		return errors.New(errorMessage)
+	}
+
+	return r.Repo.SoftDeleteByClass(classID)
+}
+
+func (r *ResultService) SoftDeleteByModule(bearerToken string, moduleID string) error {
+	err := r.ResultPolicy.SoftDeleteByModule(bearerToken, moduleID)
+	if err != nil {
+		return err
+	}
+
+	r.Validator.Validate(moduleID, []string{"IsUUID"})
+
+	validationErrors := r.Validator.GetErrors()
+	if len(validationErrors) > 0 {
+		errorMessage := valErrorBase + strings.Join(validationErrors, ", ")
+		r.Validator.ClearErrors()
+		return errors.New(errorMessage)
+	}
+
+	return r.Repo.SoftDeleteByModule(moduleID)
+}
+
+func (r *ResultService) DeleteByUser(bearerToken string, userID string) error {
+	err := r.ResultPolicy.DeleteByUser(bearerToken, userID)
+	if err != nil {
+		return err
+	}
+
+	r.Validator.Validate(userID, []string{"IsUUID"})
+
+	validationErrors := r.Validator.GetErrors()
+	if len(validationErrors) > 0 {
+		errorMessage := valErrorBase + strings.Join(validationErrors, ", ")
+		r.Validator.ClearErrors()
+		return errors.New(errorMessage)
+	}
+
+	return r.Repo.DeleteByUser(userID)
+}
+
+func (r *ResultService) DeleteByClass(bearerToken string, classID string) error {
+	err := r.ResultPolicy.DeleteByClass(bearerToken, classID)
+	if err != nil {
+		return err
+	}
+
+	r.Validator.Validate(classID, []string{"IsUUID"})
+
+	validationErrors := r.Validator.GetErrors()
+	if len(validationErrors) > 0 {
+		errorMessage := valErrorBase + strings.Join(validationErrors, ", ")
+		r.Validator.ClearErrors()
+		return errors.New(errorMessage)
+	}
+
+	return r.Repo.DeleteByClass(classID)
+}
+
+func (r *ResultService) DeleteByModule(bearerToken string, moduleID string) error {
+	err := r.ResultPolicy.DeleteByModule(bearerToken, moduleID)
+	if err != nil {
+		return err
+	}
+
+	r.Validator.Validate(moduleID, []string{"IsUUID"})
+
+	validationErrors := r.Validator.GetErrors()
+	if len(validationErrors) > 0 {
+		errorMessage := valErrorBase + strings.Join(validationErrors, ", ")
+		r.Validator.ClearErrors()
+		return errors.New(errorMessage)
+	}
+
+	return r.Repo.DeleteByModule(moduleID)
 }
 
 func (r *ResultService) ValidateResult(result *model.InputResult) {

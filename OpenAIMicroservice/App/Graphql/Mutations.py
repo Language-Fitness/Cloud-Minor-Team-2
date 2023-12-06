@@ -1,31 +1,33 @@
 import graphene
 from App.Services.OpenAI.AssistantAPIAdapter import AssistantAPIAdapter
-
+from .Types import SubjectEnum, LevelEnum
 
 class GenerateOpenAnswerQuestions(graphene.Mutation):
     class Arguments:
-        subject = graphene.String(required=True)
+        subject = SubjectEnum(required=True)
+        level = LevelEnum(required=True)
         amount_questions = graphene.Int(required=True)
 
     token = graphene.String()
 
-    def mutate(self, info, subject, amount_questions):
+    def mutate(self, info, subject, level, amount_questions):
         adapter = AssistantAPIAdapter()
-        token = adapter.generate_multiple_choice_questions(subject, amount_questions)
+        token = adapter.generate_open_answer_questions(subject, level, amount_questions)
 
         return GenerateOpenAnswerQuestions(token=token)
 
 
 class GenerateMultipleChoiceQuestions(graphene.Mutation):
     class Arguments:
-        subject = graphene.String(required=True)
+        subject = SubjectEnum(required=True)
+        level = LevelEnum(required=True)
         amount_questions = graphene.Int(required=True)
 
     token = graphene.String()
 
-    def mutate(self, info, subject, amount_questions):
+    def mutate(self, info, subject, level, amount_questions):
         adapter = AssistantAPIAdapter()
-        token = adapter.generate_multiple_choice_questions(subject, amount_questions)
+        token = adapter.generate_multiple_choice_questions(subject, level, amount_questions)
 
         return GenerateMultipleChoiceQuestions(token=token)
 
