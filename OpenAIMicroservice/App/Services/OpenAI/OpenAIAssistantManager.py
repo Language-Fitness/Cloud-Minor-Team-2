@@ -66,15 +66,22 @@ class OpenAIAssistantManager:
         )
 
     def retrieve_thread(self, thread_id, run_id):
-        return self.client.beta.threads.runs.retrieve(
-            thread_id=thread_id,
-            run_id=run_id
-        )
+        try:
+            return self.client.beta.threads.runs.retrieve(
+                thread_id=thread_id,
+                run_id=run_id
+            )
+
+        except Exception:
+            raise Exception("No valid thread id")
 
     def retrieve_messages(self, thread_id):
-        return self.client.beta.threads.messages.list(
-            thread_id=thread_id
-        )
+        try:
+            return self.client.beta.threads.messages.list(
+                thread_id=thread_id
+            )
+        except Exception:
+            raise Exception("No valid thread id")
 
     def load_assistant(self, assistant_file):
         try:
