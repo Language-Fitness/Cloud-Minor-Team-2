@@ -16,6 +16,13 @@ type IResultPolicy interface {
 	GetResultsByUser(bearerToken string, userID string) error
 	GetResultByID(bearerToken string, id string) error
 	DeleteResultByClass(bearerToken string, classID string) (*string, error)
+	// Saga GRPC functions
+	SoftDeleteByUser(bearerToken string, userID string) error
+	SoftDeleteByClass(bearerToken string, classID string) error
+	SoftDeleteByModule(bearerToken string, moduleID string) error
+	DeleteByUser(bearerToken string, userID string) error
+	DeleteByClass(bearerToken string, classID string) error
+	DeleteByModule(bearerToken string, moduleID string) error
 }
 
 type ResultPolicy struct {
@@ -152,6 +159,84 @@ func (p *ResultPolicy) DeleteResultByClass(bearerToken string, classID string) (
 	}
 
 	return &uuid, nil
+}
+
+func (p *ResultPolicy) SoftDeleteByUser(bearerToken string, userID string) error {
+	uuid, roles, err := p.getSubAndRoles(bearerToken)
+	if err != nil {
+		return err
+	}
+
+	if !p.hasRole(roles, "soft_delete_result_by_user") && uuid == userID {
+		return errors.New("invalid permissions for this action")
+	}
+
+	return nil
+}
+
+func (p *ResultPolicy) SoftDeleteByClass(bearerToken string, classID string) error {
+	_, roles, err := p.getSubAndRoles(bearerToken)
+	if err != nil {
+		return err
+	}
+
+	if !p.hasRole(roles, "soft_delete_result_by_class") {
+		return errors.New("invalid permissions for this action")
+	}
+
+	return nil
+}
+
+func (p *ResultPolicy) SoftDeleteByModule(bearerToken string, moduleID string) error {
+	_, roles, err := p.getSubAndRoles(bearerToken)
+	if err != nil {
+		return err
+	}
+
+	if !p.hasRole(roles, "soft_delete_result_by_module") {
+		return errors.New("invalid permissions for this action")
+	}
+
+	return nil
+}
+
+func (p *ResultPolicy) DeleteByUser(bearerToken string, userID string) error {
+	uuid, roles, err := p.getSubAndRoles(bearerToken)
+	if err != nil {
+		return err
+	}
+
+	if !p.hasRole(roles, "delete_result_by_user") && uuid == userID {
+		return errors.New("invalid permissions for this action")
+	}
+
+	return nil
+}
+
+func (p *ResultPolicy) DeleteByClass(bearerToken string, classID string) error {
+	_, roles, err := p.getSubAndRoles(bearerToken)
+	if err != nil {
+		return err
+	}
+
+	if !p.hasRole(roles, "delete_result_by_class") {
+		return errors.New("invalid permissions for this action")
+	}
+
+	return nil
+}
+
+func (p *ResultPolicy) DeleteByModule(bearerToken string, moduleID string) error {
+	_, roles, err := p.getSubAndRoles(bearerToken)
+	if err != nil {
+		return err
+	}
+
+	if !p.hasRole(roles, "delete_result_by_module") {
+		return errors.New("invalid permissions for this action")
+	}
+
+	return nil
 }
 
 func (p *ResultPolicy) getSubAndRoles(bearerToken string) (string, []interface{}, error) {
