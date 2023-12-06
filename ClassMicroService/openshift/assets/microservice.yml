@@ -21,13 +21,13 @@ spec:
             timeoutSeconds: 3
             initialDelaySeconds: 5
             httpGet:
-              path: "/healthz"
+              path: "/health/ready"
               port: 8082
           livenessProbe:
             timeoutSeconds: 3
             initialDelaySeconds: 30
             httpGet:
-              path: "/healthz"
+              path: "/health/live"
               port: 8082
 ---
 kind: Service

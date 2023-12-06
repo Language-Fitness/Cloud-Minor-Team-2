@@ -7,10 +7,20 @@ type Class struct {
 	ModuleID    string  `json:"module_Id"`
 	Name        string  `json:"name"`
 	Description string  `json:"description"`
-	Difficulty  float64 `json:"difficulty"`
-	CreatedAt   string  `json:"created_at"`
-	UpdatedAt   string  `json:"updated_at"`
-	SoftDeleted bool    `json:"soft_deleted"`
+	Difficulty  int     `json:"difficulty"`
+	MadeBy      string  `json:"made_by"`
+	CreatedAt   *string `json:"created_at,omitempty"`
+	UpdatedAt   *string `json:"updated_at,omitempty"`
+	SoftDeleted *bool   `json:"soft_deleted,omitempty"`
+}
+
+type ClassInfo struct {
+	ID          string `json:"id"`
+	ModuleID    string `json:"module_Id"`
+	Name        string `json:"name"`
+	Description string `json:"description"`
+	Difficulty  int    `json:"difficulty"`
+	MadeBy      string `json:"made_by"`
 }
 
 type Exercise struct {
@@ -22,9 +32,20 @@ type Exercise struct {
 	PosCorrectAnswer int     `json:"pos_correct_answer"`
 	QuestionTypeID   string  `json:"question_type_id"`
 	Difficulty       float64 `json:"difficulty"`
-	CreatedAt        string  `json:"created_at"`
-	UpdatedAt        string  `json:"updated_at"`
-	SoftDeleted      bool    `json:"soft_deleted"`
+	CreatedAt        *string `json:"created_at,omitempty"`
+	UpdatedAt        *string `json:"updated_at,omitempty"`
+	SoftDeleted      *bool   `json:"soft_deleted,omitempty"`
+}
+
+type ExerciseInfo struct {
+	ID               string  `json:"id"`
+	ClassID          string  `json:"class_Id"`
+	Name             string  `json:"name"`
+	Question         string  `json:"question"`
+	Answers          string  `json:"answers"`
+	PosCorrectAnswer int     `json:"pos_correct_answer"`
+	QuestionTypeID   string  `json:"question_type_id"`
+	Difficulty       float64 `json:"difficulty"`
 }
 
 type LeaderboardRow struct {
@@ -38,14 +59,24 @@ type Module struct {
 	ID          string  `json:"id"`
 	Name        string  `json:"name"`
 	Description string  `json:"description"`
-	Difficulty  float64 `json:"difficulty"`
+	Difficulty  int     `json:"difficulty"`
 	Category    string  `json:"category"`
 	MadeBy      string  `json:"made_by"`
 	Private     bool    `json:"private"`
 	Key         *string `json:"key,omitempty"`
-	CreatedAt   string  `json:"created_at"`
-	UpdatedAt   string  `json:"updated_at"`
-	SoftDeleted bool    `json:"soft_deleted"`
+	CreatedAt   *string `json:"created_at,omitempty"`
+	UpdatedAt   *string `json:"updated_at,omitempty"`
+	SoftDeleted *bool   `json:"soft_deleted,omitempty"`
+}
+
+type ModuleInfo struct {
+	ID          string `json:"id"`
+	Name        string `json:"name"`
+	Description string `json:"description"`
+	Difficulty  int    `json:"difficulty"`
+	Category    string `json:"category"`
+	MadeBy      string `json:"made_by"`
+	Private     bool   `json:"private"`
 }
 
 type NewResult struct {
@@ -58,23 +89,31 @@ type NewResult struct {
 }
 
 type Result struct {
-	ID          string `json:"id"`
-	ExerciseID  string `json:"exercise_id"`
-	UserID      string `json:"user_id"`
-	ClassID     string `json:"class_id"`
-	ModuleID    string `json:"module_id"`
-	Input       string `json:"input"`
-	Result      string `json:"result"`
-	CreatedAt   string `json:"created_at"`
-	UpdatedAt   string `json:"updated_at"`
-	SoftDeleted bool   `json:"soft_deleted"`
+	ID          string  `json:"id"`
+	ExerciseID  string  `json:"exercise_id"`
+	UserID      string  `json:"user_id"`
+	ClassID     string  `json:"class_id"`
+	ModuleID    string  `json:"module_id"`
+	Input       string  `json:"input"`
+	Result      string  `json:"result"`
+	CreatedAt   *string `json:"created_at,omitempty"`
+	UpdatedAt   *string `json:"updated_at,omitempty"`
+	SoftDeleted *bool   `json:"soft_deleted,omitempty"`
 }
 
 type School struct {
-	ID          string `json:"id"`
-	Name        string `json:"name"`
-	Location    string `json:"location"`
-	CreatedAt   string `json:"created_at"`
-	UpdatedAt   string `json:"updated_at"`
-	SoftDeleted bool   `json:"soft_deleted"`
+	ID          string  `json:"id"`
+	Name        string  `json:"name"`
+	Location    string  `json:"location"`
+	MadeBy      string  `json:"made_by"`
+	CreatedAt   *string `json:"created_at,omitempty"`
+	UpdatedAt   *string `json:"updated_at,omitempty"`
+	SoftDeleted *bool   `json:"soft_deleted,omitempty"`
+}
+
+type SchoolInfo struct {
+	ID       string `json:"id"`
+	Name     string `json:"name"`
+	Location string `json:"location"`
+	MadeBy   string `json:"made_by"`
 }

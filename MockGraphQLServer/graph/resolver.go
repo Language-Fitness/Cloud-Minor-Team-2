@@ -17,13 +17,16 @@ type Resolver struct {
 
 func (r *Resolver) init() {
 	/// MODULES ///
+	timestamp := "2023-01-01T00:00:00Z"
+	softDeleted := false
 	r.schools = append(r.schools, &model.School{
 		ID:          "67bd70b8-8ac8-11ee-b9d1-0242ac120002",
 		Name:        "Inholland",
 		Location:    "Haarlem",
-		CreatedAt:   "2023-01-01T00:00:00Z",
-		UpdatedAt:   "2023-01-01T00:00:00Z",
-		SoftDeleted: false,
+		MadeBy:      "bbf78bc0-942b-11ee-b9d1-0242ac120002",
+		CreatedAt:   &timestamp,
+		UpdatedAt:   &timestamp,
+		SoftDeleted: &softDeleted,
 	})
 
 	/// MODULES ///
@@ -31,13 +34,13 @@ func (r *Resolver) init() {
 		ID:          "e41189cc-83cc-11ee-b962-0242ac120002",
 		Name:        "Grammatica door Toon",
 		Description: "Leer de basis van grammatica",
-		Difficulty:  1.5,
+		Difficulty:  1,
 		Category:    "Grammatica",
 		MadeBy:      "3a6085b2-83cd-11ee-b962-0242ac120002",
 		Private:     false,
-		CreatedAt:   "2023-01-01T00:00:00Z",
-		UpdatedAt:   "2023-01-01T00:00:00Z",
-		SoftDeleted: false,
+		CreatedAt:   &timestamp,
+		UpdatedAt:   &timestamp,
+		SoftDeleted: &softDeleted,
 	})
 
 	key := "key"
@@ -45,14 +48,14 @@ func (r *Resolver) init() {
 		ID:          "25524ed4-83ce-11ee-b962-0242ac120002",
 		Name:        "Werkwoordspelling door Toon",
 		Description: "Leer de basis van grammatica",
-		Difficulty:  1.5,
+		Difficulty:  1,
 		Category:    "Werkwoordspelling",
 		MadeBy:      "3a6085b2-83cd-11ee-b962-0242ac120002",
 		Private:     false,
 		Key:         &key,
-		CreatedAt:   "2023-01-01T00:00:00Z",
-		UpdatedAt:   "2023-01-01T00:00:00Z",
-		SoftDeleted: false,
+		CreatedAt:   &timestamp,
+		UpdatedAt:   &timestamp,
+		SoftDeleted: &softDeleted,
 	})
 
 	/// CLASSES ///
@@ -61,10 +64,11 @@ func (r *Resolver) init() {
 		ModuleID:    "e41189cc-83cc-11ee-b962-0242ac120002",
 		Name:        "Class A",
 		Description: "Dit is Class A",
-		Difficulty:  3.5,
-		CreatedAt:   "2023-01-01T00:00:00Z",
-		UpdatedAt:   "2023-01-01T00:00:00Z",
-		SoftDeleted: false,
+		Difficulty:  3,
+		MadeBy:      "bbf78bc0-942b-11ee-b9d1-0242ac120002",
+		CreatedAt:   &timestamp,
+		UpdatedAt:   &timestamp,
+		SoftDeleted: &softDeleted,
 	})
 
 	r.classes = append(r.classes, &model.Class{
@@ -72,10 +76,11 @@ func (r *Resolver) init() {
 		ModuleID:    "25524ed4-83ce-11ee-b962-0242ac120002",
 		Name:        "Class A",
 		Description: "Dit is Class A",
-		Difficulty:  3.5,
-		CreatedAt:   "2023-01-01T00:00:00Z",
-		UpdatedAt:   "2023-01-01T00:00:00Z",
-		SoftDeleted: false,
+		Difficulty:  3,
+		MadeBy:      "bbf78bc0-942b-11ee-b9d1-0242ac120002",
+		CreatedAt:   &timestamp,
+		UpdatedAt:   &timestamp,
+		SoftDeleted: &softDeleted,
 	})
 
 	/// EXERCISES ///
@@ -88,9 +93,9 @@ func (r *Resolver) init() {
 		PosCorrectAnswer: 0,
 		QuestionTypeID:   "multiple_choice",
 		Difficulty:       2.5,
-		CreatedAt:        "2023-01-01T00:00:00Z",
-		UpdatedAt:        "2023-01-01T00:00:00Z",
-		SoftDeleted:      false,
+		CreatedAt:        &timestamp,
+		UpdatedAt:        &timestamp,
+		SoftDeleted:      &softDeleted,
 	})
 
 	r.exercises = append(r.exercises, &model.Exercise{
@@ -102,9 +107,9 @@ func (r *Resolver) init() {
 		PosCorrectAnswer: 0,
 		QuestionTypeID:   "multiple_choice",
 		Difficulty:       2.5,
-		CreatedAt:        "2023-01-01T00:00:00Z",
-		UpdatedAt:        "2023-01-01T00:00:00Z",
-		SoftDeleted:      false,
+		CreatedAt:        &timestamp,
+		UpdatedAt:        &timestamp,
+		SoftDeleted:      &softDeleted,
 	})
 
 	/// RESULTS ///
@@ -116,9 +121,9 @@ func (r *Resolver) init() {
 		ModuleID:    "e41189cc-83cc-11ee-b962-0242ac120002",
 		Input:       "Example input",
 		Result:      "Example result",
-		CreatedAt:   "2023-01-01T00:00:00Z",
-		UpdatedAt:   "2023-01-01T00:00:00Z",
-		SoftDeleted: false,
+		CreatedAt:   &timestamp,
+		UpdatedAt:   &timestamp,
+		SoftDeleted: &softDeleted,
 	})
 
 	/// LEADERBOARDS ///

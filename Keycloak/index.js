@@ -18,7 +18,7 @@ const keycloakServer        = 'https://example-kc-bramterlouw-dev.apps.ocp2-inho
 const masterRealm           = 'master';
 const projectRealm          = 'cloud-project';
 const adminClientId         = 'admin-cli';
-const adminClientSecret     = 'khvMZZL8TH781UUWvNM5FDslu4xEhgpi';
+const adminClientSecret     = '9ZgvDdABsfsycWPAysWGOwUg8FTBJ97X';
 const adminTokenEndpoint    = `${keycloakServer}/realms/${masterRealm}/protocol/openid-connect/token`;
 const clientTokenEndpoint   = `${keycloakServer}/realms/${projectRealm}/protocol/openid-connect/token`;
 

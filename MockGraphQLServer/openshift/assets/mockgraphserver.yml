@@ -1,60 +1,60 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: module-microservice
+  name: mock-graph-server
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: module-microservice
+      app: mock-graph-server
   template:
     metadata:
       labels:
-        app: module-microservice
+        app: mock-graph-server
     spec:
       containers:
-        - name: module-microservice
-          image: microservice_image
+        - name: mock-graph-server
+          image: mock-graph-server_image
           ports:
-            - containerPort: 8081
+            - containerPort: 8095
           readinessProbe:
             timeoutSeconds: 3
             initialDelaySeconds: 5
             httpGet:
               path: "/health/ready"
-              port: 8081
+              port: 8095
           livenessProbe:
             timeoutSeconds: 3
             initialDelaySeconds: 30
             httpGet:
               path: "/health/live"
-              port: 8081
+              port: 8095
 ---
 kind: Service
 apiVersion: v1
 metadata:
-  name: module-microservice-service
+  name: mock-graph-server-service
   annotations:
     description: Exposes and load balances the application pods
   labels:
-    app: module-microservice
+    app: mock-graph-server
 spec:
   ports:
     - name: http
-      port: 8081
-      targetPort: 8081
+      port: 8095
+      targetPort: 8095
   selector:
-    app: module-microservice
+    app: mock-graph-server
 ---
 kind: Route
 apiVersion: route.openshift.io/v1
 metadata:
-  name: module-microservice-route
+  name: mock-graph-server-route
   labels:
-    app: module-microservice
+    app: mock-graph-server
 spec:
   port:
-    targetPort: 8081
+    targetPort: 8095
   to:
     kind: Service
-    name: module-microservice-service
+    name: mock-graph-server-service

@@ -15,6 +15,8 @@ import (
 
 // CreateResult is the resolver for the createResult field.
 func (r *mutationResolver) CreateResult(ctx context.Context, input *model.NewResult) (*model.Result, error) {
+	timestamp := time.Now().String()
+	softDeleted := false
 	newResult := &model.Result{
 		ID:          uuid.New().String(),
 		ExerciseID:  input.ExerciseID,
@@ -23,8 +25,8 @@ func (r *mutationResolver) CreateResult(ctx context.Context, input *model.NewRes
 		ModuleID:    input.ModuleID,
 		Input:       input.Input,
 		Result:      input.Result,
-		CreatedAt:   time.Now().String(),
-		SoftDeleted: false,
+		CreatedAt:   &timestamp,
+		SoftDeleted: &softDeleted,
 	}
 
 	r.results = append(r.results, newResult)
@@ -47,12 +49,26 @@ func (r *queryResolver) GetModule(ctx context.Context, id string) (*model.Module
 }
 
 // ListModules is the resolver for the listModules field.
-func (r *queryResolver) ListModules(ctx context.Context) ([]*model.Module, error) {
+func (r *queryResolver) ListModules(ctx context.Context) ([]*model.ModuleInfo, error) {
 	if len(r.modules) == 0 {
 		r.init()
 	}
 
-	return r.modules, nil
+	var slice []*model.ModuleInfo
+	for _, module := range r.modules {
+		moduleInfo := &model.ModuleInfo{
+			ID:          module.ID,
+			Name:        module.Name,
+			Description: module.Description,
+			Difficulty:  module.Difficulty,
+			Category:    module.Category,
+			MadeBy:      module.MadeBy,
+			Private:     module.Private,
+		}
+		slice = append(slice, moduleInfo)
+	}
+
+	return slice, nil
 }
 
 // GetClass is the resolver for the getClass field.
@@ -70,12 +86,25 @@ func (r *queryResolver) GetClass(ctx context.Context, id string) (*model.Class, 
 }
 
 // ListClasses is the resolver for the listClasses field.
-func (r *queryResolver) ListClasses(ctx context.Context) ([]*model.Class, error) {
+func (r *queryResolver) ListClasses(ctx context.Context) ([]*model.ClassInfo, error) {
 	if len(r.classes) == 0 {
 		r.init()
 	}
 
-	return r.classes, nil
+	var slice []*model.ClassInfo
+	for _, class := range r.classes {
+		classInfo := &model.ClassInfo{
+			ID:          class.ID,
+			ModuleID:    class.ModuleID,
+			Name:        class.Name,
+			Description: class.Description,
+			Difficulty:  class.Difficulty,
+			MadeBy:      class.MadeBy,
+		}
+		slice = append(slice, classInfo)
+	}
+
+	return slice, nil
 }
 
 // GetExercise is the resolver for the getExercise field.
@@ -92,12 +121,27 @@ func (r *queryResolver) GetExercise(ctx context.Context, id string) (*model.Exer
 }
 
 // ListExercises is the resolver for the listExercises field.
-func (r *queryResolver) ListExercises(ctx context.Context) ([]*model.Exercise, error) {
+func (r *queryResolver) ListExercises(ctx context.Context) ([]*model.ExerciseInfo, error) {
 	if len(r.exercises) == 0 {
 		r.init()
 	}
 
-	return r.exercises, nil
+	var slice []*model.ExerciseInfo
+	for _, exercise := range r.exercises {
+		exerciseInfo := &model.ExerciseInfo{
+			ID:               exercise.ID,
+			ClassID:          exercise.ClassID,
+			Name:             exercise.Name,
+			Question:         exercise.Question,
+			Answers:          exercise.Answers,
+			PosCorrectAnswer: exercise.PosCorrectAnswer,
+			QuestionTypeID:   exercise.QuestionTypeID,
+			Difficulty:       exercise.Difficulty,
+		}
+		slice = append(slice, exerciseInfo)
+	}
+
+	return slice, nil
 }
 
 // GetResultsByClass is the resolver for the getResultsByClass field.
@@ -106,7 +150,7 @@ func (r *queryResolver) GetResultsByClass(ctx context.Context, classID string) (
 		r.init()
 	}
 	for _, obj := range r.results {
-		if obj.ModuleID == classID {
+		if obj.ClassID == classID {
 			return r.results, nil
 		}
 	}
@@ -136,12 +180,23 @@ func (r *queryResolver) GetSchool(ctx context.Context, id string) (*model.School
 }
 
 // ListSchools is the resolver for the listSchools field.
-func (r *queryResolver) ListSchools(ctx context.Context) ([]*model.School, error) {
+func (r *queryResolver) ListSchools(ctx context.Context) ([]*model.SchoolInfo, error) {
 	if len(r.schools) == 0 {
 		r.init()
 	}
 
-	return r.schools, nil
+	var slice []*model.SchoolInfo
+	for _, school := range r.schools {
+		schoolInfo := &model.SchoolInfo{
+			ID:       school.ID,
+			Name:     school.Name,
+			Location: school.Location,
+			MadeBy:   school.MadeBy,
+		}
+		slice = append(slice, schoolInfo)
+	}
+
+	return slice, nil
 }
 
 // Mutation returns MutationResolver implementation.

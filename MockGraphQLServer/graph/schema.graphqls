@@ -9,23 +9,41 @@ type School {
   id: ID!
   name: String!
   location: String!
-  created_at: String!
-  updated_at: String!
-  soft_deleted: Boolean!
+  made_by: ID!
+  created_at: String
+  updated_at: String
+  soft_deleted: Boolean
+}
+
+type SchoolInfo {
+  id: ID!
+  name: String!
+  location: String!
+  made_by: ID!
 }
 
 type Module {
   id: ID!
   name: String!
   description: String!
-  difficulty: Float!
+  difficulty: Int!
   category: String!
   made_by: ID!
   private: Boolean!
   key: String
-  created_at: String!
-  updated_at: String!
-  soft_deleted: Boolean!
+  created_at: String
+  updated_at: String
+  soft_deleted: Boolean
+}
+
+type ModuleInfo {
+  id: ID!
+  name: String!
+  description: String!
+  difficulty: Int!
+  category: String!
+  made_by: String!
+  private: Boolean!
 }
 
 type Class {
@@ -33,10 +51,20 @@ type Class {
   module_Id: ID!
   name: String!
   description: String!
-  difficulty: Float!
-  created_at: String!
-  updated_at: String!
-  soft_deleted: Boolean!
+  difficulty: Int!
+  made_by: ID!
+  created_at: String
+  updated_at: String
+  soft_deleted: Boolean
+}
+
+type ClassInfo {
+  id: ID!
+  module_Id: ID!
+  name: String!
+  description: String!
+  difficulty: Int!
+  made_by: String!
 }
 
 type Exercise {
@@ -48,9 +76,20 @@ type Exercise {
   pos_correct_answer: Int!
   question_type_id: ID!
   difficulty: Float!
-  created_at: String!
-  updated_at: String!
-  soft_deleted: Boolean!
+  created_at: String
+  updated_at: String
+  soft_deleted: Boolean
+}
+
+type ExerciseInfo {
+  id: ID!
+  class_Id: ID!
+  name: String!
+  question: String!
+  answers: String!
+  pos_correct_answer: Int!
+  question_type_id: ID!
+  difficulty: Float!
 }
 
 type Result {
@@ -61,9 +100,9 @@ type Result {
   module_id: ID!
   input: String!
   result: String!
-  created_at: String!
-  updated_at: String!
-  soft_deleted: Boolean!
+  created_at: String
+  updated_at: String
+  soft_deleted: Boolean
 }
 
 type LeaderboardRow {
@@ -75,15 +114,15 @@ type LeaderboardRow {
 
 type Query {
   getModule(id: ID!): Module
-  listModules: [Module]
+  listModules: [ModuleInfo]
   getClass(id: ID!): Class
-  listClasses: [Class]
+  listClasses: [ClassInfo]
   getExercise(id: ID!): Exercise
-  listExercises: [Exercise]
+  listExercises: [ExerciseInfo]
   getResultsByClass(classId: ID!): [Result]
   getLeaderBord: [LeaderboardRow]
   getSchool(id: ID!): School
-  listSchools: [School]
+  listSchools: [SchoolInfo]
 }
 
 input NewResult {

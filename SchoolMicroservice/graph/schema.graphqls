@@ -33,7 +33,6 @@ type Mutation {
 input SchoolInput {
   name: String!
   location: String!
-  made_by: ID!
 }
 
 input Filter {

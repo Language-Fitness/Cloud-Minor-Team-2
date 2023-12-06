@@ -3214,7 +3214,7 @@ func (ec *executionContext) unmarshalInputSchoolInput(ctx context.Context, obj i
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"name", "location", "made_by"}
+	fieldsInOrder := [...]string{"name", "location"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -3239,15 +3239,6 @@ func (ec *executionContext) unmarshalInputSchoolInput(ctx context.Context, obj i
 				return it, err
 			}
 			it.Location = data
-		case "made_by":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("made_by"))
-			data, err := ec.unmarshalNID2string(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.MadeBy = data
 		}
 	}
 

@@ -26,5 +26,4 @@ type SchoolInfo struct {
 type SchoolInput struct {
 	Name     string `json:"name"`
 	Location string `json:"location"`
-	MadeBy   string `json:"made_by"`
 }
