@@ -78,8 +78,8 @@ type ComplexityRoot struct {
 type MutationResolver interface {
 	CreateResult(ctx context.Context, input model.InputResult) (*model.Result, error)
 	UpdateResult(ctx context.Context, id string, input model.InputResult) (*model.Result, error)
-	DeleteResult(ctx context.Context, id string) (*model.Result, error)
-	DeleteResultsByClass(ctx context.Context, classID string) ([]*model.Result, error)
+	DeleteResult(ctx context.Context, id string) (*string, error)
+	DeleteResultsByClass(ctx context.Context, classID string) (*string, error)
 }
 type QueryResolver interface {
 	GetResultByExercise(ctx context.Context, exerciseID string) (*model.Result, error)
@@ -751,9 +751,9 @@ func (ec *executionContext) _Mutation_DeleteResult(ctx context.Context, field gr
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(*model.Result)
+	res := resTmp.(*string)
 	fc.Result = res
-	return ec.marshalOResult2ᚖResultMicroserviceᚋgraphᚋmodelᚐResult(ctx, field.Selections, res)
+	return ec.marshalOID2ᚖstring(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Mutation_DeleteResult(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -763,29 +763,7 @@ func (ec *executionContext) fieldContext_Mutation_DeleteResult(ctx context.Conte
 		IsMethod:   true,
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "id":
-				return ec.fieldContext_Result_id(ctx, field)
-			case "exercise_id":
-				return ec.fieldContext_Result_exercise_id(ctx, field)
-			case "user_id":
-				return ec.fieldContext_Result_user_id(ctx, field)
-			case "class_id":
-				return ec.fieldContext_Result_class_id(ctx, field)
-			case "module_id":
-				return ec.fieldContext_Result_module_id(ctx, field)
-			case "input":
-				return ec.fieldContext_Result_input(ctx, field)
-			case "result":
-				return ec.fieldContext_Result_result(ctx, field)
-			case "created_at":
-				return ec.fieldContext_Result_created_at(ctx, field)
-			case "updated_at":
-				return ec.fieldContext_Result_updated_at(ctx, field)
-			case "soft_deleted":
-				return ec.fieldContext_Result_soft_deleted(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type Result", field.Name)
+			return nil, errors.New("field of type ID does not have child fields")
 		},
 	}
 	defer func() {
@@ -825,9 +803,9 @@ func (ec *executionContext) _Mutation_DeleteResultsByClass(ctx context.Context, 
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.([]*model.Result)
+	res := resTmp.(*string)
 	fc.Result = res
-	return ec.marshalOResult2ᚕᚖResultMicroserviceᚋgraphᚋmodelᚐResult(ctx, field.Selections, res)
+	return ec.marshalOID2ᚖstring(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Mutation_DeleteResultsByClass(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -837,29 +815,7 @@ func (ec *executionContext) fieldContext_Mutation_DeleteResultsByClass(ctx conte
 		IsMethod:   true,
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "id":
-				return ec.fieldContext_Result_id(ctx, field)
-			case "exercise_id":
-				return ec.fieldContext_Result_exercise_id(ctx, field)
-			case "user_id":
-				return ec.fieldContext_Result_user_id(ctx, field)
-			case "class_id":
-				return ec.fieldContext_Result_class_id(ctx, field)
-			case "module_id":
-				return ec.fieldContext_Result_module_id(ctx, field)
-			case "input":
-				return ec.fieldContext_Result_input(ctx, field)
-			case "result":
-				return ec.fieldContext_Result_result(ctx, field)
-			case "created_at":
-				return ec.fieldContext_Result_created_at(ctx, field)
-			case "updated_at":
-				return ec.fieldContext_Result_updated_at(ctx, field)
-			case "soft_deleted":
-				return ec.fieldContext_Result_soft_deleted(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type Result", field.Name)
+			return nil, errors.New("field of type ID does not have child fields")
 		},
 	}
 	defer func() {
@@ -4516,6 +4472,22 @@ func (ec *executionContext) marshalOBoolean2ᚖbool(ctx context.Context, sel ast
 		return graphql.Null
 	}
 	res := graphql.MarshalBoolean(*v)
+	return res
+}
+
+func (ec *executionContext) unmarshalOID2ᚖstring(ctx context.Context, v interface{}) (*string, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := graphql.UnmarshalID(v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOID2ᚖstring(ctx context.Context, sel ast.SelectionSet, v *string) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	res := graphql.MarshalID(*v)
 	return res
 }
 

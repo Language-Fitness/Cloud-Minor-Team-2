@@ -36,39 +36,27 @@ func (r *mutationResolver) UpdateResult(ctx context.Context, id string, input mo
 
 // DeleteResult is the resolver for the DeleteResult field.
 // Deleting one of your own results is allowed, and does not need SAGA.
-func (r *mutationResolver) DeleteResult(ctx context.Context, id string) (*model.Result, error) {
+func (r *mutationResolver) DeleteResult(ctx context.Context, id string) (*string, error) {
 	token := auth.TokenFromContext(ctx)
-
-	//TODO we chose to only send back the id, so remove this.
-	result, err := r.Service.GetResultById(token, id)
-	if err != nil {
-		return nil, err
-	}
 
 	err2 := r.Service.DeleteResult(token, id)
 	if err2 != nil {
 		return nil, err2
 	}
 
-	return result, nil
+	return &id, nil
 }
 
 // DeleteResultsByClass is the resolver for the DeleteResultsByClass field.
-func (r *mutationResolver) DeleteResultsByClass(ctx context.Context, classID string) ([]*model.Result, error) {
+func (r *mutationResolver) DeleteResultsByClass(ctx context.Context, classID string) (*string, error) {
 	token := auth.TokenFromContext(ctx)
-
-	//TODO we chose to only send back the id, so remove this.
-	results, err := r.Service.GetResultByClassId(token, classID)
-	if err != nil {
-		return nil, err
-	}
 
 	err2 := r.Service.DeleteResultByClassID(token, classID)
 	if err2 != nil {
 		return nil, err2
 	}
 
-	return results, nil
+	return &classID, nil
 }
 
 // GetResultByExercise is the resolver for the GetResultByExercise field.
