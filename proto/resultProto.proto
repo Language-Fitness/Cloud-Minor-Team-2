@@ -1,26 +1,19 @@
 syntax = "proto3";
 option go_package = "/result_pb";
 
-message Result {
+message Response {
   string ID = 1;
-  string ExerciseID = 2;
-  string UserID = 3;
-  string ClassID = 4;
-  string ModuleID = 5;
-  string Input = 6;
-  string Result = 7;
-  string CreatedAt = 8;
-  string UpdatedAt = 9;
-  bool SoftDeleted = 10;
+  bool Deleted = 2;
+  string Error = 3;
 }
 
 service GrpcResult  {
-  rpc DeleteByModule(DeleteByModuleRequest) returns (Result);
-  rpc SoftDeleteByModule(DeleteByModuleRequest) returns (Result);
-  rpc DeleteByClass(DeleteByClassRequest) returns (Result);
-  rpc SoftDeleteByClass(DeleteByClassRequest) returns (Result);
-  rpc DeleteByUser(DeleteByUserRequest) returns (Result);
-  rpc SoftDeleteByUser(DeleteByUserRequest) returns (Result);
+  rpc DeleteByModule(DeleteByModuleRequest) returns (Response);
+  rpc SoftDeleteByModule(DeleteByModuleRequest) returns (Response);
+  rpc DeleteByClass(DeleteByClassRequest) returns (Response);
+  rpc SoftDeleteByClass(DeleteByClassRequest) returns (Response);
+  rpc DeleteByUser(DeleteByUserRequest) returns (Response);
+  rpc SoftDeleteByUser(DeleteByUserRequest) returns (Response);
 }
 
 message DeleteByUserRequest {
