@@ -4,7 +4,6 @@ option go_package = "/result_pb";
 message Response {
   string ID = 1;
   bool Deleted = 2;
-  string Error = 3;
 }
 
 service GrpcResult  {
