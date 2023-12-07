@@ -1,0 +1,164 @@
+# Queries
+
+# Get Module by ID
+query {
+    getModule(id: "e41189cc-83cc-11ee-b962-0242ac120002") {
+        id
+        name
+        description
+        difficulty
+        category
+        made_by
+        private
+        key
+        created_at
+        updated_at
+        soft_deleted
+    }
+}
+
+# List Modules
+query {
+    listModules {
+        id
+        name
+        description
+        difficulty
+        category
+        made_by
+        private
+    }
+}
+
+# Get Class by ID
+query {
+    getClass(id: "f2f371e4-83cc-11ee-b962-0242ac120002") {
+        id
+        module_Id
+        name
+        description
+        difficulty
+        made_by
+        created_at
+        updated_at
+        soft_deleted
+    }
+}
+
+# List Classes
+query {
+    listClasses {
+        id
+        module_Id
+        name
+        description
+        difficulty
+        made_by
+    }
+}
+
+# Get Exercise by ID
+query {
+    getExercise(id: "af2cef6a-83ce-11ee-b962-0242ac120002") {
+        id
+        class_Id
+        name
+        question
+        answers
+        pos_correct_answer
+        question_type_id
+        difficulty
+        created_at
+        updated_at
+        soft_deleted
+    }
+}
+
+# List Exercises
+query {
+    listExercises {
+        id
+        class_Id
+        name
+        question
+        answers
+        pos_correct_answer
+        question_type_id
+        difficulty
+    }
+}
+
+# Get Results by Class
+query {
+    getResultsByClass(classId: "f2f371e4-83cc-11ee-b962-0242ac120002") {
+        id
+        exercise_id
+        user_id
+        class_id
+        module_id
+        input
+        result
+        created_at
+        updated_at
+        soft_deleted
+    }
+}
+
+# Get Leaderboard
+query {
+    getLeaderBord {
+        id
+        name
+        rating
+        position
+    }
+}
+
+# Get School by ID
+query {
+    getSchool(id: "67bd70b8-8ac8-11ee-b9d1-0242ac120002") {
+        id
+        name
+        location
+        made_by
+        created_at
+        updated_at
+        soft_deleted
+    }
+}
+
+# List Schools
+query {
+    listSchools {
+        id
+        name
+        location
+        made_by
+    }
+}
+
+
+# Mutations
+
+# Create Result
+mutation {
+    createResult(input: {
+        exercise_id: "af2cef6a-83ce-11ee-b962-0242ac120002"
+        user_id: "3a6085b2-83cd-11ee-b962-0242ac120002"
+        class_id: "f2f371e4-83cc-11ee-b962-0242ac120002"
+        module_id: "e41189cc-83cc-11ee-b962-0242ac120002"
+        input: "User input data"
+        result: "Correct"
+    }) {
+        id
+        exercise_id
+        user_id
+        class_id
+        module_id
+        input
+        result
+        created_at
+        updated_at
+        soft_deleted
+    }
+}

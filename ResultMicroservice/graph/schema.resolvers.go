@@ -39,7 +39,7 @@ func (r *mutationResolver) UpdateResult(ctx context.Context, id string, input mo
 func (r *mutationResolver) DeleteResult(ctx context.Context, id string) (*model.Result, error) {
 	token := auth.TokenFromContext(ctx)
 
-	//TODO fix this, it should be done in the service
+	//TODO we chose to only send back the id, so remove this.
 	result, err := r.Service.GetResultById(token, id)
 	if err != nil {
 		return nil, err
@@ -57,7 +57,7 @@ func (r *mutationResolver) DeleteResult(ctx context.Context, id string) (*model.
 func (r *mutationResolver) DeleteResultsByClass(ctx context.Context, classID string) ([]*model.Result, error) {
 	token := auth.TokenFromContext(ctx)
 
-	//TODO fix this, it should be done in the service
+	//TODO we chose to only send back the id, so remove this.
 	results, err := r.Service.GetResultByClassId(token, classID)
 	if err != nil {
 		return nil, err

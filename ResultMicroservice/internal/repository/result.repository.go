@@ -12,6 +12,7 @@ import (
 // IResultRepository GOLANG INTERFACE
 // Implements five CRUD methods for queries and mutations on Result.
 type IResultRepository interface {
+	//Todo only return items that are not soft deleted
 	CreateResult(newResult *model.Result) (*model.Result, error)
 	UpdateResult(id string, updatedResult model.Result) (*model.Result, error)
 	DeleteResultByID(id string) error
@@ -21,6 +22,7 @@ type IResultRepository interface {
 	GetResultsByUserID(userID string) ([]*model.Result, error)
 	DeleteResultByClassAndUserID(classID string, userID string) error
 	//Saga GRPC
+	//Todo has to be soft deleted, before it can be hard deleted
 	SoftDeleteByUser(userID string) error
 	SoftDeleteByClass(classID string) error
 	SoftDeleteByModule(moduleID string) error
