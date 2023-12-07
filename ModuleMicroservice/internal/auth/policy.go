@@ -12,7 +12,7 @@ type IPolicy interface {
 	UpdateModule(bearerToken string, id string) (*model.Module, error)
 	DeleteModule(bearerToken string, id string) (bool, *model.Module, error)
 	GetModule(bearerToken string, id string) (*model.Module, error)
-	ListModules(bearerToken string) error
+	ListModules(bearerToken string) (bool, error)
 }
 
 type Policy struct {
@@ -106,17 +106,21 @@ func (p *Policy) GetModule(bearerToken string, id string) (*model.Module, error)
 }
 
 // ListModules is the resolver for the listModules field.
-func (p *Policy) ListModules(bearerToken string) error {
+func (p *Policy) ListModules(bearerToken string) (bool, error) {
 	_, roles, err2 := p.getSubAndRoles(bearerToken)
 	if err2 != nil {
-		return err2
+		return false, err2
+	}
+
+	if p.hasRole(roles, "get_modules_all") {
+		return true, nil
 	}
 
 	if !p.hasRole(roles, "get_modules") {
-		return errors.New("invalid permissions for this action")
+		return false, errors.New("invalid permissions for this action")
 	}
 
-	return nil
+	return false, nil
 }
 
 func (p *Policy) getSubAndRoles(bearerToken string) (string, []interface{}, error) {

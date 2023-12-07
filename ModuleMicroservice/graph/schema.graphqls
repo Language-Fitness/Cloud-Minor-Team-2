@@ -28,7 +28,7 @@ type ModuleInfo {
 
 type Query {
   getModule(id: ID!): Module
-  listModules: [ModuleInfo]
+  listModules(filter: Filter, paginate: Paginator): [ModuleInfo]
 }
 
 type Mutation {
@@ -48,5 +48,15 @@ input ModuleInput {
 
 input Filter {
   softDelete: Boolean
+  name: String
+  difficulty: Int
+  category: String
+  private: Boolean
+}
+
+input Paginator {
+  min: Int!
+  max: Int!
+  Step: Int!
 }
 

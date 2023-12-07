@@ -59,10 +59,10 @@ func (r *queryResolver) GetModule(ctx context.Context, id string) (*model.Module
 }
 
 // ListModules is the resolver for the listModules field.
-func (r *queryResolver) ListModules(ctx context.Context) ([]*model.ModuleInfo, error) {
+func (r *queryResolver) ListModules(ctx context.Context, filter *model.Filter, paginate *model.Paginator) ([]*model.ModuleInfo, error) {
 	token := auth.TokenFromContext(ctx)
 
-	modules, err := r.Service.ListModules(token)
+	modules, err := r.Service.ListModules(token, filter, paginate)
 	if err != nil {
 		return nil, err
 	}

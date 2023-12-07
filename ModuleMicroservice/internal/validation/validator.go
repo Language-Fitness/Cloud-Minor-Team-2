@@ -2,13 +2,14 @@ package validation
 
 import (
 	"fmt"
+	"reflect"
 	"strings"
 )
 
 // IValidator GOLANG INTERFACE
 // Implements a method for validating input with Validate and to get all the errors with GetErrors.
 type IValidator interface {
-	Validate(input interface{}, arr []string)
+	Validate(input interface{}, arr []string, name string)
 	GetErrors() []string
 	ClearErrors()
 }
@@ -27,26 +28,28 @@ func NewValidator() IValidator {
 	return &Validator{}
 }
 
-func (v *Validator) Validate(input interface{}, arr []string) {
+func (v *Validator) Validate(input interface{}, arr []string, name string) {
 	rules := NewRules()
 
 	functionMap := map[string]any{
-		"IsInt":      func(input interface{}, params string) { rules.IsInt(input) },
-		"IsString":   func(input interface{}, params string) { rules.IsString(input) },
-		"IsUUID":     func(input interface{}, params string) { rules.IsUUID(input) },
-		"IsBoolean":  func(input interface{}, params string) { rules.IsBoolean(input) },
-		"IsDatetime": func(input interface{}, params string) { rules.IsDatetime(input) },
-		"IsArray":    func(input interface{}, params string) { rules.IsArray(input) },
-		"ArrayType": func(input interface{}, params string) {
+		"IsInt":      func(input interface{}, params string, name string) { rules.IsInt(input, name) },
+		"IsString":   func(input interface{}, params string, name string) { rules.IsString(input, name) },
+		"IsUUID":     func(input interface{}, params string, name string) { rules.IsUUID(input, name) },
+		"IsBoolean":  func(input interface{}, params string, name string) { rules.IsBoolean(input, name) },
+		"IsDatetime": func(input interface{}, params string, name string) { rules.IsDatetime(input, name) },
+		"IsArray":    func(input interface{}, params string, name string) { rules.IsArray(input, name) },
+		"ArrayType": func(input interface{}, params string, name string) {
 			s := strings.Split(params, ":")
-			rules.ArrayType(input, s[1])
+			rules.ArrayType(input, s[1], name)
 		},
-		"Length": func(input interface{}, params string) {
+		"Length": func(input interface{}, params string, name string) {
 			s := strings.Split(params, ":")
 			fmt.Println(s[1])
-			rules.Length(input, s[1])
+			rules.Length(input, s[1], name)
 		},
 	}
+
+	fmt.Println(arr)
 
 	for _, value := range arr {
 
@@ -58,13 +61,21 @@ func (v *Validator) Validate(input interface{}, arr []string) {
 		}
 
 		if fn, exists := functionMap[functionName]; exists {
-			if fn, ok := fn.(func(interface{}, string)); ok {
-				fn(input, value)
+			if fn, ok := fn.(func(interface{}, string, string)); ok {
+				fn(dereferenceIfNeeded(input), value, name)
 			}
 		}
 	}
 
 	v.errors = append(v.errors, rules.GetErrors()...)
+}
+
+func dereferenceIfNeeded(value interface{}) interface{} {
+	if reflect.TypeOf(value).Kind() == reflect.Ptr {
+		return reflect.ValueOf(value).Elem().Interface()
+	}
+
+	return value
 }
 
 func (v *Validator) GetErrors() []string {

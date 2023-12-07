@@ -3,7 +3,11 @@
 package model
 
 type Filter struct {
-	SoftDelete *bool `json:"softDelete,omitempty"`
+	SoftDelete *bool   `json:"softDelete,omitempty"`
+	Name       *string `json:"name,omitempty"`
+	Difficulty *int    `json:"difficulty,omitempty"`
+	Category   *string `json:"category,omitempty"`
+	Private    *bool   `json:"private,omitempty"`
 }
 
 type Module struct {
@@ -37,4 +41,10 @@ type ModuleInput struct {
 	Category    string  `json:"category"`
 	Private     bool    `json:"private"`
 	Key         *string `json:"key,omitempty"`
+}
+
+type Paginator struct {
+	Min  int `json:"min"`
+	Max  int `json:"max"`
+	Step int `json:"Step"`
 }

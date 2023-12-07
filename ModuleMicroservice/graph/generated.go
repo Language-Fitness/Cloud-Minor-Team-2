@@ -79,7 +79,7 @@ type ComplexityRoot struct {
 
 	Query struct {
 		GetModule   func(childComplexity int, id string) int
-		ListModules func(childComplexity int) int
+		ListModules func(childComplexity int, filter *model.Filter, paginate *model.Paginator) int
 	}
 }
 
@@ -90,7 +90,7 @@ type MutationResolver interface {
 }
 type QueryResolver interface {
 	GetModule(ctx context.Context, id string) (*model.Module, error)
-	ListModules(ctx context.Context) ([]*model.ModuleInfo, error)
+	ListModules(ctx context.Context, filter *model.Filter, paginate *model.Paginator) ([]*model.ModuleInfo, error)
 }
 
 type executableSchema struct {
@@ -291,7 +291,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			break
 		}
 
-		return e.complexity.Query.ListModules(childComplexity), true
+		args, err := ec.field_Query_listModules_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.ListModules(childComplexity, args["filter"].(*model.Filter), args["paginate"].(*model.Paginator)), true
 
 	}
 	return 0, false
@@ -303,6 +308,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 	inputUnmarshalMap := graphql.BuildUnmarshalerMap(
 		ec.unmarshalInputFilter,
 		ec.unmarshalInputModuleInput,
+		ec.unmarshalInputPaginator,
 	)
 	first := true
 
@@ -509,6 +515,30 @@ func (ec *executionContext) field_Query_getModule_args(ctx context.Context, rawA
 		}
 	}
 	args["id"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_listModules_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.Filter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg0, err = ec.unmarshalOFilter2ᚖModuleᚋgraphᚋmodelᚐFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	var arg1 *model.Paginator
+	if tmp, ok := rawArgs["paginate"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("paginate"))
+		arg1, err = ec.unmarshalOPaginator2ᚖModuleᚋgraphᚋmodelᚐPaginator(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["paginate"] = arg1
 	return args, nil
 }
 
@@ -1624,7 +1654,7 @@ func (ec *executionContext) _Query_listModules(ctx context.Context, field graphq
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().ListModules(rctx)
+		return ec.resolvers.Query().ListModules(rctx, fc.Args["filter"].(*model.Filter), fc.Args["paginate"].(*model.Paginator))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1663,6 +1693,17 @@ func (ec *executionContext) fieldContext_Query_listModules(ctx context.Context, 
 			}
 			return nil, fmt.Errorf("no field named %q was found under type ModuleInfo", field.Name)
 		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_listModules_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
 	}
 	return fc, nil
 }
@@ -3576,7 +3617,7 @@ func (ec *executionContext) unmarshalInputFilter(ctx context.Context, obj interf
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"softDelete"}
+	fieldsInOrder := [...]string{"softDelete", "name", "difficulty", "category", "private"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -3592,6 +3633,42 @@ func (ec *executionContext) unmarshalInputFilter(ctx context.Context, obj interf
 				return it, err
 			}
 			it.SoftDelete = data
+		case "name":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Name = data
+		case "difficulty":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("difficulty"))
+			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Difficulty = data
+		case "category":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("category"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Category = data
+		case "private":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("private"))
+			data, err := ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Private = data
 		}
 	}
 
@@ -3666,6 +3743,53 @@ func (ec *executionContext) unmarshalInputModuleInput(ctx context.Context, obj i
 				return it, err
 			}
 			it.Key = data
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputPaginator(ctx context.Context, obj interface{}) (model.Paginator, error) {
+	var it model.Paginator
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"min", "max", "Step"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "min":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("min"))
+			data, err := ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Min = data
+		case "max":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("max"))
+			data, err := ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Max = data
+		case "Step":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("Step"))
+			data, err := ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Step = data
 		}
 	}
 
@@ -4662,6 +4786,22 @@ func (ec *executionContext) marshalOID2ᚖstring(ctx context.Context, sel ast.Se
 	return res
 }
 
+func (ec *executionContext) unmarshalOInt2ᚖint(ctx context.Context, v interface{}) (*int, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := graphql.UnmarshalInt(v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOInt2ᚖint(ctx context.Context, sel ast.SelectionSet, v *int) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	res := graphql.MarshalInt(*v)
+	return res
+}
+
 func (ec *executionContext) marshalOModule2ᚖModuleᚋgraphᚋmodelᚐModule(ctx context.Context, sel ast.SelectionSet, v *model.Module) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
@@ -4715,6 +4855,14 @@ func (ec *executionContext) marshalOModuleInfo2ᚖModuleᚋgraphᚋmodelᚐModul
 		return graphql.Null
 	}
 	return ec._ModuleInfo(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalOPaginator2ᚖModuleᚋgraphᚋmodelᚐPaginator(ctx context.Context, v interface{}) (*model.Paginator, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputPaginator(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) unmarshalOString2ᚖstring(ctx context.Context, v interface{}) (*string, error) {
