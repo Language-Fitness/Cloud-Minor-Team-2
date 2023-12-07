@@ -22,12 +22,12 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type GrpcResultClient interface {
-	DeleteByModule(ctx context.Context, in *DeleteByModuleRequest, opts ...grpc.CallOption) (*Result, error)
-	SoftDeleteByModule(ctx context.Context, in *DeleteByModuleRequest, opts ...grpc.CallOption) (*Result, error)
-	DeleteByClass(ctx context.Context, in *DeleteByClassRequest, opts ...grpc.CallOption) (*Result, error)
-	SoftDeleteByClass(ctx context.Context, in *DeleteByClassRequest, opts ...grpc.CallOption) (*Result, error)
-	DeleteByUser(ctx context.Context, in *DeleteByUserRequest, opts ...grpc.CallOption) (*Result, error)
-	SoftDeleteByUser(ctx context.Context, in *DeleteByUserRequest, opts ...grpc.CallOption) (*Result, error)
+	DeleteByModule(ctx context.Context, in *DeleteByModuleRequest, opts ...grpc.CallOption) (*Response, error)
+	SoftDeleteByModule(ctx context.Context, in *DeleteByModuleRequest, opts ...grpc.CallOption) (*Response, error)
+	DeleteByClass(ctx context.Context, in *DeleteByClassRequest, opts ...grpc.CallOption) (*Response, error)
+	SoftDeleteByClass(ctx context.Context, in *DeleteByClassRequest, opts ...grpc.CallOption) (*Response, error)
+	DeleteByUser(ctx context.Context, in *DeleteByUserRequest, opts ...grpc.CallOption) (*Response, error)
+	SoftDeleteByUser(ctx context.Context, in *DeleteByUserRequest, opts ...grpc.CallOption) (*Response, error)
 }
 
 type grpcResultClient struct {
@@ -38,8 +38,8 @@ func NewGrpcResultClient(cc grpc.ClientConnInterface) GrpcResultClient {
 	return &grpcResultClient{cc}
 }
 
-func (c *grpcResultClient) DeleteByModule(ctx context.Context, in *DeleteByModuleRequest, opts ...grpc.CallOption) (*Result, error) {
-	out := new(Result)
+func (c *grpcResultClient) DeleteByModule(ctx context.Context, in *DeleteByModuleRequest, opts ...grpc.CallOption) (*Response, error) {
+	out := new(Response)
 	err := c.cc.Invoke(ctx, "/GrpcResult/DeleteByModule", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -47,8 +47,8 @@ func (c *grpcResultClient) DeleteByModule(ctx context.Context, in *DeleteByModul
 	return out, nil
 }
 
-func (c *grpcResultClient) SoftDeleteByModule(ctx context.Context, in *DeleteByModuleRequest, opts ...grpc.CallOption) (*Result, error) {
-	out := new(Result)
+func (c *grpcResultClient) SoftDeleteByModule(ctx context.Context, in *DeleteByModuleRequest, opts ...grpc.CallOption) (*Response, error) {
+	out := new(Response)
 	err := c.cc.Invoke(ctx, "/GrpcResult/SoftDeleteByModule", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -56,8 +56,8 @@ func (c *grpcResultClient) SoftDeleteByModule(ctx context.Context, in *DeleteByM
 	return out, nil
 }
 
-func (c *grpcResultClient) DeleteByClass(ctx context.Context, in *DeleteByClassRequest, opts ...grpc.CallOption) (*Result, error) {
-	out := new(Result)
+func (c *grpcResultClient) DeleteByClass(ctx context.Context, in *DeleteByClassRequest, opts ...grpc.CallOption) (*Response, error) {
+	out := new(Response)
 	err := c.cc.Invoke(ctx, "/GrpcResult/DeleteByClass", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -65,8 +65,8 @@ func (c *grpcResultClient) DeleteByClass(ctx context.Context, in *DeleteByClassR
 	return out, nil
 }
 
-func (c *grpcResultClient) SoftDeleteByClass(ctx context.Context, in *DeleteByClassRequest, opts ...grpc.CallOption) (*Result, error) {
-	out := new(Result)
+func (c *grpcResultClient) SoftDeleteByClass(ctx context.Context, in *DeleteByClassRequest, opts ...grpc.CallOption) (*Response, error) {
+	out := new(Response)
 	err := c.cc.Invoke(ctx, "/GrpcResult/SoftDeleteByClass", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -74,8 +74,8 @@ func (c *grpcResultClient) SoftDeleteByClass(ctx context.Context, in *DeleteByCl
 	return out, nil
 }
 
-func (c *grpcResultClient) DeleteByUser(ctx context.Context, in *DeleteByUserRequest, opts ...grpc.CallOption) (*Result, error) {
-	out := new(Result)
+func (c *grpcResultClient) DeleteByUser(ctx context.Context, in *DeleteByUserRequest, opts ...grpc.CallOption) (*Response, error) {
+	out := new(Response)
 	err := c.cc.Invoke(ctx, "/GrpcResult/DeleteByUser", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -83,8 +83,8 @@ func (c *grpcResultClient) DeleteByUser(ctx context.Context, in *DeleteByUserReq
 	return out, nil
 }
 
-func (c *grpcResultClient) SoftDeleteByUser(ctx context.Context, in *DeleteByUserRequest, opts ...grpc.CallOption) (*Result, error) {
-	out := new(Result)
+func (c *grpcResultClient) SoftDeleteByUser(ctx context.Context, in *DeleteByUserRequest, opts ...grpc.CallOption) (*Response, error) {
+	out := new(Response)
 	err := c.cc.Invoke(ctx, "/GrpcResult/SoftDeleteByUser", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -96,12 +96,12 @@ func (c *grpcResultClient) SoftDeleteByUser(ctx context.Context, in *DeleteByUse
 // All implementations must embed UnimplementedGrpcResultServer
 // for forward compatibility
 type GrpcResultServer interface {
-	DeleteByModule(context.Context, *DeleteByModuleRequest) (*Result, error)
-	SoftDeleteByModule(context.Context, *DeleteByModuleRequest) (*Result, error)
-	DeleteByClass(context.Context, *DeleteByClassRequest) (*Result, error)
-	SoftDeleteByClass(context.Context, *DeleteByClassRequest) (*Result, error)
-	DeleteByUser(context.Context, *DeleteByUserRequest) (*Result, error)
-	SoftDeleteByUser(context.Context, *DeleteByUserRequest) (*Result, error)
+	DeleteByModule(context.Context, *DeleteByModuleRequest) (*Response, error)
+	SoftDeleteByModule(context.Context, *DeleteByModuleRequest) (*Response, error)
+	DeleteByClass(context.Context, *DeleteByClassRequest) (*Response, error)
+	SoftDeleteByClass(context.Context, *DeleteByClassRequest) (*Response, error)
+	DeleteByUser(context.Context, *DeleteByUserRequest) (*Response, error)
+	SoftDeleteByUser(context.Context, *DeleteByUserRequest) (*Response, error)
 	mustEmbedUnimplementedGrpcResultServer()
 }
 
@@ -109,22 +109,22 @@ type GrpcResultServer interface {
 type UnimplementedGrpcResultServer struct {
 }
 
-func (UnimplementedGrpcResultServer) DeleteByModule(context.Context, *DeleteByModuleRequest) (*Result, error) {
+func (UnimplementedGrpcResultServer) DeleteByModule(context.Context, *DeleteByModuleRequest) (*Response, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteByModule not implemented")
 }
-func (UnimplementedGrpcResultServer) SoftDeleteByModule(context.Context, *DeleteByModuleRequest) (*Result, error) {
+func (UnimplementedGrpcResultServer) SoftDeleteByModule(context.Context, *DeleteByModuleRequest) (*Response, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SoftDeleteByModule not implemented")
 }
-func (UnimplementedGrpcResultServer) DeleteByClass(context.Context, *DeleteByClassRequest) (*Result, error) {
+func (UnimplementedGrpcResultServer) DeleteByClass(context.Context, *DeleteByClassRequest) (*Response, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteByClass not implemented")
 }
-func (UnimplementedGrpcResultServer) SoftDeleteByClass(context.Context, *DeleteByClassRequest) (*Result, error) {
+func (UnimplementedGrpcResultServer) SoftDeleteByClass(context.Context, *DeleteByClassRequest) (*Response, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SoftDeleteByClass not implemented")
 }
-func (UnimplementedGrpcResultServer) DeleteByUser(context.Context, *DeleteByUserRequest) (*Result, error) {
+func (UnimplementedGrpcResultServer) DeleteByUser(context.Context, *DeleteByUserRequest) (*Response, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteByUser not implemented")
 }
-func (UnimplementedGrpcResultServer) SoftDeleteByUser(context.Context, *DeleteByUserRequest) (*Result, error) {
+func (UnimplementedGrpcResultServer) SoftDeleteByUser(context.Context, *DeleteByUserRequest) (*Response, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SoftDeleteByUser not implemented")
 }
 func (UnimplementedGrpcResultServer) mustEmbedUnimplementedGrpcResultServer() {}

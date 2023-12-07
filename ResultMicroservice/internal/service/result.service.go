@@ -28,12 +28,12 @@ type IResultService interface {
 	GetResultsByUserID(bearerToken string, userID string) ([]*model.Result, error)
 	DeleteResultByClassID(bearerToken string, classID string) error
 	// Saga methods
-	SoftDeleteByUser(bearerToken string, userID string) error
-	SoftDeleteByClass(bearerToken string, classID string) error
-	SoftDeleteByModule(bearerToken string, moduleID string) error
-	DeleteByUser(bearerToken string, userID string) error
-	DeleteByClass(bearerToken string, classID string) error
-	DeleteByModule(bearerToken string, moduleID string) error
+	SoftDeleteByUser(bearerToken string, userID string) (string, bool, error)
+	SoftDeleteByClass(bearerToken string, classID string) (string, bool, error)
+	SoftDeleteByModule(bearerToken string, moduleID string) (string, bool, error)
+	DeleteByUser(bearerToken string, userID string) (string, bool, error)
+	DeleteByClass(bearerToken string, classID string) (string, bool, error)
+	DeleteByModule(bearerToken string, moduleID string) (string, bool, error)
 }
 
 // ResultService GOLANG STRUCT
@@ -274,10 +274,10 @@ func (r *ResultService) DeleteResultByClassID(bearerToken string, classID string
 
 // Saga grpc methods
 
-func (r *ResultService) SoftDeleteByUser(bearerToken string, userID string) error {
+func (r *ResultService) SoftDeleteByUser(bearerToken string, userID string) (string, bool, error) {
 	err := r.ResultPolicy.SoftDeleteByUser(bearerToken, userID)
 	if err != nil {
-		return err
+		return userID, false, err
 	}
 
 	r.Validator.Validate(userID, []string{"IsUUID"})
@@ -286,16 +286,21 @@ func (r *ResultService) SoftDeleteByUser(bearerToken string, userID string) erro
 	if len(validationErrors) > 0 {
 		errorMessage := valErrorBase + strings.Join(validationErrors, ", ")
 		r.Validator.ClearErrors()
-		return errors.New(errorMessage)
+		return userID, false, errors.New(errorMessage)
 	}
 
-	return r.Repo.SoftDeleteByUser(userID)
+	err2 := r.Repo.SoftDeleteByUser(userID)
+	if err2 != nil {
+		return userID, false, err2
+	}
+
+	return userID, true, nil
 }
 
-func (r *ResultService) SoftDeleteByClass(bearerToken string, classID string) error {
+func (r *ResultService) SoftDeleteByClass(bearerToken string, classID string) (string, bool, error) {
 	err := r.ResultPolicy.SoftDeleteByClass(bearerToken, classID)
 	if err != nil {
-		return err
+		return classID, false, err
 	}
 
 	r.Validator.Validate(classID, []string{"IsUUID"})
@@ -304,16 +309,21 @@ func (r *ResultService) SoftDeleteByClass(bearerToken string, classID string) er
 	if len(validationErrors) > 0 {
 		errorMessage := valErrorBase + strings.Join(validationErrors, ", ")
 		r.Validator.ClearErrors()
-		return errors.New(errorMessage)
+		return classID, false, errors.New(errorMessage)
 	}
 
-	return r.Repo.SoftDeleteByClass(classID)
+	err2 := r.Repo.SoftDeleteByClass(classID)
+	if err2 != nil {
+		return classID, false, err2
+	}
+
+	return classID, true, nil
 }
 
-func (r *ResultService) SoftDeleteByModule(bearerToken string, moduleID string) error {
+func (r *ResultService) SoftDeleteByModule(bearerToken string, moduleID string) (string, bool, error) {
 	err := r.ResultPolicy.SoftDeleteByModule(bearerToken, moduleID)
 	if err != nil {
-		return err
+		return moduleID, false, err
 	}
 
 	r.Validator.Validate(moduleID, []string{"IsUUID"})
@@ -322,16 +332,21 @@ func (r *ResultService) SoftDeleteByModule(bearerToken string, moduleID string) 
 	if len(validationErrors) > 0 {
 		errorMessage := valErrorBase + strings.Join(validationErrors, ", ")
 		r.Validator.ClearErrors()
-		return errors.New(errorMessage)
+		return moduleID, false, errors.New(errorMessage)
 	}
 
-	return r.Repo.SoftDeleteByModule(moduleID)
+	err2 := r.Repo.SoftDeleteByModule(moduleID)
+	if err2 != nil {
+		return moduleID, false, err2
+	}
+
+	return moduleID, true, nil
 }
 
-func (r *ResultService) DeleteByUser(bearerToken string, userID string) error {
+func (r *ResultService) DeleteByUser(bearerToken string, userID string) (string, bool, error) {
 	err := r.ResultPolicy.DeleteByUser(bearerToken, userID)
 	if err != nil {
-		return err
+		return userID, false, err
 	}
 
 	r.Validator.Validate(userID, []string{"IsUUID"})
@@ -340,16 +355,21 @@ func (r *ResultService) DeleteByUser(bearerToken string, userID string) error {
 	if len(validationErrors) > 0 {
 		errorMessage := valErrorBase + strings.Join(validationErrors, ", ")
 		r.Validator.ClearErrors()
-		return errors.New(errorMessage)
+		return userID, false, errors.New(errorMessage)
 	}
 
-	return r.Repo.DeleteByUser(userID)
+	err2 := r.Repo.DeleteByUser(userID)
+	if err2 != nil {
+		return userID, false, err2
+	}
+
+	return userID, true, nil
 }
 
-func (r *ResultService) DeleteByClass(bearerToken string, classID string) error {
+func (r *ResultService) DeleteByClass(bearerToken string, classID string) (string, bool, error) {
 	err := r.ResultPolicy.DeleteByClass(bearerToken, classID)
 	if err != nil {
-		return err
+		return classID, false, err
 	}
 
 	r.Validator.Validate(classID, []string{"IsUUID"})
@@ -358,16 +378,21 @@ func (r *ResultService) DeleteByClass(bearerToken string, classID string) error 
 	if len(validationErrors) > 0 {
 		errorMessage := valErrorBase + strings.Join(validationErrors, ", ")
 		r.Validator.ClearErrors()
-		return errors.New(errorMessage)
+		return classID, false, errors.New(errorMessage)
 	}
 
-	return r.Repo.DeleteByClass(classID)
+	err2 := r.Repo.DeleteByClass(classID)
+	if err2 != nil {
+		return classID, false, err2
+	}
+
+	return classID, true, nil
 }
 
-func (r *ResultService) DeleteByModule(bearerToken string, moduleID string) error {
+func (r *ResultService) DeleteByModule(bearerToken string, moduleID string) (string, bool, error) {
 	err := r.ResultPolicy.DeleteByModule(bearerToken, moduleID)
 	if err != nil {
-		return err
+		return moduleID, false, err
 	}
 
 	r.Validator.Validate(moduleID, []string{"IsUUID"})
@@ -376,10 +401,15 @@ func (r *ResultService) DeleteByModule(bearerToken string, moduleID string) erro
 	if len(validationErrors) > 0 {
 		errorMessage := valErrorBase + strings.Join(validationErrors, ", ")
 		r.Validator.ClearErrors()
-		return errors.New(errorMessage)
+		return moduleID, false, errors.New(errorMessage)
 	}
 
-	return r.Repo.DeleteByModule(moduleID)
+	err2 := r.Repo.DeleteByModule(moduleID)
+	if err2 != nil {
+		return moduleID, false, err2
+	}
+
+	return moduleID, true, nil
 }
 
 func (r *ResultService) ValidateResult(result *model.InputResult) {
