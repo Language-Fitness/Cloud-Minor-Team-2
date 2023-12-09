@@ -26,7 +26,7 @@ class OpenAIAssistantManager:
     def delete_assistant(self, assistant_id):
         try:
             self.client.beta.assistants.delete(assistant_id)
-        except Exception as e:
+        except Exception:
             print("Assistant already deleted")
 
     def create_thread(self):
@@ -65,15 +65,14 @@ class OpenAIAssistantManager:
             assistant_id=assistant_id
         )
 
-    def retrieve_thread(self, thread_id, run_id):
+    def retrieve_assistant(self, assistant_id):
         try:
-            return self.client.beta.threads.runs.retrieve(
-                thread_id=thread_id,
-                run_id=run_id
+            return self.client.beta.assistants.retrieve(
+                assistant_id=assistant_id
             )
 
         except Exception:
-            raise Exception("No valid thread id")
+            raise Exception("No valid assistant id")
 
     def retrieve_messages(self, thread_id):
         try:

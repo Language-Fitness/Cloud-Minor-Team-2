@@ -49,3 +49,7 @@ class SubjectEnum(graphene.Enum):
     uitdrukkingen = "Uitdrukkingen"
     interpunctie = "Interpunctie"
     werkwoordvervoegingen = "Werkwoordvervoegingen"
+
+class TokenData(graphene.ObjectType):
+    assistant_id = graphene.String()
+    thread_id = graphene.String()
