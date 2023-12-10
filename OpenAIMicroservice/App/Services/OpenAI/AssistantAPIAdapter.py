@@ -66,13 +66,9 @@ class AssistantAPIAdapter:
         token = self.encode_token(run.thread_id, run.assistant_id)
         return token
 
-    def retrieve_multiple_choice_questions(self, token):
+    def retrieve_multiple_choice_questions(self, thread_id, assistant_id):
 
-        try:
-            thread_id, assistant_id = self.decode_token(token)
-            messages = self.assistant_manager.retrieve_messages(thread_id)
-        except Exception as e:
-            raise Exception("Please enter a valid token!")
+        messages = self.assistant_manager.retrieve_messages(thread_id)
 
         try:
             json_data = self.get_last_message(messages)
@@ -115,12 +111,12 @@ class AssistantAPIAdapter:
     #     except Exception as e:
     #         raise Exception(str(e))
 
-    def retrieve_response(self, token):
-        try:
-            thread_id, assistant_id = self.decode_token(token)
-            messages = self.assistant_manager.retrieve_messages(thread_id)
-        except Exception as e:
-            raise Exception("Please enter a valid token!")
+    def retrieve_response(self, thread_id, assistant_id):
+        # try:
+        # thread_id, assistant_id = self.decode_token(token)
+        messages = self.assistant_manager.retrieve_messages(thread_id)
+        # except Exception as e:
+        #     raise Exception("Please enter a valid token!")
 
         try:
             json_data = self.get_last_message(messages)
@@ -174,26 +170,26 @@ class AssistantAPIAdapter:
         except Exception as e:
             raise Exception(f"Token encoding error: {e}")
 
-    def decode_token(self, token):
-        if not self.is_valid_base64(token):
-            raise Exception("Invalid token!")
+    # def decode_token(self, token):
+    #     if not self.is_valid_base64(token):
+    #         raise Exception("Invalid token!")
+    #
+    #     try:
+    #         ids_bytes = base64.b64decode(token)
+    #         ids_json = ids_bytes.decode('utf-8')
+    #         ids_dict = json.loads(ids_json)
+    #
+    #         return ids_dict['thread_id'], ids_dict['assistant_id']
+    #     except Exception:
+    #         raise Exception("Invalid token!")
 
-        try:
-            ids_bytes = base64.b64decode(token)
-            ids_json = ids_bytes.decode('utf-8')
-            ids_dict = json.loads(ids_json)
-
-            return ids_dict['thread_id'], ids_dict['assistant_id']
-        except Exception:
-            raise Exception("Invalid token!")
-
-    def is_valid_base64(self, token):
-        if not token or len(token) % 4 != 0:
-            return False
-
-        if not re.match('^[A-Za-z0-9+/]+={0,2}$', token):
-            return False
-        return True
+    # def is_valid_base64(self, token):
+    #     if not token or len(token) % 4 != 0:
+    #         return False
+    #
+    #     if not re.match('^[A-Za-z0-9+/]+={0,2}$', token):
+    #         return False
+    #     return True
 
     def get_last_message(self, messages):
         if messages and messages.data:

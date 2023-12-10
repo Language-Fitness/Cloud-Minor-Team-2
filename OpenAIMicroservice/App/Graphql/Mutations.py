@@ -1,6 +1,7 @@
 import graphene
 from App.Services.OpenAI.AssistantAPIAdapter import AssistantAPIAdapter
 from .Types import SubjectEnum, LevelEnum
+from .Validators import validate_minimum_int, validate_string
 
 
 # class GenerateOpenAnswerQuestions(graphene.Mutation):
@@ -69,4 +70,4 @@ class Mutation(graphene.ObjectType):
     generate_explanation = GenerateExplanation.Field()
     # generate_open_answer_questions = GenerateOpenAnswerQuestions.Field()
     generate_multiple_choice_questions = GenerateMultipleChoiceQuestions.Field()
-    generate_answer = GenerateMultipleChoiceAnswer.Field()
+    generate_multiple_choice_answer = GenerateMultipleChoiceAnswer.Field()
