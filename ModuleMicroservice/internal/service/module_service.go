@@ -8,7 +8,10 @@ import (
 	"errors"
 	"fmt"
 	"github.com/google/uuid"
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
+	"reflect"
 	"strings"
 	"time"
 )
@@ -187,9 +190,11 @@ func (m *ModuleService) ListModules(token string, filter *model.Filter, paginate
 
 	m.Validator.Validate(filter.SoftDelete, []string{"IsNull", "IsBoolean"}, "Filter softDelete")
 	m.Validator.Validate(filter.Name, []string{"IsNull", "IsString", "Length:<50"}, "Filter Name")
-	m.Validator.Validate(filter.Description, []string{"IsNull", "IsString"}, "Filter Description")
-	m.Validator.Validate(filter.Difficulty, []string{"IsNull", "IsInt"}, "Filter Difficulty")
+	m.Validator.Validate(filter.Difficulty, []string{"IsNull", "IsInt", "Size:>0"}, "Filter Difficulty")
 	m.Validator.Validate(filter.Private, []string{"IsNull", "IsBoolean"}, "Filter Private")
+	m.Validator.Validate(filter.Category, []string{"IsNull", "IsString", "Length:<50"}, "Filter Category")
+	m.Validator.Validate(paginate.Amount, []string{"IsInt", "Size:>0"}, "Paginate Amount")
+	m.Validator.Validate(paginate.Step, []string{"IsInt", "Size:>0"}, "Paginate Step")
 
 	validationErrors := m.Validator.GetErrors()
 	if len(validationErrors) > 0 {
@@ -198,15 +203,47 @@ func (m *ModuleService) ListModules(token string, filter *model.Filter, paginate
 		return nil, errors.New(errorMessage)
 	}
 
-	fmt.Println("test")
-	fmt.Println(filter)
-	fmt.Println(paginate)
-	//fmt.Println(isAdmin)
+	fmt.Println(dereferenceIfNeeded(filter.SoftDelete))
 
-	modules, err := m.Repo.ListModules()
+	bsonFilter := bson.D{}
+	if m.Policy.HasPermissions(token, "filter_module_SoftDelete") == true {
+		bsonFilter = append(bsonFilter, bson.E{Key: "softdeleted", Value: dereferenceIfNeeded(filter.SoftDelete)})
+	}
+
+	if m.Policy.HasPermissions(token, "filter_module_Name") == true {
+		bsonFilter = append(bsonFilter, bson.E{Key: "name", Value: dereferenceIfNeeded(filter.Name)})
+	}
+
+	if m.Policy.HasPermissions(token, "filter_module_Difficulty") == true {
+		bsonFilter = append(bsonFilter, bson.E{Key: "difficulty", Value: dereferenceIfNeeded(filter.Difficulty)})
+	}
+
+	if m.Policy.HasPermissions(token, "filter_module_Private") == true {
+		bsonFilter = append(bsonFilter, bson.E{Key: "private", Value: dereferenceIfNeeded(filter.Private)})
+	}
+
+	if m.Policy.HasPermissions(token, "filter_module_Category") == true {
+		bsonFilter = append(bsonFilter, bson.E{Key: "category", Value: dereferenceIfNeeded(filter.Category)})
+	}
+
+	fmt.Println(bsonFilter)
+
+	paginateOptions := options.Find().
+		SetSkip(int64(paginate.Step)).
+		SetLimit(int64(paginate.Amount))
+
+	modules, err := m.Repo.ListModules(bsonFilter, paginateOptions)
 	if err != nil {
 		return nil, err
 	}
 
 	return modules, nil
+}
+
+func dereferenceIfNeeded(value interface{}) interface{} {
+	if reflect.TypeOf(value).Kind() == reflect.Ptr {
+		return reflect.ValueOf(value).Elem().Interface()
+	}
+
+	return value
 }

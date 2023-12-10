@@ -9,7 +9,7 @@ import (
 
 type MockPolicy struct {
 	mock.Mock
-	Token            auth.IToken
+	Token            auth.ITokenProvider
 	ModuleRepository repository.IModuleRepository
 }
 

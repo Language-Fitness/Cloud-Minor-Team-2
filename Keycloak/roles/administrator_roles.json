@@ -18,6 +18,9 @@
     "name": "delete_module_all"
   },
   {
+    "name": "get_modules_all"
+  },
+  {
     "name": "update_school_all"
   },
   {
@@ -34,5 +37,21 @@
   },
   {
     "name": "update_school"
+  },
+
+  {
+    "name": "filter_module_SoftDelete"
+  },
+  {
+    "name": "filter_module_Name"
+  },
+  {
+    "name": "filter_module_Difficulty"
+  },
+  {
+    "name": "filter_module_Private"
+  },
+  {
+    "name": "filter_module_Category"
   }
 ]
