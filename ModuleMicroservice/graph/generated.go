@@ -3756,31 +3756,22 @@ func (ec *executionContext) unmarshalInputPaginator(ctx context.Context, obj int
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"min", "max", "Step"}
+	fieldsInOrder := [...]string{"amount", "Step"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
 			continue
 		}
 		switch k {
-		case "min":
+		case "amount":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("min"))
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("amount"))
 			data, err := ec.unmarshalNInt2int(ctx, v)
 			if err != nil {
 				return it, err
 			}
-			it.Min = data
-		case "max":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("max"))
-			data, err := ec.unmarshalNInt2int(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.Max = data
+			it.Amount = data
 		case "Step":
 			var err error
 

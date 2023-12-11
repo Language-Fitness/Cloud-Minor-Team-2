@@ -3,6 +3,7 @@ package repository
 import (
 	"Module/graph/model"
 	"context"
+	"fmt"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -17,7 +18,7 @@ type IModuleRepository interface {
 	SoftDeleteModuleByID(id string, existingModule model.Module) error
 	HardDeleteModuleByID(id string) error
 	GetModuleByID(id string) (*model.Module, error)
-	ListModules() ([]*model.ModuleInfo, error)
+	ListModules(bsonFilter bson.D, paginateOptions *options.FindOptions) ([]*model.ModuleInfo, error)
 }
 
 // ModuleRepository GOLANG STRUCT
@@ -125,27 +126,31 @@ func (r *ModuleRepository) GetModuleByID(id string) (*model.Module, error) {
 	return &result, nil
 }
 
-func (r *ModuleRepository) ListModules() ([]*model.ModuleInfo, error) {
+func (r *ModuleRepository) ListModules(bsonFilter bson.D, paginateOptions *options.FindOptions) ([]*model.ModuleInfo, error) {
 	ctx, cancel := context.WithTimeout(context.TODO(), time.Second*10) // 10-second timeout
 	defer cancel()
 
 	var modules []*model.ModuleInfo
 
-	cursor, err := r.collection.Find(ctx, bson.D{})
+	fmt.Println("ewa")
+	fmt.Println(bsonFilter, paginateOptions)
+
+	cursor, err := r.collection.Find(ctx, bsonFilter, paginateOptions)
 	if err != nil {
-		return nil, err // Return any MongoDB-related errors.
+		return nil, err
 	}
 	defer func(cursor *mongo.Cursor, ctx context.Context) {
 		err := cursor.Close(ctx)
 		if err != nil {
-
+			// Handle closing error if needed
 		}
 	}(cursor, ctx)
 
+	// Decode results
 	for cursor.Next(ctx) {
 		var module model.ModuleInfo
 		if err := cursor.Decode(&module); err != nil {
-			return nil, err // Return any decoding errors.
+			return nil, err
 		}
 		modules = append(modules, &module)
 	}

@@ -44,7 +44,6 @@ type ModuleInput struct {
 }
 
 type Paginator struct {
-	Min  int `json:"min"`
-	Max  int `json:"max"`
-	Step int `json:"Step"`
+	Amount int `json:"amount"`
+	Step   int `json:"Step"`
 }

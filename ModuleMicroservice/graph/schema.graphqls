@@ -55,8 +55,7 @@ input Filter {
 }
 
 input Paginator {
-  min: Int!
-  max: Int!
+  amount: Int!
   Step: Int!
 }
 

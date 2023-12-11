@@ -4,6 +4,7 @@ import (
 	"Module/graph/model"
 	"Module/internal/repository"
 	"errors"
+	"fmt"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
@@ -13,10 +14,11 @@ type IPolicy interface {
 	DeleteModule(bearerToken string, id string) (bool, *model.Module, error)
 	GetModule(bearerToken string, id string) (*model.Module, error)
 	ListModules(bearerToken string) (bool, error)
+	HasPermissions(bearerToken string, role string) bool
 }
 
 type Policy struct {
-	Token            IToken
+	Token            ITokenProvider
 	ModuleRepository repository.IModuleRepository
 }
 
@@ -123,8 +125,16 @@ func (p *Policy) ListModules(bearerToken string) (bool, error) {
 	return false, nil
 }
 
+func (p *Policy) HasPermissions(bearerToken string, role string) bool {
+	_, roles, _ := p.getSubAndRoles(bearerToken)
+
+	fmt.Println(roles, role)
+
+	return p.hasRole(roles, role)
+}
+
 func (p *Policy) getSubAndRoles(bearerToken string) (string, []interface{}, error) {
-	//token, err := p.Token.IntrospectToken(bearerToken)
+	//token, err := p.TokenProvider.IntrospectToken(bearerToken)
 	//if err != nil || token == false {
 	//	return "", nil, errors.New("invalid token")
 	//}
@@ -133,6 +143,8 @@ func (p *Policy) getSubAndRoles(bearerToken string) (string, []interface{}, erro
 	if err != nil {
 		return "", nil, err
 	}
+
+	fmt.Println(decodeToken)
 
 	sub, _ := decodeToken["sub"].(string)
 

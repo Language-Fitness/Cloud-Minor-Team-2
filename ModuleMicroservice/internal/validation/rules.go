@@ -23,6 +23,7 @@ type IRules interface {
 	IsArray(value interface{}, name string) bool
 	ArrayType(input interface{}, expectedType string, name string) bool
 	Length(s interface{}, condition string, name string) bool
+	Size(s interface{}, condition string, name string) bool
 }
 
 // Rules GOLANG STRUCT
@@ -168,42 +169,80 @@ func (v *Rules) Length(s interface{}, condition string, name string) bool {
 	case "=":
 		if len(value) == lengthValue {
 			return true
-		} else {
-			v.AddError(fmt.Sprintf("%s should have a length equal to %d", name, lengthValue))
-			return false
 		}
+		v.AddError(fmt.Sprintf("%s should have a length equal to %d", name, lengthValue))
 	case "<":
 		if len(value) < lengthValue {
 			return true
-		} else {
-			v.AddError(fmt.Sprintf("%s length should be less than %d", name, lengthValue))
-			return false
 		}
+		v.AddError(fmt.Sprintf("%s length should be less than %d", name, lengthValue))
 	case "<=":
 		if len(value) <= lengthValue {
 			return true
-		} else {
-			v.AddError(fmt.Sprintf("%s length should be less than or equal to %d", name, lengthValue))
-			return false
 		}
+		v.AddError(fmt.Sprintf("%s length should be less than or equal to %d", name, lengthValue))
 	case ">":
 		if len(value) > lengthValue {
 			return true
-		} else {
-			v.AddError(fmt.Sprintf("%s length should be greater than %d", name, lengthValue))
-			return false
 		}
+		v.AddError(fmt.Sprintf("%s length should be greater than %d", name, lengthValue))
 	case ">=":
 		if len(value) >= lengthValue {
 			return true
-		} else {
-			v.AddError(fmt.Sprintf("%s length should be greater than or equal to %d", name, lengthValue))
-			return false
 		}
+		v.AddError(fmt.Sprintf("%s length should be greater than or equal to %d", name, lengthValue))
 	default:
 		v.AddError("Invalid length condition")
+	}
+
+	return false
+}
+
+func (v *Rules) Size(s interface{}, condition string, name string) bool {
+	strValue, ok := s.(string)
+	if !ok {
+		strValue = fmt.Sprintf("%v", s)
+	}
+
+	value, err := strconv.Atoi(strValue)
+	if err != nil {
+		v.AddError(fmt.Sprintf("%s: '%v' is not a valid integer", name, strValue))
 		return false
 	}
+
+	operator, lengthValue := SplitCondition(condition)
+
+	switch operator {
+	case "=":
+		if value == lengthValue {
+			return true
+		}
+		v.AddError(fmt.Sprintf("%s should have a size equal to %d", name, lengthValue))
+	case "<":
+		if value < lengthValue {
+			return true
+		}
+		v.AddError(fmt.Sprintf("%s size should be less than %d", name, lengthValue))
+	case "<=":
+		if value <= lengthValue {
+			return true
+		}
+		v.AddError(fmt.Sprintf("%s size should be less than or equal to %d", name, lengthValue))
+	case ">":
+		if value > lengthValue {
+			return true
+		}
+		v.AddError(fmt.Sprintf("%s size should be greater than %d", name, lengthValue))
+	case ">=":
+		if value >= lengthValue {
+			return true
+		}
+		v.AddError(fmt.Sprintf("%s size should be greater than or equal to %d", name, lengthValue))
+	default:
+		v.AddError("Invalid length condition")
+	}
+
+	return false
 }
 
 func SplitCondition(condition string) (string, int) {

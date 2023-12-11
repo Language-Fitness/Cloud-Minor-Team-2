@@ -44,18 +44,21 @@ func (v *Validator) Validate(input interface{}, arr []string, name string) {
 		},
 		"Length": func(input interface{}, params string, name string) {
 			s := strings.Split(params, ":")
-			fmt.Println(s[1])
 			rules.Length(input, s[1], name)
+		},
+		"Size": func(input interface{}, params string, name string) {
+			s := strings.Split(params, ":")
+			rules.Size(input, s[1], name)
 		},
 	}
 
-	fmt.Println(arr)
+	if containsString(arr, "IsNull") == true && isNil(input) {
+		return
+	}
 
 	for _, value := range arr {
-
 		functionName := value
 
-		// Check if value contains a colon and extract the part before it
 		if parts := strings.Split(value, ":"); len(parts) > 1 {
 			functionName = parts[0]
 		}
@@ -84,4 +87,26 @@ func (v *Validator) GetErrors() []string {
 
 func (v *Validator) ClearErrors() {
 	v.errors = []string{}
+}
+
+func containsString(array []string, target string) bool {
+	for _, str := range array {
+		if str == target {
+			return true
+		}
+	}
+	return false
+}
+
+func isNil(input interface{}) bool {
+	if input == nil {
+		return true
+	}
+
+	val := reflect.ValueOf(input)
+	if val.Kind() == reflect.Ptr && val.IsNil() {
+		return true
+	}
+
+	return false
 }
