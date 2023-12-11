@@ -5,4 +5,4 @@ metadata:
   namespace: bramterlouw-dev
 spec:
   ca:
-    secretName: issuer-tls-secret
+    secretName: ss-certificate
