@@ -1,0 +1,25 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  labels:
+    app: gandalf-the-gateway
+  annotations: {}
+#    cert-manager.io/issuer: acme-issuer
+  name: gandalf-the-gateway-ingres
+  namespace: bramterlouw-dev
+spec:
+  rules:
+    - host: gandalf-the-gateway-bramterlouw-dev.apps.ocp2-inholland.joran-bergfeld.com
+      http:
+        paths:
+          - pathType: Prefix
+            path: /
+            backend:
+              service:
+                name: gandalf-the-gateway-service
+                port:
+                  number: 4000
+#  tls:
+#    - hosts:
+#        - gandalf-the-gateway-bramterlouw-dev.apps.ocp2-inholland.joran-bergfeld.com
+#      secretName: myingress-cert

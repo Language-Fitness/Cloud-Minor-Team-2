@@ -1,0 +1,12 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: your-certificate
+  namespace: bramterlouw-dev
+spec:
+  secretName: your-secret
+  issuerRef:
+    name: acme-issuer-v2
+    kind: Issuer
+  dnsNames:
+    - gandalf-the-gateway-bramterlouw-dev.apps.ocp2-inholland.joran-bergfeld.com

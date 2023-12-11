@@ -1,7 +1,7 @@
 import graphene
 from App.Services.OpenAI.AssistantAPIAdapter import AssistantAPIAdapter
 from .Types import SubjectEnum, LevelEnum
-from .Validators import validate_minimum_int, validate_string
+from .Validators import validate_minimum_int, validate_string, validate_answer_options
 
 
 # class GenerateOpenAnswerQuestions(graphene.Mutation):
@@ -28,6 +28,10 @@ class GenerateMultipleChoiceQuestions(graphene.Mutation):
     token = graphene.String()
 
     def mutate(self, info, question_subject, question_level, amount_questions):
+
+        # validate amount questions
+        validate_minimum_int("amount_questions", amount_questions)
+
         adapter = AssistantAPIAdapter()
         token = adapter.generate_multiple_choice_questions(question_subject, question_level, amount_questions)
 
@@ -44,6 +48,12 @@ class GenerateExplanation(graphene.Mutation):
     token = graphene.String()
 
     def mutate(self, info, question_subject, question_text, given_answer, correct_answer):
+
+        # validate given strings
+        validate_string("question_text", question_text)
+        validate_string("given_answer", given_answer)
+        validate_string("correct_answer", correct_answer)
+
         adapter = AssistantAPIAdapter()
         token = adapter.generate_explanation(question_subject, question_text, given_answer, correct_answer)
 
@@ -60,6 +70,13 @@ class GenerateMultipleChoiceAnswer(graphene.Mutation):
     token = graphene.String()
 
     def mutate(self, info, question_level, question_subject, question_text, answer_options):
+
+        # validate given string
+        validate_string("question_text", question_text)
+
+        # validate given answer options
+        validate_answer_options(answer_options)
+
         adapter = AssistantAPIAdapter()
         token = adapter.generate_multiple_choice_answer(question_level, question_subject, question_text, answer_options)
 

@@ -1,0 +1,8 @@
+apiVersion: cert-manager.io/v1
+kind: Issuer
+metadata:
+  name: ca-issuer
+  namespace: bramterlouw-dev
+spec:
+  ca:
+    secretName: issuer-tls-secret
