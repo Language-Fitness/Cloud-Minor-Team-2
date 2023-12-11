@@ -5,14 +5,22 @@ from App.Services.OpenAI.OpenAIAssistantManager import OpenAIAssistantManager
 from graphql import GraphQLError
 
 
-def validate_minimum_int(value):
+def validate_minimum_int(variable_name, value):
     if value < 1:
-        raise GraphQLError("Amount questions must be at least 1")
+        raise GraphQLError(f"Amount at {variable_name} must be at least 1")
 
 
-def validate_string(value):
+def validate_string(variable_name, value):
     if value is None or value.strip() == '':
-        raise GraphQLError("String must not be empty")
+        raise GraphQLError(f"{variable_name} must not be empty")
+
+
+def validate_answer_options(answer_options):
+    if not answer_options or not isinstance(answer_options, list):
+        raise GraphQLError("Answer options must be a non-empty list.")
+
+    if any(option is None or option.strip() == '' for option in answer_options):
+        raise GraphQLError("Answer options must not contain empty or whitespace-only strings.")
 
 
 def validate_token(token):

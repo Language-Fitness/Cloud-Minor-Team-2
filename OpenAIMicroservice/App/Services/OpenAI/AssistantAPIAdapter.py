@@ -1,10 +1,6 @@
 import base64
 import json
-import re
 
-from graphql import GraphQLError
-
-from App.Graphql.Types import ResponseMultipleChoiceQuestion, MultipleChoiceQuestion
 from App.Services.OpenAI.OpenAIAssistantManager import OpenAIAssistantManager
 
 
@@ -66,26 +62,26 @@ class AssistantAPIAdapter:
         token = self.encode_token(run.thread_id, run.assistant_id)
         return token
 
-    def retrieve_multiple_choice_questions(self, thread_id, assistant_id):
-
-        messages = self.assistant_manager.retrieve_messages(thread_id)
-
-        try:
-            json_data = self.get_last_message(messages)
-            json_data = json_data.replace('```json', '').replace('```', '')
-
-            json_data_dict = json.loads(json_data)
-            json_data_dict["status"] = "success"
-
-            self.assistant_manager.delete_assistant(assistant_id)
-
-            return json_data_dict
-
-        except json.JSONDecodeError:
-            raise Exception("Response still pending, please wait.")
-
-        except Exception as e:
-            raise Exception(str(e))
+    # def retrieve_multiple_choice_questions(self, thread_id, assistant_id):
+    #
+    #     messages = self.assistant_manager.retrieve_messages(thread_id)
+    #
+    #     try:
+    #         json_data = self.get_last_message(messages)
+    #         json_data = json_data.replace('```json', '').replace('```', '')
+    #
+    #         json_data_dict = json.loads(json_data)
+    #         json_data_dict["status"] = "success"
+    #
+    #         self.assistant_manager.delete_assistant(assistant_id)
+    #
+    #         return json_data_dict
+    #
+    #     except json.JSONDecodeError:
+    #         raise Exception("Response still pending, please wait.")
+    #
+    #     except Exception as e:
+    #         raise Exception(str(e))
 
     # def retrieve_open_answer_questions(self, token):
     #     try:
@@ -112,11 +108,8 @@ class AssistantAPIAdapter:
     #         raise Exception(str(e))
 
     def retrieve_response(self, thread_id, assistant_id):
-        # try:
-        # thread_id, assistant_id = self.decode_token(token)
+
         messages = self.assistant_manager.retrieve_messages(thread_id)
-        # except Exception as e:
-        #     raise Exception("Please enter a valid token!")
 
         try:
             json_data = self.get_last_message(messages)

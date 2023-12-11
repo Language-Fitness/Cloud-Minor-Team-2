@@ -17,7 +17,7 @@ class Query(ObjectType):
             thread_id, assistant_id = validate_token(token)
 
             adapter = AssistantAPIAdapter()
-            response = adapter.retrieve_multiple_choice_questions(thread_id, assistant_id)
+            response = adapter.retrieve_response(thread_id, assistant_id)
 
             return response
 
