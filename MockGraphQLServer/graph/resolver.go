@@ -32,7 +32,7 @@ func (r *Resolver) init() {
 	/// MODULES ///
 	r.modules = append(r.modules, &model.Module{
 		ID:          "e41189cc-83cc-11ee-b962-0242ac120002",
-		Name:        "Grammatica door Toon",
+		Name:        "Grammatica B1",
 		Description: "Leer de basis van grammatica",
 		Difficulty:  1,
 		Category:    "Grammatica",
@@ -46,12 +46,39 @@ func (r *Resolver) init() {
 	key := "key"
 	r.modules = append(r.modules, &model.Module{
 		ID:          "25524ed4-83ce-11ee-b962-0242ac120002",
-		Name:        "Werkwoordspelling door Toon",
+		Name:        "Spelling B1",
 		Description: "Leer de basis van grammatica",
 		Difficulty:  1,
 		Category:    "Werkwoordspelling",
 		MadeBy:      "3a6085b2-83cd-11ee-b962-0242ac120002",
+		Private:     true,
+		Key:         &key,
+		CreatedAt:   &timestamp,
+		UpdatedAt:   &timestamp,
+		SoftDeleted: &softDeleted,
+	})
+
+	r.modules = append(r.modules, &model.Module{
+		ID:          "a5c78bc2-9762-11ee-b9d1-0242ac120002",
+		Name:        "Woordenschat B1",
+		Description: "Leer de basis van grammatica",
+		Difficulty:  1,
+		Category:    "Grammatica",
+		MadeBy:      "3a6085b2-83cd-11ee-b962-0242ac120002",
 		Private:     false,
+		CreatedAt:   &timestamp,
+		UpdatedAt:   &timestamp,
+		SoftDeleted: &softDeleted,
+	})
+
+	r.modules = append(r.modules, &model.Module{
+		ID:          "aa52990c-9762-11ee-b9d1-0242ac120002",
+		Name:        "Interpunctie B1",
+		Description: "Leer de basis van grammatica",
+		Difficulty:  1,
+		Category:    "Werkwoordspelling",
+		MadeBy:      "3a6085b2-83cd-11ee-b962-0242ac120002",
+		Private:     true,
 		Key:         &key,
 		CreatedAt:   &timestamp,
 		UpdatedAt:   &timestamp,
@@ -60,24 +87,36 @@ func (r *Resolver) init() {
 
 	/// CLASSES ///
 	r.classes = append(r.classes, &model.Class{
-		ID:          "f2f371e4-83cc-11ee-b962-0242ac120002",
+		ID:          "c316e75e-9762-11ee-b9d1-0242ac120002",
 		ModuleID:    "e41189cc-83cc-11ee-b962-0242ac120002",
-		Name:        "Class A",
-		Description: "Dit is Class A",
+		Name:        "Les 1",
+		Description: "Dit is de eerste les van deze module.",
 		Difficulty:  3,
-		MadeBy:      "bbf78bc0-942b-11ee-b9d1-0242ac120002",
+		MadeBy:      "3a6085b2-83cd-11ee-b962-0242ac120002",
 		CreatedAt:   &timestamp,
 		UpdatedAt:   &timestamp,
 		SoftDeleted: &softDeleted,
 	})
 
 	r.classes = append(r.classes, &model.Class{
-		ID:          "7c1ee614-83ce-11ee-b962-0242ac120002",
-		ModuleID:    "25524ed4-83ce-11ee-b962-0242ac120002",
-		Name:        "Class A",
-		Description: "Dit is Class A",
+		ID:          "c685aa06-9762-11ee-b9d1-0242ac120002",
+		ModuleID:    "e41189cc-83cc-11ee-b962-0242ac120002",
+		Name:        "Les 2",
+		Description: "Dit is de tweede les van deze module.",
 		Difficulty:  3,
-		MadeBy:      "bbf78bc0-942b-11ee-b9d1-0242ac120002",
+		MadeBy:      "3a6085b2-83cd-11ee-b962-0242ac120002",
+		CreatedAt:   &timestamp,
+		UpdatedAt:   &timestamp,
+		SoftDeleted: &softDeleted,
+	})
+
+	r.classes = append(r.classes, &model.Class{
+		ID:          "ca1192ca-9762-11ee-b9d1-0242ac120002",
+		ModuleID:    "e41189cc-83cc-11ee-b962-0242ac120002",
+		Name:        "Les 3",
+		Description: "Dit is de derde les van deze module.",
+		Difficulty:  3,
+		MadeBy:      "3a6085b2-83cd-11ee-b962-0242ac120002",
 		CreatedAt:   &timestamp,
 		UpdatedAt:   &timestamp,
 		SoftDeleted: &softDeleted,
@@ -85,9 +124,9 @@ func (r *Resolver) init() {
 
 	/// EXERCISES ///
 	r.exercises = append(r.exercises, &model.Exercise{
-		ID:               "af2cef6a-83ce-11ee-b962-0242ac120002",
-		ClassID:          "f2f371e4-83cc-11ee-b962-0242ac120002",
-		Name:             "Exercise A",
+		ID:               "8d82c1ca-9763-11ee-b9d1-0242ac120002",
+		ClassID:          "c316e75e-9762-11ee-b9d1-0242ac120002",
+		Name:             "Oefening 1",
 		Question:         "What is the capital of France?",
 		Answers:          "[Paris, Amsterdam, Brussels, Berlin]",
 		PosCorrectAnswer: 0,
@@ -99,12 +138,12 @@ func (r *Resolver) init() {
 	})
 
 	r.exercises = append(r.exercises, &model.Exercise{
-		ID:               "94ed3b8c-83ce-11ee-b962-0242ac120002",
-		ClassID:          "7c1ee614-83ce-11ee-b962-0242ac120002",
-		Name:             "Exercise A",
-		Question:         "What is the capital of France?",
+		ID:               "93831df4-9763-11ee-b9d1-0242ac120002",
+		ClassID:          "c316e75e-9762-11ee-b9d1-0242ac120002",
+		Name:             "Oefening 2",
+		Question:         "What is the capital of Netherlands?",
 		Answers:          "[Paris, Amsterdam, Brussels, Berlin]",
-		PosCorrectAnswer: 0,
+		PosCorrectAnswer: 1,
 		QuestionTypeID:   "multiple_choice",
 		Difficulty:       2.5,
 		CreatedAt:        &timestamp,
@@ -115,9 +154,9 @@ func (r *Resolver) init() {
 	/// RESULTS ///
 	r.results = append(r.results, &model.Result{
 		ID:          "fe1951f6-83cc-11ee-b962-0242ac120002",
-		ExerciseID:  "af2cef6a-83ce-11ee-b962-0242ac120002",
+		ExerciseID:  "8d82c1ca-9763-11ee-b9d1-0242ac120002",
 		UserID:      "3a6085b2-83cd-11ee-b962-0242ac120002",
-		ClassID:     "f2f371e4-83cc-11ee-b962-0242ac120002",
+		ClassID:     "c316e75e-9762-11ee-b9d1-0242ac120002",
 		ModuleID:    "e41189cc-83cc-11ee-b962-0242ac120002",
 		Input:       "Example input",
 		Result:      "Example result",

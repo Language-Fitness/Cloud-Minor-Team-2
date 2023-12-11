@@ -1,0 +1,15 @@
+apiVersion: cert-manager.io/v1
+kind: Issuer
+metadata:
+  name: acme-issuer
+  namespace: bramterlouw-dev
+spec:
+  acme:
+    email: 614992@student.inholland.nl
+    server: https://acme-staging-v02.api.letsencrypt.org/directory
+    privateKeySecretRef:
+      name: acme-issur-private-key
+    solvers:
+      - http01:
+          ingress:
+            ingressClassName: nginx
