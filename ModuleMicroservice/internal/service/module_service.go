@@ -193,7 +193,7 @@ func (m *ModuleService) ListModules(token string, filter *model.Filter, paginate
 	m.Validator.Validate(filter.Difficulty, []string{"IsNull", "IsInt", "Size:>0"}, "Filter Difficulty")
 	m.Validator.Validate(filter.Private, []string{"IsNull", "IsBoolean"}, "Filter Private")
 	m.Validator.Validate(filter.Category, []string{"IsNull", "IsString", "Length:<50"}, "Filter Category")
-	m.Validator.Validate(paginate.Amount, []string{"IsInt", "Size:>0"}, "Paginate Amount")
+	m.Validator.Validate(paginate.Amount, []string{"IsInt", "Size:>0", "Size:<100"}, "Paginate Amount")
 	m.Validator.Validate(paginate.Step, []string{"IsInt", "Size:>0"}, "Paginate Step")
 
 	validationErrors := m.Validator.GetErrors()

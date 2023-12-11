@@ -10,6 +10,17 @@ services:
     volumes:
       - mariadb-data:/var/lib/mysql
 
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    environment:
+      PMA_HOST: mysql
+      PMA_PORT: 3306
+      MYSQL_ROOT_PASSWORD: ${MARIADB_ROOT_PASSWORD}
+    ports:
+      - "9080:80"
+    depends_on:
+      - mysql
+
   keycloak:
     image: quay.io/keycloak/keycloak:23.0.0
     environment:
