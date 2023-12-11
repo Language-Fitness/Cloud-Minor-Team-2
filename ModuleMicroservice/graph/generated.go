@@ -308,6 +308,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 	inputUnmarshalMap := graphql.BuildUnmarshalerMap(
 		ec.unmarshalInputFilter,
 		ec.unmarshalInputModuleInput,
+		ec.unmarshalInputNameFilter,
 		ec.unmarshalInputPaginator,
 	)
 	first := true
@@ -738,9 +739,9 @@ func (ec *executionContext) _Module_difficulty(ctx context.Context, field graphq
 		}
 		return graphql.Null
 	}
-	res := resTmp.(int)
+	res := resTmp.(model.LanguageLevel)
 	fc.Result = res
-	return ec.marshalNInt2int(ctx, field.Selections, res)
+	return ec.marshalNLanguageLevel2ModuleᚋgraphᚋmodelᚐLanguageLevel(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Module_difficulty(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -750,7 +751,7 @@ func (ec *executionContext) fieldContext_Module_difficulty(ctx context.Context, 
 		IsMethod:   false,
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Int does not have child fields")
+			return nil, errors.New("field of type LanguageLevel does not have child fields")
 		},
 	}
 	return fc, nil
@@ -782,9 +783,9 @@ func (ec *executionContext) _Module_category(ctx context.Context, field graphql.
 		}
 		return graphql.Null
 	}
-	res := resTmp.(string)
+	res := resTmp.(model.Category)
 	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
+	return ec.marshalNCategory2ModuleᚋgraphᚋmodelᚐCategory(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Module_category(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -794,7 +795,7 @@ func (ec *executionContext) fieldContext_Module_category(ctx context.Context, fi
 		IsMethod:   false,
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
+			return nil, errors.New("field of type Category does not have child fields")
 		},
 	}
 	return fc, nil
@@ -1210,9 +1211,9 @@ func (ec *executionContext) _ModuleInfo_difficulty(ctx context.Context, field gr
 		}
 		return graphql.Null
 	}
-	res := resTmp.(int)
+	res := resTmp.(model.LanguageLevel)
 	fc.Result = res
-	return ec.marshalNInt2int(ctx, field.Selections, res)
+	return ec.marshalNLanguageLevel2ModuleᚋgraphᚋmodelᚐLanguageLevel(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_ModuleInfo_difficulty(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -1222,7 +1223,7 @@ func (ec *executionContext) fieldContext_ModuleInfo_difficulty(ctx context.Conte
 		IsMethod:   false,
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Int does not have child fields")
+			return nil, errors.New("field of type LanguageLevel does not have child fields")
 		},
 	}
 	return fc, nil
@@ -1254,9 +1255,9 @@ func (ec *executionContext) _ModuleInfo_category(ctx context.Context, field grap
 		}
 		return graphql.Null
 	}
-	res := resTmp.(string)
+	res := resTmp.(model.Category)
 	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
+	return ec.marshalNCategory2ModuleᚋgraphᚋmodelᚐCategory(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_ModuleInfo_category(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -1266,7 +1267,7 @@ func (ec *executionContext) fieldContext_ModuleInfo_category(ctx context.Context
 		IsMethod:   false,
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
+			return nil, errors.New("field of type Category does not have child fields")
 		},
 	}
 	return fc, nil
@@ -3637,7 +3638,7 @@ func (ec *executionContext) unmarshalInputFilter(ctx context.Context, obj interf
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
-			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalONameFilter2ᚖModuleᚋgraphᚋmodelᚐNameFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -3646,7 +3647,7 @@ func (ec *executionContext) unmarshalInputFilter(ctx context.Context, obj interf
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("difficulty"))
-			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
+			data, err := ec.unmarshalOLanguageLevel2ᚖModuleᚋgraphᚋmodelᚐLanguageLevel(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -3655,7 +3656,7 @@ func (ec *executionContext) unmarshalInputFilter(ctx context.Context, obj interf
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("category"))
-			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOCategory2ᚖModuleᚋgraphᚋmodelᚐCategory(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -3711,7 +3712,7 @@ func (ec *executionContext) unmarshalInputModuleInput(ctx context.Context, obj i
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("difficulty"))
-			data, err := ec.unmarshalNInt2int(ctx, v)
+			data, err := ec.unmarshalNLanguageLevel2ModuleᚋgraphᚋmodelᚐLanguageLevel(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -3720,7 +3721,7 @@ func (ec *executionContext) unmarshalInputModuleInput(ctx context.Context, obj i
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("category"))
-			data, err := ec.unmarshalNString2string(ctx, v)
+			data, err := ec.unmarshalNCategory2ModuleᚋgraphᚋmodelᚐCategory(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -3743,6 +3744,44 @@ func (ec *executionContext) unmarshalInputModuleInput(ctx context.Context, obj i
 				return it, err
 			}
 			it.Key = data
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputNameFilter(ctx context.Context, obj interface{}) (model.NameFilter, error) {
+	var it model.NameFilter
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"input", "type"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "input":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+			data, err := ec.unmarshalNString2ᚕᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Input = data
+		case "type":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("type"))
+			data, err := ec.unmarshalNNameFilterTypes2ModuleᚋgraphᚋmodelᚐNameFilterTypes(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Type = data
 		}
 	}
 
@@ -4424,6 +4463,16 @@ func (ec *executionContext) marshalNBoolean2bool(ctx context.Context, sel ast.Se
 	return res
 }
 
+func (ec *executionContext) unmarshalNCategory2ModuleᚋgraphᚋmodelᚐCategory(ctx context.Context, v interface{}) (model.Category, error) {
+	var res model.Category
+	err := res.UnmarshalGQL(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNCategory2ModuleᚋgraphᚋmodelᚐCategory(ctx context.Context, sel ast.SelectionSet, v model.Category) graphql.Marshaler {
+	return v
+}
+
 func (ec *executionContext) unmarshalNID2string(ctx context.Context, v interface{}) (string, error) {
 	res, err := graphql.UnmarshalID(v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -4454,9 +4503,29 @@ func (ec *executionContext) marshalNInt2int(ctx context.Context, sel ast.Selecti
 	return res
 }
 
+func (ec *executionContext) unmarshalNLanguageLevel2ModuleᚋgraphᚋmodelᚐLanguageLevel(ctx context.Context, v interface{}) (model.LanguageLevel, error) {
+	var res model.LanguageLevel
+	err := res.UnmarshalGQL(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNLanguageLevel2ModuleᚋgraphᚋmodelᚐLanguageLevel(ctx context.Context, sel ast.SelectionSet, v model.LanguageLevel) graphql.Marshaler {
+	return v
+}
+
 func (ec *executionContext) unmarshalNModuleInput2ModuleᚋgraphᚋmodelᚐModuleInput(ctx context.Context, v interface{}) (model.ModuleInput, error) {
 	res, err := ec.unmarshalInputModuleInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNNameFilterTypes2ModuleᚋgraphᚋmodelᚐNameFilterTypes(ctx context.Context, v interface{}) (model.NameFilterTypes, error) {
+	var res model.NameFilterTypes
+	err := res.UnmarshalGQL(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNNameFilterTypes2ModuleᚋgraphᚋmodelᚐNameFilterTypes(ctx context.Context, sel ast.SelectionSet, v model.NameFilterTypes) graphql.Marshaler {
+	return v
 }
 
 func (ec *executionContext) unmarshalNString2string(ctx context.Context, v interface{}) (string, error) {
@@ -4472,6 +4541,32 @@ func (ec *executionContext) marshalNString2string(ctx context.Context, sel ast.S
 		}
 	}
 	return res
+}
+
+func (ec *executionContext) unmarshalNString2ᚕᚖstring(ctx context.Context, v interface{}) ([]*string, error) {
+	var vSlice []interface{}
+	if v != nil {
+		vSlice = graphql.CoerceList(v)
+	}
+	var err error
+	res := make([]*string, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalOString2ᚖstring(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) marshalNString2ᚕᚖstring(ctx context.Context, sel ast.SelectionSet, v []*string) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	for i := range v {
+		ret[i] = ec.marshalOString2ᚖstring(ctx, sel, v[i])
+	}
+
+	return ret
 }
 
 func (ec *executionContext) marshalN__Directive2githubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐDirective(ctx context.Context, sel ast.SelectionSet, v introspection.Directive) graphql.Marshaler {
@@ -4753,6 +4848,22 @@ func (ec *executionContext) marshalOBoolean2ᚖbool(ctx context.Context, sel ast
 	return res
 }
 
+func (ec *executionContext) unmarshalOCategory2ᚖModuleᚋgraphᚋmodelᚐCategory(ctx context.Context, v interface{}) (*model.Category, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var res = new(model.Category)
+	err := res.UnmarshalGQL(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOCategory2ᚖModuleᚋgraphᚋmodelᚐCategory(ctx context.Context, sel ast.SelectionSet, v *model.Category) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return v
+}
+
 func (ec *executionContext) unmarshalOFilter2ᚖModuleᚋgraphᚋmodelᚐFilter(ctx context.Context, v interface{}) (*model.Filter, error) {
 	if v == nil {
 		return nil, nil
@@ -4777,20 +4888,20 @@ func (ec *executionContext) marshalOID2ᚖstring(ctx context.Context, sel ast.Se
 	return res
 }
 
-func (ec *executionContext) unmarshalOInt2ᚖint(ctx context.Context, v interface{}) (*int, error) {
+func (ec *executionContext) unmarshalOLanguageLevel2ᚖModuleᚋgraphᚋmodelᚐLanguageLevel(ctx context.Context, v interface{}) (*model.LanguageLevel, error) {
 	if v == nil {
 		return nil, nil
 	}
-	res, err := graphql.UnmarshalInt(v)
-	return &res, graphql.ErrorOnPath(ctx, err)
+	var res = new(model.LanguageLevel)
+	err := res.UnmarshalGQL(v)
+	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalOInt2ᚖint(ctx context.Context, sel ast.SelectionSet, v *int) graphql.Marshaler {
+func (ec *executionContext) marshalOLanguageLevel2ᚖModuleᚋgraphᚋmodelᚐLanguageLevel(ctx context.Context, sel ast.SelectionSet, v *model.LanguageLevel) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
-	res := graphql.MarshalInt(*v)
-	return res
+	return v
 }
 
 func (ec *executionContext) marshalOModule2ᚖModuleᚋgraphᚋmodelᚐModule(ctx context.Context, sel ast.SelectionSet, v *model.Module) graphql.Marshaler {
@@ -4846,6 +4957,14 @@ func (ec *executionContext) marshalOModuleInfo2ᚖModuleᚋgraphᚋmodelᚐModul
 		return graphql.Null
 	}
 	return ec._ModuleInfo(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalONameFilter2ᚖModuleᚋgraphᚋmodelᚐNameFilter(ctx context.Context, v interface{}) (*model.NameFilter, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputNameFilter(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) unmarshalOPaginator2ᚖModuleᚋgraphᚋmodelᚐPaginator(ctx context.Context, v interface{}) (*model.Paginator, error) {
