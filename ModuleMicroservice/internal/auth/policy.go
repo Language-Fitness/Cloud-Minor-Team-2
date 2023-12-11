@@ -4,7 +4,6 @@ import (
 	"Module/graph/model"
 	"Module/internal/repository"
 	"errors"
-	"fmt"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
@@ -128,8 +127,6 @@ func (p *Policy) ListModules(bearerToken string) (bool, error) {
 func (p *Policy) HasPermissions(bearerToken string, role string) bool {
 	_, roles, _ := p.getSubAndRoles(bearerToken)
 
-	fmt.Println(roles, role)
-
 	return p.hasRole(roles, role)
 }
 
@@ -143,8 +140,6 @@ func (p *Policy) getSubAndRoles(bearerToken string) (string, []interface{}, erro
 	if err != nil {
 		return "", nil, err
 	}
-
-	fmt.Println(decodeToken)
 
 	sub, _ := decodeToken["sub"].(string)
 

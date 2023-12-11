@@ -6,8 +6,8 @@ type Module {
   id: ID!
   name: String!
   description: String!
-  difficulty: Int!
-  category: String!
+  difficulty: LanguageLevel!
+  category: Category!
   made_by: String!
   private: Boolean!
   key: String
@@ -20,8 +20,8 @@ type ModuleInfo {
   id: ID!
   name: String!
   description: String!
-  difficulty: Int!
-  category: String!
+  difficulty: LanguageLevel!
+  category: Category!
   made_by: String!
   private: Boolean!
 }
@@ -40,22 +40,56 @@ type Mutation {
 input ModuleInput {
   name: String!
   description: String!
-  difficulty: Int!
-  category: String!
+  difficulty: LanguageLevel!
+  category: Category!
   private: Boolean!
   key: String
 }
 
 input Filter {
   softDelete: Boolean
-  name: String
-  difficulty: Int
-  category: String
+  name: NameFilter
+  difficulty: LanguageLevel
+  category: Category
   private: Boolean
+}
+
+input NameFilter {
+  input: [String]!
+  type: NameFilterTypes!
 }
 
 input Paginator {
   amount: Int!
   Step: Int!
 }
+
+enum Category {
+  Grammatica
+  Spelling
+  Woordenschat
+  Uitdrukkingen
+  Interpunctie
+  Werkwoordvervoegingen
+  Fast_Track
+}
+
+enum LanguageLevel{
+  A1
+  A2
+  B1
+  B2
+  C1
+  C2
+}
+
+enum NameFilterTypes {
+  eq
+  ne
+  starts
+  ends
+}
+
+
+
 

@@ -188,12 +188,16 @@ func (m *ModuleService) ListModules(token string, filter *model.Filter, paginate
 	//	return nil, err
 	//}
 
+	filterNameInput := dereferenceArrayIfNeeded(filter.Name.Input)
+	fmt.Println(filterNameInput)
+	fmt.Println("$" + string(filter.Name.Type))
+	fmt.Println(dereferenceIfNeeded(filter.Difficulty))
+	fmt.Println(filter.Difficulty)
+
 	m.Validator.Validate(filter.SoftDelete, []string{"IsNull", "IsBoolean"}, "Filter softDelete")
-	m.Validator.Validate(filter.Name, []string{"IsNull", "IsString", "Length:<50"}, "Filter Name")
-	m.Validator.Validate(filter.Difficulty, []string{"IsNull", "IsInt", "Size:>0"}, "Filter Difficulty")
+	m.Validator.Validate(dereferenceArrayIfNeeded(filter.Name.Input), []string{"IsNull", "ArrayType:string"}, "Filter Name input")
 	m.Validator.Validate(filter.Private, []string{"IsNull", "IsBoolean"}, "Filter Private")
-	m.Validator.Validate(filter.Category, []string{"IsNull", "IsString", "Length:<50"}, "Filter Category")
-	m.Validator.Validate(paginate.Amount, []string{"IsInt", "Size:>0", "Size:<100"}, "Paginate Amount")
+	m.Validator.Validate(paginate.Amount, []string{"IsInt", "Size:>0", "Size:<101"}, "Paginate Amount")
 	m.Validator.Validate(paginate.Step, []string{"IsInt", "Size:>0"}, "Paginate Step")
 
 	validationErrors := m.Validator.GetErrors()
@@ -211,7 +215,9 @@ func (m *ModuleService) ListModules(token string, filter *model.Filter, paginate
 	}
 
 	if m.Policy.HasPermissions(token, "filter_module_Name") == true {
-		bsonFilter = append(bsonFilter, bson.E{Key: "name", Value: dereferenceIfNeeded(filter.Name)})
+		bsonFilter = addFilter(bsonFilter, "name", string(filter.Name.Type), dereferenceArrayIfNeeded(filter.Name.Input))
+		fmt.Println("test")
+		fmt.Println(bsonFilter)
 	}
 
 	if m.Policy.HasPermissions(token, "filter_module_Difficulty") == true {
@@ -238,6 +244,46 @@ func (m *ModuleService) ListModules(token string, filter *model.Filter, paginate
 	}
 
 	return modules, nil
+}
+
+func dereferenceArrayIfNeeded(value interface{}) []string {
+	var newArray []string
+
+	if myArray, ok := value.([]*string); ok {
+		for _, pointer := range myArray {
+			if pointer == nil {
+				continue
+			}
+
+			value := *pointer
+			newArray = append(newArray, value)
+		}
+	}
+
+	return newArray
+}
+
+func addFilter(bsonFilter []bson.E, key, op string, values []string) []bson.E {
+	switch op {
+	case "eq": // works
+		bsonFilter = append(bsonFilter, bson.E{Key: key, Value: bson.D{{"$in", values}}})
+	case "ne": // works
+		bsonFilter = append(bsonFilter, bson.E{Key: key, Value: bson.D{{"$nin", values}}})
+	case "starts": // works
+		var regexPatterns []string
+		for _, prefix := range values {
+			regexPatterns = append(regexPatterns, "^"+prefix)
+		}
+		bsonFilter = append(bsonFilter, bson.E{Key: key, Value: bson.D{{"$regex", strings.Join(regexPatterns, "|")}}})
+	case "ends": // works
+		var regexPatterns []string
+		for _, suffix := range values {
+			regexPatterns = append(regexPatterns, suffix+"$")
+		}
+		bsonFilter = append(bsonFilter, bson.E{Key: key, Value: bson.D{{"$regex", strings.Join(regexPatterns, "|")}}})
+	}
+
+	return bsonFilter
 }
 
 func dereferenceIfNeeded(value interface{}) interface{} {
