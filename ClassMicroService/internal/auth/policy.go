@@ -118,11 +118,10 @@ func (p *Policy) ListClasses(bearerToken string) error {
 }
 
 func (p *Policy) getSubAndRoles(bearerToken string) (string, []interface{}, error) {
-	//TODO: Valid Certificate
-	//token, err := p.Token.IntrospectToken(bearerToken)
-	//if err != nil || token == false {
-	//	return "", nil, errors.New("invalid token")
-	//}
+	token, err := p.Token.IntrospectToken(bearerToken)
+	if err != nil || token == false {
+		return "", nil, errors.New("invalid token introspect")
+	}
 
 	decodeToken, err := p.Token.DecodeToken(bearerToken)
 	if err != nil {

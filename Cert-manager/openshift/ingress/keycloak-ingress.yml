@@ -2,25 +2,25 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   labels:
-    app: gandalf-the-gateway
+    app: keycloak
   annotations:
     cert-manager.io/issuer: acme-issuer-production
     acme.cert-manager.io/http01-edit-in-place: "true"
-  name: gandalf-the-gateway-ingres
+  name: keycloak-ingres
   namespace: bramterlouw-dev
 spec:
   rules:
-    - host: gandalf-the-gateway-bramterlouw-dev.apps.ocp2-inholland.joran-bergfeld.com
+    - host: example-keycloak-bramterlouw-dev.apps.ocp2-inholland.joran-bergfeld.com
       http:
         paths:
           - pathType: Prefix
             path: /
             backend:
               service:
-                name: gandalf-the-gateway-service
+                name: example-keycloak-service
                 port:
-                  number: 4000
+                  number: 8888
   tls:
     - hosts:
-        - gandalf-the-gateway-bramterlouw-dev.apps.ocp2-inholland.joran-bergfeld.com
-      secretName: gateway-ingres-cert
+        - example-keycloak-bramterlouw-dev.apps.ocp2-inholland.joran-bergfeld.com
+      secretName: keycloak-ingres-cert

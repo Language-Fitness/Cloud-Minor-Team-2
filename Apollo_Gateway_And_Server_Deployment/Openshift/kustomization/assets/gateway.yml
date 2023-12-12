@@ -36,16 +36,3 @@ spec:
       targetPort: 4000
   selector:
     app: gandalf-the-gateway
----
-kind: Route
-apiVersion: route.openshift.io/v1
-metadata:
-  name: gandalf-the-gateway-route
-  labels:
-    app: gandalf-the-gateway
-spec:
-  port:
-    targetPort: 4000
-  to:
-    kind: Service
-    name: gandalf-the-gateway-service
