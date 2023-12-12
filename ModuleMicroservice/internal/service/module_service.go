@@ -3,6 +3,7 @@ package service
 import (
 	"Module/graph/model"
 	"Module/internal/auth"
+	"Module/internal/helper"
 	"Module/internal/repository"
 	"Module/internal/validation"
 	"errors"
@@ -11,7 +12,6 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
-	"reflect"
 	"strings"
 	"time"
 )
@@ -145,30 +145,29 @@ func (m *ModuleService) UpdateModule(token string, id string, updateData model.M
 }
 
 func (m *ModuleService) DeleteModule(token string, id string, filter *model.Filter) error {
-	//isAdmin, existingModule, err := m.Policy.DeleteModule(token, id)
-	//if err != nil {
-	//	return err
-	//}
+	isAdmin, existingModule, err := m.Policy.DeleteModule(token, id)
+	if err != nil {
+		return err
+	}
 
-	//if !*existingModule.SoftDeleted {
-	//	softDelete := true
-	//	existingModule.SoftDeleted = &softDelete
-	//
-	//	err := m.Repo.SoftDeleteModuleByID(id, *existingModule)
-	//	if err != nil {
-	//		return err
-	//	}
-	//	return nil
-	//}
+	if !*existingModule.SoftDeleted {
+		softDelete := true
+		existingModule.SoftDeleted = &softDelete
 
-	//
-	//if isAdmin && filter != nil && !*filter.SoftDelete {
-	//	err := m.Repo.HardDeleteModuleByID(id)
-	//	if err != nil {
-	//		return err
-	//	}
-	//	return nil
-	//}
+		err := m.Repo.SoftDeleteModuleByID(id, *existingModule)
+		if err != nil {
+			return err
+		}
+		return nil
+	}
+
+	if isAdmin && filter != nil && !*filter.SoftDelete {
+		err := m.Repo.HardDeleteModuleByID(id)
+		if err != nil {
+			return err
+		}
+		return nil
+	}
 
 	return errors.New("module could not be deleted")
 }
@@ -188,17 +187,18 @@ func (m *ModuleService) ListModules(token string, filter *model.Filter, paginate
 	//	return nil, err
 	//}
 
-	filterNameInput := dereferenceArrayIfNeeded(filter.Name.Input)
+	filterNameInput := helper.DereferenceArrayIfNeeded(filter.Name.Input)
 	fmt.Println(filterNameInput)
 	fmt.Println("$" + string(filter.Name.Type))
-	fmt.Println(dereferenceIfNeeded(filter.Difficulty))
+	fmt.Println(helper.DereferenceIfNeeded(filter.Difficulty))
 	fmt.Println(filter.Difficulty)
 
 	m.Validator.Validate(filter.SoftDelete, []string{"IsNull", "IsBoolean"}, "Filter softDelete")
-	m.Validator.Validate(dereferenceArrayIfNeeded(filter.Name.Input), []string{"IsNull", "ArrayType:string"}, "Filter Name input")
+	//@TODO fix this server 500 error
+	m.Validator.Validate(helper.DereferenceArrayIfNeeded(filter.Name.Input), []string{"IsNull", "ArrayType:string"}, "Filter Name input")
 	m.Validator.Validate(filter.Private, []string{"IsNull", "IsBoolean"}, "Filter Private")
 	m.Validator.Validate(paginate.Amount, []string{"IsInt", "Size:>0", "Size:<101"}, "Paginate Amount")
-	m.Validator.Validate(paginate.Step, []string{"IsInt", "Size:>0"}, "Paginate Step")
+	m.Validator.Validate(paginate.Step, []string{"IsInt", "Size:>=0"}, "Paginate Step")
 
 	validationErrors := m.Validator.GetErrors()
 	if len(validationErrors) > 0 {
@@ -207,29 +207,27 @@ func (m *ModuleService) ListModules(token string, filter *model.Filter, paginate
 		return nil, errors.New(errorMessage)
 	}
 
-	fmt.Println(dereferenceIfNeeded(filter.SoftDelete))
+	fmt.Println(helper.DereferenceIfNeeded(filter.SoftDelete))
 
 	bsonFilter := bson.D{}
 	if m.Policy.HasPermissions(token, "filter_module_SoftDelete") == true {
-		bsonFilter = append(bsonFilter, bson.E{Key: "softdeleted", Value: dereferenceIfNeeded(filter.SoftDelete)})
+		bsonFilter = append(bsonFilter, bson.E{Key: "softdeleted", Value: helper.DereferenceIfNeeded(filter.SoftDelete)})
 	}
 
 	if m.Policy.HasPermissions(token, "filter_module_Name") == true {
-		bsonFilter = addFilter(bsonFilter, "name", string(filter.Name.Type), dereferenceArrayIfNeeded(filter.Name.Input))
-		fmt.Println("test")
-		fmt.Println(bsonFilter)
+		bsonFilter = helper.AddFilter(bsonFilter, "name", string(filter.Name.Type), helper.DereferenceArrayIfNeeded(filter.Name.Input))
 	}
 
 	if m.Policy.HasPermissions(token, "filter_module_Difficulty") == true {
-		bsonFilter = append(bsonFilter, bson.E{Key: "difficulty", Value: dereferenceIfNeeded(filter.Difficulty)})
+		bsonFilter = append(bsonFilter, bson.E{Key: "difficulty", Value: helper.DereferenceIfNeeded(filter.Difficulty)})
 	}
 
 	if m.Policy.HasPermissions(token, "filter_module_Private") == true {
-		bsonFilter = append(bsonFilter, bson.E{Key: "private", Value: dereferenceIfNeeded(filter.Private)})
+		bsonFilter = append(bsonFilter, bson.E{Key: "private", Value: helper.DereferenceIfNeeded(filter.Private)})
 	}
 
 	if m.Policy.HasPermissions(token, "filter_module_Category") == true {
-		bsonFilter = append(bsonFilter, bson.E{Key: "category", Value: dereferenceIfNeeded(filter.Category)})
+		bsonFilter = append(bsonFilter, bson.E{Key: "category", Value: helper.DereferenceIfNeeded(filter.Category)})
 	}
 
 	fmt.Println(bsonFilter)
@@ -244,52 +242,4 @@ func (m *ModuleService) ListModules(token string, filter *model.Filter, paginate
 	}
 
 	return modules, nil
-}
-
-func dereferenceArrayIfNeeded(value interface{}) []string {
-	var newArray []string
-
-	if myArray, ok := value.([]*string); ok {
-		for _, pointer := range myArray {
-			if pointer == nil {
-				continue
-			}
-
-			value := *pointer
-			newArray = append(newArray, value)
-		}
-	}
-
-	return newArray
-}
-
-func addFilter(bsonFilter []bson.E, key, op string, values []string) []bson.E {
-	switch op {
-	case "eq": // works
-		bsonFilter = append(bsonFilter, bson.E{Key: key, Value: bson.D{{"$in", values}}})
-	case "ne": // works
-		bsonFilter = append(bsonFilter, bson.E{Key: key, Value: bson.D{{"$nin", values}}})
-	case "starts": // works
-		var regexPatterns []string
-		for _, prefix := range values {
-			regexPatterns = append(regexPatterns, "^"+prefix)
-		}
-		bsonFilter = append(bsonFilter, bson.E{Key: key, Value: bson.D{{"$regex", strings.Join(regexPatterns, "|")}}})
-	case "ends": // works
-		var regexPatterns []string
-		for _, suffix := range values {
-			regexPatterns = append(regexPatterns, suffix+"$")
-		}
-		bsonFilter = append(bsonFilter, bson.E{Key: key, Value: bson.D{{"$regex", strings.Join(regexPatterns, "|")}}})
-	}
-
-	return bsonFilter
-}
-
-func dereferenceIfNeeded(value interface{}) interface{} {
-	if reflect.TypeOf(value).Kind() == reflect.Ptr {
-		return reflect.ValueOf(value).Elem().Interface()
-	}
-
-	return value
 }
