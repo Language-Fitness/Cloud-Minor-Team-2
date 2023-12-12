@@ -17,9 +17,9 @@ spec:
             path: /
             backend:
               service:
-                name: cloud-keycloak-service
+                name: example-keycloak-service
                 port:
-                  number: 8443
+                  number: 8888
   tls:
     - hosts:
         - example-keycloak-bramterlouw-dev.apps.ocp2-inholland.joran-bergfeld.com
