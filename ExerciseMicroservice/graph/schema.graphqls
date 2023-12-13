@@ -27,11 +27,12 @@ input ExerciseInput {
 }
 
 type Query {
-  GetExerciseByModuleId(moduleId: ID!): [Exercise]
+  GetExercise(ExerciseId: ID!): [Exercise]
+  ListExercise: [Exercise]
 }
 
 type Mutation {
-  AddExercise(exercise: ExerciseInput!): Exercise
+  CreateExercise(exercise: ExerciseInput!): Exercise
   UpdateExercise(exercise: ExerciseInput!): Exercise
   DeleteExercise(id: ID!): Exercise
 }
