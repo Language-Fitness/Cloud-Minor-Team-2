@@ -11,11 +11,9 @@ type IResultPolicy interface {
 	CreateResult(bearerToken string) error
 	UpdateResult(bearerToken string, id string) (*model.Result, error)
 	DeleteResult(bearerToken string, id string) error
-	GetResultByExercise(bearerToken string, exerciseID string) error
-	GetResultsByClass(bearerToken string, classID string) error
-	GetResultsByUser(bearerToken string, userID string) error
 	GetResultByID(bearerToken string, id string) error
-	DeleteResultByClass(bearerToken string, classID string) (*string, error)
+	ListResult(bearerToken string) error //TODO: implement
+
 	// Saga GRPC functions
 	SoftDeleteByUser(bearerToken string, userID string) error
 	SoftDeleteByClass(bearerToken string, classID string) error
@@ -37,6 +35,11 @@ func NewResultPolicy(collection *mongo.Collection) IResultPolicy {
 		Token:            token,
 		ResultRepository: repository.NewResultRepository(collection),
 	}
+}
+
+func (p *ResultPolicy) ListResult(bearerToken string) error {
+	//TODO implement me
+	panic("implement me")
 }
 
 func (p *ResultPolicy) CreateResult(bearerToken string) error {
@@ -96,45 +99,6 @@ func (p *ResultPolicy) DeleteResult(bearerToken string, id string) error {
 	return errors.New("invalid permissions for this action")
 }
 
-func (p *ResultPolicy) GetResultByExercise(bearerToken string, exerciseID string) error {
-	_, roles, err2 := p.getSubAndRoles(bearerToken)
-	if err2 != nil {
-		return err2
-	}
-
-	if !p.hasRole(roles, "get_result_by_exercise") {
-		return errors.New("invalid permissions for this action")
-	}
-
-	return nil
-}
-
-func (p *ResultPolicy) GetResultsByClass(bearerToken string, classID string) error {
-	_, roles, err2 := p.getSubAndRoles(bearerToken)
-	if err2 != nil {
-		return err2
-	}
-
-	if !p.hasRole(roles, "get_results_by_class") {
-		return errors.New("invalid permissions for this action")
-	}
-
-	return nil
-}
-
-func (p *ResultPolicy) GetResultsByUser(bearerToken string, userID string) error {
-	_, roles, err2 := p.getSubAndRoles(bearerToken)
-	if err2 != nil {
-		return err2
-	}
-
-	if !p.hasRole(roles, "get_results_by_user") {
-		return errors.New("invalid permissions for this action")
-	}
-
-	return nil
-}
-
 func (p *ResultPolicy) GetResultByID(bearerToken string, id string) error {
 	_, roles, err2 := p.getSubAndRoles(bearerToken)
 	if err2 != nil {
@@ -148,18 +112,7 @@ func (p *ResultPolicy) GetResultByID(bearerToken string, id string) error {
 	return nil
 }
 
-func (p *ResultPolicy) DeleteResultByClass(bearerToken string, classID string) (*string, error) {
-	uuid, roles, err := p.getSubAndRoles(bearerToken)
-	if err != nil {
-		return nil, err
-	}
-
-	if !p.hasRole(roles, "delete_result_by_class") {
-		return nil, errors.New("invalid permissions for this action")
-	}
-
-	return &uuid, nil
-}
+//grpc functions
 
 func (p *ResultPolicy) SoftDeleteByUser(bearerToken string, userID string) error {
 	uuid, roles, err := p.getSubAndRoles(bearerToken)

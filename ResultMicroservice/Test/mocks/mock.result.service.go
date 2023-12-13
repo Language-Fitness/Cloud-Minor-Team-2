@@ -29,26 +29,6 @@ func (m *MockResultService) GetResultById(bearerToken string, id string) (*model
 	return args.Get(0).(*model.Result), args.Error(1)
 }
 
-func (m *MockResultService) GetResultByExerciseId(bearerToken string, id string) (*model.Result, error) {
-	args := m.Called(bearerToken, id)
-	return args.Get(0).(*model.Result), args.Error(1)
-}
-
-func (m *MockResultService) GetResultByClassId(bearerToken string, id string) ([]*model.Result, error) {
-	args := m.Called(bearerToken, id)
-	return args.Get(0).([]*model.Result), args.Error(1)
-}
-
-func (m *MockResultService) GetResultsByUserID(bearerToken string, userID string) ([]*model.Result, error) {
-	args := m.Called(bearerToken, userID)
-	return args.Get(0).([]*model.Result), args.Error(1)
-}
-
-func (m *MockResultService) DeleteResultByClassID(bearerToken string, classID string) error {
-	args := m.Called(bearerToken, classID)
-	return args.Error(0)
-}
-
 func (m *MockResultService) SoftDeleteByUser(bearerToken string, userID string) (string, bool, error) {
 	args := m.Called(bearerToken, userID)
 	return args.String(0), args.Bool(1), args.Error(2)
@@ -77,4 +57,9 @@ func (m *MockResultService) DeleteByClass(bearerToken string, classID string) (s
 func (m *MockResultService) DeleteByModule(bearerToken string, moduleID string) (string, bool, error) {
 	args := m.Called(bearerToken, moduleID)
 	return args.String(0), args.Bool(1), args.Error(2)
+}
+
+func (m *MockResultService) ListResults(bearerToken string) ([]*model.Result, error) {
+	args := m.Called(bearerToken)
+	return args.Get(0).([]*model.Result), args.Error(1)
 }
