@@ -23,6 +23,7 @@ export default {
 
     //Show generated functionality
     canGenerate: false, // (only if user has access to this)
+    questionsToGenerate: 2,
     hasGenerated: false,
     genQuestions: [],
 
@@ -58,7 +59,7 @@ export default {
       question: '',
       answers: [],
       pos_correct_answer: 0,
-      question_type: '',
+      question_type: 'MC',
       difficulty: '',
     },
 
@@ -69,7 +70,7 @@ export default {
       question: '',
       answers: [],
       pos_correct_answer: 0,
-      question_type: '',
+      question_type: 'MC',
       difficulty: '',
     },
   }),
@@ -107,6 +108,8 @@ export default {
       this.$nextTick(() => {
         this.editedItem = Object.assign({}, this.defaultItem)
         this.editedIndex = -1
+        this.genQuestions = []
+        this.hasGenerated = false
       })
     },
 
@@ -156,7 +159,8 @@ export default {
       </p>
 
       <h3 class="my-2 pa-2 w-100" :style="'border: 1px solid lightgray'">Class:
-        2055b38e-992d-11ee-b9d1-0242ac120002</h3>
+        2055b38e-992d-11ee-b9d1-0242ac120002
+      </h3>
 
       <div class="filter-container">
         <div class="d-flex flex-row flex-nowrap w-50">
@@ -233,134 +237,141 @@ export default {
           </v-text-field>
         </div>
 
-      <!-- MODALS -->
-      <v-dialog
-          v-model="dialog"
-          max-width="600px"
-      >
-        <template v-slot:activator="{ props }">
-          <v-btn
-              color="primary"
-              class="ml-2"
-              dark
-              v-bind="props"
-              border
-          >
-            New Item
-          </v-btn>
+        <!-- MODALS -->
+        <v-dialog
+            v-model="dialog"
+            max-width="600px"
+            @click:outside="close"
+        >
+          <!-- New Item Button -->
+          <template v-slot:activator="{ props }">
+            <v-btn
+                color="primary"
+                class="ml-2"
+                dark
+                v-bind="props"
+                border
+            >
+              New Item
+            </v-btn>
+          </template>
 
-        </template>
-        <v-card>
-          <v-card-title class="ml-5 mt-2">
-            <span class="text-h5">{{ formTitle }}</span>
-          </v-card-title>
+          <v-card>
+            <v-card-title class="ml-5 mt-2">
+              <span class="text-h5">{{ formTitle }}</span>
+            </v-card-title>
 
-          <v-card-text class="ma-0 pt-0">
-            <v-container dense>
-              <v-row no-gutters v-if="!hasGenerated && this.editedIndex === -1">
-                <v-col
-                    cols="6"
-                >
-                  <v-combobox
-                      class="mb-5"
-                      density="compact"
-                      v-model="editedItem.question_type"
-                      hide-details
-                      :items="[2,3,4,5,6,7,8,9,10]"
-                      label="How many questions to generate?"
-                  ></v-combobox>
-                </v-col>
-                <v-col cols="6" class="pl-2">
-                  <v-btn
-                      color="blue-darken-1"
-                      variant="outlined"
-                      @click="generate"
+            <v-card-text class="ma-0 pt-0">
+              <v-container dense>
+
+                <v-row no-gutters v-if="!hasGenerated && this.editedIndex === -1">
+                  <v-col
+                      cols="6"
                   >
-                    Generate
-                  </v-btn>
-                </v-col>
-              </v-row>
+                    <v-combobox
+                        class="mb-5"
+                        density="compact"
+                        v-model="questionsToGenerate"
+                        hide-details
+                        :items="[2,3,4,5,6,7,8,9,10]"
+                        label="How many questions to generate?"
+                    ></v-combobox>
+                  </v-col>
+                  <v-col cols="6" class="pl-2">
+                    <v-btn
+                        color="blue-darken-1"
+                        variant="outlined"
+                        @click="generate"
+                    >
+                      Generate
+                    </v-btn>
+                  </v-col>
+                </v-row>
 
-              <v-row no-gutters>
-                <v-col
-                    cols="12"
-                >
-                  <v-text-field
-                      v-model="editedItem.name"
-                      label="Name"
-                  ></v-text-field>
-                </v-col>
-              </v-row>
-              <v-row no-gutters>
-                <v-col
-                    cols="12"
-                >
-                  <v-text-field
-                      v-model="editedItem.question"
-                      label="Question"
-                  ></v-text-field>
-                </v-col>
-              </v-row>
-              <v-row no-gutters>
-                <v-col
-                    cols="12"
-                >
-                  <v-combobox
-                      class="mb-5"
-                      v-model="editedItem.question_type"
-                      hide-details
-                      :items="question_types"
-                      label="Question type"
-                  ></v-combobox>
-                </v-col>
-              </v-row>
+                <v-divider class="mb-5"></v-divider>
 
-              <v-row>
-                <v-col cols="6">
-                  <v-text-field
-                      v-model="editedItem.name"
-                      label="Answer 1"
-                  ></v-text-field>
-                  <v-text-field
-                      v-model="editedItem.name"
-                      label="Answer 3"
-                  ></v-text-field>
-                  <v-text-field
-                      v-model="editedItem.name"
-                      label="Answer 3"
-                  ></v-text-field>
-                </v-col>
+                <v-row no-gutters>
+                  <v-col
+                      cols="12"
+                  >
+                    <v-text-field
+                        v-model="editedItem.name"
+                        label="Name"
+                    ></v-text-field>
+                  </v-col>
+                </v-row>
 
-                <v-col cols="6">
-                  <v-text-field
-                      v-model="editedItem.name"
-                      label="Answer 2"
-                  ></v-text-field>
-                  <v-text-field
-                      v-model="editedItem.name"
-                      label="Answer 4"
-                  ></v-text-field>
-                </v-col>
-              </v-row>
+                <v-row no-gutters>
+                  <v-col
+                      cols="12"
+                  >
+                    <v-text-field
+                        v-model="editedItem.question"
+                        label="Question"
+                    ></v-text-field>
+                  </v-col>
+                </v-row>
 
-              <v-row>
-                <v-col
-                    cols="12"
-                >
-                  <v-combobox
-                      class="mb-5"
-                      v-model="editedItem.difficulty"
-                      hide-details
-                      :items="difficulties"
-                      label="Difficulty"
-                  ></v-combobox>
-                </v-col>
-              </v-row>
-            </v-container>
-          </v-card-text>
+                <v-row no-gutters>
+                  <v-row>
+                    <v-col
+                        cols="6"
+                    >
+                      <v-combobox
+                          class="mb-5"
+                          v-model="editedItem.question_type"
+                          hide-details
+                          :items="question_types"
+                          label="Question type"
+                      ></v-combobox>
+                    </v-col>
+                    <v-col
+                        cols="6"
+                    >
+                      <v-combobox
+                          class="mb-5"
+                          v-model="editedItem.difficulty"
+                          hide-details
+                          :items="difficulties"
+                          label="Difficulty"
+                      ></v-combobox>
+                    </v-col>
+                  </v-row>
+                </v-row>
 
-          <!-- EDITING CONFIRMATION SECTION -->
+                <v-row>
+                  <v-col cols="6">
+                    <v-text-field
+                        v-model="todo"
+                        label="Answer 1"
+                    ></v-text-field>
+                    <v-text-field
+                        v-model="todo"
+                        label="Answer 3"
+                    ></v-text-field>
+                    <v-text-field
+                        v-model="todo"
+                        label="Answer 5"
+                    ></v-text-field>
+                  </v-col>
+
+                  <v-col cols="6">
+                    <v-text-field
+                        v-model="todo"
+                        label="Answer 2"
+                    ></v-text-field>
+                    <v-text-field
+                        v-model="todo"
+                        label="Answer 4"
+                    ></v-text-field>
+                  </v-col>
+                </v-row>
+              </v-container>
+            </v-card-text>
+
+            <!-- EDITING CONFIRMATION SECTION -->
             <v-card-actions class="flex-row justify-space-between mx-5">
+
               <v-btn
                   color="blue-darken-1"
                   variant="text"
@@ -368,6 +379,7 @@ export default {
               >
                 Cancel
               </v-btn>
+
               <v-btn
                   v-if="hasGenerated"
                   color="blue-darken-1"
@@ -376,6 +388,7 @@ export default {
               >
                 Save & next
               </v-btn>
+
               <v-btn
                   v-else
                   color="blue-darken-1"
@@ -385,26 +398,27 @@ export default {
                 Save
               </v-btn>
             </v-card-actions>
-        </v-card>
-      </v-dialog>
+          </v-card>
+        </v-dialog>
 
-      <!-- DELETION MODAL -->
-      <v-dialog v-model="dialogDelete" max-width="500px">
-        <v-card class="flex-column align-center pa-5">
-          <v-card-title class="text-h5">Are you sure you want to delete this item?</v-card-title>
+        <!-- DELETION MODAL -->
+        <v-dialog v-model="dialogDelete" max-width="500px">
+          <v-card class="flex-column align-center pa-5">
+            <v-card-title class="text-h5">Are you sure you want to delete this item?</v-card-title>
 
-          <v-checkbox v-if="isAdmin" class="pa-0" hide-details label="Hard delete"></v-checkbox>
+            <v-checkbox v-if="isAdmin" class="pa-0" hide-details label="Hard delete"></v-checkbox>
 
-          <v-card-text class="pt-0">You will not be able to recover this item.</v-card-text>
+            <v-card-text class="pt-0">You will not be able to recover this item.</v-card-text>
 
-          <v-card-actions class="flex-row justify-space-between">
-            <v-btn color="blue-darken-1" variant="text" @click="closeDelete">Cancel</v-btn>
-            <v-btn color="blue-darken-1" variant="text" @click="deleteItemConfirm">OK</v-btn>
-            <v-spacer></v-spacer>
-          </v-card-actions>
-        </v-card>
-      </v-dialog>
-    </div>
+            <v-card-actions class="flex-row justify-space-between">
+              <v-btn color="blue-darken-1" variant="text" @click="closeDelete">Cancel</v-btn>
+              <v-btn color="blue-darken-1" variant="text" @click="deleteItemConfirm">OK</v-btn>
+              <v-spacer></v-spacer>
+            </v-card-actions>
+          </v-card>
+        </v-dialog>
+      </div>
+
       <v-data-table-server
           height="100%"
           class="table-entity"
@@ -425,21 +439,12 @@ export default {
           >
             mdi-pencil
           </v-icon>
+
           <v-icon
               size="small"
               @click="deleteItem(item)"
           >
             mdi-delete
-          </v-icon>
-        </template>
-
-        <template v-slot:item.exercises="{ item }">
-          <v-icon
-              size="small"
-              class="me-2"
-              @click="goToClasses(item)"
-          >
-            mdi-arrow-right-bold-circle-outline
           </v-icon>
         </template>
       </v-data-table-server>

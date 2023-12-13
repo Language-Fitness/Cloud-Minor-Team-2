@@ -2,7 +2,7 @@ export const headers = [
     {title: 'Name', key: 'name', align: 'start', sortable: false},
     {title: 'Question', key: 'question', align: 'start', sortable: false},
     {title: 'Answers', key: 'answers', align: 'start', sortable: false},
-    {title: 'Question Type', key: 'question_type', align: 'start', sortable: false},
+    {title: 'Type', key: 'question_type', align: 'start', sortable: false},
     {title: 'Difficulty', key: 'difficulty', align: 'start', sortable: false},
     {title: 'Made by', key: 'made_by', align: 'start', sortable: false},
     {title: 'Actions', key: 'actions', align: 'start', sortable: false},
