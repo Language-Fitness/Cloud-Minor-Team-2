@@ -1,6 +1,7 @@
 <script>
 import {headers} from "@/views/class/class";
 import {classes} from "@/views/class/class";
+import router from '@/router'
 
 const FakeAPI = {
   async fetch({page, itemsPerPage}) {
@@ -22,7 +23,6 @@ export default {
     isAdmin: true,
     itemsPerPage: 10,
     headers: headers,
-    categories: ['Grammatica', 'Spelling', 'Woordenschat', 'Werkwoordspelling', 'Fastlane'],
     difficulties: ['A1', 'A2', 'B1', 'B2', 'C1', 'C2'],
     name_search: '',
     name_type_search: '',
@@ -107,7 +107,7 @@ export default {
     },
 
     goToClasses(item) {
-      console.log(item.id)
+      router.push('/exercise');
     }
   },
 }

@@ -21,8 +21,6 @@ export default {
     isAdmin: true,
     itemsPerPage: 10,
     headers: headers,
-    categories: ['Grammatica', 'Spelling', 'Woordenschat', 'Werkwoordspelling', 'Fastlane'],
-    difficulties: ['A1', 'A2', 'B1', 'B2', 'C1', 'C2'],
     name_search: '',
     name_type_search: '',
     location_search: '',
@@ -158,7 +156,7 @@ export default {
               :items="[true, false]"
               density="compact"
               label="Soft deleted"
-              class="ma-2"
+              class="mx-2 mt-2"
           ></v-combobox>
         </div>
 
