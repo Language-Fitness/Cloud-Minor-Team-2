@@ -10,9 +10,9 @@ import (
 	"fmt"
 )
 
-// AddExercise is the resolver for the AddExercise field.
-func (r *mutationResolver) AddExercise(ctx context.Context, exercise model.ExerciseInput) (*model.Exercise, error) {
-	panic(fmt.Errorf("not implemented: AddExercise - AddExercise"))
+// CreateExercise is the resolver for the CreateExercise field.
+func (r *mutationResolver) CreateExercise(ctx context.Context, exercise model.ExerciseInput) (*model.Exercise, error) {
+	panic(fmt.Errorf("not implemented: CreateExercise - CreateExercise"))
 }
 
 // UpdateExercise is the resolver for the UpdateExercise field.
@@ -25,9 +25,14 @@ func (r *mutationResolver) DeleteExercise(ctx context.Context, id string) (*mode
 	panic(fmt.Errorf("not implemented: DeleteExercise - DeleteExercise"))
 }
 
-// GetExerciseByModuleID is the resolver for the GetExerciseByModuleId field.
-func (r *queryResolver) GetExerciseByModuleID(ctx context.Context, moduleID string) ([]*model.Exercise, error) {
-	panic(fmt.Errorf("not implemented: GetExerciseByModuleID - GetExerciseByModuleId"))
+// GetExercise is the resolver for the GetExercise field.
+func (r *queryResolver) GetExercise(ctx context.Context, exerciseID string) ([]*model.Exercise, error) {
+	panic(fmt.Errorf("not implemented: GetExercise - GetExercise"))
+}
+
+// ListExercise is the resolver for the ListExercise field.
+func (r *queryResolver) ListExercise(ctx context.Context) ([]*model.Exercise, error) {
+	panic(fmt.Errorf("not implemented: ListExercise - ListExercise"))
 }
 
 // Mutation returns MutationResolver implementation.

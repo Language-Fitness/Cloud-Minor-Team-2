@@ -62,23 +62,25 @@ type ComplexityRoot struct {
 	}
 
 	Mutation struct {
-		AddExercise    func(childComplexity int, exercise model.ExerciseInput) int
+		CreateExercise func(childComplexity int, exercise model.ExerciseInput) int
 		DeleteExercise func(childComplexity int, id string) int
 		UpdateExercise func(childComplexity int, exercise model.ExerciseInput) int
 	}
 
 	Query struct {
-		GetExerciseByModuleID func(childComplexity int, moduleID string) int
+		GetExercise  func(childComplexity int, exerciseID string) int
+		ListExercise func(childComplexity int) int
 	}
 }
 
 type MutationResolver interface {
-	AddExercise(ctx context.Context, exercise model.ExerciseInput) (*model.Exercise, error)
+	CreateExercise(ctx context.Context, exercise model.ExerciseInput) (*model.Exercise, error)
 	UpdateExercise(ctx context.Context, exercise model.ExerciseInput) (*model.Exercise, error)
 	DeleteExercise(ctx context.Context, id string) (*model.Exercise, error)
 }
 type QueryResolver interface {
-	GetExerciseByModuleID(ctx context.Context, moduleID string) ([]*model.Exercise, error)
+	GetExercise(ctx context.Context, exerciseID string) ([]*model.Exercise, error)
+	ListExercise(ctx context.Context) ([]*model.Exercise, error)
 }
 
 type executableSchema struct {
@@ -177,17 +179,17 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Exercise.UpdatedAt(childComplexity), true
 
-	case "Mutation.AddExercise":
-		if e.complexity.Mutation.AddExercise == nil {
+	case "Mutation.CreateExercise":
+		if e.complexity.Mutation.CreateExercise == nil {
 			break
 		}
 
-		args, err := ec.field_Mutation_AddExercise_args(context.TODO(), rawArgs)
+		args, err := ec.field_Mutation_CreateExercise_args(context.TODO(), rawArgs)
 		if err != nil {
 			return 0, false
 		}
 
-		return e.complexity.Mutation.AddExercise(childComplexity, args["exercise"].(model.ExerciseInput)), true
+		return e.complexity.Mutation.CreateExercise(childComplexity, args["exercise"].(model.ExerciseInput)), true
 
 	case "Mutation.DeleteExercise":
 		if e.complexity.Mutation.DeleteExercise == nil {
@@ -213,17 +215,24 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.UpdateExercise(childComplexity, args["exercise"].(model.ExerciseInput)), true
 
-	case "Query.GetExerciseByModuleId":
-		if e.complexity.Query.GetExerciseByModuleID == nil {
+	case "Query.GetExercise":
+		if e.complexity.Query.GetExercise == nil {
 			break
 		}
 
-		args, err := ec.field_Query_GetExerciseByModuleId_args(context.TODO(), rawArgs)
+		args, err := ec.field_Query_GetExercise_args(context.TODO(), rawArgs)
 		if err != nil {
 			return 0, false
 		}
 
-		return e.complexity.Query.GetExerciseByModuleID(childComplexity, args["moduleId"].(string)), true
+		return e.complexity.Query.GetExercise(childComplexity, args["ExerciseId"].(string)), true
+
+	case "Query.ListExercise":
+		if e.complexity.Query.ListExercise == nil {
+			break
+		}
+
+		return e.complexity.Query.ListExercise(childComplexity), true
 
 	}
 	return 0, false
@@ -350,7 +359,7 @@ var parsedSchema = gqlparser.MustLoadSchema(sources...)
 
 // region    ***************************** args.gotpl *****************************
 
-func (ec *executionContext) field_Mutation_AddExercise_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_Mutation_CreateExercise_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
 	var arg0 model.ExerciseInput
@@ -395,18 +404,18 @@ func (ec *executionContext) field_Mutation_UpdateExercise_args(ctx context.Conte
 	return args, nil
 }
 
-func (ec *executionContext) field_Query_GetExerciseByModuleId_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_Query_GetExercise_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
 	var arg0 string
-	if tmp, ok := rawArgs["moduleId"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("moduleId"))
+	if tmp, ok := rawArgs["ExerciseId"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("ExerciseId"))
 		arg0, err = ec.unmarshalNID2string(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["moduleId"] = arg0
+	args["ExerciseId"] = arg0
 	return args, nil
 }
 
@@ -947,8 +956,8 @@ func (ec *executionContext) fieldContext_Exercise_soft_deleted(ctx context.Conte
 	return fc, nil
 }
 
-func (ec *executionContext) _Mutation_AddExercise(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Mutation_AddExercise(ctx, field)
+func (ec *executionContext) _Mutation_CreateExercise(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_CreateExercise(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -961,7 +970,7 @@ func (ec *executionContext) _Mutation_AddExercise(ctx context.Context, field gra
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().AddExercise(rctx, fc.Args["exercise"].(model.ExerciseInput))
+		return ec.resolvers.Mutation().CreateExercise(rctx, fc.Args["exercise"].(model.ExerciseInput))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -975,7 +984,7 @@ func (ec *executionContext) _Mutation_AddExercise(ctx context.Context, field gra
 	return ec.marshalOExercise2ᚖExerciseMicroserviceᚋgraphᚋmodelᚐExercise(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Mutation_AddExercise(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Mutation_CreateExercise(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Mutation",
 		Field:      field,
@@ -1016,7 +1025,7 @@ func (ec *executionContext) fieldContext_Mutation_AddExercise(ctx context.Contex
 		}
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Mutation_AddExercise_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+	if fc.Args, err = ec.field_Mutation_CreateExercise_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -1175,8 +1184,8 @@ func (ec *executionContext) fieldContext_Mutation_DeleteExercise(ctx context.Con
 	return fc, nil
 }
 
-func (ec *executionContext) _Query_GetExerciseByModuleId(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Query_GetExerciseByModuleId(ctx, field)
+func (ec *executionContext) _Query_GetExercise(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_GetExercise(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -1189,7 +1198,7 @@ func (ec *executionContext) _Query_GetExerciseByModuleId(ctx context.Context, fi
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().GetExerciseByModuleID(rctx, fc.Args["moduleId"].(string))
+		return ec.resolvers.Query().GetExercise(rctx, fc.Args["ExerciseId"].(string))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1203,7 +1212,7 @@ func (ec *executionContext) _Query_GetExerciseByModuleId(ctx context.Context, fi
 	return ec.marshalOExercise2ᚕᚖExerciseMicroserviceᚋgraphᚋmodelᚐExercise(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Query_GetExerciseByModuleId(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Query_GetExercise(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Query",
 		Field:      field,
@@ -1244,9 +1253,74 @@ func (ec *executionContext) fieldContext_Query_GetExerciseByModuleId(ctx context
 		}
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Query_GetExerciseByModuleId_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+	if fc.Args, err = ec.field_Query_GetExercise_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_ListExercise(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_ListExercise(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().ListExercise(rctx)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*model.Exercise)
+	fc.Result = res
+	return ec.marshalOExercise2ᚕᚖExerciseMicroserviceᚋgraphᚋmodelᚐExercise(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_ListExercise(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Exercise_id(ctx, field)
+			case "class_Id":
+				return ec.fieldContext_Exercise_class_Id(ctx, field)
+			case "name":
+				return ec.fieldContext_Exercise_name(ctx, field)
+			case "question":
+				return ec.fieldContext_Exercise_question(ctx, field)
+			case "answers":
+				return ec.fieldContext_Exercise_answers(ctx, field)
+			case "pos_correct_answer":
+				return ec.fieldContext_Exercise_pos_correct_answer(ctx, field)
+			case "question_type_id":
+				return ec.fieldContext_Exercise_question_type_id(ctx, field)
+			case "difficulty":
+				return ec.fieldContext_Exercise_difficulty(ctx, field)
+			case "created_at":
+				return ec.fieldContext_Exercise_created_at(ctx, field)
+			case "updated_at":
+				return ec.fieldContext_Exercise_updated_at(ctx, field)
+			case "soft_deleted":
+				return ec.fieldContext_Exercise_soft_deleted(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Exercise", field.Name)
+		},
 	}
 	return fc, nil
 }
@@ -3352,9 +3426,9 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Mutation")
-		case "AddExercise":
+		case "CreateExercise":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Mutation_AddExercise(ctx, field)
+				return ec._Mutation_CreateExercise(ctx, field)
 			})
 		case "UpdateExercise":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
@@ -3406,7 +3480,7 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Query")
-		case "GetExerciseByModuleId":
+		case "GetExercise":
 			field := field
 
 			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
@@ -3415,7 +3489,26 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Query_GetExerciseByModuleId(ctx, field)
+				res = ec._Query_GetExercise(ctx, field)
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "ListExercise":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_ListExercise(ctx, field)
 				return res
 			}
 
