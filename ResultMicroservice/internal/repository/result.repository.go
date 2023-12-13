@@ -17,10 +17,7 @@ type IResultRepository interface {
 	UpdateResult(id string, updatedResult model.Result) (*model.Result, error)
 	DeleteResultByID(id string) error
 	GetResultByID(id string) (*model.Result, error)
-	GetResultByExerciseId(id string) (*model.Result, error)
-	GetResultByClassId(id string) ([]*model.Result, error)
-	GetResultsByUserID(userID string) ([]*model.Result, error)
-	DeleteResultByClassAndUserID(classID string, userID string) error
+	ListResults() ([]*model.Result, error) //TODO: implement
 	//Saga GRPC
 	//Todo has to be soft deleted, before it can be hard deleted
 	SoftDeleteByUser(userID string) error
@@ -45,6 +42,11 @@ func NewResultRepository(collection *mongo.Collection) IResultRepository {
 		results:    []*model.Result{},
 		collection: collection,
 	}
+}
+
+func (r *ResultRepository) ListResults() ([]*model.Result, error) {
+	//TODO implement me
+	panic("implement me")
 }
 
 func (r *ResultRepository) CreateResult(newResult *model.Result) (*model.Result, error) {
@@ -111,58 +113,6 @@ func (r *ResultRepository) DeleteResultByID(id string) error {
 	return nil
 }
 
-func (r *ResultRepository) DeleteResultByClassAndUserID(classID string, userID string) error {
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10) // 10-second timeout
-	defer cancel()
-
-	filter := bson.M{
-		"class_id": classID,
-		"user_id":  userID, // Add filter for user_id
-	}
-
-	_, err := r.collection.DeleteMany(ctx, filter)
-	if err != nil {
-		return err // Return any MongoDB-related errors.
-	}
-
-	return nil
-}
-
-func (r *ResultRepository) GetResultByExerciseId(id string) (*model.Result, error) {
-	ctx, cancel := context.WithTimeout(context.TODO(), time.Second*10) // 10-second timeout
-	defer cancel()
-
-	filter := bson.M{"exercise_id": id}
-	var result model.Result
-
-	err := r.collection.FindOne(ctx, filter).Decode(&result)
-	if err != nil {
-		return nil, err
-	}
-
-	return &result, nil
-}
-
-func (r *ResultRepository) GetResultByClassId(id string) ([]*model.Result, error) {
-	ctx, cancel := context.WithTimeout(context.TODO(), time.Second*10) // 10-second timeout
-	defer cancel()
-
-	filter := bson.M{"class_id": id}
-	var result []*model.Result
-
-	cursor, err := r.collection.Find(ctx, filter)
-	if err != nil {
-		return nil, err
-	}
-
-	err = cursor.All(ctx, &result)
-	if err != nil {
-		return nil, err
-	}
-
-	return result, nil
-}
-
 func (r *ResultRepository) GetResultByID(id string) (*model.Result, error) {
 	ctx, cancel := context.WithTimeout(context.TODO(), time.Second*10) // 10-second timeout
 	defer cancel()
@@ -176,26 +126,6 @@ func (r *ResultRepository) GetResultByID(id string) (*model.Result, error) {
 	}
 
 	return &result, nil
-}
-
-func (r *ResultRepository) GetResultsByUserID(userID string) ([]*model.Result, error) {
-	ctx, cancel := context.WithTimeout(context.TODO(), time.Second*10) // 10-second timeout
-	defer cancel()
-
-	filter := bson.M{"user_id": userID}
-	var results []*model.Result
-
-	cursor, err := r.collection.Find(ctx, filter)
-	if err != nil {
-		return nil, err
-	}
-
-	err = cursor.All(ctx, &results)
-	if err != nil {
-		return nil, err
-	}
-
-	return results, nil
 }
 
 // SoftDeleteByClass GOLANG METHOD

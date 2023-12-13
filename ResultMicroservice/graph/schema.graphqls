@@ -25,9 +25,7 @@ input InputResult {
 }
 
 type Query {
-    GetResultByExercise(exercise_id: ID!): Result
-    GetResultsByClass(class_id: ID!): [Result]
-    GetResultsByUser(user_id: ID!): [Result]
+    ListResults: [Result]
     GetResultsByID(id: ID!): Result
 }
 
@@ -35,7 +33,6 @@ type Mutation {
     CreateResult(input: InputResult!): Result
     UpdateResult(id: ID!, input: InputResult!): Result
     DeleteResult(id: ID!): ID
-    DeleteResultsByClass(class_id: ID!): ID
 }
 
 #go mod init example

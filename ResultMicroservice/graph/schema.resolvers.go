@@ -8,6 +8,7 @@ import (
 	"ResultMicroservice/graph/model"
 	"ResultMicroservice/internal/auth"
 	"context"
+	"fmt"
 )
 
 // CreateResult is the resolver for the CreateResult field.
@@ -47,52 +48,9 @@ func (r *mutationResolver) DeleteResult(ctx context.Context, id string) (*string
 	return &id, nil
 }
 
-// DeleteResultsByClass is the resolver for the DeleteResultsByClass field.
-func (r *mutationResolver) DeleteResultsByClass(ctx context.Context, classID string) (*string, error) {
-	token := auth.TokenFromContext(ctx)
-
-	err2 := r.Service.DeleteResultByClassID(token, classID)
-	if err2 != nil {
-		return nil, err2
-	}
-
-	return &classID, nil
-}
-
-// GetResultByExercise is the resolver for the GetResultByExercise field.
-func (r *queryResolver) GetResultByExercise(ctx context.Context, exerciseID string) (*model.Result, error) {
-	token := auth.TokenFromContext(ctx)
-
-	results, err := r.Service.GetResultByExerciseId(token, exerciseID)
-	if err != nil {
-		return nil, err
-	}
-
-	return results, nil
-}
-
-// GetResultsByClass is the resolver for the GetResultsByClass field.
-func (r *queryResolver) GetResultsByClass(ctx context.Context, classID string) ([]*model.Result, error) {
-	token := auth.TokenFromContext(ctx)
-
-	results, err := r.Service.GetResultByClassId(token, classID)
-	if err != nil {
-		return nil, err
-	}
-
-	return results, nil
-}
-
-// GetResultsByUser is the resolver for the GetResultsByUser field.
-func (r *queryResolver) GetResultsByUser(ctx context.Context, userID string) ([]*model.Result, error) {
-	token := auth.TokenFromContext(ctx)
-
-	results, err := r.Service.GetResultsByUserID(token, userID)
-	if err != nil {
-		return nil, err
-	}
-
-	return results, nil
+// ListResults is the resolver for the ListResults field.
+func (r *queryResolver) ListResults(ctx context.Context) ([]*model.Result, error) {
+	panic(fmt.Errorf("not implemented: ListResults - ListResults"))
 }
 
 // GetResultsByID is the resolver for the GetResultsByID field.

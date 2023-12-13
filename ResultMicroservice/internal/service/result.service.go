@@ -23,10 +23,8 @@ type IResultService interface {
 	UpdateResult(bearerToken string, id string, updateData model.InputResult) (*model.Result, error)
 	DeleteResult(bearerToken string, id string) error
 	GetResultById(bearerToken string, id string) (*model.Result, error)
-	GetResultByExerciseId(bearerToken string, id string) (*model.Result, error)
-	GetResultByClassId(bearerToken string, id string) ([]*model.Result, error)
-	GetResultsByUserID(bearerToken string, userID string) ([]*model.Result, error)
-	DeleteResultByClassID(bearerToken string, classID string) error
+	ListResults(bearerToken string) ([]*model.Result, error) //TODO: implement
+
 	// Saga methods
 	SoftDeleteByUser(bearerToken string, userID string) (string, bool, error)
 	SoftDeleteByClass(bearerToken string, classID string) (string, bool, error)
@@ -54,6 +52,11 @@ func NewResultService() IResultService {
 		Repo:         repository.NewResultRepository(collection),
 		ResultPolicy: auth.NewResultPolicy(collection),
 	}
+}
+
+func (r *ResultService) ListResults(bearerToken string) ([]*model.Result, error) {
+	//TODO implement me
+	panic("implement me")
 }
 
 func (r *ResultService) CreateResult(bearerToken string, newResult model.InputResult) (*model.Result, error) {
@@ -176,100 +179,6 @@ func (r *ResultService) GetResultById(bearerToken string, id string) (*model.Res
 	}
 
 	return result, nil
-}
-
-func (r *ResultService) GetResultByExerciseId(bearerToken string, id string) (*model.Result, error) {
-	err := r.ResultPolicy.GetResultByExercise(bearerToken, id)
-	if err != nil {
-		return nil, err
-	}
-
-	r.Validator.Validate(id, []string{"IsUUID"})
-
-	validationErrors := r.Validator.GetErrors()
-	if len(validationErrors) > 0 {
-		errorMessage := valErrorBase + strings.Join(validationErrors, ", ")
-		r.Validator.ClearErrors()
-		return nil, errors.New(errorMessage)
-	}
-
-	result, err := r.Repo.GetResultByExerciseId(id)
-	if err != nil {
-		return nil, err
-	}
-
-	return result, nil
-}
-
-func (r *ResultService) GetResultByClassId(bearerToken string, id string) ([]*model.Result, error) {
-	err := r.ResultPolicy.GetResultsByClass(bearerToken, id)
-	if err != nil {
-		return nil, err
-	}
-
-	r.Validator.Validate(id, []string{"IsUUID"})
-
-	validationErrors := r.Validator.GetErrors()
-	if len(validationErrors) > 0 {
-		errorMessage := valErrorBase + strings.Join(validationErrors, ", ")
-		r.Validator.ClearErrors()
-		return nil, errors.New(errorMessage)
-	}
-
-	result, err := r.Repo.GetResultByClassId(id)
-	if err != nil {
-		return nil, err
-	}
-
-	return result, nil
-}
-
-// GetResultsByUserID GOLANG METHOD
-// Retrieves results by user ID.
-func (r *ResultService) GetResultsByUserID(bearerToken string, userID string) ([]*model.Result, error) {
-	err := r.ResultPolicy.GetResultsByUser(bearerToken, userID)
-	if err != nil {
-		return nil, err
-	}
-
-	r.Validator.Validate(userID, []string{"IsUUID"})
-
-	validationErrors := r.Validator.GetErrors()
-	if len(validationErrors) > 0 {
-		errorMessage := valErrorBase + strings.Join(validationErrors, ", ")
-		r.Validator.ClearErrors()
-		return nil, errors.New(errorMessage)
-	}
-
-	results, err := r.Repo.GetResultsByUserID(userID)
-	if err != nil {
-		return nil, err
-	}
-
-	return results, nil
-}
-
-func (r *ResultService) DeleteResultByClassID(bearerToken string, classID string) error {
-	uuid, err := r.ResultPolicy.DeleteResultByClass(bearerToken, classID)
-	if err != nil {
-		return err
-	}
-
-	r.Validator.Validate(classID, []string{"IsUUID"})
-
-	validationErrors := r.Validator.GetErrors()
-	if len(validationErrors) > 0 {
-		errorMessage := valErrorBase + strings.Join(validationErrors, ", ")
-		r.Validator.ClearErrors()
-		return errors.New(errorMessage)
-	}
-
-	err2 := r.Repo.DeleteResultByClassAndUserID(classID, *uuid)
-	if err2 != nil {
-		return err2
-	}
-
-	return nil
 }
 
 // Saga grpc methods
