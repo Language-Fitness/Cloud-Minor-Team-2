@@ -52,7 +52,7 @@ func (v *Validator) Validate(input interface{}, arr []string, name string) {
 		},
 	}
 
-	if containsString(arr, "IsNull") == true && helper.IsNil(input) {
+	if helper.ContainsString(arr, "IsNull") == true && helper.IsNil(input) {
 		return
 	}
 
@@ -81,13 +81,4 @@ func (v *Validator) GetErrors() []string {
 
 func (v *Validator) ClearErrors() {
 	v.errors = []string{}
-}
-
-func containsString(array []string, target string) bool {
-	for _, str := range array {
-		if str == target {
-			return true
-		}
-	}
-	return false
 }

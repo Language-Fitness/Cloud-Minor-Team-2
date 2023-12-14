@@ -1,6 +1,7 @@
 package validation
 
 import (
+	"Module/internal/helper"
 	"fmt"
 	"github.com/google/uuid"
 	"reflect"
@@ -254,10 +255,5 @@ func SplitCondition(condition string) (string, int) {
 	}
 	operator := matches[1]
 	value := matches[2]
-	return operator, stringToInt(value)
-}
-
-func stringToInt(s string) int {
-	intValue, _ := strconv.Atoi(s)
-	return intValue
+	return operator, helper.StringToInt(value)
 }
