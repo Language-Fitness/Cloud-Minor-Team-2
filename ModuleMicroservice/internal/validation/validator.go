@@ -1,8 +1,8 @@
 package validation
 
 import (
+	"Module/internal/helper"
 	"fmt"
-	"reflect"
 	"strings"
 )
 
@@ -52,9 +52,11 @@ func (v *Validator) Validate(input interface{}, arr []string, name string) {
 		},
 	}
 
-	if containsString(arr, "IsNull") == true && isNil(input) {
+	if containsString(arr, "IsNull") == true && helper.IsNil(input) {
 		return
 	}
+
+	fmt.Println("error here")
 
 	for _, value := range arr {
 		functionName := value
@@ -65,20 +67,12 @@ func (v *Validator) Validate(input interface{}, arr []string, name string) {
 
 		if fn, exists := functionMap[functionName]; exists {
 			if fn, ok := fn.(func(interface{}, string, string)); ok {
-				fn(dereferenceIfNeeded(input), value, name)
+				fn(helper.DereferenceIfNeeded(input), value, name)
 			}
 		}
 	}
 
 	v.errors = append(v.errors, rules.GetErrors()...)
-}
-
-func dereferenceIfNeeded(value interface{}) interface{} {
-	if reflect.TypeOf(value).Kind() == reflect.Ptr {
-		return reflect.ValueOf(value).Elem().Interface()
-	}
-
-	return value
 }
 
 func (v *Validator) GetErrors() []string {
@@ -95,18 +89,5 @@ func containsString(array []string, target string) bool {
 			return true
 		}
 	}
-	return false
-}
-
-func isNil(input interface{}) bool {
-	if input == nil {
-		return true
-	}
-
-	val := reflect.ValueOf(input)
-	if val.Kind() == reflect.Ptr && val.IsNil() {
-		return true
-	}
-
 	return false
 }

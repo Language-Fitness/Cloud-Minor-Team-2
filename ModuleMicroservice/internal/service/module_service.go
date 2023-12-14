@@ -187,15 +187,10 @@ func (m *ModuleService) ListModules(token string, filter *model.Filter, paginate
 	//	return nil, err
 	//}
 
-	filterNameInput := helper.DereferenceArrayIfNeeded(filter.Name.Input)
-	fmt.Println(filterNameInput)
-	fmt.Println("$" + string(filter.Name.Type))
-	fmt.Println(helper.DereferenceIfNeeded(filter.Difficulty))
-	fmt.Println(filter.Difficulty)
-
 	m.Validator.Validate(filter.SoftDelete, []string{"IsNull", "IsBoolean"}, "Filter softDelete")
-	//@TODO fix this server 500 error
-	m.Validator.Validate(helper.DereferenceArrayIfNeeded(filter.Name.Input), []string{"IsNull", "ArrayType:string"}, "Filter Name input")
+	if helper.IsNil(filter.Name) == false {
+		m.Validator.Validate(helper.DereferenceArrayIfNeeded(filter.Name.Input), []string{"IsNull", "ArrayType:string"}, "Filter Name input")
+	}
 	m.Validator.Validate(filter.Private, []string{"IsNull", "IsBoolean"}, "Filter Private")
 	m.Validator.Validate(paginate.Amount, []string{"IsInt", "Size:>0", "Size:<101"}, "Paginate Amount")
 	m.Validator.Validate(paginate.Step, []string{"IsInt", "Size:>=0"}, "Paginate Step")
@@ -214,7 +209,7 @@ func (m *ModuleService) ListModules(token string, filter *model.Filter, paginate
 		bsonFilter = append(bsonFilter, bson.E{Key: "softdeleted", Value: helper.DereferenceIfNeeded(filter.SoftDelete)})
 	}
 
-	if m.Policy.HasPermissions(token, "filter_module_Name") == true {
+	if m.Policy.HasPermissions(token, "filter_module_Name") == true && helper.IsNil(filter.Name) == false {
 		bsonFilter = helper.AddFilter(bsonFilter, "name", string(filter.Name.Type), helper.DereferenceArrayIfNeeded(filter.Name.Input))
 	}
 
