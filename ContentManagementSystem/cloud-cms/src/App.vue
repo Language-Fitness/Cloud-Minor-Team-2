@@ -5,9 +5,7 @@ import SideNav from "@/components/nav/side-nav.vue";
 
 <template>
   <header>
-    <div class="wrapper">
     <side-nav></side-nav>
-    </div>
   </header>
 
   <RouterView />

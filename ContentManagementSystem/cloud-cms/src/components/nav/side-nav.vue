@@ -6,7 +6,6 @@ const items = [
   { text: 'School', icon: 'mdi-school', link: '/school' },
   { text: 'Module', icon: 'mdi-view-module', link: '/module' },
   { text: 'Class', icon: 'mdi-google-classroom', link: '/class' },
-  { text: 'Exercise', icon: 'mdi-clipboard-text', link: '/exercise' },
   { text: 'Result', icon: 'mdi-format-list-numbered', link: '/result' },
 ]
 

@@ -48,17 +48,14 @@ type DirectiveRoot struct {
 
 type ComplexityRoot struct {
 	Mutation struct {
-		CreateResult         func(childComplexity int, input model.InputResult) int
-		DeleteResult         func(childComplexity int, id string) int
-		DeleteResultsByClass func(childComplexity int, classID string) int
-		UpdateResult         func(childComplexity int, id string, input model.InputResult) int
+		CreateResult func(childComplexity int, input model.InputResult) int
+		DeleteResult func(childComplexity int, id string) int
+		UpdateResult func(childComplexity int, id string, input model.InputResult) int
 	}
 
 	Query struct {
-		GetResultByExercise func(childComplexity int, exerciseID string) int
-		GetResultsByClass   func(childComplexity int, classID string) int
-		GetResultsByID      func(childComplexity int, id string) int
-		GetResultsByUser    func(childComplexity int, userID string) int
+		GetResultsByID func(childComplexity int, id string) int
+		ListResults    func(childComplexity int) int
 	}
 
 	Result struct {
@@ -79,12 +76,9 @@ type MutationResolver interface {
 	CreateResult(ctx context.Context, input model.InputResult) (*model.Result, error)
 	UpdateResult(ctx context.Context, id string, input model.InputResult) (*model.Result, error)
 	DeleteResult(ctx context.Context, id string) (*string, error)
-	DeleteResultsByClass(ctx context.Context, classID string) (*string, error)
 }
 type QueryResolver interface {
-	GetResultByExercise(ctx context.Context, exerciseID string) (*model.Result, error)
-	GetResultsByClass(ctx context.Context, classID string) ([]*model.Result, error)
-	GetResultsByUser(ctx context.Context, userID string) ([]*model.Result, error)
+	ListResults(ctx context.Context) ([]*model.Result, error)
 	GetResultsByID(ctx context.Context, id string) (*model.Result, error)
 }
 
@@ -131,18 +125,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.DeleteResult(childComplexity, args["id"].(string)), true
 
-	case "Mutation.DeleteResultsByClass":
-		if e.complexity.Mutation.DeleteResultsByClass == nil {
-			break
-		}
-
-		args, err := ec.field_Mutation_DeleteResultsByClass_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Mutation.DeleteResultsByClass(childComplexity, args["class_id"].(string)), true
-
 	case "Mutation.UpdateResult":
 		if e.complexity.Mutation.UpdateResult == nil {
 			break
@@ -154,30 +136,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.UpdateResult(childComplexity, args["id"].(string), args["input"].(model.InputResult)), true
-
-	case "Query.GetResultByExercise":
-		if e.complexity.Query.GetResultByExercise == nil {
-			break
-		}
-
-		args, err := ec.field_Query_GetResultByExercise_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Query.GetResultByExercise(childComplexity, args["exercise_id"].(string)), true
-
-	case "Query.GetResultsByClass":
-		if e.complexity.Query.GetResultsByClass == nil {
-			break
-		}
-
-		args, err := ec.field_Query_GetResultsByClass_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Query.GetResultsByClass(childComplexity, args["class_id"].(string)), true
 
 	case "Query.GetResultsByID":
 		if e.complexity.Query.GetResultsByID == nil {
@@ -191,17 +149,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Query.GetResultsByID(childComplexity, args["id"].(string)), true
 
-	case "Query.GetResultsByUser":
-		if e.complexity.Query.GetResultsByUser == nil {
+	case "Query.ListResults":
+		if e.complexity.Query.ListResults == nil {
 			break
 		}
 
-		args, err := ec.field_Query_GetResultsByUser_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Query.GetResultsByUser(childComplexity, args["user_id"].(string)), true
+		return e.complexity.Query.ListResults(childComplexity), true
 
 	case "Result.class_id":
 		if e.complexity.Result.ClassID == nil {
@@ -428,21 +381,6 @@ func (ec *executionContext) field_Mutation_DeleteResult_args(ctx context.Context
 	return args, nil
 }
 
-func (ec *executionContext) field_Mutation_DeleteResultsByClass_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 string
-	if tmp, ok := rawArgs["class_id"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("class_id"))
-		arg0, err = ec.unmarshalNID2string(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["class_id"] = arg0
-	return args, nil
-}
-
 func (ec *executionContext) field_Mutation_UpdateResult_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -467,36 +405,6 @@ func (ec *executionContext) field_Mutation_UpdateResult_args(ctx context.Context
 	return args, nil
 }
 
-func (ec *executionContext) field_Query_GetResultByExercise_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 string
-	if tmp, ok := rawArgs["exercise_id"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("exercise_id"))
-		arg0, err = ec.unmarshalNID2string(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["exercise_id"] = arg0
-	return args, nil
-}
-
-func (ec *executionContext) field_Query_GetResultsByClass_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 string
-	if tmp, ok := rawArgs["class_id"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("class_id"))
-		arg0, err = ec.unmarshalNID2string(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["class_id"] = arg0
-	return args, nil
-}
-
 func (ec *executionContext) field_Query_GetResultsByID_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -509,21 +417,6 @@ func (ec *executionContext) field_Query_GetResultsByID_args(ctx context.Context,
 		}
 	}
 	args["id"] = arg0
-	return args, nil
-}
-
-func (ec *executionContext) field_Query_GetResultsByUser_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 string
-	if tmp, ok := rawArgs["user_id"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("user_id"))
-		arg0, err = ec.unmarshalNID2string(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["user_id"] = arg0
 	return args, nil
 }
 
@@ -780,8 +673,8 @@ func (ec *executionContext) fieldContext_Mutation_DeleteResult(ctx context.Conte
 	return fc, nil
 }
 
-func (ec *executionContext) _Mutation_DeleteResultsByClass(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Mutation_DeleteResultsByClass(ctx, field)
+func (ec *executionContext) _Query_ListResults(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_ListResults(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -794,133 +687,7 @@ func (ec *executionContext) _Mutation_DeleteResultsByClass(ctx context.Context, 
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().DeleteResultsByClass(rctx, fc.Args["class_id"].(string))
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*string)
-	fc.Result = res
-	return ec.marshalOID2ᚖstring(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Mutation_DeleteResultsByClass(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Mutation",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type ID does not have child fields")
-		},
-	}
-	defer func() {
-		if r := recover(); r != nil {
-			err = ec.Recover(ctx, r)
-			ec.Error(ctx, err)
-		}
-	}()
-	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Mutation_DeleteResultsByClass_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
-		ec.Error(ctx, err)
-		return fc, err
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Query_GetResultByExercise(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Query_GetResultByExercise(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().GetResultByExercise(rctx, fc.Args["exercise_id"].(string))
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*model.Result)
-	fc.Result = res
-	return ec.marshalOResult2ᚖResultMicroserviceᚋgraphᚋmodelᚐResult(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Query_GetResultByExercise(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Query",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "id":
-				return ec.fieldContext_Result_id(ctx, field)
-			case "exercise_id":
-				return ec.fieldContext_Result_exercise_id(ctx, field)
-			case "user_id":
-				return ec.fieldContext_Result_user_id(ctx, field)
-			case "class_id":
-				return ec.fieldContext_Result_class_id(ctx, field)
-			case "module_id":
-				return ec.fieldContext_Result_module_id(ctx, field)
-			case "input":
-				return ec.fieldContext_Result_input(ctx, field)
-			case "result":
-				return ec.fieldContext_Result_result(ctx, field)
-			case "created_at":
-				return ec.fieldContext_Result_created_at(ctx, field)
-			case "updated_at":
-				return ec.fieldContext_Result_updated_at(ctx, field)
-			case "soft_deleted":
-				return ec.fieldContext_Result_soft_deleted(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type Result", field.Name)
-		},
-	}
-	defer func() {
-		if r := recover(); r != nil {
-			err = ec.Recover(ctx, r)
-			ec.Error(ctx, err)
-		}
-	}()
-	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Query_GetResultByExercise_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
-		ec.Error(ctx, err)
-		return fc, err
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Query_GetResultsByClass(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Query_GetResultsByClass(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().GetResultsByClass(rctx, fc.Args["class_id"].(string))
+		return ec.resolvers.Query().ListResults(rctx)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -934,7 +701,7 @@ func (ec *executionContext) _Query_GetResultsByClass(ctx context.Context, field 
 	return ec.marshalOResult2ᚕᚖResultMicroserviceᚋgraphᚋmodelᚐResult(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Query_GetResultsByClass(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Query_ListResults(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Query",
 		Field:      field,
@@ -965,91 +732,6 @@ func (ec *executionContext) fieldContext_Query_GetResultsByClass(ctx context.Con
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Result", field.Name)
 		},
-	}
-	defer func() {
-		if r := recover(); r != nil {
-			err = ec.Recover(ctx, r)
-			ec.Error(ctx, err)
-		}
-	}()
-	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Query_GetResultsByClass_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
-		ec.Error(ctx, err)
-		return fc, err
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Query_GetResultsByUser(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Query_GetResultsByUser(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().GetResultsByUser(rctx, fc.Args["user_id"].(string))
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.([]*model.Result)
-	fc.Result = res
-	return ec.marshalOResult2ᚕᚖResultMicroserviceᚋgraphᚋmodelᚐResult(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Query_GetResultsByUser(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Query",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "id":
-				return ec.fieldContext_Result_id(ctx, field)
-			case "exercise_id":
-				return ec.fieldContext_Result_exercise_id(ctx, field)
-			case "user_id":
-				return ec.fieldContext_Result_user_id(ctx, field)
-			case "class_id":
-				return ec.fieldContext_Result_class_id(ctx, field)
-			case "module_id":
-				return ec.fieldContext_Result_module_id(ctx, field)
-			case "input":
-				return ec.fieldContext_Result_input(ctx, field)
-			case "result":
-				return ec.fieldContext_Result_result(ctx, field)
-			case "created_at":
-				return ec.fieldContext_Result_created_at(ctx, field)
-			case "updated_at":
-				return ec.fieldContext_Result_updated_at(ctx, field)
-			case "soft_deleted":
-				return ec.fieldContext_Result_soft_deleted(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type Result", field.Name)
-		},
-	}
-	defer func() {
-		if r := recover(); r != nil {
-			err = ec.Recover(ctx, r)
-			ec.Error(ctx, err)
-		}
-	}()
-	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Query_GetResultsByUser_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
-		ec.Error(ctx, err)
-		return fc, err
 	}
 	return fc, nil
 }
@@ -3583,10 +3265,6 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_DeleteResult(ctx, field)
 			})
-		case "DeleteResultsByClass":
-			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Mutation_DeleteResultsByClass(ctx, field)
-			})
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -3629,7 +3307,7 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Query")
-		case "GetResultByExercise":
+		case "ListResults":
 			field := field
 
 			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
@@ -3638,45 +3316,7 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Query_GetResultByExercise(ctx, field)
-				return res
-			}
-
-			rrm := func(ctx context.Context) graphql.Marshaler {
-				return ec.OperationContext.RootResolverMiddleware(ctx,
-					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-			}
-
-			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
-		case "GetResultsByClass":
-			field := field
-
-			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._Query_GetResultsByClass(ctx, field)
-				return res
-			}
-
-			rrm := func(ctx context.Context) graphql.Marshaler {
-				return ec.OperationContext.RootResolverMiddleware(ctx,
-					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-			}
-
-			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
-		case "GetResultsByUser":
-			field := field
-
-			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._Query_GetResultsByUser(ctx, field)
+				res = ec._Query_ListResults(ctx, field)
 				return res
 			}
 
