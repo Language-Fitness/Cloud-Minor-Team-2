@@ -1,6 +1,9 @@
 import base64
 import json
 import re
+
+import magic
+
 from App.Services.OpenAI.OpenAIAssistantManager import OpenAIAssistantManager
 from graphql import GraphQLError
 
@@ -23,38 +26,25 @@ def validate_answer_options(answer_options):
         raise GraphQLError("Answer options must not contain empty or whitespace-only strings.")
 
 
-def validate_token(token):
-    if not is_valid_base64(token):
-        raise GraphQLError("Invalid token!")
-
+def validate_file(file_data_base64):
     try:
-        ids_bytes = base64.b64decode(token)
-        ids_json = ids_bytes.decode('utf-8')
-        ids_dict = json.loads(ids_json)
-
-        if not ids_dict.get('thread_id') or not ids_dict.get('thread_id').strip():
-            raise GraphQLError("Invalid token: 'thread_id' is missing or empty")
-        if not ids_dict.get('assistant_id') or not ids_dict.get('assistant_id').strip():
-            raise GraphQLError("Invalid token: 'assistant_id' is missing or empty")
-
-        validate_thread_id(ids_dict['thread_id'])
-
-        return ids_dict['thread_id'], ids_dict['assistant_id']
+        # Decode the base64 data to bytes
+        file_data = base64.b64decode(file_data_base64)
     except Exception:
-        raise GraphQLError("Invalid token!")
+        raise GraphQLError('Invalid Base64 data')
+
+    # Use python-magic to identify the file type from its content
+    mime_type = magic.from_buffer(file_data, mime=True)
+
+    # List of acceptable MIME types for PDF and Word documents
+    valid_mime_types = ['application/pdf', 'application/msword',
+                        'application/vnd.openxmlformats-officedocument.wordprocessingml.document']
+
+    if mime_type not in valid_mime_types:
+        raise GraphQLError('The file is not a PDF or Word document')
 
 
-def validate_thread_id(thread_id):
-    manager = OpenAIAssistantManager()
-    manager.retrieve_messages(thread_id=thread_id)
-
-
-def validate_assistant_id(assistant_id):
-    manager = OpenAIAssistantManager()
-    manager.retrieve_assistant(assistant_id=assistant_id)
-
-
-def is_valid_base64(token):
+def validate_base64(token):
     if not token or len(token) % 4 != 0:
         return False
 

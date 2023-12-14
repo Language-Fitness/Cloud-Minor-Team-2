@@ -2,7 +2,7 @@ from graphene import ObjectType, String, Field
 from graphql import GraphQLError
 from .Types import ResponseExplanation, ResponseAnswer, ResponseMultipleChoiceQuestion
 from App.Services.OpenAI.AssistantAPIAdapter import AssistantAPIAdapter
-from .Validators import validate_token
+from .Validators import validate_base64
 
 
 class Query(ObjectType):
@@ -14,10 +14,11 @@ class Query(ObjectType):
     async def resolve_retrieve_multiple_choice_questions(self, info, token):
 
         try:
-            thread_id, assistant_id = validate_token(token)
+            # validate if token is in base64
+            validate_base64(token)
 
             adapter = AssistantAPIAdapter()
-            response = adapter.retrieve_response(thread_id, assistant_id)
+            response = adapter.retrieve_questions_response(token)
 
             return response
 
@@ -38,8 +39,11 @@ class Query(ObjectType):
     async def resolve_retrieve_explanation(self, info, token):
 
         try:
+            # validate if token is in base64
+            validate_base64(token)
+
             adapter = AssistantAPIAdapter()
-            response = adapter.retrieve_response(token)
+            response = adapter.retrieve_explanation_response(token)
 
             return response
 
@@ -49,8 +53,11 @@ class Query(ObjectType):
     async def resolve_retrieve_answer(self, info, token):
 
         try:
+            # validate if token is in base64
+            validate_base64(token)
+
             adapter = AssistantAPIAdapter()
-            response = adapter.retrieve_response(token)
+            response = adapter.retrieve_question_response(token)
 
             return response
 

@@ -1,7 +1,8 @@
 import graphene
+
 from App.Services.OpenAI.AssistantAPIAdapter import AssistantAPIAdapter
 from .Types import SubjectEnum, LevelEnum
-from .Validators import validate_minimum_int, validate_string, validate_answer_options
+from .Validators import validate_minimum_int, validate_string, validate_answer_options, validate_file
 
 
 # class GenerateOpenAnswerQuestions(graphene.Mutation):
@@ -28,7 +29,6 @@ class GenerateMultipleChoiceQuestions(graphene.Mutation):
     token = graphene.String()
 
     def mutate(self, info, question_subject, question_level, amount_questions):
-
         # validate amount questions
         validate_minimum_int("amount_questions", amount_questions)
 
@@ -36,6 +36,24 @@ class GenerateMultipleChoiceQuestions(graphene.Mutation):
         token = adapter.generate_multiple_choice_questions(question_subject, question_level, amount_questions)
 
         return GenerateMultipleChoiceQuestions(token=token)
+
+
+class ReadMultipleChoiceQuestionsFromFile(graphene.Mutation):
+    class Arguments:
+        file_data = graphene.String(required=True)
+        filename = graphene.String(required=True)
+
+    token = graphene.String()
+
+    def mutate(self, info, file_data, filename):
+
+        # validate file
+        file_data = validate_file(file_data)
+
+        adapter = AssistantAPIAdapter()
+        token = adapter.read_multiple_choice_questions_from_file(file_data, filename)
+
+        return ReadMultipleChoiceQuestionsFromFile(token=token)
 
 
 class GenerateExplanation(graphene.Mutation):
@@ -48,7 +66,6 @@ class GenerateExplanation(graphene.Mutation):
     token = graphene.String()
 
     def mutate(self, info, question_subject, question_text, given_answer, correct_answer):
-
         # validate given strings
         validate_string("question_text", question_text)
         validate_string("given_answer", given_answer)
@@ -70,7 +87,6 @@ class GenerateMultipleChoiceAnswer(graphene.Mutation):
     token = graphene.String()
 
     def mutate(self, info, question_level, question_subject, question_text, answer_options):
-
         # validate given string
         validate_string("question_text", question_text)
 
@@ -86,5 +102,6 @@ class GenerateMultipleChoiceAnswer(graphene.Mutation):
 class Mutation(graphene.ObjectType):
     generate_explanation = GenerateExplanation.Field()
     # generate_open_answer_questions = GenerateOpenAnswerQuestions.Field()
+    read_multiple_choice_questions_from_file = ReadMultipleChoiceQuestionsFromFile.Field()
     generate_multiple_choice_questions = GenerateMultipleChoiceQuestions.Field()
     generate_multiple_choice_answer = GenerateMultipleChoiceAnswer.Field()

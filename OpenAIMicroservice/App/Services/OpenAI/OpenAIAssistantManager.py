@@ -50,9 +50,9 @@ class OpenAIAssistantManager:
             content=message
         )
 
-    def create_file(self, filename):
+    def create_file(self, file_data):
         return self.client.files.create(
-            file=open(filename, "rb"),
+            file=file_data,
             purpose="assistants"
         )
 
