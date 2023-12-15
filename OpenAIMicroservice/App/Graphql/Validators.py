@@ -1,29 +1,25 @@
 import base64
-import json
 import re
-
+from App.Utils.Exceptions.ValidationException import ValidationException
 import magic
-
-from App.Services.OpenAI.OpenAIAssistantManager import OpenAIAssistantManager
-from graphql import GraphQLError
 
 
 def validate_minimum_int(variable_name, value):
     if value < 1:
-        raise GraphQLError(f"Amount at {variable_name} must be at least 1")
+        raise ValidationException(f"Amount at {variable_name} must be at least 1")
 
 
 def validate_string(variable_name, value):
     if value is None or value.strip() == '':
-        raise GraphQLError(f"{variable_name} must not be empty")
+        raise ValidationException(f"{variable_name} must not be empty")
 
 
 def validate_answer_options(answer_options):
     if not answer_options or not isinstance(answer_options, list):
-        raise GraphQLError("Answer options must be a non-empty list.")
+        raise ValidationException("Answer options must be a non-empty list.")
 
     if any(option is None or option.strip() == '' for option in answer_options):
-        raise GraphQLError("Answer options must not contain empty or whitespace-only strings.")
+        raise ValidationException("Answer options must not contain empty or whitespace-only strings.")
 
 
 def validate_file(file_data_base64):
@@ -31,7 +27,7 @@ def validate_file(file_data_base64):
         # Decode the base64 data to bytes
         file_data = base64.b64decode(file_data_base64)
     except Exception:
-        raise GraphQLError('Invalid Base64 data')
+        raise ValidationException('Invalid Base64 data used in file upload.')
 
     # Use python-magic to identify the file type from its content
     mime_type = magic.from_buffer(file_data, mime=True)
@@ -41,7 +37,7 @@ def validate_file(file_data_base64):
                         'application/vnd.openxmlformats-officedocument.wordprocessingml.document']
 
     if mime_type not in valid_mime_types:
-        raise GraphQLError('The file is not a PDF or Word document')
+        raise ValidationException("Invalid file format. Please upload a valid file.")
 
 
 def validate_base64(token):

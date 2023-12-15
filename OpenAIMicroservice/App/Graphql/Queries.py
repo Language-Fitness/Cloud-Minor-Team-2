@@ -2,6 +2,8 @@ from graphene import ObjectType, String, Field
 from graphql import GraphQLError
 from .Types import ResponseExplanation, ResponseAnswer, ResponseMultipleChoiceQuestion
 from App.Services.OpenAI.AssistantAPIAdapter import AssistantAPIAdapter
+from App.Utils.Exceptions.AssistantAPIException import AssistantAPIException
+from App.Utils.Exceptions.ValidationException import ValidationException
 from .Validators import validate_base64
 
 
@@ -18,12 +20,35 @@ class Query(ObjectType):
             validate_base64(token)
 
             adapter = AssistantAPIAdapter()
-            response = adapter.retrieve_questions_response(token)
+            response = adapter.retrieve_generated_questions_response(token)
+
+            return response
+        except ValidationException as e:
+            raise GraphQLError(str(e))
+        except AssistantAPIException as e:
+            raise GraphQLError(str(e))
+        except Exception as e:
+            raise GraphQLError("An unexpected error occurred. Please try again later.")
+
+    async def resolve_retrieve_custom_multiple_choice_questions(self, info, token):
+
+        try:
+            # validate if token is in base64
+            validate_base64(token)
+
+            adapter = AssistantAPIAdapter()
+            response = adapter.retrieve_custom_questions_response(token)
 
             return response
 
-        except Exception as e:
+        except ValidationException as e:
             raise GraphQLError(str(e))
+
+        except AssistantAPIException as e:
+            raise GraphQLError(str(e))
+
+        except Exception as e:
+            raise GraphQLError("An unexpected error occurred. Please try again later.")
 
     # async def resolve_retrieve_open_answer_questions(self, info, token):
     #
@@ -47,8 +72,14 @@ class Query(ObjectType):
 
             return response
 
-        except Exception as e:
+        except ValidationException as e:
             raise GraphQLError(str(e))
+
+        except AssistantAPIException as e:
+            raise GraphQLError(str(e))
+
+        except Exception as e:
+            raise GraphQLError("An unexpected error occurred. Please try again later.")
 
     async def resolve_retrieve_answer(self, info, token):
 
@@ -57,9 +88,15 @@ class Query(ObjectType):
             validate_base64(token)
 
             adapter = AssistantAPIAdapter()
-            response = adapter.retrieve_question_response(token)
+            response = adapter.retrieve_generated_question_response(token)
 
             return response
 
-        except Exception as e:
+        except ValidationException as e:
             raise GraphQLError(str(e))
+
+        except AssistantAPIException as e:
+            raise GraphQLError(str(e))
+
+        except Exception as e:
+            raise GraphQLError("An unexpected error occurred. Please try again later.")

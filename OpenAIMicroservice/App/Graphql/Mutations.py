@@ -1,7 +1,8 @@
 import graphene
-
+from graphql import GraphQLError
 from App.Services.OpenAI.AssistantAPIAdapter import AssistantAPIAdapter
 from .Types import SubjectEnum, LevelEnum
+from App.Utils.Exceptions import ValidationException, AssistantAPIException
 from .Validators import validate_minimum_int, validate_string, validate_answer_options, validate_file
 
 
@@ -29,13 +30,23 @@ class GenerateMultipleChoiceQuestions(graphene.Mutation):
     token = graphene.String()
 
     def mutate(self, info, question_subject, question_level, amount_questions):
-        # validate amount questions
-        validate_minimum_int("amount_questions", amount_questions)
 
-        adapter = AssistantAPIAdapter()
-        token = adapter.generate_multiple_choice_questions(question_subject, question_level, amount_questions)
+        try:
+            # validate amount questions
+            validate_minimum_int("amount_questions", amount_questions)
 
-        return GenerateMultipleChoiceQuestions(token=token)
+            adapter = AssistantAPIAdapter()
+            token = adapter.generate_multiple_choice_questions(question_subject, question_level, amount_questions)
+
+            return GenerateMultipleChoiceQuestions(token=token)
+
+        except ValidationException as e:
+            raise GraphQLError(str(e))
+        except AssistantAPIException as e:
+            raise GraphQLError(str(e))
+        except Exception:
+            # Generic error for unexpected exceptions
+            raise GraphQLError("An unexpected error occurred. Please try again later.")
 
 
 class ReadMultipleChoiceQuestionsFromFile(graphene.Mutation):
@@ -47,13 +58,21 @@ class ReadMultipleChoiceQuestionsFromFile(graphene.Mutation):
 
     def mutate(self, info, file_data, filename):
 
-        # validate file
-        file_data = validate_file(file_data)
+        try:
+            # validate file
+            validate_file(file_data)
 
-        adapter = AssistantAPIAdapter()
-        token = adapter.read_multiple_choice_questions_from_file(file_data, filename)
+            adapter = AssistantAPIAdapter()
+            token = adapter.read_multiple_choice_questions_from_file(file_data, filename)
+            return ReadMultipleChoiceQuestionsFromFile(token=token)
 
-        return ReadMultipleChoiceQuestionsFromFile(token=token)
+        except ValidationException as e:
+            raise GraphQLError(str(e))
+        except AssistantAPIException as e:
+            raise GraphQLError(str(e))
+        except Exception:
+            # Generic error for unexpected exceptions
+            raise GraphQLError("An unexpected error occurred. Please try again later.")
 
 
 class GenerateExplanation(graphene.Mutation):
@@ -66,15 +85,24 @@ class GenerateExplanation(graphene.Mutation):
     token = graphene.String()
 
     def mutate(self, info, question_subject, question_text, given_answer, correct_answer):
-        # validate given strings
-        validate_string("question_text", question_text)
-        validate_string("given_answer", given_answer)
-        validate_string("correct_answer", correct_answer)
+        try:
+            # validate given strings
+            validate_string("question_text", question_text)
+            validate_string("given_answer", given_answer)
+            validate_string("correct_answer", correct_answer)
 
-        adapter = AssistantAPIAdapter()
-        token = adapter.generate_explanation(question_subject, question_text, given_answer, correct_answer)
+            adapter = AssistantAPIAdapter()
+            token = adapter.generate_explanation(question_subject, question_text, given_answer, correct_answer)
 
-        return GenerateExplanation(token=token)
+            return GenerateExplanation(token=token)
+
+        except ValidationException as e:
+            raise GraphQLError(str(e))
+        except AssistantAPIException as e:
+            raise GraphQLError(str(e))
+        except Exception:
+            # Generic error for unexpected exceptions
+            raise GraphQLError("An unexpected error occurred. Please try again later.")
 
 
 class GenerateMultipleChoiceAnswer(graphene.Mutation):
@@ -87,16 +115,26 @@ class GenerateMultipleChoiceAnswer(graphene.Mutation):
     token = graphene.String()
 
     def mutate(self, info, question_level, question_subject, question_text, answer_options):
-        # validate given string
-        validate_string("question_text", question_text)
+        try:
+            # validate given string
+            validate_string("question_text", question_text)
 
-        # validate given answer options
-        validate_answer_options(answer_options)
+            # validate given answer options
+            validate_answer_options(answer_options)
 
-        adapter = AssistantAPIAdapter()
-        token = adapter.generate_multiple_choice_answer(question_level, question_subject, question_text, answer_options)
+            adapter = AssistantAPIAdapter()
+            token = adapter.generate_multiple_choice_answer(question_level, question_subject, question_text,
+                                                            answer_options)
 
-        return GenerateExplanation(token=token)
+            return GenerateExplanation(token=token)
+
+        except ValidationException as e:
+            raise GraphQLError(str(e))
+        except AssistantAPIException as e:
+            raise GraphQLError(str(e))
+        except Exception:
+            # Generic error for unexpected exceptions
+            raise GraphQLError("An unexpected error occurred. Please try again later.")
 
 
 class Mutation(graphene.ObjectType):
