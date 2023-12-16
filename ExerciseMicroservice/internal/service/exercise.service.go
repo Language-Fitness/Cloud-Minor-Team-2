@@ -182,6 +182,7 @@ func (e *ExerciseService) ListExercises(token string, filter *model.ExerciseFilt
 	e.Validator.Validate(filter.ModuleID, []string{"IsNull", "IsString"}, "Filter ModuleID")
 	e.Validator.Validate(filter.MadeBy, []string{"IsNull", "IsString"}, "Filter MadeBy")
 
+	//todo reduce cognitive complexity to many if statements (sonarlint)
 	validationErrors := e.Validator.GetErrors()
 	if len(validationErrors) > 0 {
 		errorMessage := "Validation errors: " + strings.Join(validationErrors, ", ")
