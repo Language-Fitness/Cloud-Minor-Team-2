@@ -2,26 +2,149 @@
 
 package model
 
+import (
+	"fmt"
+	"io"
+	"strconv"
+)
+
 type Exercise struct {
-	ID               string  `json:"id"`
-	ClassID          string  `json:"class_Id"`
-	Name             string  `json:"name"`
-	Question         string  `json:"question"`
-	Answers          string  `json:"answers"`
-	PosCorrectAnswer int     `json:"pos_correct_answer"`
-	QuestionTypeID   string  `json:"question_type_id"`
-	Difficulty       float64 `json:"difficulty"`
-	CreatedAt        string  `json:"created_at"`
-	UpdatedAt        string  `json:"updated_at"`
-	SoftDeleted      bool    `json:"soft_deleted"`
+	ID               string     `json:"id"`
+	ClassID          string     `json:"class_Id"`
+	ModuleID         string     `json:"module_id"`
+	Name             string     `json:"name"`
+	Question         string     `json:"question"`
+	Answers          string     `json:"answers"`
+	PosCorrectAnswer int        `json:"pos_correct_answer"`
+	QuestionTypeID   string     `json:"question_type_id"`
+	Difficulty       Difficulty `json:"difficulty"`
+	CreatedAt        string     `json:"created_at"`
+	UpdatedAt        string     `json:"updated_at"`
+	SoftDeleted      bool       `json:"soft_deleted"`
+	MadeBy           string     `json:"made_by"`
+}
+
+type ExerciseFilter struct {
+	SoftDelete     *bool       `json:"softDelete,omitempty"`
+	Name           *NameFilter `json:"name,omitempty"`
+	Difficulty     *float64    `json:"difficulty,omitempty"`
+	QuestionTypeID *string     `json:"question_type_id,omitempty"`
+	ClassID        *string     `json:"class_Id,omitempty"`
+	ModuleID       *string     `json:"module_id,omitempty"`
+	MadeBy         *string     `json:"made_by,omitempty"`
 }
 
 type ExerciseInput struct {
-	ClassID          string  `json:"class_Id"`
-	Name             string  `json:"name"`
-	Question         string  `json:"question"`
-	Answers          string  `json:"answers"`
-	PosCorrectAnswer int     `json:"pos_correct_answer"`
-	QuestionTypeID   string  `json:"question_type_id"`
-	Difficulty       float64 `json:"difficulty"`
+	ClassID          string     `json:"class_Id"`
+	ModuleID         string     `json:"module_id"`
+	Name             string     `json:"name"`
+	Question         string     `json:"question"`
+	Answers          string     `json:"answers"`
+	PosCorrectAnswer int        `json:"pos_correct_answer"`
+	QuestionTypeID   string     `json:"question_type_id"`
+	Difficulty       Difficulty `json:"difficulty"`
+}
+
+type NameFilter struct {
+	Input []*string       `json:"input"`
+	Type  NameFilterTypes `json:"type"`
+}
+
+type Paginator struct {
+	Amount int `json:"amount"`
+	Step   int `json:"Step"`
+}
+
+type NameFilterTypes string
+
+const (
+	NameFilterTypesEq     NameFilterTypes = "eq"
+	NameFilterTypesNe     NameFilterTypes = "ne"
+	NameFilterTypesStarts NameFilterTypes = "starts"
+	NameFilterTypesEnds   NameFilterTypes = "ends"
+)
+
+var AllNameFilterTypes = []NameFilterTypes{
+	NameFilterTypesEq,
+	NameFilterTypesNe,
+	NameFilterTypesStarts,
+	NameFilterTypesEnds,
+}
+
+func (e NameFilterTypes) IsValid() bool {
+	switch e {
+	case NameFilterTypesEq, NameFilterTypesNe, NameFilterTypesStarts, NameFilterTypesEnds:
+		return true
+	}
+	return false
+}
+
+func (e NameFilterTypes) String() string {
+	return string(e)
+}
+
+func (e *NameFilterTypes) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = NameFilterTypes(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid NameFilterTypes", str)
+	}
+	return nil
+}
+
+func (e NameFilterTypes) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
+type Difficulty string
+
+const (
+	DifficultyA1 Difficulty = "A1"
+	DifficultyA2 Difficulty = "A2"
+	DifficultyB1 Difficulty = "B1"
+	DifficultyB2 Difficulty = "B2"
+	DifficultyC1 Difficulty = "C1"
+	DifficultyC2 Difficulty = "C2"
+)
+
+var AllDifficulty = []Difficulty{
+	DifficultyA1,
+	DifficultyA2,
+	DifficultyB1,
+	DifficultyB2,
+	DifficultyC1,
+	DifficultyC2,
+}
+
+func (e Difficulty) IsValid() bool {
+	switch e {
+	case DifficultyA1, DifficultyA2, DifficultyB1, DifficultyB2, DifficultyC1, DifficultyC2:
+		return true
+	}
+	return false
+}
+
+func (e Difficulty) String() string {
+	return string(e)
+}
+
+func (e *Difficulty) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = Difficulty(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid difficulty", str)
+	}
+	return nil
+}
+
+func (e Difficulty) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
 }

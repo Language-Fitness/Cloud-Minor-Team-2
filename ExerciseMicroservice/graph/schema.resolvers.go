@@ -21,7 +21,7 @@ func (r *mutationResolver) UpdateExercise(ctx context.Context, exercise model.Ex
 }
 
 // DeleteExercise is the resolver for the DeleteExercise field.
-func (r *mutationResolver) DeleteExercise(ctx context.Context, id string) (*model.Exercise, error) {
+func (r *mutationResolver) DeleteExercise(ctx context.Context, userID string, filter model.ExerciseFilter) (*model.Exercise, error) {
 	panic(fmt.Errorf("not implemented: DeleteExercise - DeleteExercise"))
 }
 
@@ -31,7 +31,7 @@ func (r *queryResolver) GetExercise(ctx context.Context, exerciseID string) ([]*
 }
 
 // ListExercise is the resolver for the ListExercise field.
-func (r *queryResolver) ListExercise(ctx context.Context) ([]*model.Exercise, error) {
+func (r *queryResolver) ListExercise(ctx context.Context, filter model.ExerciseFilter, paginator model.Paginator) ([]*model.Exercise, error) {
 	panic(fmt.Errorf("not implemented: ListExercise - ListExercise"))
 }
 
