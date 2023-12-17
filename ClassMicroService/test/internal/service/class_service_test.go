@@ -268,9 +268,17 @@ func TestService_ListClasses(t *testing.T) {
 
 	mockPolicy.On("ListClasses", mock.AnythingOfType("string")).Return(nil)
 
-	mockRepo.On("ListClasses").Return([]*model.ClassInfo{&mocks.MockClassInfo}, nil)
+	mockPolicy.On("HasPermissions", mock.AnythingOfType("string"), mock.AnythingOfType("string")).
+		Return(true)
 
-	result, err := service.ListClasses(adminToken)
+	mockRepo.On("ListClasses", mock.AnythingOfType("primitive.D"), mock.AnythingOfType("*options.FindOptions")).
+		Return([]*model.ClassInfo{&mocks.MockClassInfo}, nil)
+
+	mockValidator.On("GetErrors").Return([]string{})
+
+	filter := model.Filter{}
+	paginate := model.Paginator{}
+	result, err := service.ListClasses(adminToken, &filter, &paginate)
 
 	assert.Nil(t, err)
 	assert.NotNil(t, result)
@@ -291,9 +299,16 @@ func TestService_ListClasses_CatchRetrieveError(t *testing.T) {
 
 	mockPolicy.On("ListClasses", mock.AnythingOfType("string")).Return(nil)
 
-	mockRepo.On("ListClasses").Return([]*model.ClassInfo{}, errors.New("retrieval_error"))
+	mockPolicy.On("HasPermissions", mock.AnythingOfType("string"), mock.AnythingOfType("string")).
+		Return(true)
 
-	result, err := service.ListClasses(adminToken)
+	mockRepo.On("ListClasses", mock.AnythingOfType("primitive.D"), mock.AnythingOfType("*options.FindOptions")).Return([]*model.ClassInfo{}, errors.New("retrieval_error"))
+
+	mockValidator.On("GetErrors").Return([]string{})
+
+	filter := model.Filter{}
+	paginate := model.Paginator{}
+	result, err := service.ListClasses(adminToken, &filter, &paginate)
 
 	assert.Nil(t, result)
 	assert.NotNil(t, err)

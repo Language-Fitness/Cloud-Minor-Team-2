@@ -8,14 +8,12 @@ import (
 var Location = "This is a sample location."
 var UpdatedLocation = "This is an updated sample location."
 var Timestamp = time.Now().String()
-var MadeBy = "3a3bd756-6353-4e29-8aba-5b3531bdb9ee"
 var SoftDeleted = false
 var IsSoftDeleted = true
 
 var MockCreateInput = model.SchoolInput{
 	Name:     "Sample School",
 	Location: Location,
-	MadeBy:   MadeBy,
 }
 
 var MockUpdateInput = model.SchoolInput{

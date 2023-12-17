@@ -38,6 +38,11 @@ func (m *MockPolicy) ListClasses(bearerToken string) error {
 	return args.Error(0)
 }
 
+func (m *MockPolicy) HasPermissions(bearerToken string, role string) bool {
+	args := m.Called(bearerToken, role)
+	return args.Get(0).(bool)
+}
+
 func (m *MockPolicy) getSubAndRoles(bearerToken string) (string, []interface{}, error) {
 	args := m.Called(bearerToken)
 	return args.String(0), args.Get(1).([]interface{}), args.Error(2)

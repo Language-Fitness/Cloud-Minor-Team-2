@@ -267,9 +267,16 @@ func TestService_ListSchools(t *testing.T) {
 
 	mockPolicy.On("ListSchools", mock.AnythingOfType("string")).Return(nil)
 
+	mockPolicy.On("HasPermissions", mock.AnythingOfType("string"), mock.AnythingOfType("string")).
+		Return(true)
+
 	mockRepo.On("ListSchools").Return([]*model.SchoolInfo{&mocks.MockSchoolInfo}, nil)
 
-	result, err := service.ListSchools(adminToken)
+	mockValidator.On("GetErrors").Return([]string{})
+
+	filter := model.Filter{}
+	paginate := model.Paginator{}
+	result, err := service.ListSchools(adminToken, &filter, &paginate)
 
 	assert.Nil(t, err)
 	assert.NotNil(t, result)
@@ -290,9 +297,16 @@ func TestService_ListSchools_CatchRetrieveError(t *testing.T) {
 
 	mockPolicy.On("ListSchools", mock.AnythingOfType("string")).Return(nil)
 
+	mockPolicy.On("HasPermissions", mock.AnythingOfType("string"), mock.AnythingOfType("string")).
+		Return(true)
+
 	mockRepo.On("ListSchools").Return([]*model.SchoolInfo{}, errors.New("retrieval_error"))
 
-	result, err := service.ListSchools(adminToken)
+	mockValidator.On("GetErrors").Return([]string{})
+
+	filter := model.Filter{}
+	paginate := model.Paginator{}
+	result, err := service.ListSchools(adminToken, &filter, &paginate)
 
 	assert.Nil(t, result)
 	assert.NotNil(t, err)

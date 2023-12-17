@@ -7,6 +7,7 @@ import (
 	database "example/test/internal/helpers"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 	"log"
 	"reflect"
 	"testing"
@@ -318,8 +319,12 @@ func TestListSchools(t *testing.T) {
 		t.Errorf("Error creating school 2: %v", err)
 	}
 
+	paginateOptions := options.Find().
+		SetSkip(int64(0)).
+		SetLimit(int64(2))
+
 	// Call the method you want to test.
-	schools, err := repo.ListSchools()
+	schools, err := repo.ListSchools(bson.D{}, paginateOptions)
 
 	// Assert the result and error as needed.
 	if err != nil {

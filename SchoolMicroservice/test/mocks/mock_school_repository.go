@@ -3,7 +3,9 @@ package mocks
 import (
 	"example/graph/model"
 	"github.com/stretchr/testify/mock"
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 type MockRepository struct {
@@ -37,7 +39,7 @@ func (m *MockRepository) GetSchoolByID(id string) (*model.School, error) {
 	return args.Get(0).(*model.School), args.Error(1)
 }
 
-func (m *MockRepository) ListSchools() ([]*model.SchoolInfo, error) {
+func (m *MockRepository) ListSchools(bsonFilter bson.D, paginateOptions *options.FindOptions) ([]*model.SchoolInfo, error) {
 	args := m.Called()
 	return args.Get(0).([]*model.SchoolInfo), args.Error(1)
 }

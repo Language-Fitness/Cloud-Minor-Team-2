@@ -7,6 +7,7 @@ import (
 	database "example/test/internal/helpers"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 	"log"
 	"reflect"
 	"testing"
@@ -29,7 +30,7 @@ func TestCreateClass(t *testing.T) {
 
 	// Define your test data based on the Class struct.
 	description := "Test description."
-	difficulty := 1
+	difficulty := "B2"
 	timestamp := time.Now().String()
 	softDeleted := false
 
@@ -38,7 +39,7 @@ func TestCreateClass(t *testing.T) {
 		ModuleID:    "Test module-id",
 		Name:        "Test Class",
 		Description: description,
-		Difficulty:  difficulty,
+		Difficulty:  model.LanguageLevel(difficulty),
 		CreatedAt:   &timestamp,
 		SoftDeleted: &softDeleted,
 	}
@@ -325,8 +326,12 @@ func TestListClasses(t *testing.T) {
 		t.Errorf("Error creating class 2: %v", err)
 	}
 
+	paginateOptions := options.Find().
+		SetSkip(int64(0)).
+		SetLimit(int64(2))
+
 	// Call the method you want to test.
-	classes, err := repo.ListClasses()
+	classes, err := repo.ListClasses(bson.D{}, paginateOptions)
 
 	// Assert the result and error as needed.
 	if err != nil {
