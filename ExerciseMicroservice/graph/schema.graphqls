@@ -2,40 +2,80 @@
 #
 # https://gqlgen.com/getting-started/
 
+input ExerciseFilter {
+  softDelete: Boolean
+  name: NameFilter
+  difficulty: Float
+  question_type_id: ID
+  class_Id: ID
+  module_id: ID
+  made_by: ID
+}
+
+input NameFilter {
+  input: [String]!
+  type: NameFilterTypes!
+}
+
+input Paginator {
+  amount: Int!
+  Step: Int!
+}
+
+enum NameFilterTypes {
+  eq
+  ne
+  starts
+  ends
+}
+
+enum difficulty{
+  A1
+  A2
+  B1
+  B2
+  C1
+  C2
+}
+
 type Exercise {
   id: ID!
   class_Id: ID!
+  module_id: ID!
   name: String!
   question: String!
   answers: String!
   pos_correct_answer: Int!
   question_type_id: ID!
-  difficulty: Float!
+  difficulty: difficulty!
   created_at: String!
   updated_at: String!
   soft_deleted: Boolean!
+  made_by: ID!
 }
 
 input ExerciseInput {
   class_Id: ID!
+  module_id: ID!
   name: String!
   question: String!
   answers: String!
   pos_correct_answer: Int!
   question_type_id: ID!
-  difficulty: Float!
+  difficulty: difficulty!
 }
 
 type Query {
   GetExercise(ExerciseId: ID!): [Exercise]
-  ListExercise: [Exercise]
+  ListExercise(filter: ExerciseFilter!, paginator: Paginator!): [Exercise]
 }
 
 type Mutation {
   CreateExercise(exercise: ExerciseInput!): Exercise
   UpdateExercise(exercise: ExerciseInput!): Exercise
-  DeleteExercise(id: ID!): Exercise
+  DeleteExercise(UserID: ID!, filter: ExerciseFilter!): Exercise
 }
+
 
 #go mod init example
 #go get github.com/99designs/gqlgen

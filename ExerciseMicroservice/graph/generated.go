@@ -53,6 +53,8 @@ type ComplexityRoot struct {
 		CreatedAt        func(childComplexity int) int
 		Difficulty       func(childComplexity int) int
 		ID               func(childComplexity int) int
+		MadeBy           func(childComplexity int) int
+		ModuleID         func(childComplexity int) int
 		Name             func(childComplexity int) int
 		PosCorrectAnswer func(childComplexity int) int
 		Question         func(childComplexity int) int
@@ -63,24 +65,24 @@ type ComplexityRoot struct {
 
 	Mutation struct {
 		CreateExercise func(childComplexity int, exercise model.ExerciseInput) int
-		DeleteExercise func(childComplexity int, id string) int
+		DeleteExercise func(childComplexity int, userID string, filter model.ExerciseFilter) int
 		UpdateExercise func(childComplexity int, exercise model.ExerciseInput) int
 	}
 
 	Query struct {
 		GetExercise  func(childComplexity int, exerciseID string) int
-		ListExercise func(childComplexity int) int
+		ListExercise func(childComplexity int, filter model.ExerciseFilter, paginator model.Paginator) int
 	}
 }
 
 type MutationResolver interface {
 	CreateExercise(ctx context.Context, exercise model.ExerciseInput) (*model.Exercise, error)
 	UpdateExercise(ctx context.Context, exercise model.ExerciseInput) (*model.Exercise, error)
-	DeleteExercise(ctx context.Context, id string) (*model.Exercise, error)
+	DeleteExercise(ctx context.Context, userID string, filter model.ExerciseFilter) (*model.Exercise, error)
 }
 type QueryResolver interface {
 	GetExercise(ctx context.Context, exerciseID string) ([]*model.Exercise, error)
-	ListExercise(ctx context.Context) ([]*model.Exercise, error)
+	ListExercise(ctx context.Context, filter model.ExerciseFilter, paginator model.Paginator) ([]*model.Exercise, error)
 }
 
 type executableSchema struct {
@@ -136,6 +138,20 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Exercise.ID(childComplexity), true
+
+	case "Exercise.made_by":
+		if e.complexity.Exercise.MadeBy == nil {
+			break
+		}
+
+		return e.complexity.Exercise.MadeBy(childComplexity), true
+
+	case "Exercise.module_id":
+		if e.complexity.Exercise.ModuleID == nil {
+			break
+		}
+
+		return e.complexity.Exercise.ModuleID(childComplexity), true
 
 	case "Exercise.name":
 		if e.complexity.Exercise.Name == nil {
@@ -201,7 +217,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.DeleteExercise(childComplexity, args["id"].(string)), true
+		return e.complexity.Mutation.DeleteExercise(childComplexity, args["UserID"].(string), args["filter"].(model.ExerciseFilter)), true
 
 	case "Mutation.UpdateExercise":
 		if e.complexity.Mutation.UpdateExercise == nil {
@@ -232,7 +248,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			break
 		}
 
-		return e.complexity.Query.ListExercise(childComplexity), true
+		args, err := ec.field_Query_ListExercise_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.ListExercise(childComplexity, args["filter"].(model.ExerciseFilter), args["paginator"].(model.Paginator)), true
 
 	}
 	return 0, false
@@ -242,7 +263,10 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 	rc := graphql.GetOperationContext(ctx)
 	ec := executionContext{rc, e, 0, 0, make(chan graphql.DeferredResult)}
 	inputUnmarshalMap := graphql.BuildUnmarshalerMap(
+		ec.unmarshalInputExerciseFilter,
 		ec.unmarshalInputExerciseInput,
+		ec.unmarshalInputNameFilter,
+		ec.unmarshalInputPaginator,
 	)
 	first := true
 
@@ -378,14 +402,23 @@ func (ec *executionContext) field_Mutation_DeleteExercise_args(ctx context.Conte
 	var err error
 	args := map[string]interface{}{}
 	var arg0 string
-	if tmp, ok := rawArgs["id"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+	if tmp, ok := rawArgs["UserID"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("UserID"))
 		arg0, err = ec.unmarshalNID2string(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["id"] = arg0
+	args["UserID"] = arg0
+	var arg1 model.ExerciseFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg1, err = ec.unmarshalNExerciseFilter2ExerciseMicroserviceᚋgraphᚋmodelᚐExerciseFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg1
 	return args, nil
 }
 
@@ -416,6 +449,30 @@ func (ec *executionContext) field_Query_GetExercise_args(ctx context.Context, ra
 		}
 	}
 	args["ExerciseId"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_ListExercise_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 model.ExerciseFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg0, err = ec.unmarshalNExerciseFilter2ExerciseMicroserviceᚋgraphᚋmodelᚐExerciseFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	var arg1 model.Paginator
+	if tmp, ok := rawArgs["paginator"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("paginator"))
+		arg1, err = ec.unmarshalNPaginator2ExerciseMicroserviceᚋgraphᚋmodelᚐPaginator(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["paginator"] = arg1
 	return args, nil
 }
 
@@ -548,6 +605,50 @@ func (ec *executionContext) _Exercise_class_Id(ctx context.Context, field graphq
 }
 
 func (ec *executionContext) fieldContext_Exercise_class_Id(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Exercise",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ID does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Exercise_module_id(ctx context.Context, field graphql.CollectedField, obj *model.Exercise) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Exercise_module_id(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ModuleID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNID2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Exercise_module_id(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Exercise",
 		Field:      field,
@@ -806,9 +907,9 @@ func (ec *executionContext) _Exercise_difficulty(ctx context.Context, field grap
 		}
 		return graphql.Null
 	}
-	res := resTmp.(float64)
+	res := resTmp.(model.Difficulty)
 	fc.Result = res
-	return ec.marshalNFloat2float64(ctx, field.Selections, res)
+	return ec.marshalNdifficulty2ExerciseMicroserviceᚋgraphᚋmodelᚐDifficulty(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Exercise_difficulty(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -818,7 +919,7 @@ func (ec *executionContext) fieldContext_Exercise_difficulty(ctx context.Context
 		IsMethod:   false,
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Float does not have child fields")
+			return nil, errors.New("field of type difficulty does not have child fields")
 		},
 	}
 	return fc, nil
@@ -956,6 +1057,50 @@ func (ec *executionContext) fieldContext_Exercise_soft_deleted(ctx context.Conte
 	return fc, nil
 }
 
+func (ec *executionContext) _Exercise_made_by(ctx context.Context, field graphql.CollectedField, obj *model.Exercise) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Exercise_made_by(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.MadeBy, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNID2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Exercise_made_by(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Exercise",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ID does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Mutation_CreateExercise(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Mutation_CreateExercise(ctx, field)
 	if err != nil {
@@ -996,6 +1141,8 @@ func (ec *executionContext) fieldContext_Mutation_CreateExercise(ctx context.Con
 				return ec.fieldContext_Exercise_id(ctx, field)
 			case "class_Id":
 				return ec.fieldContext_Exercise_class_Id(ctx, field)
+			case "module_id":
+				return ec.fieldContext_Exercise_module_id(ctx, field)
 			case "name":
 				return ec.fieldContext_Exercise_name(ctx, field)
 			case "question":
@@ -1014,6 +1161,8 @@ func (ec *executionContext) fieldContext_Mutation_CreateExercise(ctx context.Con
 				return ec.fieldContext_Exercise_updated_at(ctx, field)
 			case "soft_deleted":
 				return ec.fieldContext_Exercise_soft_deleted(ctx, field)
+			case "made_by":
+				return ec.fieldContext_Exercise_made_by(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Exercise", field.Name)
 		},
@@ -1072,6 +1221,8 @@ func (ec *executionContext) fieldContext_Mutation_UpdateExercise(ctx context.Con
 				return ec.fieldContext_Exercise_id(ctx, field)
 			case "class_Id":
 				return ec.fieldContext_Exercise_class_Id(ctx, field)
+			case "module_id":
+				return ec.fieldContext_Exercise_module_id(ctx, field)
 			case "name":
 				return ec.fieldContext_Exercise_name(ctx, field)
 			case "question":
@@ -1090,6 +1241,8 @@ func (ec *executionContext) fieldContext_Mutation_UpdateExercise(ctx context.Con
 				return ec.fieldContext_Exercise_updated_at(ctx, field)
 			case "soft_deleted":
 				return ec.fieldContext_Exercise_soft_deleted(ctx, field)
+			case "made_by":
+				return ec.fieldContext_Exercise_made_by(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Exercise", field.Name)
 		},
@@ -1122,7 +1275,7 @@ func (ec *executionContext) _Mutation_DeleteExercise(ctx context.Context, field 
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().DeleteExercise(rctx, fc.Args["id"].(string))
+		return ec.resolvers.Mutation().DeleteExercise(rctx, fc.Args["UserID"].(string), fc.Args["filter"].(model.ExerciseFilter))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1148,6 +1301,8 @@ func (ec *executionContext) fieldContext_Mutation_DeleteExercise(ctx context.Con
 				return ec.fieldContext_Exercise_id(ctx, field)
 			case "class_Id":
 				return ec.fieldContext_Exercise_class_Id(ctx, field)
+			case "module_id":
+				return ec.fieldContext_Exercise_module_id(ctx, field)
 			case "name":
 				return ec.fieldContext_Exercise_name(ctx, field)
 			case "question":
@@ -1166,6 +1321,8 @@ func (ec *executionContext) fieldContext_Mutation_DeleteExercise(ctx context.Con
 				return ec.fieldContext_Exercise_updated_at(ctx, field)
 			case "soft_deleted":
 				return ec.fieldContext_Exercise_soft_deleted(ctx, field)
+			case "made_by":
+				return ec.fieldContext_Exercise_made_by(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Exercise", field.Name)
 		},
@@ -1224,6 +1381,8 @@ func (ec *executionContext) fieldContext_Query_GetExercise(ctx context.Context, 
 				return ec.fieldContext_Exercise_id(ctx, field)
 			case "class_Id":
 				return ec.fieldContext_Exercise_class_Id(ctx, field)
+			case "module_id":
+				return ec.fieldContext_Exercise_module_id(ctx, field)
 			case "name":
 				return ec.fieldContext_Exercise_name(ctx, field)
 			case "question":
@@ -1242,6 +1401,8 @@ func (ec *executionContext) fieldContext_Query_GetExercise(ctx context.Context, 
 				return ec.fieldContext_Exercise_updated_at(ctx, field)
 			case "soft_deleted":
 				return ec.fieldContext_Exercise_soft_deleted(ctx, field)
+			case "made_by":
+				return ec.fieldContext_Exercise_made_by(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Exercise", field.Name)
 		},
@@ -1274,7 +1435,7 @@ func (ec *executionContext) _Query_ListExercise(ctx context.Context, field graph
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().ListExercise(rctx)
+		return ec.resolvers.Query().ListExercise(rctx, fc.Args["filter"].(model.ExerciseFilter), fc.Args["paginator"].(model.Paginator))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1300,6 +1461,8 @@ func (ec *executionContext) fieldContext_Query_ListExercise(ctx context.Context,
 				return ec.fieldContext_Exercise_id(ctx, field)
 			case "class_Id":
 				return ec.fieldContext_Exercise_class_Id(ctx, field)
+			case "module_id":
+				return ec.fieldContext_Exercise_module_id(ctx, field)
 			case "name":
 				return ec.fieldContext_Exercise_name(ctx, field)
 			case "question":
@@ -1318,9 +1481,22 @@ func (ec *executionContext) fieldContext_Query_ListExercise(ctx context.Context,
 				return ec.fieldContext_Exercise_updated_at(ctx, field)
 			case "soft_deleted":
 				return ec.fieldContext_Exercise_soft_deleted(ctx, field)
+			case "made_by":
+				return ec.fieldContext_Exercise_made_by(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Exercise", field.Name)
 		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_ListExercise_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
 	}
 	return fc, nil
 }
@@ -3227,6 +3403,89 @@ func (ec *executionContext) fieldContext___Type_specifiedByURL(ctx context.Conte
 
 // region    **************************** input.gotpl *****************************
 
+func (ec *executionContext) unmarshalInputExerciseFilter(ctx context.Context, obj interface{}) (model.ExerciseFilter, error) {
+	var it model.ExerciseFilter
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"softDelete", "name", "difficulty", "question_type_id", "class_Id", "module_id", "made_by"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "softDelete":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("softDelete"))
+			data, err := ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.SoftDelete = data
+		case "name":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
+			data, err := ec.unmarshalONameFilter2ᚖExerciseMicroserviceᚋgraphᚋmodelᚐNameFilter(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Name = data
+		case "difficulty":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("difficulty"))
+			data, err := ec.unmarshalOFloat2ᚖfloat64(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Difficulty = data
+		case "question_type_id":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("question_type_id"))
+			data, err := ec.unmarshalOID2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.QuestionTypeID = data
+		case "class_Id":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("class_Id"))
+			data, err := ec.unmarshalOID2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ClassID = data
+		case "module_id":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("module_id"))
+			data, err := ec.unmarshalOID2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ModuleID = data
+		case "made_by":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("made_by"))
+			data, err := ec.unmarshalOID2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.MadeBy = data
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputExerciseInput(ctx context.Context, obj interface{}) (model.ExerciseInput, error) {
 	var it model.ExerciseInput
 	asMap := map[string]interface{}{}
@@ -3234,7 +3493,7 @@ func (ec *executionContext) unmarshalInputExerciseInput(ctx context.Context, obj
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"class_Id", "name", "question", "answers", "pos_correct_answer", "question_type_id", "difficulty"}
+	fieldsInOrder := [...]string{"class_Id", "module_id", "name", "question", "answers", "pos_correct_answer", "question_type_id", "difficulty"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -3250,6 +3509,15 @@ func (ec *executionContext) unmarshalInputExerciseInput(ctx context.Context, obj
 				return it, err
 			}
 			it.ClassID = data
+		case "module_id":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("module_id"))
+			data, err := ec.unmarshalNID2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ModuleID = data
 		case "name":
 			var err error
 
@@ -3299,11 +3567,87 @@ func (ec *executionContext) unmarshalInputExerciseInput(ctx context.Context, obj
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("difficulty"))
-			data, err := ec.unmarshalNFloat2float64(ctx, v)
+			data, err := ec.unmarshalNdifficulty2ExerciseMicroserviceᚋgraphᚋmodelᚐDifficulty(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.Difficulty = data
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputNameFilter(ctx context.Context, obj interface{}) (model.NameFilter, error) {
+	var it model.NameFilter
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"input", "type"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "input":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+			data, err := ec.unmarshalNString2ᚕᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Input = data
+		case "type":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("type"))
+			data, err := ec.unmarshalNNameFilterTypes2ExerciseMicroserviceᚋgraphᚋmodelᚐNameFilterTypes(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Type = data
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputPaginator(ctx context.Context, obj interface{}) (model.Paginator, error) {
+	var it model.Paginator
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"amount", "Step"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "amount":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("amount"))
+			data, err := ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Amount = data
+		case "Step":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("Step"))
+			data, err := ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Step = data
 		}
 	}
 
@@ -3336,6 +3680,11 @@ func (ec *executionContext) _Exercise(ctx context.Context, sel ast.SelectionSet,
 			}
 		case "class_Id":
 			out.Values[i] = ec._Exercise_class_Id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "module_id":
+			out.Values[i] = ec._Exercise_module_id(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
@@ -3381,6 +3730,11 @@ func (ec *executionContext) _Exercise(ctx context.Context, sel ast.SelectionSet,
 			}
 		case "soft_deleted":
 			out.Values[i] = ec._Exercise_soft_deleted(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "made_by":
+			out.Values[i] = ec._Exercise_made_by(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
@@ -3890,24 +4244,14 @@ func (ec *executionContext) marshalNBoolean2bool(ctx context.Context, sel ast.Se
 	return res
 }
 
+func (ec *executionContext) unmarshalNExerciseFilter2ExerciseMicroserviceᚋgraphᚋmodelᚐExerciseFilter(ctx context.Context, v interface{}) (model.ExerciseFilter, error) {
+	res, err := ec.unmarshalInputExerciseFilter(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
 func (ec *executionContext) unmarshalNExerciseInput2ExerciseMicroserviceᚋgraphᚋmodelᚐExerciseInput(ctx context.Context, v interface{}) (model.ExerciseInput, error) {
 	res, err := ec.unmarshalInputExerciseInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) unmarshalNFloat2float64(ctx context.Context, v interface{}) (float64, error) {
-	res, err := graphql.UnmarshalFloatContext(ctx, v)
-	return res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) marshalNFloat2float64(ctx context.Context, sel ast.SelectionSet, v float64) graphql.Marshaler {
-	res := graphql.MarshalFloatContext(v)
-	if res == graphql.Null {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
-		}
-	}
-	return graphql.WrapContextMarshaler(ctx, res)
 }
 
 func (ec *executionContext) unmarshalNID2string(ctx context.Context, v interface{}) (string, error) {
@@ -3940,6 +4284,21 @@ func (ec *executionContext) marshalNInt2int(ctx context.Context, sel ast.Selecti
 	return res
 }
 
+func (ec *executionContext) unmarshalNNameFilterTypes2ExerciseMicroserviceᚋgraphᚋmodelᚐNameFilterTypes(ctx context.Context, v interface{}) (model.NameFilterTypes, error) {
+	var res model.NameFilterTypes
+	err := res.UnmarshalGQL(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNNameFilterTypes2ExerciseMicroserviceᚋgraphᚋmodelᚐNameFilterTypes(ctx context.Context, sel ast.SelectionSet, v model.NameFilterTypes) graphql.Marshaler {
+	return v
+}
+
+func (ec *executionContext) unmarshalNPaginator2ExerciseMicroserviceᚋgraphᚋmodelᚐPaginator(ctx context.Context, v interface{}) (model.Paginator, error) {
+	res, err := ec.unmarshalInputPaginator(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
 func (ec *executionContext) unmarshalNString2string(ctx context.Context, v interface{}) (string, error) {
 	res, err := graphql.UnmarshalString(v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -3953,6 +4312,32 @@ func (ec *executionContext) marshalNString2string(ctx context.Context, sel ast.S
 		}
 	}
 	return res
+}
+
+func (ec *executionContext) unmarshalNString2ᚕᚖstring(ctx context.Context, v interface{}) ([]*string, error) {
+	var vSlice []interface{}
+	if v != nil {
+		vSlice = graphql.CoerceList(v)
+	}
+	var err error
+	res := make([]*string, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalOString2ᚖstring(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) marshalNString2ᚕᚖstring(ctx context.Context, sel ast.SelectionSet, v []*string) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	for i := range v {
+		ret[i] = ec.marshalOString2ᚖstring(ctx, sel, v[i])
+	}
+
+	return ret
 }
 
 func (ec *executionContext) marshalN__Directive2githubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐDirective(ctx context.Context, sel ast.SelectionSet, v introspection.Directive) graphql.Marshaler {
@@ -4208,6 +4593,16 @@ func (ec *executionContext) marshalN__TypeKind2string(ctx context.Context, sel a
 	return res
 }
 
+func (ec *executionContext) unmarshalNdifficulty2ExerciseMicroserviceᚋgraphᚋmodelᚐDifficulty(ctx context.Context, v interface{}) (model.Difficulty, error) {
+	var res model.Difficulty
+	err := res.UnmarshalGQL(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNdifficulty2ExerciseMicroserviceᚋgraphᚋmodelᚐDifficulty(ctx context.Context, sel ast.SelectionSet, v model.Difficulty) graphql.Marshaler {
+	return v
+}
+
 func (ec *executionContext) unmarshalOBoolean2bool(ctx context.Context, v interface{}) (bool, error) {
 	res, err := graphql.UnmarshalBoolean(v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -4280,6 +4675,46 @@ func (ec *executionContext) marshalOExercise2ᚖExerciseMicroserviceᚋgraphᚋm
 		return graphql.Null
 	}
 	return ec._Exercise(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalOFloat2ᚖfloat64(ctx context.Context, v interface{}) (*float64, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := graphql.UnmarshalFloatContext(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOFloat2ᚖfloat64(ctx context.Context, sel ast.SelectionSet, v *float64) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	res := graphql.MarshalFloatContext(*v)
+	return graphql.WrapContextMarshaler(ctx, res)
+}
+
+func (ec *executionContext) unmarshalOID2ᚖstring(ctx context.Context, v interface{}) (*string, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := graphql.UnmarshalID(v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOID2ᚖstring(ctx context.Context, sel ast.SelectionSet, v *string) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	res := graphql.MarshalID(*v)
+	return res
+}
+
+func (ec *executionContext) unmarshalONameFilter2ᚖExerciseMicroserviceᚋgraphᚋmodelᚐNameFilter(ctx context.Context, v interface{}) (*model.NameFilter, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputNameFilter(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) unmarshalOString2ᚖstring(ctx context.Context, v interface{}) (*string, error) {
