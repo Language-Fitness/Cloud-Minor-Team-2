@@ -182,10 +182,10 @@ func (m *ModuleService) GetModuleById(token string, id string) (*model.Module, e
 }
 
 func (m *ModuleService) ListModules(token string, filter *model.Filter, paginate *model.Paginator) ([]*model.ModuleInfo, error) {
-	//isAdmin, err := m.Policy.ListModules(token)
-	//if err != nil {
-	//	return nil, err
-	//}
+	_, err := m.Policy.ListModules(token)
+	if err != nil {
+		return nil, err
+	}
 
 	m.Validator.Validate(filter.SoftDelete, []string{"IsNull", "IsBoolean"}, "Filter softDelete")
 	if helper.IsNil(filter.Name) == false {
@@ -205,23 +205,23 @@ func (m *ModuleService) ListModules(token string, filter *model.Filter, paginate
 	fmt.Println(helper.DereferenceIfNeeded(filter.SoftDelete))
 
 	bsonFilter := bson.D{}
-	if m.Policy.HasPermissions(token, "filter_module_SoftDelete") == true {
+	if m.Policy.HasPermissions(token, "filter_module_softDelete") == true {
 		bsonFilter = append(bsonFilter, bson.E{Key: "softdeleted", Value: helper.DereferenceIfNeeded(filter.SoftDelete)})
 	}
 
-	if m.Policy.HasPermissions(token, "filter_module_Name") == true && helper.IsNil(filter.Name) == false {
+	if m.Policy.HasPermissions(token, "filter_module_name") == true && helper.IsNil(filter.Name) == false {
 		bsonFilter = helper.AddFilter(bsonFilter, "name", string(filter.Name.Type), helper.DereferenceArrayIfNeeded(filter.Name.Input))
 	}
 
-	if m.Policy.HasPermissions(token, "filter_module_Difficulty") == true {
+	if m.Policy.HasPermissions(token, "filter_module_difficulty") == true {
 		bsonFilter = append(bsonFilter, bson.E{Key: "difficulty", Value: helper.DereferenceIfNeeded(filter.Difficulty)})
 	}
 
-	if m.Policy.HasPermissions(token, "filter_module_Private") == true {
+	if m.Policy.HasPermissions(token, "filter_module_private") == true {
 		bsonFilter = append(bsonFilter, bson.E{Key: "private", Value: helper.DereferenceIfNeeded(filter.Private)})
 	}
 
-	if m.Policy.HasPermissions(token, "filter_module_Category") == true {
+	if m.Policy.HasPermissions(token, "filter_module_category") == true {
 		bsonFilter = append(bsonFilter, bson.E{Key: "category", Value: helper.DereferenceIfNeeded(filter.Category)})
 	}
 

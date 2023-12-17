@@ -21,7 +21,7 @@ type SchoolInfo {
 
 type Query {
   getSchool(id: ID!): School
-  listSchools: [SchoolInfo]
+  listSchools(filter: Filter, paginate: Paginator): [SchoolInfo]
 }
 
 type Mutation {
@@ -37,4 +37,29 @@ input SchoolInput {
 
 input Filter {
   softDelete: Boolean
+  name: NameFilter
+  location: LocationFilter
+  made_by: ID
+}
+
+input NameFilter {
+  input: [String]!
+  type: NameFilterTypes!
+}
+
+input LocationFilter {
+  input: [String]!
+  type: NameFilterTypes!
+}
+
+input Paginator {
+  amount: Int!
+  Step: Int!
+}
+
+enum NameFilterTypes {
+  eq
+  ne
+  starts
+  ends
 }

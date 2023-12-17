@@ -17,7 +17,7 @@ type ISchoolRepository interface {
 	SoftDeleteSchoolByID(id string, existingSchool model.School) error
 	HardDeleteSchoolByID(id string) error
 	GetSchoolByID(id string) (*model.School, error)
-	ListSchools() ([]*model.SchoolInfo, error)
+	ListSchools(bsonFilter bson.D, paginateOptions *options.FindOptions) ([]*model.SchoolInfo, error)
 }
 
 // SchoolRepository GOLANG STRUCT
@@ -125,20 +125,20 @@ func (r *SchoolRepository) GetSchoolByID(id string) (*model.School, error) {
 	return &result, nil
 }
 
-func (r *SchoolRepository) ListSchools() ([]*model.SchoolInfo, error) {
+func (r *SchoolRepository) ListSchools(bsonFilter bson.D, paginateOptions *options.FindOptions) ([]*model.SchoolInfo, error) {
 	ctx, cancel := context.WithTimeout(context.TODO(), time.Second*10) // 10-second timeout
 	defer cancel()
 
 	var Schools []*model.SchoolInfo
 
-	cursor, err := r.collection.Find(ctx, bson.D{})
+	cursor, err := r.collection.Find(ctx, bsonFilter, paginateOptions)
 	if err != nil {
 		return nil, err // Return any MongoDB-related errors.
 	}
 	defer func(cursor *mongo.Cursor, ctx context.Context) {
 		err := cursor.Close(ctx)
 		if err != nil {
-
+			// Handle closing error if needed
 		}
 	}(cursor, ctx)
 

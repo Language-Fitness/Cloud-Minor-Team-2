@@ -13,6 +13,7 @@ type IPolicy interface {
 	DeleteClass(bearerToken string, id string) (bool, *model.Class, error)
 	GetClass(bearerToken string, id string) (*model.Class, error)
 	ListClasses(bearerToken string) error
+	HasPermissions(bearerToken string, role string) bool
 }
 
 type Policy struct {
@@ -110,11 +111,21 @@ func (p *Policy) ListClasses(bearerToken string) error {
 		return err2
 	}
 
+	if p.hasRole(roles, "get_classes_all") {
+		return nil
+	}
+
 	if !p.hasRole(roles, "get_classes") {
 		return errors.New("invalid permissions for this action")
 	}
 
 	return nil
+}
+
+func (p *Policy) HasPermissions(bearerToken string, role string) bool {
+	_, roles, _ := p.getSubAndRoles(bearerToken)
+
+	return p.hasRole(roles, role)
 }
 
 func (p *Policy) getSubAndRoles(bearerToken string) (string, []interface{}, error) {

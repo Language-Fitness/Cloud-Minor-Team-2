@@ -59,10 +59,10 @@ func (r *queryResolver) GetSchool(ctx context.Context, id string) (*model.School
 }
 
 // ListSchools is the resolver for the listSchools field.
-func (r *queryResolver) ListSchools(ctx context.Context) ([]*model.SchoolInfo, error) {
+func (r *queryResolver) ListSchools(ctx context.Context, filter *model.Filter, paginate *model.Paginator) ([]*model.SchoolInfo, error) {
 	token := auth.TokenFromContext(ctx)
 
-	schools, err := r.Service.ListSchools(token)
+	schools, err := r.Service.ListSchools(token, filter, paginate)
 	if err != nil {
 		return nil, err
 	}

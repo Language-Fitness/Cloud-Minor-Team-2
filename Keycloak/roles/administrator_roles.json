@@ -21,6 +21,12 @@
     "name": "get_modules_all"
   },
   {
+    "name": "get_schools_all"
+  },
+  {
+    "name": "get_classes_all"
+  },
+  {
     "name": "update_school_all"
   },
   {
@@ -38,20 +44,37 @@
   {
     "name": "update_school"
   },
-
   {
-    "name": "filter_module_SoftDelete"
+    "name": "filter_module_softDelete"
   },
   {
-    "name": "filter_module_Name"
+    "name": "filter_module_name"
   },
   {
-    "name": "filter_module_Difficulty"
+    "name": "filter_module_difficulty"
   },
   {
-    "name": "filter_module_Private"
+    "name": "filter_module_private"
   },
   {
-    "name": "filter_module_Category"
+    "name": "filter_module_category"
+  },
+  {
+    "name": "filter_class_softDelete"
+  },
+  {
+    "name": "filter_class_made_by"
+  },
+  {
+    "name": "filter_school_softDelete"
+  },
+  {
+    "name": "filter_school_name"
+  },
+  {
+    "name": "filter_school_location"
+  },
+  {
+    "name": "filter_school_made_by"
   }
 ]

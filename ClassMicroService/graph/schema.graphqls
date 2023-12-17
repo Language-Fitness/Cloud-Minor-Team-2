@@ -7,7 +7,7 @@ type Class {
   module_Id: ID!
   name: String!
   description: String!
-  difficulty: Int!
+  difficulty: LanguageLevel!
   made_by: String!
   created_at: String
   updated_at: String
@@ -19,13 +19,13 @@ type ClassInfo {
   module_Id: ID!
   name: String!
   description: String!
-  difficulty: Int!
+  difficulty: LanguageLevel!
   made_by: String!
 }
 
 type Query {
   getClass(id: ID!): Class
-  listClasses: [ClassInfo]
+  listClasses(filter: Filter, paginate: Paginator): [ClassInfo]
 }
 
 type Mutation {
@@ -38,9 +38,39 @@ input ClassInput {
   module_Id: ID!
   name: String!
   description: String!
-  difficulty: Int!
+  difficulty: LanguageLevel!
 }
 
 input Filter {
   softDelete: Boolean
+  module_id: ID
+  name: NameFilter
+  difficulty: LanguageLevel
+  made_by: ID
+}
+
+input NameFilter {
+  input: [String]!
+  type: NameFilterTypes!
+}
+
+input Paginator {
+  amount: Int!
+  Step: Int!
+}
+
+enum LanguageLevel{
+  A1
+  A2
+  B1
+  B2
+  C1
+  C2
+}
+
+enum NameFilterTypes {
+  eq
+  ne
+  starts
+  ends
 }

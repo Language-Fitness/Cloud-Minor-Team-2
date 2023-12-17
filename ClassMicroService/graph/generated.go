@@ -76,7 +76,7 @@ type ComplexityRoot struct {
 
 	Query struct {
 		GetClass    func(childComplexity int, id string) int
-		ListClasses func(childComplexity int) int
+		ListClasses func(childComplexity int, filter *model.Filter, paginate *model.Paginator) int
 	}
 }
 
@@ -87,7 +87,7 @@ type MutationResolver interface {
 }
 type QueryResolver interface {
 	GetClass(ctx context.Context, id string) (*model.Class, error)
-	ListClasses(ctx context.Context) ([]*model.ClassInfo, error)
+	ListClasses(ctx context.Context, filter *model.Filter, paginate *model.Paginator) ([]*model.ClassInfo, error)
 }
 
 type executableSchema struct {
@@ -267,7 +267,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			break
 		}
 
-		return e.complexity.Query.ListClasses(childComplexity), true
+		args, err := ec.field_Query_listClasses_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.ListClasses(childComplexity, args["filter"].(*model.Filter), args["paginate"].(*model.Paginator)), true
 
 	}
 	return 0, false
@@ -279,6 +284,8 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 	inputUnmarshalMap := graphql.BuildUnmarshalerMap(
 		ec.unmarshalInputClassInput,
 		ec.unmarshalInputFilter,
+		ec.unmarshalInputNameFilter,
+		ec.unmarshalInputPaginator,
 	)
 	first := true
 
@@ -485,6 +492,30 @@ func (ec *executionContext) field_Query_getClass_args(ctx context.Context, rawAr
 		}
 	}
 	args["id"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_listClasses_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.Filter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg0, err = ec.unmarshalOFilter2ᚖexampleᚋgraphᚋmodelᚐFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	var arg1 *model.Paginator
+	if tmp, ok := rawArgs["paginate"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("paginate"))
+		arg1, err = ec.unmarshalOPaginator2ᚖexampleᚋgraphᚋmodelᚐPaginator(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["paginate"] = arg1
 	return args, nil
 }
 
@@ -728,9 +759,9 @@ func (ec *executionContext) _Class_difficulty(ctx context.Context, field graphql
 		}
 		return graphql.Null
 	}
-	res := resTmp.(int)
+	res := resTmp.(model.LanguageLevel)
 	fc.Result = res
-	return ec.marshalNInt2int(ctx, field.Selections, res)
+	return ec.marshalNLanguageLevel2exampleᚋgraphᚋmodelᚐLanguageLevel(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Class_difficulty(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -740,7 +771,7 @@ func (ec *executionContext) fieldContext_Class_difficulty(ctx context.Context, f
 		IsMethod:   false,
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Int does not have child fields")
+			return nil, errors.New("field of type LanguageLevel does not have child fields")
 		},
 	}
 	return fc, nil
@@ -1115,9 +1146,9 @@ func (ec *executionContext) _ClassInfo_difficulty(ctx context.Context, field gra
 		}
 		return graphql.Null
 	}
-	res := resTmp.(int)
+	res := resTmp.(model.LanguageLevel)
 	fc.Result = res
-	return ec.marshalNInt2int(ctx, field.Selections, res)
+	return ec.marshalNLanguageLevel2exampleᚋgraphᚋmodelᚐLanguageLevel(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_ClassInfo_difficulty(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -1127,7 +1158,7 @@ func (ec *executionContext) fieldContext_ClassInfo_difficulty(ctx context.Contex
 		IsMethod:   false,
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Int does not have child fields")
+			return nil, errors.New("field of type LanguageLevel does not have child fields")
 		},
 	}
 	return fc, nil
@@ -1459,7 +1490,7 @@ func (ec *executionContext) _Query_listClasses(ctx context.Context, field graphq
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().ListClasses(rctx)
+		return ec.resolvers.Query().ListClasses(rctx, fc.Args["filter"].(*model.Filter), fc.Args["paginate"].(*model.Paginator))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1496,6 +1527,17 @@ func (ec *executionContext) fieldContext_Query_listClasses(ctx context.Context, 
 			}
 			return nil, fmt.Errorf("no field named %q was found under type ClassInfo", field.Name)
 		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_listClasses_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
 	}
 	return fc, nil
 }
@@ -3447,7 +3489,7 @@ func (ec *executionContext) unmarshalInputClassInput(ctx context.Context, obj in
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("difficulty"))
-			data, err := ec.unmarshalNInt2int(ctx, v)
+			data, err := ec.unmarshalNLanguageLevel2exampleᚋgraphᚋmodelᚐLanguageLevel(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -3465,7 +3507,7 @@ func (ec *executionContext) unmarshalInputFilter(ctx context.Context, obj interf
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"softDelete"}
+	fieldsInOrder := [...]string{"softDelete", "module_id", "name", "difficulty", "made_by"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -3481,6 +3523,118 @@ func (ec *executionContext) unmarshalInputFilter(ctx context.Context, obj interf
 				return it, err
 			}
 			it.SoftDelete = data
+		case "module_id":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("module_id"))
+			data, err := ec.unmarshalOID2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ModuleID = data
+		case "name":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
+			data, err := ec.unmarshalONameFilter2ᚖexampleᚋgraphᚋmodelᚐNameFilter(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Name = data
+		case "difficulty":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("difficulty"))
+			data, err := ec.unmarshalOLanguageLevel2ᚖexampleᚋgraphᚋmodelᚐLanguageLevel(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Difficulty = data
+		case "made_by":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("made_by"))
+			data, err := ec.unmarshalOID2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.MadeBy = data
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputNameFilter(ctx context.Context, obj interface{}) (model.NameFilter, error) {
+	var it model.NameFilter
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"input", "type"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "input":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+			data, err := ec.unmarshalNString2ᚕᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Input = data
+		case "type":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("type"))
+			data, err := ec.unmarshalNNameFilterTypes2exampleᚋgraphᚋmodelᚐNameFilterTypes(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Type = data
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputPaginator(ctx context.Context, obj interface{}) (model.Paginator, error) {
+	var it model.Paginator
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"amount", "Step"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "amount":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("amount"))
+			data, err := ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Amount = data
+		case "Step":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("Step"))
+			data, err := ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Step = data
 		}
 	}
 
@@ -4147,6 +4301,26 @@ func (ec *executionContext) marshalNInt2int(ctx context.Context, sel ast.Selecti
 	return res
 }
 
+func (ec *executionContext) unmarshalNLanguageLevel2exampleᚋgraphᚋmodelᚐLanguageLevel(ctx context.Context, v interface{}) (model.LanguageLevel, error) {
+	var res model.LanguageLevel
+	err := res.UnmarshalGQL(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNLanguageLevel2exampleᚋgraphᚋmodelᚐLanguageLevel(ctx context.Context, sel ast.SelectionSet, v model.LanguageLevel) graphql.Marshaler {
+	return v
+}
+
+func (ec *executionContext) unmarshalNNameFilterTypes2exampleᚋgraphᚋmodelᚐNameFilterTypes(ctx context.Context, v interface{}) (model.NameFilterTypes, error) {
+	var res model.NameFilterTypes
+	err := res.UnmarshalGQL(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNNameFilterTypes2exampleᚋgraphᚋmodelᚐNameFilterTypes(ctx context.Context, sel ast.SelectionSet, v model.NameFilterTypes) graphql.Marshaler {
+	return v
+}
+
 func (ec *executionContext) unmarshalNString2string(ctx context.Context, v interface{}) (string, error) {
 	res, err := graphql.UnmarshalString(v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -4160,6 +4334,32 @@ func (ec *executionContext) marshalNString2string(ctx context.Context, sel ast.S
 		}
 	}
 	return res
+}
+
+func (ec *executionContext) unmarshalNString2ᚕᚖstring(ctx context.Context, v interface{}) ([]*string, error) {
+	var vSlice []interface{}
+	if v != nil {
+		vSlice = graphql.CoerceList(v)
+	}
+	var err error
+	res := make([]*string, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalOString2ᚖstring(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) marshalNString2ᚕᚖstring(ctx context.Context, sel ast.SelectionSet, v []*string) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	for i := range v {
+		ret[i] = ec.marshalOString2ᚖstring(ctx, sel, v[i])
+	}
+
+	return ret
 }
 
 func (ec *executionContext) marshalN__Directive2githubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐDirective(ctx context.Context, sel ast.SelectionSet, v introspection.Directive) graphql.Marshaler {
@@ -4518,6 +4718,38 @@ func (ec *executionContext) marshalOID2ᚖstring(ctx context.Context, sel ast.Se
 	}
 	res := graphql.MarshalID(*v)
 	return res
+}
+
+func (ec *executionContext) unmarshalOLanguageLevel2ᚖexampleᚋgraphᚋmodelᚐLanguageLevel(ctx context.Context, v interface{}) (*model.LanguageLevel, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var res = new(model.LanguageLevel)
+	err := res.UnmarshalGQL(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOLanguageLevel2ᚖexampleᚋgraphᚋmodelᚐLanguageLevel(ctx context.Context, sel ast.SelectionSet, v *model.LanguageLevel) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return v
+}
+
+func (ec *executionContext) unmarshalONameFilter2ᚖexampleᚋgraphᚋmodelᚐNameFilter(ctx context.Context, v interface{}) (*model.NameFilter, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputNameFilter(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalOPaginator2ᚖexampleᚋgraphᚋmodelᚐPaginator(ctx context.Context, v interface{}) (*model.Paginator, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputPaginator(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) unmarshalOString2ᚖstring(ctx context.Context, v interface{}) (*string, error) {

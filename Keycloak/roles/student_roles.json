@@ -16,5 +16,8 @@
   },
   {
     "name": "get_modules"
+  },
+  {
+    "name:": "filter_class_module_id"
   }
 ]

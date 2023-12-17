@@ -5,9 +5,13 @@ import (
 	"example/graph/model"
 	"example/internal/auth"
 	"example/internal/database"
+	"example/internal/helper"
 	"example/internal/repository"
 	"example/internal/validation"
+	"fmt"
 	"github.com/google/uuid"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo/options"
 	"strings"
 	"time"
 )
@@ -19,7 +23,7 @@ type ISchoolService interface {
 	UpdateSchool(token string, id string, updatedData model.SchoolInput) (*model.School, error)
 	DeleteSchool(token string, id string, filter *model.Filter) error
 	GetSchoolById(token string, id string) (*model.School, error)
-	ListSchools(token string) ([]*model.SchoolInfo, error)
+	ListSchools(token string, filter *model.Filter, paginate *model.Paginator) ([]*model.SchoolInfo, error)
 }
 
 // SchoolService GOLANG STRUCT
@@ -48,9 +52,8 @@ func (s *SchoolService) CreateSchool(token string, newSchool model.SchoolInput) 
 		return nil, err
 	}
 
-	s.Validator.Validate(newSchool.Name, []string{"IsString", "Length:<25"})
-	s.Validator.Validate(newSchool.Location, []string{"IsString", "Length:<50"})
-	s.Validator.Validate(newSchool.Location, []string{"IsString", "Length:<50"})
+	s.Validator.Validate(newSchool.Name, []string{"IsString", "Length:<25"}, "Name")
+	s.Validator.Validate(newSchool.Location, []string{"IsString", "Length:<50"}, "Location")
 
 	validationErrors := s.Validator.GetErrors()
 	if len(validationErrors) > 0 {
@@ -85,9 +88,9 @@ func (s *SchoolService) UpdateSchool(token string, id string, updatedData model.
 		return nil, err
 	}
 
-	s.Validator.Validate(id, []string{"IsUUID"})
-	s.Validator.Validate(updatedData.Name, []string{"IsString", "Length:<25"})
-	s.Validator.Validate(updatedData.Location, []string{"IsString", "Length:<50"})
+	s.Validator.Validate(id, []string{"IsUUID"}, "ID")
+	s.Validator.Validate(updatedData.Name, []string{"IsString", "Length:<25"}, "Name")
+	s.Validator.Validate(updatedData.Location, []string{"IsString", "Length:<50"}, "Location")
 
 	validationErrors := s.Validator.GetErrors()
 	if len(validationErrors) > 0 {
@@ -152,16 +155,73 @@ func (s *SchoolService) GetSchoolById(token string, id string) (*model.School, e
 	return existingSchool, nil
 }
 
-func (s *SchoolService) ListSchools(token string) ([]*model.SchoolInfo, error) {
+func (s *SchoolService) ListSchools(token string, filter *model.Filter, paginate *model.Paginator) ([]*model.SchoolInfo, error) {
 	err := s.Policy.ListSchools(token)
 	if err != nil {
 		return nil, err
 	}
 
-	Schools, err := s.Repo.ListSchools()
+	s.Validator.Validate(filter.SoftDelete, []string{"IsNull", "IsBoolean"}, "Filter softDelete")
+
+	if !helper.IsNil(filter.Name) {
+		s.Validator.Validate(helper.DereferenceArrayIfNeeded(
+			filter.Name.Input),
+			[]string{"IsNull", "ArrayType:string"},
+			"Filter Name input")
+	}
+
+	if !helper.IsNil(filter.Location) {
+		s.Validator.Validate(helper.DereferenceArrayIfNeeded(
+			filter.Location.Input),
+			[]string{"IsNull", "ArrayType:string"},
+			"Filter Location input")
+	}
+
+	s.Validator.Validate(filter.MadeBy, []string{"IsNull", "IsUUID"}, "Filter Made_By")
+	s.Validator.Validate(paginate.Amount, []string{"IsInt", "Size:>0", "Size:<101"}, "Paginate Amount")
+	s.Validator.Validate(paginate.Step, []string{"IsInt", "Size:>=0"}, "Paginate Step")
+
+	validationErrors := s.Validator.GetErrors()
+	if len(validationErrors) > 0 {
+		errorMessage := "Validation errors: " + strings.Join(validationErrors, ", ")
+		s.Validator.ClearErrors()
+		return nil, errors.New(errorMessage)
+	}
+
+	bsonFilter := bson.D{}
+	if s.Policy.HasPermissions(token, "filter_school_softDelete") == true && !helper.IsNil(filter.SoftDelete) {
+		bsonFilter = append(bsonFilter, bson.E{Key: "softdeleted", Value: helper.DereferenceIfNeeded(filter.SoftDelete)})
+	}
+
+	if s.Policy.HasPermissions(token, "filter_school_name") == true && !helper.IsNil(filter.Name) {
+		bsonFilter = helper.AddFilter(
+			bsonFilter, "name",
+			string(filter.Name.Type),
+			helper.DereferenceArrayIfNeeded(filter.Name.Input))
+	}
+
+	if s.Policy.HasPermissions(token, "filter_school_location") == true && !helper.IsNil(filter.Location) {
+		bsonFilter = helper.AddFilter(
+			bsonFilter,
+			"location",
+			string(filter.Location.Type),
+			helper.DereferenceArrayIfNeeded(filter.Location.Input))
+	}
+
+	if s.Policy.HasPermissions(token, "filter_school_made_by") == true && !helper.IsNil(filter.MadeBy) {
+		bsonFilter = append(bsonFilter, bson.E{Key: "madeby", Value: helper.DereferenceIfNeeded(filter.MadeBy)})
+	}
+
+	fmt.Println(bsonFilter)
+
+	paginateOptions := options.Find().
+		SetSkip(int64(paginate.Step)).
+		SetLimit(int64(paginate.Amount))
+
+	schools, err := s.Repo.ListSchools(bsonFilter, paginateOptions)
 	if err != nil {
 		return nil, err
 	}
 
-	return Schools, nil
+	return schools, nil
 }
