@@ -36,7 +36,7 @@ type ClassInput struct {
 	Difficulty  LanguageLevel `json:"difficulty"`
 }
 
-type Filter struct {
+type ListClassFilter struct {
 	SoftDelete *bool          `json:"softDelete,omitempty"`
 	ModuleID   *string        `json:"module_id,omitempty"`
 	Name       *NameFilter    `json:"name,omitempty"`

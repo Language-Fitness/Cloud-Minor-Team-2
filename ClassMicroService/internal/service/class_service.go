@@ -21,9 +21,9 @@ import (
 type IClassService interface {
 	CreateClass(token string, newClass model.ClassInput) (*model.Class, error)
 	UpdateClass(token string, id string, updatedData model.ClassInput) (*model.Class, error)
-	DeleteClass(token string, id string, filter *model.Filter) error
+	DeleteClass(token string, id string, filter *model.ListClassFilter) error
 	GetClassById(token string, id string) (*model.Class, error)
-	ListClasses(token string, filter *model.Filter, paginate *model.Paginator) ([]*model.ClassInfo, error)
+	ListClasses(token string, filter *model.ListClassFilter, paginate *model.Paginator) ([]*model.ClassInfo, error)
 }
 
 // ClassService GOLANG STRUCT
@@ -95,7 +95,6 @@ func (c *ClassService) UpdateClass(token string, id string, updatedData model.Cl
 	c.Validator.Validate(updatedData.ModuleID, []string{"IsUUID"}, "Module ID")
 	c.Validator.Validate(updatedData.Name, []string{"IsString", "Length:<25"}, "Name")
 	c.Validator.Validate(updatedData.Description, []string{"IsString", "Length:<50"}, "Description")
-	c.Validator.Validate(updatedData.Difficulty, []string{"IsString"}, "Difficulty")
 
 	validationErrors := c.Validator.GetErrors()
 	if len(validationErrors) > 0 {
@@ -125,7 +124,7 @@ func (c *ClassService) UpdateClass(token string, id string, updatedData model.Cl
 	return result, nil
 }
 
-func (c *ClassService) DeleteClass(token string, id string, filter *model.Filter) error {
+func (c *ClassService) DeleteClass(token string, id string, filter *model.ListClassFilter) error {
 	isAdmin, existingClass, err := c.Policy.DeleteClass(token, id)
 	if err != nil {
 		return err
@@ -162,7 +161,7 @@ func (c *ClassService) GetClassById(token string, id string) (*model.Class, erro
 	return existingClass, nil
 }
 
-func (c *ClassService) ListClasses(token string, filter *model.Filter, paginate *model.Paginator) ([]*model.ClassInfo, error) {
+func (c *ClassService) ListClasses(token string, filter *model.ListClassFilter, paginate *model.Paginator) ([]*model.ClassInfo, error) {
 	err := c.Policy.ListClasses(token)
 	if err != nil {
 		return nil, err
@@ -191,6 +190,8 @@ func (c *ClassService) ListClasses(token string, filter *model.Filter, paginate 
 
 	if c.Policy.HasPermissions(token, "filter_class_softDelete") == true && !helper.IsNil(filter.SoftDelete) {
 		bsonFilter = append(bsonFilter, bson.E{Key: "softdeleted", Value: helper.DereferenceIfNeeded(filter.SoftDelete)})
+	} else {
+		bsonFilter = append(bsonFilter, bson.E{Key: "softdeleted", Value: false})
 	}
 
 	if c.Policy.HasPermissions(token, "filter_class_module_id") == true && !helper.IsNil(filter.ModuleID) {

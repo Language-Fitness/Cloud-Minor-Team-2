@@ -138,14 +138,13 @@ func (r *ClassRepository) ListClasses(bsonFilter bson.D, paginateOptions *option
 	defer func(cursor *mongo.Cursor, ctx context.Context) {
 		err := cursor.Close(ctx)
 		if err != nil {
-			// handle closing error if needed
 		}
 	}(cursor, ctx)
 
 	for cursor.Next(ctx) {
 		var Class model.ClassInfo
 		if err := cursor.Decode(&Class); err != nil {
-			return nil, err // Return any decoding errors.
+			return nil, err
 		}
 		classes = append(classes, &Class)
 	}

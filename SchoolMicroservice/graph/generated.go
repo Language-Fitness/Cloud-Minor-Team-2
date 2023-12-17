@@ -49,13 +49,13 @@ type DirectiveRoot struct {
 type ComplexityRoot struct {
 	Mutation struct {
 		CreateSchool func(childComplexity int, input model.SchoolInput) int
-		DeleteSchool func(childComplexity int, id string, filter *model.Filter) int
+		DeleteSchool func(childComplexity int, id string, filter *model.ListSchoolFilter) int
 		UpdateSchool func(childComplexity int, id string, input model.SchoolInput) int
 	}
 
 	Query struct {
 		GetSchool   func(childComplexity int, id string) int
-		ListSchools func(childComplexity int, filter *model.Filter, paginate *model.Paginator) int
+		ListSchools func(childComplexity int, filter *model.ListSchoolFilter, paginate *model.Paginator) int
 	}
 
 	School struct {
@@ -79,11 +79,11 @@ type ComplexityRoot struct {
 type MutationResolver interface {
 	CreateSchool(ctx context.Context, input model.SchoolInput) (*model.School, error)
 	UpdateSchool(ctx context.Context, id string, input model.SchoolInput) (*model.School, error)
-	DeleteSchool(ctx context.Context, id string, filter *model.Filter) (*string, error)
+	DeleteSchool(ctx context.Context, id string, filter *model.ListSchoolFilter) (*string, error)
 }
 type QueryResolver interface {
 	GetSchool(ctx context.Context, id string) (*model.School, error)
-	ListSchools(ctx context.Context, filter *model.Filter, paginate *model.Paginator) ([]*model.SchoolInfo, error)
+	ListSchools(ctx context.Context, filter *model.ListSchoolFilter, paginate *model.Paginator) ([]*model.SchoolInfo, error)
 }
 
 type executableSchema struct {
@@ -127,7 +127,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.DeleteSchool(childComplexity, args["id"].(string), args["filter"].(*model.Filter)), true
+		return e.complexity.Mutation.DeleteSchool(childComplexity, args["id"].(string), args["filter"].(*model.ListSchoolFilter)), true
 
 	case "Mutation.updateSchool":
 		if e.complexity.Mutation.UpdateSchool == nil {
@@ -163,7 +163,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.ListSchools(childComplexity, args["filter"].(*model.Filter), args["paginate"].(*model.Paginator)), true
+		return e.complexity.Query.ListSchools(childComplexity, args["filter"].(*model.ListSchoolFilter), args["paginate"].(*model.Paginator)), true
 
 	case "School.created_at":
 		if e.complexity.School.CreatedAt == nil {
@@ -250,7 +250,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 	rc := graphql.GetOperationContext(ctx)
 	ec := executionContext{rc, e, 0, 0, make(chan graphql.DeferredResult)}
 	inputUnmarshalMap := graphql.BuildUnmarshalerMap(
-		ec.unmarshalInputFilter,
+		ec.unmarshalInputListSchoolFilter,
 		ec.unmarshalInputLocationFilter,
 		ec.unmarshalInputNameFilter,
 		ec.unmarshalInputPaginator,
@@ -398,10 +398,10 @@ func (ec *executionContext) field_Mutation_deleteSchool_args(ctx context.Context
 		}
 	}
 	args["id"] = arg0
-	var arg1 *model.Filter
+	var arg1 *model.ListSchoolFilter
 	if tmp, ok := rawArgs["filter"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
-		arg1, err = ec.unmarshalOFilter2ᚖexampleᚋgraphᚋmodelᚐFilter(ctx, tmp)
+		arg1, err = ec.unmarshalOListSchoolFilter2ᚖexampleᚋgraphᚋmodelᚐListSchoolFilter(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -467,10 +467,10 @@ func (ec *executionContext) field_Query_getSchool_args(ctx context.Context, rawA
 func (ec *executionContext) field_Query_listSchools_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 *model.Filter
+	var arg0 *model.ListSchoolFilter
 	if tmp, ok := rawArgs["filter"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
-		arg0, err = ec.unmarshalOFilter2ᚖexampleᚋgraphᚋmodelᚐFilter(ctx, tmp)
+		arg0, err = ec.unmarshalOListSchoolFilter2ᚖexampleᚋgraphᚋmodelᚐListSchoolFilter(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -676,7 +676,7 @@ func (ec *executionContext) _Mutation_deleteSchool(ctx context.Context, field gr
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().DeleteSchool(rctx, fc.Args["id"].(string), fc.Args["filter"].(*model.Filter))
+		return ec.resolvers.Mutation().DeleteSchool(rctx, fc.Args["id"].(string), fc.Args["filter"].(*model.ListSchoolFilter))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -796,7 +796,7 @@ func (ec *executionContext) _Query_listSchools(ctx context.Context, field graphq
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().ListSchools(rctx, fc.Args["filter"].(*model.Filter), fc.Args["paginate"].(*model.Paginator))
+		return ec.resolvers.Query().ListSchools(rctx, fc.Args["filter"].(*model.ListSchoolFilter), fc.Args["paginate"].(*model.Paginator))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -3221,8 +3221,8 @@ func (ec *executionContext) fieldContext___Type_specifiedByURL(ctx context.Conte
 
 // region    **************************** input.gotpl *****************************
 
-func (ec *executionContext) unmarshalInputFilter(ctx context.Context, obj interface{}) (model.Filter, error) {
-	var it model.Filter
+func (ec *executionContext) unmarshalInputListSchoolFilter(ctx context.Context, obj interface{}) (model.ListSchoolFilter, error) {
+	var it model.ListSchoolFilter
 	asMap := map[string]interface{}{}
 	for k, v := range obj.(map[string]interface{}) {
 		asMap[k] = v
@@ -4399,14 +4399,6 @@ func (ec *executionContext) marshalOBoolean2ᚖbool(ctx context.Context, sel ast
 	return res
 }
 
-func (ec *executionContext) unmarshalOFilter2ᚖexampleᚋgraphᚋmodelᚐFilter(ctx context.Context, v interface{}) (*model.Filter, error) {
-	if v == nil {
-		return nil, nil
-	}
-	res, err := ec.unmarshalInputFilter(ctx, v)
-	return &res, graphql.ErrorOnPath(ctx, err)
-}
-
 func (ec *executionContext) unmarshalOID2ᚖstring(ctx context.Context, v interface{}) (*string, error) {
 	if v == nil {
 		return nil, nil
@@ -4421,6 +4413,14 @@ func (ec *executionContext) marshalOID2ᚖstring(ctx context.Context, sel ast.Se
 	}
 	res := graphql.MarshalID(*v)
 	return res
+}
+
+func (ec *executionContext) unmarshalOListSchoolFilter2ᚖexampleᚋgraphᚋmodelᚐListSchoolFilter(ctx context.Context, v interface{}) (*model.ListSchoolFilter, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputListSchoolFilter(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) unmarshalOLocationFilter2ᚖexampleᚋgraphᚋmodelᚐLocationFilter(ctx context.Context, v interface{}) (*model.LocationFilter, error) {

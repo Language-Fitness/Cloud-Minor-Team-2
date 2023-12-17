@@ -70,24 +70,24 @@ type ComplexityRoot struct {
 
 	Mutation struct {
 		CreateClass func(childComplexity int, input model.ClassInput) int
-		DeleteClass func(childComplexity int, id string, filter *model.Filter) int
+		DeleteClass func(childComplexity int, id string, filter *model.ListClassFilter) int
 		UpdateClass func(childComplexity int, id string, input model.ClassInput) int
 	}
 
 	Query struct {
 		GetClass    func(childComplexity int, id string) int
-		ListClasses func(childComplexity int, filter *model.Filter, paginate *model.Paginator) int
+		ListClasses func(childComplexity int, filter *model.ListClassFilter, paginate *model.Paginator) int
 	}
 }
 
 type MutationResolver interface {
 	CreateClass(ctx context.Context, input model.ClassInput) (*model.Class, error)
 	UpdateClass(ctx context.Context, id string, input model.ClassInput) (*model.Class, error)
-	DeleteClass(ctx context.Context, id string, filter *model.Filter) (*string, error)
+	DeleteClass(ctx context.Context, id string, filter *model.ListClassFilter) (*string, error)
 }
 type QueryResolver interface {
 	GetClass(ctx context.Context, id string) (*model.Class, error)
-	ListClasses(ctx context.Context, filter *model.Filter, paginate *model.Paginator) ([]*model.ClassInfo, error)
+	ListClasses(ctx context.Context, filter *model.ListClassFilter, paginate *model.Paginator) ([]*model.ClassInfo, error)
 }
 
 type executableSchema struct {
@@ -236,7 +236,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.DeleteClass(childComplexity, args["id"].(string), args["filter"].(*model.Filter)), true
+		return e.complexity.Mutation.DeleteClass(childComplexity, args["id"].(string), args["filter"].(*model.ListClassFilter)), true
 
 	case "Mutation.updateClass":
 		if e.complexity.Mutation.UpdateClass == nil {
@@ -272,7 +272,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.ListClasses(childComplexity, args["filter"].(*model.Filter), args["paginate"].(*model.Paginator)), true
+		return e.complexity.Query.ListClasses(childComplexity, args["filter"].(*model.ListClassFilter), args["paginate"].(*model.Paginator)), true
 
 	}
 	return 0, false
@@ -283,7 +283,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 	ec := executionContext{rc, e, 0, 0, make(chan graphql.DeferredResult)}
 	inputUnmarshalMap := graphql.BuildUnmarshalerMap(
 		ec.unmarshalInputClassInput,
-		ec.unmarshalInputFilter,
+		ec.unmarshalInputListClassFilter,
 		ec.unmarshalInputNameFilter,
 		ec.unmarshalInputPaginator,
 	)
@@ -429,10 +429,10 @@ func (ec *executionContext) field_Mutation_deleteClass_args(ctx context.Context,
 		}
 	}
 	args["id"] = arg0
-	var arg1 *model.Filter
+	var arg1 *model.ListClassFilter
 	if tmp, ok := rawArgs["filter"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
-		arg1, err = ec.unmarshalOFilter2ᚖexampleᚋgraphᚋmodelᚐFilter(ctx, tmp)
+		arg1, err = ec.unmarshalOListClassFilter2ᚖexampleᚋgraphᚋmodelᚐListClassFilter(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -498,10 +498,10 @@ func (ec *executionContext) field_Query_getClass_args(ctx context.Context, rawAr
 func (ec *executionContext) field_Query_listClasses_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 *model.Filter
+	var arg0 *model.ListClassFilter
 	if tmp, ok := rawArgs["filter"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
-		arg0, err = ec.unmarshalOFilter2ᚖexampleᚋgraphᚋmodelᚐFilter(ctx, tmp)
+		arg0, err = ec.unmarshalOListClassFilter2ᚖexampleᚋgraphᚋmodelᚐListClassFilter(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -1366,7 +1366,7 @@ func (ec *executionContext) _Mutation_deleteClass(ctx context.Context, field gra
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().DeleteClass(rctx, fc.Args["id"].(string), fc.Args["filter"].(*model.Filter))
+		return ec.resolvers.Mutation().DeleteClass(rctx, fc.Args["id"].(string), fc.Args["filter"].(*model.ListClassFilter))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1490,7 +1490,7 @@ func (ec *executionContext) _Query_listClasses(ctx context.Context, field graphq
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().ListClasses(rctx, fc.Args["filter"].(*model.Filter), fc.Args["paginate"].(*model.Paginator))
+		return ec.resolvers.Query().ListClasses(rctx, fc.Args["filter"].(*model.ListClassFilter), fc.Args["paginate"].(*model.Paginator))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -3500,8 +3500,8 @@ func (ec *executionContext) unmarshalInputClassInput(ctx context.Context, obj in
 	return it, nil
 }
 
-func (ec *executionContext) unmarshalInputFilter(ctx context.Context, obj interface{}) (model.Filter, error) {
-	var it model.Filter
+func (ec *executionContext) unmarshalInputListClassFilter(ctx context.Context, obj interface{}) (model.ListClassFilter, error) {
+	var it model.ListClassFilter
 	asMap := map[string]interface{}{}
 	for k, v := range obj.(map[string]interface{}) {
 		asMap[k] = v
@@ -4696,14 +4696,6 @@ func (ec *executionContext) marshalOClassInfo2ᚖexampleᚋgraphᚋmodelᚐClass
 	return ec._ClassInfo(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalOFilter2ᚖexampleᚋgraphᚋmodelᚐFilter(ctx context.Context, v interface{}) (*model.Filter, error) {
-	if v == nil {
-		return nil, nil
-	}
-	res, err := ec.unmarshalInputFilter(ctx, v)
-	return &res, graphql.ErrorOnPath(ctx, err)
-}
-
 func (ec *executionContext) unmarshalOID2ᚖstring(ctx context.Context, v interface{}) (*string, error) {
 	if v == nil {
 		return nil, nil
@@ -4734,6 +4726,14 @@ func (ec *executionContext) marshalOLanguageLevel2ᚖexampleᚋgraphᚋmodelᚐL
 		return graphql.Null
 	}
 	return v
+}
+
+func (ec *executionContext) unmarshalOListClassFilter2ᚖexampleᚋgraphᚋmodelᚐListClassFilter(ctx context.Context, v interface{}) (*model.ListClassFilter, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputListClassFilter(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) unmarshalONameFilter2ᚖexampleᚋgraphᚋmodelᚐNameFilter(ctx context.Context, v interface{}) (*model.NameFilter, error) {

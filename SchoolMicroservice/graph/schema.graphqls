@@ -21,13 +21,13 @@ type SchoolInfo {
 
 type Query {
   getSchool(id: ID!): School
-  listSchools(filter: Filter, paginate: Paginator): [SchoolInfo]
+  listSchools(filter: ListSchoolFilter, paginate: Paginator): [SchoolInfo]
 }
 
 type Mutation {
   createSchool(input: SchoolInput!): School
   updateSchool(id: ID!, input: SchoolInput!): School
-  deleteSchool(id: ID!, filter: Filter): ID
+  deleteSchool(id: ID!, filter: ListSchoolFilter): ID
 }
 
 input SchoolInput {
@@ -35,7 +35,7 @@ input SchoolInput {
   location: String!
 }
 
-input Filter {
+input ListSchoolFilter {
   softDelete: Boolean
   name: NameFilter
   location: LocationFilter

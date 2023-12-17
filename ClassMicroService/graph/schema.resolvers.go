@@ -35,7 +35,7 @@ func (r *mutationResolver) UpdateClass(ctx context.Context, id string, input mod
 }
 
 // DeleteClass is the resolver for the deleteClass field.
-func (r *mutationResolver) DeleteClass(ctx context.Context, id string, filter *model.Filter) (*string, error) {
+func (r *mutationResolver) DeleteClass(ctx context.Context, id string, filter *model.ListClassFilter) (*string, error) {
 	token := auth.TokenFromContext(ctx)
 
 	err := r.Service.DeleteClass(token, id, filter)
@@ -59,7 +59,7 @@ func (r *queryResolver) GetClass(ctx context.Context, id string) (*model.Class, 
 }
 
 // ListClasses is the resolver for the listClasses field.
-func (r *queryResolver) ListClasses(ctx context.Context, filter *model.Filter, paginate *model.Paginator) ([]*model.ClassInfo, error) {
+func (r *queryResolver) ListClasses(ctx context.Context, filter *model.ListClassFilter, paginate *model.Paginator) ([]*model.ClassInfo, error) {
 	token := auth.TokenFromContext(ctx)
 
 	classes, err := r.Service.ListClasses(token, filter, paginate)

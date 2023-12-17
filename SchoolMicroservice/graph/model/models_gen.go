@@ -8,7 +8,7 @@ import (
 	"strconv"
 )
 
-type Filter struct {
+type ListSchoolFilter struct {
 	SoftDelete *bool           `json:"softDelete,omitempty"`
 	Name       *NameFilter     `json:"name,omitempty"`
 	Location   *LocationFilter `json:"location,omitempty"`

@@ -138,7 +138,6 @@ func (r *SchoolRepository) ListSchools(bsonFilter bson.D, paginateOptions *optio
 	defer func(cursor *mongo.Cursor, ctx context.Context) {
 		err := cursor.Close(ctx)
 		if err != nil {
-			// Handle closing error if needed
 		}
 	}(cursor, ctx)
 

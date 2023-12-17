@@ -25,13 +25,13 @@ type ClassInfo {
 
 type Query {
   getClass(id: ID!): Class
-  listClasses(filter: Filter, paginate: Paginator): [ClassInfo]
+  listClasses(filter: ListClassFilter, paginate: Paginator): [ClassInfo]
 }
 
 type Mutation {
   createClass(input: ClassInput!): Class
   updateClass(id: ID!, input: ClassInput!): Class
-  deleteClass(id: ID!, filter: Filter): ID
+  deleteClass(id: ID!, filter: ListClassFilter): ID
 }
 
 input ClassInput {
@@ -41,7 +41,7 @@ input ClassInput {
   difficulty: LanguageLevel!
 }
 
-input Filter {
+input ListClassFilter {
   softDelete: Boolean
   module_id: ID
   name: NameFilter

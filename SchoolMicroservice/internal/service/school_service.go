@@ -21,9 +21,9 @@ import (
 type ISchoolService interface {
 	CreateSchool(token string, School model.SchoolInput) (*model.School, error)
 	UpdateSchool(token string, id string, updatedData model.SchoolInput) (*model.School, error)
-	DeleteSchool(token string, id string, filter *model.Filter) error
+	DeleteSchool(token string, id string, filter *model.ListSchoolFilter) error
 	GetSchoolById(token string, id string) (*model.School, error)
-	ListSchools(token string, filter *model.Filter, paginate *model.Paginator) ([]*model.SchoolInfo, error)
+	ListSchools(token string, filter *model.ListSchoolFilter, paginate *model.Paginator) ([]*model.SchoolInfo, error)
 }
 
 // SchoolService GOLANG STRUCT
@@ -118,7 +118,7 @@ func (s *SchoolService) UpdateSchool(token string, id string, updatedData model.
 	return result, nil
 }
 
-func (s *SchoolService) DeleteSchool(token string, id string, filter *model.Filter) error {
+func (s *SchoolService) DeleteSchool(token string, id string, filter *model.ListSchoolFilter) error {
 	existingSchool, err := s.Policy.DeleteSchool(token, id)
 	if err != nil {
 		return err
@@ -155,7 +155,7 @@ func (s *SchoolService) GetSchoolById(token string, id string) (*model.School, e
 	return existingSchool, nil
 }
 
-func (s *SchoolService) ListSchools(token string, filter *model.Filter, paginate *model.Paginator) ([]*model.SchoolInfo, error) {
+func (s *SchoolService) ListSchools(token string, filter *model.ListSchoolFilter, paginate *model.Paginator) ([]*model.SchoolInfo, error) {
 	err := s.Policy.ListSchools(token)
 	if err != nil {
 		return nil, err

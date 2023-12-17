@@ -35,7 +35,7 @@ func (r *mutationResolver) UpdateSchool(ctx context.Context, id string, input mo
 }
 
 // DeleteSchool is the resolver for the deleteSchool field.
-func (r *mutationResolver) DeleteSchool(ctx context.Context, id string, filter *model.Filter) (*string, error) {
+func (r *mutationResolver) DeleteSchool(ctx context.Context, id string, filter *model.ListSchoolFilter) (*string, error) {
 	token := auth.TokenFromContext(ctx)
 
 	err := r.Service.DeleteSchool(token, id, filter)
@@ -59,7 +59,7 @@ func (r *queryResolver) GetSchool(ctx context.Context, id string) (*model.School
 }
 
 // ListSchools is the resolver for the listSchools field.
-func (r *queryResolver) ListSchools(ctx context.Context, filter *model.Filter, paginate *model.Paginator) ([]*model.SchoolInfo, error) {
+func (r *queryResolver) ListSchools(ctx context.Context, filter *model.ListSchoolFilter, paginate *model.Paginator) ([]*model.SchoolInfo, error) {
 	token := auth.TokenFromContext(ctx)
 
 	schools, err := r.Service.ListSchools(token, filter, paginate)

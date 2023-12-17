@@ -106,7 +106,7 @@ mutation UpdateClass {
             module_Id: "c0c60670-9293-11ee-b9d1-0242ac120002"
             name: "Updated Module Name",
             description: "Updated description",
-            difficulty: 2,
+            difficulty: B1,
         }
     ) {
         id
