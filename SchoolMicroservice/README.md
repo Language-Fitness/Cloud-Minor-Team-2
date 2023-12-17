@@ -1,3 +1,10 @@
+## Auth Headers (REQUIRED)
+```
+{
+    "Authorization": "Bearer <token>"
+}
+```
+
 ## Create School
 ```graphql
 mutation CreateSchool{
@@ -32,11 +39,29 @@ query GetSchool {
 ## Get all schools
 ```graphql
 query ListSchools {
-  listSchools {
-    id,
-    name,
-    location,
-  }
+    listSchools(
+        filter:{
+            softDelete:false,
+            name: {
+                input:"Sample",
+                type: starts
+            },
+            location: {
+                input: "Sample location",
+                type: eq
+            }
+            made_by: "6c1ce448-670f-47b2-83f7-4d771b01775b"
+        },
+        paginate:{
+            Step: 0,
+            amount: 10
+        }
+    ) {
+        id
+        name
+        location
+        made_by
+    }
 }
 ```
 

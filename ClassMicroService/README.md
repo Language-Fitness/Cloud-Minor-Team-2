@@ -1,3 +1,10 @@
+## Auth Headers (REQUIRED)
+```
+{
+    "Authorization": "Bearer <token>"
+}
+```
+
 ## Create Class
 ```graphql
 mutation CreateClass {
@@ -5,7 +12,7 @@ mutation CreateClass {
         module_Id: "c0c60670-9293-11ee-b9d1-0242ac120002"
         name: "Sample Class",
         description: "sample description"
-        difficulty: 1,
+        difficulty: B2,
     }) {
         id
         name
@@ -39,7 +46,47 @@ query GetClass {
 ## Get all classes
 ```graphql
 query ListClasses {
-    listClasses {
+    listClasses(
+        filter: {
+            name: {
+                input: "Class"
+                type: ends
+            }
+            module_id: "c0c60670-9293-11ee-b9d1-0242ac120002"
+            difficulty: B2
+        },
+        paginate: {
+            Step: 0,
+            amount: 4
+        }) {
+        id
+        module_Id
+        name
+        description
+        difficulty
+        made_by
+    }
+}
+```
+
+## Get all classes (ADMIN)
+```graphql
+query ListClasses {
+    listClasses(
+        filter: {
+            name: {
+                input: "Class"
+                type: ends
+            }
+            module_id: "c0c60670-9293-11ee-b9d1-0242ac120002"
+            difficulty: B2
+            softDelete: false
+            made_by: "id-of-creator"
+        },
+        paginate: {
+            Step: 0,
+            amount: 4
+        }) {
         id
         module_Id
         name
