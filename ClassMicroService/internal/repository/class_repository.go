@@ -14,8 +14,7 @@ import (
 type IClassRepository interface {
 	CreateClass(newClass *model.Class) (*model.Class, error)
 	UpdateClass(id string, updatedClass model.Class) (*model.Class, error)
-	SoftDeleteClassByID(id string, existingClass model.Class) error
-	HardDeleteClassByID(id string) error
+	DeleteClass(id string, existingClass model.Class) error
 	GetClassByID(id string) (*model.Class, error)
 	ListClasses(bsonFilter bson.D, paginateOptions *options.FindOptions) ([]*model.ClassInfo, error)
 }
@@ -76,7 +75,7 @@ func (r *ClassRepository) UpdateClass(id string, updatedClass model.Class) (*mod
 	return &result, nil
 }
 
-func (r *ClassRepository) SoftDeleteClassByID(id string, existingClass model.Class) error {
+func (r *ClassRepository) DeleteClass(id string, existingClass model.Class) error {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
 	defer cancel()
 
@@ -91,20 +90,6 @@ func (r *ClassRepository) SoftDeleteClassByID(id string, existingClass model.Cla
 		options.FindOneAndUpdate().SetReturnDocument(options.After)).Decode(&result)
 	if err != nil {
 		return err
-	}
-
-	return nil
-}
-
-func (r *ClassRepository) HardDeleteClassByID(id string) error {
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10) // 10-second timeout
-	defer cancel()
-
-	filter := bson.M{"id": id}
-
-	_, err := r.collection.DeleteOne(ctx, filter)
-	if err != nil {
-		return err // Return any MongoDB-related errors.
 	}
 
 	return nil
@@ -138,6 +123,7 @@ func (r *ClassRepository) ListClasses(bsonFilter bson.D, paginateOptions *option
 	defer func(cursor *mongo.Cursor, ctx context.Context) {
 		err := cursor.Close(ctx)
 		if err != nil {
+			return
 		}
 	}(cursor, ctx)
 

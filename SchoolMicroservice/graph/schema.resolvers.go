@@ -35,10 +35,10 @@ func (r *mutationResolver) UpdateSchool(ctx context.Context, id string, input mo
 }
 
 // DeleteSchool is the resolver for the deleteSchool field.
-func (r *mutationResolver) DeleteSchool(ctx context.Context, id string, filter *model.ListSchoolFilter) (*string, error) {
+func (r *mutationResolver) DeleteSchool(ctx context.Context, id string) (*string, error) {
 	token := auth.TokenFromContext(ctx)
 
-	err := r.Service.DeleteSchool(token, id, filter)
+	err := r.Service.DeleteSchool(token, id)
 	if err != nil {
 		return nil, err
 	}

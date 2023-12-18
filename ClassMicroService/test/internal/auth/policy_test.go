@@ -171,7 +171,7 @@ func TestDeleteClassWithAdminToken(t *testing.T) {
 			"3a3bd756-6353-4e29-8aba-5b3531bdb9ed").
 		Return(&mocks.MockClass, nil)
 
-	_, _, err := classPolicy.DeleteClass(adminToken, "3a3bd756-6353-4e29-8aba-5b3531bdb9ed")
+	_, err := classPolicy.DeleteClass(adminToken, "3a3bd756-6353-4e29-8aba-5b3531bdb9ed")
 
 	assert.Nil(t, err)
 	mockToken.AssertExpectations(t)
@@ -197,7 +197,7 @@ func TestDeleteClassWithTeacherToken(t *testing.T) {
 		On("IntrospectToken", mock.AnythingOfType("string")).
 		Return(true, nil)
 
-	_, _, err := classPolicy.DeleteClass(teacherToken, "3a3bd756-6353-4e29-8aba-5b3531bdb9ed")
+	_, err := classPolicy.DeleteClass(teacherToken, "3a3bd756-6353-4e29-8aba-5b3531bdb9ed")
 
 	assert.NotNil(t, err)
 	mockToken.AssertExpectations(t)
@@ -227,7 +227,7 @@ func TestDeleteClassWithTeacherTokenAndWrongUUID(t *testing.T) {
 		On("IntrospectToken", mock.AnythingOfType("string")).
 		Return(true, nil)
 
-	_, _, err := classPolicy.DeleteClass(teacherToken, "3a3bd756-6353-4e29-8aba-5b3531bdb9ed")
+	_, err := classPolicy.DeleteClass(teacherToken, "3a3bd756-6353-4e29-8aba-5b3531bdb9ed")
 
 	assert.Nil(t, err)
 	mockToken.AssertExpectations(t)
@@ -253,7 +253,7 @@ func TestDeleteClassWithStudentToken(t *testing.T) {
 		On("IntrospectToken", mock.AnythingOfType("string")).
 		Return(true, nil)
 
-	_, _, err := classPolicy.DeleteClass(studentToken, "3a3bd756-6353-4e29-8aba-5b3531bdb9ed")
+	_, err := classPolicy.DeleteClass(studentToken, "3a3bd756-6353-4e29-8aba-5b3531bdb9ed")
 
 	assert.NotNil(t, err)
 	assert.Equal(t, "invalid permissions for this action", err.Error())

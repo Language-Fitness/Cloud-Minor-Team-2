@@ -9,10 +9,11 @@ import (
 )
 
 type ListSchoolFilter struct {
-	SoftDelete *bool           `json:"softDelete,omitempty"`
-	Name       *NameFilter     `json:"name,omitempty"`
-	Location   *LocationFilter `json:"location,omitempty"`
-	MadeBy     *string         `json:"made_by,omitempty"`
+	SoftDelete      *bool           `json:"softDelete,omitempty"`
+	Name            *NameFilter     `json:"name,omitempty"`
+	Location        *LocationFilter `json:"location,omitempty"`
+	MadeBy          *string         `json:"made_by,omitempty"`
+	HasOpenaiAccess *bool           `json:"has_openai_access,omitempty"`
 }
 
 type LocationFilter struct {
@@ -31,25 +32,31 @@ type Paginator struct {
 }
 
 type School struct {
-	ID          string  `json:"id"`
-	Name        string  `json:"name"`
-	Location    string  `json:"location"`
-	MadeBy      string  `json:"made_by"`
-	CreatedAt   *string `json:"created_at,omitempty"`
-	UpdatedAt   *string `json:"updated_at,omitempty"`
-	SoftDeleted *bool   `json:"soft_deleted,omitempty"`
+	ID              string  `json:"id"`
+	Name            string  `json:"name"`
+	Location        string  `json:"location"`
+	MadeBy          string  `json:"made_by"`
+	HasOpenaiAccess bool    `json:"has_openai_access"`
+	OpenaiKey       *string `json:"openai_key,omitempty"`
+	JoinCode        string  `json:"join_code"`
+	CreatedAt       *string `json:"created_at,omitempty"`
+	UpdatedAt       *string `json:"updated_at,omitempty"`
+	SoftDeleted     *bool   `json:"soft_deleted,omitempty"`
 }
 
 type SchoolInfo struct {
-	ID       string `json:"id"`
-	Name     string `json:"name"`
-	Location string `json:"location"`
-	MadeBy   string `json:"made_by"`
+	ID              string `json:"id"`
+	Name            string `json:"name"`
+	Location        string `json:"location"`
+	MadeBy          string `json:"made_by"`
+	HasOpenaiAccess bool   `json:"has_openai_access"`
 }
 
 type SchoolInput struct {
-	Name     string `json:"name"`
-	Location string `json:"location"`
+	Name            string  `json:"name"`
+	Location        string  `json:"location"`
+	HasOpenaiAccess bool    `json:"has_openai_access"`
+	OpenaiKey       *string `json:"openai_key,omitempty"`
 }
 
 type NameFilterTypes string

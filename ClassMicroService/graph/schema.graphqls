@@ -31,7 +31,7 @@ type Query {
 type Mutation {
   createClass(input: ClassInput!): Class
   updateClass(id: ID!, input: ClassInput!): Class
-  deleteClass(id: ID!, filter: ListClassFilter): ID
+  deleteClass(id: ID!): ID
 }
 
 input ClassInput {

@@ -49,7 +49,7 @@ type DirectiveRoot struct {
 type ComplexityRoot struct {
 	Mutation struct {
 		CreateSchool func(childComplexity int, input model.SchoolInput) int
-		DeleteSchool func(childComplexity int, id string, filter *model.ListSchoolFilter) int
+		DeleteSchool func(childComplexity int, id string) int
 		UpdateSchool func(childComplexity int, id string, input model.SchoolInput) int
 	}
 
@@ -59,27 +59,31 @@ type ComplexityRoot struct {
 	}
 
 	School struct {
-		CreatedAt   func(childComplexity int) int
-		ID          func(childComplexity int) int
-		Location    func(childComplexity int) int
-		MadeBy      func(childComplexity int) int
-		Name        func(childComplexity int) int
-		SoftDeleted func(childComplexity int) int
-		UpdatedAt   func(childComplexity int) int
+		CreatedAt       func(childComplexity int) int
+		HasOpenaiAccess func(childComplexity int) int
+		ID              func(childComplexity int) int
+		JoinCode        func(childComplexity int) int
+		Location        func(childComplexity int) int
+		MadeBy          func(childComplexity int) int
+		Name            func(childComplexity int) int
+		OpenaiKey       func(childComplexity int) int
+		SoftDeleted     func(childComplexity int) int
+		UpdatedAt       func(childComplexity int) int
 	}
 
 	SchoolInfo struct {
-		ID       func(childComplexity int) int
-		Location func(childComplexity int) int
-		MadeBy   func(childComplexity int) int
-		Name     func(childComplexity int) int
+		HasOpenaiAccess func(childComplexity int) int
+		ID              func(childComplexity int) int
+		Location        func(childComplexity int) int
+		MadeBy          func(childComplexity int) int
+		Name            func(childComplexity int) int
 	}
 }
 
 type MutationResolver interface {
 	CreateSchool(ctx context.Context, input model.SchoolInput) (*model.School, error)
 	UpdateSchool(ctx context.Context, id string, input model.SchoolInput) (*model.School, error)
-	DeleteSchool(ctx context.Context, id string, filter *model.ListSchoolFilter) (*string, error)
+	DeleteSchool(ctx context.Context, id string) (*string, error)
 }
 type QueryResolver interface {
 	GetSchool(ctx context.Context, id string) (*model.School, error)
@@ -127,7 +131,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.DeleteSchool(childComplexity, args["id"].(string), args["filter"].(*model.ListSchoolFilter)), true
+		return e.complexity.Mutation.DeleteSchool(childComplexity, args["id"].(string)), true
 
 	case "Mutation.updateSchool":
 		if e.complexity.Mutation.UpdateSchool == nil {
@@ -172,12 +176,26 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.School.CreatedAt(childComplexity), true
 
+	case "School.has_openai_access":
+		if e.complexity.School.HasOpenaiAccess == nil {
+			break
+		}
+
+		return e.complexity.School.HasOpenaiAccess(childComplexity), true
+
 	case "School.id":
 		if e.complexity.School.ID == nil {
 			break
 		}
 
 		return e.complexity.School.ID(childComplexity), true
+
+	case "School.join_code":
+		if e.complexity.School.JoinCode == nil {
+			break
+		}
+
+		return e.complexity.School.JoinCode(childComplexity), true
 
 	case "School.location":
 		if e.complexity.School.Location == nil {
@@ -200,6 +218,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.School.Name(childComplexity), true
 
+	case "School.openai_key":
+		if e.complexity.School.OpenaiKey == nil {
+			break
+		}
+
+		return e.complexity.School.OpenaiKey(childComplexity), true
+
 	case "School.soft_deleted":
 		if e.complexity.School.SoftDeleted == nil {
 			break
@@ -213,6 +238,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.School.UpdatedAt(childComplexity), true
+
+	case "SchoolInfo.has_openai_access":
+		if e.complexity.SchoolInfo.HasOpenaiAccess == nil {
+			break
+		}
+
+		return e.complexity.SchoolInfo.HasOpenaiAccess(childComplexity), true
 
 	case "SchoolInfo.id":
 		if e.complexity.SchoolInfo.ID == nil {
@@ -398,15 +430,6 @@ func (ec *executionContext) field_Mutation_deleteSchool_args(ctx context.Context
 		}
 	}
 	args["id"] = arg0
-	var arg1 *model.ListSchoolFilter
-	if tmp, ok := rawArgs["filter"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
-		arg1, err = ec.unmarshalOListSchoolFilter2ᚖexampleᚋgraphᚋmodelᚐListSchoolFilter(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["filter"] = arg1
 	return args, nil
 }
 
@@ -570,6 +593,12 @@ func (ec *executionContext) fieldContext_Mutation_createSchool(ctx context.Conte
 				return ec.fieldContext_School_location(ctx, field)
 			case "made_by":
 				return ec.fieldContext_School_made_by(ctx, field)
+			case "has_openai_access":
+				return ec.fieldContext_School_has_openai_access(ctx, field)
+			case "openai_key":
+				return ec.fieldContext_School_openai_key(ctx, field)
+			case "join_code":
+				return ec.fieldContext_School_join_code(ctx, field)
 			case "created_at":
 				return ec.fieldContext_School_created_at(ctx, field)
 			case "updated_at":
@@ -638,6 +667,12 @@ func (ec *executionContext) fieldContext_Mutation_updateSchool(ctx context.Conte
 				return ec.fieldContext_School_location(ctx, field)
 			case "made_by":
 				return ec.fieldContext_School_made_by(ctx, field)
+			case "has_openai_access":
+				return ec.fieldContext_School_has_openai_access(ctx, field)
+			case "openai_key":
+				return ec.fieldContext_School_openai_key(ctx, field)
+			case "join_code":
+				return ec.fieldContext_School_join_code(ctx, field)
 			case "created_at":
 				return ec.fieldContext_School_created_at(ctx, field)
 			case "updated_at":
@@ -676,7 +711,7 @@ func (ec *executionContext) _Mutation_deleteSchool(ctx context.Context, field gr
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().DeleteSchool(rctx, fc.Args["id"].(string), fc.Args["filter"].(*model.ListSchoolFilter))
+		return ec.resolvers.Mutation().DeleteSchool(rctx, fc.Args["id"].(string))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -758,6 +793,12 @@ func (ec *executionContext) fieldContext_Query_getSchool(ctx context.Context, fi
 				return ec.fieldContext_School_location(ctx, field)
 			case "made_by":
 				return ec.fieldContext_School_made_by(ctx, field)
+			case "has_openai_access":
+				return ec.fieldContext_School_has_openai_access(ctx, field)
+			case "openai_key":
+				return ec.fieldContext_School_openai_key(ctx, field)
+			case "join_code":
+				return ec.fieldContext_School_join_code(ctx, field)
 			case "created_at":
 				return ec.fieldContext_School_created_at(ctx, field)
 			case "updated_at":
@@ -826,6 +867,8 @@ func (ec *executionContext) fieldContext_Query_listSchools(ctx context.Context, 
 				return ec.fieldContext_SchoolInfo_location(ctx, field)
 			case "made_by":
 				return ec.fieldContext_SchoolInfo_made_by(ctx, field)
+			case "has_openai_access":
+				return ec.fieldContext_SchoolInfo_has_openai_access(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type SchoolInfo", field.Name)
 		},
@@ -1149,6 +1192,135 @@ func (ec *executionContext) fieldContext_School_made_by(ctx context.Context, fie
 	return fc, nil
 }
 
+func (ec *executionContext) _School_has_openai_access(ctx context.Context, field graphql.CollectedField, obj *model.School) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_School_has_openai_access(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.HasOpenaiAccess, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_School_has_openai_access(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "School",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _School_openai_key(ctx context.Context, field graphql.CollectedField, obj *model.School) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_School_openai_key(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.OpenaiKey, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_School_openai_key(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "School",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _School_join_code(ctx context.Context, field graphql.CollectedField, obj *model.School) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_School_join_code(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.JoinCode, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNID2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_School_join_code(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "School",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ID does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _School_created_at(ctx context.Context, field graphql.CollectedField, obj *model.School) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_School_created_at(ctx, field)
 	if err != nil {
@@ -1443,6 +1615,50 @@ func (ec *executionContext) fieldContext_SchoolInfo_made_by(ctx context.Context,
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type ID does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _SchoolInfo_has_openai_access(ctx context.Context, field graphql.CollectedField, obj *model.SchoolInfo) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_SchoolInfo_has_openai_access(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.HasOpenaiAccess, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_SchoolInfo_has_openai_access(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "SchoolInfo",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
 		},
 	}
 	return fc, nil
@@ -3228,7 +3444,7 @@ func (ec *executionContext) unmarshalInputListSchoolFilter(ctx context.Context, 
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"softDelete", "name", "location", "made_by"}
+	fieldsInOrder := [...]string{"softDelete", "name", "location", "made_by", "has_openai_access"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -3271,6 +3487,15 @@ func (ec *executionContext) unmarshalInputListSchoolFilter(ctx context.Context, 
 				return it, err
 			}
 			it.MadeBy = data
+		case "has_openai_access":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("has_openai_access"))
+			data, err := ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.HasOpenaiAccess = data
 		}
 	}
 
@@ -3398,7 +3623,7 @@ func (ec *executionContext) unmarshalInputSchoolInput(ctx context.Context, obj i
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"name", "location"}
+	fieldsInOrder := [...]string{"name", "location", "has_openai_access", "openai_key"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -3423,6 +3648,24 @@ func (ec *executionContext) unmarshalInputSchoolInput(ctx context.Context, obj i
 				return it, err
 			}
 			it.Location = data
+		case "has_openai_access":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("has_openai_access"))
+			data, err := ec.unmarshalNBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.HasOpenaiAccess = data
+		case "openai_key":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("openai_key"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.OpenaiKey = data
 		}
 	}
 
@@ -3610,6 +3853,18 @@ func (ec *executionContext) _School(ctx context.Context, sel ast.SelectionSet, o
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
+		case "has_openai_access":
+			out.Values[i] = ec._School_has_openai_access(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "openai_key":
+			out.Values[i] = ec._School_openai_key(ctx, field, obj)
+		case "join_code":
+			out.Values[i] = ec._School_join_code(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
 		case "created_at":
 			out.Values[i] = ec._School_created_at(ctx, field, obj)
 		case "updated_at":
@@ -3667,6 +3922,11 @@ func (ec *executionContext) _SchoolInfo(ctx context.Context, sel ast.SelectionSe
 			}
 		case "made_by":
 			out.Values[i] = ec._SchoolInfo_made_by(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "has_openai_access":
+			out.Values[i] = ec._SchoolInfo_has_openai_access(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
