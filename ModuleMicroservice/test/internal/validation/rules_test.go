@@ -23,7 +23,7 @@ func TestRules_IsInt(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.input, func(t *testing.T) {
-			result := validator.IsInt(tc.input)
+			result := validator.IsInt(tc.input, "s")
 			if result != tc.expected {
 				t.Errorf("IsInt(%s) = %v; expected %v", tc.input, result, tc.expected)
 			}
@@ -47,7 +47,7 @@ func TestRules_IsString(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run("IsString with input "+toString(tc.input), func(t *testing.T) {
-			result := validator.IsString(tc.input)
+			result := validator.IsString(tc.input, "s")
 			if result != tc.expected {
 				t.Errorf("IsString(%v) = %v; expected %v", tc.input, result, tc.expected)
 			}
@@ -78,7 +78,7 @@ func TestRules_IsUUID(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.input, func(t *testing.T) {
-			result := validator.IsUUID(tc.input)
+			result := validator.IsUUID(tc.input, "s")
 			if result != tc.expected {
 				t.Errorf("IsUUID(%s) = %v; expected %v", tc.input, result, tc.expected)
 			}
@@ -102,7 +102,7 @@ func TestRules_IsBoolean(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run("IsBoolean with input "+toString(tc.input), func(t *testing.T) {
-			result := validator.IsBoolean(tc.input)
+			result := validator.IsBoolean(tc.input, "s")
 			if result != tc.expected {
 				t.Errorf("IsBoolean(%v) = %v; expected %v", tc.input, result, tc.expected)
 			}
@@ -125,7 +125,7 @@ func TestRules_IsDatetime(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.input, func(t *testing.T) {
-			result := validator.IsDatetime(tc.input)
+			result := validator.IsDatetime(tc.input, "s")
 			if result != tc.expected {
 				t.Errorf("IsDatetime(%s) = %v; expected %v", tc.input, result, tc.expected)
 			}
@@ -149,7 +149,7 @@ func TestRules_IsArray(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(reflect.TypeOf(tc.input).String(), func(t *testing.T) {
-			result := validator.IsArray(tc.input)
+			result := validator.IsArray(tc.input, "s")
 			if result != tc.expected {
 				t.Errorf("IsArray(%v) = %v; expected %v", tc.input, result, tc.expected)
 			}
@@ -177,7 +177,7 @@ func TestRules_ArrayType(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(reflect.TypeOf(tc.input).String()+"_"+tc.expectedType, func(t *testing.T) {
-			result := validator.ArrayType(tc.input, tc.expectedType)
+			result := validator.ArrayType(tc.input, tc.expectedType, "s")
 			if result != tc.expected {
 				t.Errorf("ArrayType(%v, %s) = %v; expected %v", tc.input, tc.expectedType, result, tc.expected)
 			}
@@ -209,7 +209,7 @@ func TestRules_Length(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(fmt.Sprintf("Length(%s, %s)", tc.value, tc.condition), func(t *testing.T) {
-			result := validator.Length(tc.value, tc.condition)
+			result := validator.Length(tc.value, tc.condition, "s")
 			if result != tc.expected {
 				t.Errorf("Length(%s, %s) = %v; expected %v", tc.value, tc.condition, result, tc.expected)
 			}

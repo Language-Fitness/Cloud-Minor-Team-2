@@ -207,7 +207,7 @@ func TestService_SoftDeleteClass_CatchDeleteError_WithAdminToken_AlreadySoftDele
 		Return(true, &mocks.SoftDeletedMockModule, nil)
 
 	isSoftDeleted := true
-	filter := model.Filter{SoftDelete: &isSoftDeleted}
+	filter := model.ModuleFilter{SoftDelete: &isSoftDeleted}
 	err := service.DeleteModule(adminToken, "3a3bd756-6353-4e29-8aba-5b3531bdb9ed", &filter)
 
 	assert.NotNil(t, err)
@@ -233,7 +233,7 @@ func TestService_HardDeleteClass_WithAdminToken_AlreadySoftDeleted_WithFilter(t 
 		Return(nil)
 
 	isSoftDeleted := false
-	filter := model.Filter{SoftDelete: &isSoftDeleted}
+	filter := model.ModuleFilter{SoftDelete: &isSoftDeleted}
 	err := service.DeleteModule(adminToken, "3a3bd756-6353-4e29-8aba-5b3531bdb9ed", &filter)
 
 	assert.Nil(t, err)
@@ -271,7 +271,14 @@ func TestService_ListModules(t *testing.T) {
 
 	mockRepo.On("ListModules").Return([]*model.ModuleInfo{&mocks.MockModuleInfo}, nil)
 
-	result, err := service.ListModules(adminToken)
+	moduleFilter := &model.ModuleFilter{}
+
+	paginator := &model.Paginator{
+		Step:   0,
+		Amount: 100,
+	}
+
+	result, err := service.ListModules(adminToken, moduleFilter, paginator)
 
 	assert.Nil(t, err)
 	assert.NotNil(t, result)
@@ -295,7 +302,14 @@ func TestService_ListModules_CatchRetrieveError(t *testing.T) {
 
 	mockRepo.On("ListModules").Return([]*model.ModuleInfo{}, errors.New("retrieval_error"))
 
-	result, err := service.ListModules(adminToken)
+	moduleFilter := &model.ModuleFilter{}
+
+	paginator := &model.Paginator{
+		Step:   0,
+		Amount: 100,
+	}
+
+	result, err := service.ListModules(adminToken, moduleFilter, paginator)
 
 	assert.Nil(t, result)
 	assert.NotNil(t, err)

@@ -13,6 +13,16 @@ type MockPolicy struct {
 	ModuleRepository repository.IModuleRepository
 }
 
+func (m *MockPolicy) DeleteModule(bearerToken string, id string) (*model.Module, error) {
+	args := m.Called(bearerToken, id)
+	return args.Get(0).(*model.Module), args.Error(1)
+}
+
+func (m *MockPolicy) HasPermissions(bearerToken string, role string) bool {
+	args := m.Called(bearerToken, role)
+	return args.Get(0).(bool)
+}
+
 func (m *MockPolicy) CreateModule(bearerToken string) (string, error) {
 	args := m.Called(bearerToken)
 	return args.Get(0).(string), args.Error(1)
@@ -21,11 +31,6 @@ func (m *MockPolicy) CreateModule(bearerToken string) (string, error) {
 func (m *MockPolicy) UpdateModule(bearerToken string, id string) (*model.Module, error) {
 	args := m.Called(bearerToken, id)
 	return args.Get(0).(*model.Module), args.Error(1)
-}
-
-func (m *MockPolicy) DeleteModule(bearerToken string, id string) (bool, *model.Module, error) {
-	args := m.Called(bearerToken, id)
-	return args.Get(0).(bool), args.Get(1).(*model.Module), args.Error(2)
 }
 
 func (m *MockPolicy) GetModule(bearerToken string, id string) (*model.Module, error) {

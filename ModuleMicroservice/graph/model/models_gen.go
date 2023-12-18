@@ -8,16 +8,9 @@ import (
 	"strconv"
 )
 
-type Filter struct {
-	SoftDelete *bool          `json:"softDelete,omitempty"`
-	Name       *NameFilter    `json:"name,omitempty"`
-	Difficulty *LanguageLevel `json:"difficulty,omitempty"`
-	Category   *Category      `json:"category,omitempty"`
-	Private    *bool          `json:"private,omitempty"`
-}
-
 type Module struct {
 	ID          string        `json:"id"`
+	SchoolID    string        `json:"school_id"`
 	Name        string        `json:"name"`
 	Description string        `json:"description"`
 	Difficulty  LanguageLevel `json:"difficulty"`
@@ -30,8 +23,19 @@ type Module struct {
 	SoftDeleted *bool         `json:"soft_deleted,omitempty"`
 }
 
+type ModuleFilter struct {
+	SchoolID   *string        `json:"school_id,omitempty"`
+	MadeBy     *string        `json:"made_by,omitempty"`
+	SoftDelete *bool          `json:"softDelete,omitempty"`
+	Name       *NameFilter    `json:"name,omitempty"`
+	Difficulty *LanguageLevel `json:"difficulty,omitempty"`
+	Category   *Category      `json:"category,omitempty"`
+	Private    *bool          `json:"private,omitempty"`
+}
+
 type ModuleInfo struct {
 	ID          string        `json:"id"`
+	SchoolID    string        `json:"school_id"`
 	Name        string        `json:"name"`
 	Description string        `json:"description"`
 	Difficulty  LanguageLevel `json:"difficulty"`
@@ -40,7 +44,17 @@ type ModuleInfo struct {
 	Private     bool          `json:"private"`
 }
 
-type ModuleInput struct {
+type ModuleInputCreate struct {
+	Name        string        `json:"name"`
+	SchoolID    string        `json:"school_id"`
+	Description string        `json:"description"`
+	Difficulty  LanguageLevel `json:"difficulty"`
+	Category    Category      `json:"category"`
+	Private     bool          `json:"private"`
+	Key         *string       `json:"key,omitempty"`
+}
+
+type ModuleInputUpdate struct {
 	Name        string        `json:"name"`
 	Description string        `json:"description"`
 	Difficulty  LanguageLevel `json:"difficulty"`

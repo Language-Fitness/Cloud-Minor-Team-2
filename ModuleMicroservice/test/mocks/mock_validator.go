@@ -9,7 +9,7 @@ type MockValidator struct {
 func (m *MockValidator) ClearErrors() {
 }
 
-func (m *MockValidator) Validate(input interface{}, arr []string) {
+func (m *MockValidator) Validate(input interface{}, arr []string, name string) {
 
 }
 

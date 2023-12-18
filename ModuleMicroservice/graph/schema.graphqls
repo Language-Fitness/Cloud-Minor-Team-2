@@ -4,6 +4,7 @@
 
 type Module {
   id: ID!
+  school_id: ID!
   name: String!
   description: String!
   difficulty: LanguageLevel!
@@ -18,6 +19,7 @@ type Module {
 
 type ModuleInfo {
   id: ID!
+  school_id: String!
   name: String!
   description: String!
   difficulty: LanguageLevel!
@@ -28,16 +30,26 @@ type ModuleInfo {
 
 type Query {
   getModule(id: ID!): Module
-  listModules(filter: Filter, paginate: Paginator): [ModuleInfo]
+  listModules(filter: ModuleFilter, paginate: Paginator): [ModuleInfo]
 }
 
 type Mutation {
-  createModule(input: ModuleInput!): Module
-  updateModule(id: ID!, input: ModuleInput!): Module
-  deleteModule(id: ID!, filter: Filter): ID
+  createModule(input: ModuleInputCreate!): Module
+  updateModule(id: ID!, input: ModuleInputUpdate!): Module
+  deleteModule(id: ID!, filter: ModuleFilter): ID
 }
 
-input ModuleInput {
+input ModuleInputCreate {
+  name: String!
+  school_id: String!
+  description: String!
+  difficulty: LanguageLevel!
+  category: Category!
+  private: Boolean!
+  key: String
+}
+
+input ModuleInputUpdate {
   name: String!
   description: String!
   difficulty: LanguageLevel!
@@ -46,7 +58,9 @@ input ModuleInput {
   key: String
 }
 
-input Filter {
+input ModuleFilter {
+  school_id: String
+  made_by: String
   softDelete: Boolean
   name: NameFilter
   difficulty: LanguageLevel

@@ -10,9 +10,9 @@ import (
 type IPolicy interface {
 	CreateModule(bearerToken string) (string, error)
 	UpdateModule(bearerToken string, id string) (*model.Module, error)
-	DeleteModule(bearerToken string, id string) (bool, *model.Module, error)
+	DeleteModule(bearerToken string, id string) (*model.Module, error)
 	GetModule(bearerToken string, id string) (*model.Module, error)
-	ListModules(bearerToken string) (bool, error)
+	ListModules(bearerToken string) error
 	HasPermissions(bearerToken string, role string) bool
 }
 
@@ -65,26 +65,22 @@ func (p *Policy) UpdateModule(bearerToken string, id string) (*model.Module, err
 	return nil, errors.New("invalid permissions for this action")
 }
 
-func (p *Policy) DeleteModule(bearerToken string, id string) (bool, *model.Module, error) {
+func (p *Policy) DeleteModule(bearerToken string, id string) (*model.Module, error) {
 	uuid, roles, err2 := p.getSubAndRoles(bearerToken)
 	if err2 != nil {
-		return false, nil, err2
+		return nil, err2
 	}
 
 	module, err := p.ModuleRepository.GetModuleByID(id)
 	if err != nil {
-		return false, nil, errors.New("invalid permissions for this action")
+		return nil, errors.New("invalid permissions for this action")
 	}
 
-	if p.hasRole(roles, "delete_module_all") {
-		return true, module, nil
+	if p.hasRole(roles, "delete_module") && module.MadeBy == uuid || p.hasRole(roles, "delete_module_all") {
+		return module, nil
 	}
 
-	if p.hasRole(roles, "delete_module") && module.MadeBy == uuid {
-		return false, module, nil
-	}
-
-	return false, nil, errors.New("invalid permissions for this action")
+	return nil, errors.New("invalid permissions for this action")
 }
 
 // GetModule is the resolver for the getModule field.
@@ -107,21 +103,21 @@ func (p *Policy) GetModule(bearerToken string, id string) (*model.Module, error)
 }
 
 // ListModules is the resolver for the listModules field.
-func (p *Policy) ListModules(bearerToken string) (bool, error) {
+func (p *Policy) ListModules(bearerToken string) error {
 	_, roles, err2 := p.getSubAndRoles(bearerToken)
 	if err2 != nil {
-		return false, err2
+		return err2
 	}
 
 	if p.hasRole(roles, "get_modules_all") {
-		return true, nil
+		return nil
 	}
 
 	if !p.hasRole(roles, "get_modules") {
-		return false, errors.New("invalid permissions for this action")
+		return errors.New("invalid permissions for this action")
 	}
 
-	return false, nil
+	return nil
 }
 
 func (p *Policy) HasPermissions(bearerToken string, role string) bool {
