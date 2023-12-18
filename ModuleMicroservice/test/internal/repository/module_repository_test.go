@@ -7,6 +7,7 @@ import (
 	"context"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 	"log"
 	"reflect"
 	"testing"
@@ -29,19 +30,20 @@ func TestCreateModule(t *testing.T) {
 
 	// Define your test data based on the Module struct.
 	desc := "Test description"
-	category := "Test category"
+	category := "Grammatica"
 	user := "Test user"
 	key := "test-key"
 	createdAt := "2023-10-27"
-	difficulty := 100
+	difficulty := "A1"
 	boolean := false
 
 	newModule := &model.Module{
 		ID:          "123",
 		Name:        "Test Module",
+		SchoolID:    "e5ba872c-cb9a-4cac-9a89-d7a2f3f1e4f1",
 		Description: desc,
-		Difficulty:  difficulty,
-		Category:    category,
+		Difficulty:  model.LanguageLevel(difficulty),
+		Category:    model.Category(category),
 		MadeBy:      user,
 		Private:     boolean,
 		Key:         &key,
@@ -329,7 +331,11 @@ func TestListModules(t *testing.T) {
 	}
 
 	// Call the method you want to test.
-	modules, err := repo.ListModules()
+	paginateOptions := options.Find().
+		SetSkip(int64(0)).
+		SetLimit(int64(100))
+
+	modules, err := repo.ListModules(bson.D{}, paginateOptions)
 
 	// Assert the result and error as needed.
 	if err != nil {

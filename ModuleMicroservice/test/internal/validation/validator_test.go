@@ -37,7 +37,7 @@ func TestValidator_Validate(t *testing.T) {
 			v := validation.NewValidator()
 
 			// Call the Validate function
-			v.Validate(tc.input, tc.arr)
+			v.Validate(tc.input, tc.arr, "string")
 
 			// Add assertions here to check if the validation was successful
 

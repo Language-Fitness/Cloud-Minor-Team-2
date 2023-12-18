@@ -12,6 +12,7 @@ import (
 
 type FakeModule struct {
 	ID          string `faker:"uuid_hyphenated"`
+	SchoolID    string `faker:"uuid_hyphenated"`
 	Name        string `faker:"word"`
 	Description string `faker:"sentence"`
 	Difficulty  string `faker:"oneof:A1,A2,B1,B2,C1,C2"`

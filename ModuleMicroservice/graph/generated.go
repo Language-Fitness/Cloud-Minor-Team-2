@@ -57,6 +57,7 @@ type ComplexityRoot struct {
 		MadeBy      func(childComplexity int) int
 		Name        func(childComplexity int) int
 		Private     func(childComplexity int) int
+		SchoolID    func(childComplexity int) int
 		SoftDeleted func(childComplexity int) int
 		UpdatedAt   func(childComplexity int) int
 	}
@@ -69,28 +70,29 @@ type ComplexityRoot struct {
 		MadeBy      func(childComplexity int) int
 		Name        func(childComplexity int) int
 		Private     func(childComplexity int) int
+		SchoolID    func(childComplexity int) int
 	}
 
 	Mutation struct {
-		CreateModule func(childComplexity int, input model.ModuleInput) int
-		DeleteModule func(childComplexity int, id string, filter *model.Filter) int
-		UpdateModule func(childComplexity int, id string, input model.ModuleInput) int
+		CreateModule func(childComplexity int, input model.ModuleInputCreate) int
+		DeleteModule func(childComplexity int, id string, filter *model.ModuleFilter) int
+		UpdateModule func(childComplexity int, id string, input model.ModuleInputUpdate) int
 	}
 
 	Query struct {
 		GetModule   func(childComplexity int, id string) int
-		ListModules func(childComplexity int, filter *model.Filter, paginate *model.Paginator) int
+		ListModules func(childComplexity int, filter *model.ModuleFilter, paginate *model.Paginator) int
 	}
 }
 
 type MutationResolver interface {
-	CreateModule(ctx context.Context, input model.ModuleInput) (*model.Module, error)
-	UpdateModule(ctx context.Context, id string, input model.ModuleInput) (*model.Module, error)
-	DeleteModule(ctx context.Context, id string, filter *model.Filter) (*string, error)
+	CreateModule(ctx context.Context, input model.ModuleInputCreate) (*model.Module, error)
+	UpdateModule(ctx context.Context, id string, input model.ModuleInputUpdate) (*model.Module, error)
+	DeleteModule(ctx context.Context, id string, filter *model.ModuleFilter) (*string, error)
 }
 type QueryResolver interface {
 	GetModule(ctx context.Context, id string) (*model.Module, error)
-	ListModules(ctx context.Context, filter *model.Filter, paginate *model.Paginator) ([]*model.ModuleInfo, error)
+	ListModules(ctx context.Context, filter *model.ModuleFilter, paginate *model.Paginator) ([]*model.ModuleInfo, error)
 }
 
 type executableSchema struct {
@@ -175,6 +177,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Module.Private(childComplexity), true
 
+	case "Module.school_id":
+		if e.complexity.Module.SchoolID == nil {
+			break
+		}
+
+		return e.complexity.Module.SchoolID(childComplexity), true
+
 	case "Module.soft_deleted":
 		if e.complexity.Module.SoftDeleted == nil {
 			break
@@ -238,6 +247,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.ModuleInfo.Private(childComplexity), true
 
+	case "ModuleInfo.school_id":
+		if e.complexity.ModuleInfo.SchoolID == nil {
+			break
+		}
+
+		return e.complexity.ModuleInfo.SchoolID(childComplexity), true
+
 	case "Mutation.createModule":
 		if e.complexity.Mutation.CreateModule == nil {
 			break
@@ -248,7 +264,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.CreateModule(childComplexity, args["input"].(model.ModuleInput)), true
+		return e.complexity.Mutation.CreateModule(childComplexity, args["input"].(model.ModuleInputCreate)), true
 
 	case "Mutation.deleteModule":
 		if e.complexity.Mutation.DeleteModule == nil {
@@ -260,7 +276,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.DeleteModule(childComplexity, args["id"].(string), args["filter"].(*model.Filter)), true
+		return e.complexity.Mutation.DeleteModule(childComplexity, args["id"].(string), args["filter"].(*model.ModuleFilter)), true
 
 	case "Mutation.updateModule":
 		if e.complexity.Mutation.UpdateModule == nil {
@@ -272,7 +288,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.UpdateModule(childComplexity, args["id"].(string), args["input"].(model.ModuleInput)), true
+		return e.complexity.Mutation.UpdateModule(childComplexity, args["id"].(string), args["input"].(model.ModuleInputUpdate)), true
 
 	case "Query.getModule":
 		if e.complexity.Query.GetModule == nil {
@@ -296,7 +312,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.ListModules(childComplexity, args["filter"].(*model.Filter), args["paginate"].(*model.Paginator)), true
+		return e.complexity.Query.ListModules(childComplexity, args["filter"].(*model.ModuleFilter), args["paginate"].(*model.Paginator)), true
 
 	}
 	return 0, false
@@ -306,8 +322,9 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 	rc := graphql.GetOperationContext(ctx)
 	ec := executionContext{rc, e, 0, 0, make(chan graphql.DeferredResult)}
 	inputUnmarshalMap := graphql.BuildUnmarshalerMap(
-		ec.unmarshalInputFilter,
-		ec.unmarshalInputModuleInput,
+		ec.unmarshalInputModuleFilter,
+		ec.unmarshalInputModuleInputCreate,
+		ec.unmarshalInputModuleInputUpdate,
 		ec.unmarshalInputNameFilter,
 		ec.unmarshalInputPaginator,
 	)
@@ -429,10 +446,10 @@ var parsedSchema = gqlparser.MustLoadSchema(sources...)
 func (ec *executionContext) field_Mutation_createModule_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 model.ModuleInput
+	var arg0 model.ModuleInputCreate
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg0, err = ec.unmarshalNModuleInput2ModuleᚋgraphᚋmodelᚐModuleInput(ctx, tmp)
+		arg0, err = ec.unmarshalNModuleInputCreate2ModuleᚋgraphᚋmodelᚐModuleInputCreate(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -453,10 +470,10 @@ func (ec *executionContext) field_Mutation_deleteModule_args(ctx context.Context
 		}
 	}
 	args["id"] = arg0
-	var arg1 *model.Filter
+	var arg1 *model.ModuleFilter
 	if tmp, ok := rawArgs["filter"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
-		arg1, err = ec.unmarshalOFilter2ᚖModuleᚋgraphᚋmodelᚐFilter(ctx, tmp)
+		arg1, err = ec.unmarshalOModuleFilter2ᚖModuleᚋgraphᚋmodelᚐModuleFilter(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -477,10 +494,10 @@ func (ec *executionContext) field_Mutation_updateModule_args(ctx context.Context
 		}
 	}
 	args["id"] = arg0
-	var arg1 model.ModuleInput
+	var arg1 model.ModuleInputUpdate
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg1, err = ec.unmarshalNModuleInput2ModuleᚋgraphᚋmodelᚐModuleInput(ctx, tmp)
+		arg1, err = ec.unmarshalNModuleInputUpdate2ModuleᚋgraphᚋmodelᚐModuleInputUpdate(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -522,10 +539,10 @@ func (ec *executionContext) field_Query_getModule_args(ctx context.Context, rawA
 func (ec *executionContext) field_Query_listModules_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 *model.Filter
+	var arg0 *model.ModuleFilter
 	if tmp, ok := rawArgs["filter"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
-		arg0, err = ec.unmarshalOFilter2ᚖModuleᚋgraphᚋmodelᚐFilter(ctx, tmp)
+		arg0, err = ec.unmarshalOModuleFilter2ᚖModuleᚋgraphᚋmodelᚐModuleFilter(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -613,6 +630,50 @@ func (ec *executionContext) _Module_id(ctx context.Context, field graphql.Collec
 }
 
 func (ec *executionContext) fieldContext_Module_id(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Module",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ID does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Module_school_id(ctx context.Context, field graphql.CollectedField, obj *model.Module) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Module_school_id(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.SchoolID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNID2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Module_school_id(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Module",
 		Field:      field,
@@ -1097,6 +1158,50 @@ func (ec *executionContext) fieldContext_ModuleInfo_id(ctx context.Context, fiel
 	return fc, nil
 }
 
+func (ec *executionContext) _ModuleInfo_school_id(ctx context.Context, field graphql.CollectedField, obj *model.ModuleInfo) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ModuleInfo_school_id(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.SchoolID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ModuleInfo_school_id(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ModuleInfo",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _ModuleInfo_name(ctx context.Context, field graphql.CollectedField, obj *model.ModuleInfo) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_ModuleInfo_name(ctx, field)
 	if err != nil {
@@ -1375,7 +1480,7 @@ func (ec *executionContext) _Mutation_createModule(ctx context.Context, field gr
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().CreateModule(rctx, fc.Args["input"].(model.ModuleInput))
+		return ec.resolvers.Mutation().CreateModule(rctx, fc.Args["input"].(model.ModuleInputCreate))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1399,6 +1504,8 @@ func (ec *executionContext) fieldContext_Mutation_createModule(ctx context.Conte
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_Module_id(ctx, field)
+			case "school_id":
+				return ec.fieldContext_Module_school_id(ctx, field)
 			case "name":
 				return ec.fieldContext_Module_name(ctx, field)
 			case "description":
@@ -1451,7 +1558,7 @@ func (ec *executionContext) _Mutation_updateModule(ctx context.Context, field gr
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().UpdateModule(rctx, fc.Args["id"].(string), fc.Args["input"].(model.ModuleInput))
+		return ec.resolvers.Mutation().UpdateModule(rctx, fc.Args["id"].(string), fc.Args["input"].(model.ModuleInputUpdate))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1475,6 +1582,8 @@ func (ec *executionContext) fieldContext_Mutation_updateModule(ctx context.Conte
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_Module_id(ctx, field)
+			case "school_id":
+				return ec.fieldContext_Module_school_id(ctx, field)
 			case "name":
 				return ec.fieldContext_Module_name(ctx, field)
 			case "description":
@@ -1527,7 +1636,7 @@ func (ec *executionContext) _Mutation_deleteModule(ctx context.Context, field gr
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().DeleteModule(rctx, fc.Args["id"].(string), fc.Args["filter"].(*model.Filter))
+		return ec.resolvers.Mutation().DeleteModule(rctx, fc.Args["id"].(string), fc.Args["filter"].(*model.ModuleFilter))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1603,6 +1712,8 @@ func (ec *executionContext) fieldContext_Query_getModule(ctx context.Context, fi
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_Module_id(ctx, field)
+			case "school_id":
+				return ec.fieldContext_Module_school_id(ctx, field)
 			case "name":
 				return ec.fieldContext_Module_name(ctx, field)
 			case "description":
@@ -1655,7 +1766,7 @@ func (ec *executionContext) _Query_listModules(ctx context.Context, field graphq
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().ListModules(rctx, fc.Args["filter"].(*model.Filter), fc.Args["paginate"].(*model.Paginator))
+		return ec.resolvers.Query().ListModules(rctx, fc.Args["filter"].(*model.ModuleFilter), fc.Args["paginate"].(*model.Paginator))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1679,6 +1790,8 @@ func (ec *executionContext) fieldContext_Query_listModules(ctx context.Context, 
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_ModuleInfo_id(ctx, field)
+			case "school_id":
+				return ec.fieldContext_ModuleInfo_school_id(ctx, field)
 			case "name":
 				return ec.fieldContext_ModuleInfo_name(ctx, field)
 			case "description":
@@ -3611,20 +3724,38 @@ func (ec *executionContext) fieldContext___Type_specifiedByURL(ctx context.Conte
 
 // region    **************************** input.gotpl *****************************
 
-func (ec *executionContext) unmarshalInputFilter(ctx context.Context, obj interface{}) (model.Filter, error) {
-	var it model.Filter
+func (ec *executionContext) unmarshalInputModuleFilter(ctx context.Context, obj interface{}) (model.ModuleFilter, error) {
+	var it model.ModuleFilter
 	asMap := map[string]interface{}{}
 	for k, v := range obj.(map[string]interface{}) {
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"softDelete", "name", "difficulty", "category", "private"}
+	fieldsInOrder := [...]string{"school_id", "made_by", "softDelete", "name", "difficulty", "category", "private"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
 			continue
 		}
 		switch k {
+		case "school_id":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("school_id"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.SchoolID = data
+		case "made_by":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("made_by"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.MadeBy = data
 		case "softDelete":
 			var err error
 
@@ -3676,8 +3807,91 @@ func (ec *executionContext) unmarshalInputFilter(ctx context.Context, obj interf
 	return it, nil
 }
 
-func (ec *executionContext) unmarshalInputModuleInput(ctx context.Context, obj interface{}) (model.ModuleInput, error) {
-	var it model.ModuleInput
+func (ec *executionContext) unmarshalInputModuleInputCreate(ctx context.Context, obj interface{}) (model.ModuleInputCreate, error) {
+	var it model.ModuleInputCreate
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"name", "school_id", "description", "difficulty", "category", "private", "key"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "name":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Name = data
+		case "school_id":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("school_id"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.SchoolID = data
+		case "description":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("description"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Description = data
+		case "difficulty":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("difficulty"))
+			data, err := ec.unmarshalNLanguageLevel2ModuleᚋgraphᚋmodelᚐLanguageLevel(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Difficulty = data
+		case "category":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("category"))
+			data, err := ec.unmarshalNCategory2ModuleᚋgraphᚋmodelᚐCategory(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Category = data
+		case "private":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("private"))
+			data, err := ec.unmarshalNBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Private = data
+		case "key":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("key"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Key = data
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputModuleInputUpdate(ctx context.Context, obj interface{}) (model.ModuleInputUpdate, error) {
+	var it model.ModuleInputUpdate
 	asMap := map[string]interface{}{}
 	for k, v := range obj.(map[string]interface{}) {
 		asMap[k] = v
@@ -3850,6 +4064,11 @@ func (ec *executionContext) _Module(ctx context.Context, sel ast.SelectionSet, o
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
+		case "school_id":
+			out.Values[i] = ec._Module_school_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
 		case "name":
 			out.Values[i] = ec._Module_name(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
@@ -3924,6 +4143,11 @@ func (ec *executionContext) _ModuleInfo(ctx context.Context, sel ast.SelectionSe
 			out.Values[i] = graphql.MarshalString("ModuleInfo")
 		case "id":
 			out.Values[i] = ec._ModuleInfo_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "school_id":
+			out.Values[i] = ec._ModuleInfo_school_id(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
@@ -4513,8 +4737,13 @@ func (ec *executionContext) marshalNLanguageLevel2ModuleᚋgraphᚋmodelᚐLangu
 	return v
 }
 
-func (ec *executionContext) unmarshalNModuleInput2ModuleᚋgraphᚋmodelᚐModuleInput(ctx context.Context, v interface{}) (model.ModuleInput, error) {
-	res, err := ec.unmarshalInputModuleInput(ctx, v)
+func (ec *executionContext) unmarshalNModuleInputCreate2ModuleᚋgraphᚋmodelᚐModuleInputCreate(ctx context.Context, v interface{}) (model.ModuleInputCreate, error) {
+	res, err := ec.unmarshalInputModuleInputCreate(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNModuleInputUpdate2ModuleᚋgraphᚋmodelᚐModuleInputUpdate(ctx context.Context, v interface{}) (model.ModuleInputUpdate, error) {
+	res, err := ec.unmarshalInputModuleInputUpdate(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
@@ -4864,14 +5093,6 @@ func (ec *executionContext) marshalOCategory2ᚖModuleᚋgraphᚋmodelᚐCategor
 	return v
 }
 
-func (ec *executionContext) unmarshalOFilter2ᚖModuleᚋgraphᚋmodelᚐFilter(ctx context.Context, v interface{}) (*model.Filter, error) {
-	if v == nil {
-		return nil, nil
-	}
-	res, err := ec.unmarshalInputFilter(ctx, v)
-	return &res, graphql.ErrorOnPath(ctx, err)
-}
-
 func (ec *executionContext) unmarshalOID2ᚖstring(ctx context.Context, v interface{}) (*string, error) {
 	if v == nil {
 		return nil, nil
@@ -4909,6 +5130,14 @@ func (ec *executionContext) marshalOModule2ᚖModuleᚋgraphᚋmodelᚐModule(ct
 		return graphql.Null
 	}
 	return ec._Module(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalOModuleFilter2ᚖModuleᚋgraphᚋmodelᚐModuleFilter(ctx context.Context, v interface{}) (*model.ModuleFilter, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputModuleFilter(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) marshalOModuleInfo2ᚕᚖModuleᚋgraphᚋmodelᚐModuleInfo(ctx context.Context, sel ast.SelectionSet, v []*model.ModuleInfo) graphql.Marshaler {

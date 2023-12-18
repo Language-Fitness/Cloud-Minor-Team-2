@@ -11,7 +11,7 @@ import (
 )
 
 // CreateModule is the resolver for the createModule field.
-func (r *mutationResolver) CreateModule(ctx context.Context, input model.ModuleInput) (*model.Module, error) {
+func (r *mutationResolver) CreateModule(ctx context.Context, input model.ModuleInputCreate) (*model.Module, error) {
 	token := auth.TokenFromContext(ctx)
 
 	module, err := r.Service.CreateModule(token, input)
@@ -23,7 +23,7 @@ func (r *mutationResolver) CreateModule(ctx context.Context, input model.ModuleI
 }
 
 // UpdateModule is the resolver for the updateModule field.
-func (r *mutationResolver) UpdateModule(ctx context.Context, id string, input model.ModuleInput) (*model.Module, error) {
+func (r *mutationResolver) UpdateModule(ctx context.Context, id string, input model.ModuleInputUpdate) (*model.Module, error) {
 	token := auth.TokenFromContext(ctx)
 
 	updatedModule, err := r.Service.UpdateModule(token, id, input)
@@ -35,7 +35,7 @@ func (r *mutationResolver) UpdateModule(ctx context.Context, id string, input mo
 }
 
 // DeleteModule is the resolver for the deleteModule field.
-func (r *mutationResolver) DeleteModule(ctx context.Context, id string, filter *model.Filter) (*string, error) {
+func (r *mutationResolver) DeleteModule(ctx context.Context, id string, filter *model.ModuleFilter) (*string, error) {
 	token := auth.TokenFromContext(ctx)
 
 	err := r.Service.DeleteModule(token, id, filter)
@@ -59,7 +59,7 @@ func (r *queryResolver) GetModule(ctx context.Context, id string) (*model.Module
 }
 
 // ListModules is the resolver for the listModules field.
-func (r *queryResolver) ListModules(ctx context.Context, filter *model.Filter, paginate *model.Paginator) ([]*model.ModuleInfo, error) {
+func (r *queryResolver) ListModules(ctx context.Context, filter *model.ModuleFilter, paginate *model.Paginator) ([]*model.ModuleInfo, error) {
 	token := auth.TokenFromContext(ctx)
 
 	modules, err := r.Service.ListModules(token, filter, paginate)

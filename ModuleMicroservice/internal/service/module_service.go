@@ -19,11 +19,11 @@ import (
 // IModuleService GOLANG INTERFACE
 // Implements five CRUD methods for query's and mutations on Module.
 type IModuleService interface {
-	CreateModule(token string, newModule model.ModuleInput) (*model.Module, error)
-	UpdateModule(token string, id string, updateData model.ModuleInput) (*model.Module, error)
-	DeleteModule(token string, id string, filter *model.Filter) error
+	CreateModule(token string, newModule model.ModuleInputCreate) (*model.Module, error)
+	UpdateModule(token string, id string, updateData model.ModuleInputUpdate) (*model.Module, error)
+	DeleteModule(token string, id string, filter *model.ModuleFilter) error
 	GetModuleById(token string, id string) (*model.Module, error)
-	ListModules(token string, filter *model.Filter, paginate *model.Paginator) ([]*model.ModuleInfo, error)
+	ListModules(token string, filter *model.ModuleFilter, paginate *model.Paginator) ([]*model.ModuleInfo, error)
 }
 
 // ModuleService GOLANG STRUCT
@@ -44,12 +44,12 @@ func NewModuleService(collection *mongo.Collection) IModuleService {
 	}
 }
 
-func (m *ModuleService) CreateModule(token string, newModule model.ModuleInput) (*model.Module, error) {
+func (m *ModuleService) CreateModule(token string, newModule model.ModuleInputCreate) (*model.Module, error) {
 	sub, err := m.Policy.CreateModule(token)
 	if err != nil {
 		return nil, err
 	}
-
+	m.Validator.Validate(newModule.SchoolID, []string{"IsUUID"}, "Filter School")
 	m.Validator.Validate(newModule.Name, []string{"IsString", "Length:<25"}, "Name")
 	m.Validator.Validate(newModule.Description, []string{"IsString", "Length:<50"}, "Description")
 	m.Validator.Validate(newModule.Difficulty, []string{"IsInt"}, "Difficulty")
@@ -58,6 +58,8 @@ func (m *ModuleService) CreateModule(token string, newModule model.ModuleInput) 
 	if newModule.Private {
 		m.Validator.Validate(*newModule.Key, []string{"IsString", "Length:<30"}, "Key")
 	}
+
+	//@TODO check if school exist
 
 	validationErrors := m.Validator.GetErrors()
 
@@ -72,6 +74,7 @@ func (m *ModuleService) CreateModule(token string, newModule model.ModuleInput) 
 
 	moduleToInsert := &model.Module{
 		ID:          uuid.New().String(),
+		SchoolID:    newModule.SchoolID,
 		Name:        newModule.Name,
 		Description: newModule.Description,
 		Difficulty:  newModule.Difficulty,
@@ -95,7 +98,7 @@ func (m *ModuleService) CreateModule(token string, newModule model.ModuleInput) 
 	return result, nil
 }
 
-func (m *ModuleService) UpdateModule(token string, id string, updateData model.ModuleInput) (*model.Module, error) {
+func (m *ModuleService) UpdateModule(token string, id string, updateData model.ModuleInputUpdate) (*model.Module, error) {
 	existingModule, err := m.Policy.UpdateModule(token, id)
 	if err != nil {
 		return nil, err
@@ -120,6 +123,7 @@ func (m *ModuleService) UpdateModule(token string, id string, updateData model.M
 	timestamp := time.Now().String()
 	newModule := model.Module{
 		ID:          existingModule.ID,
+		SchoolID:    existingModule.SchoolID,
 		Name:        updateData.Name,
 		Description: updateData.Description,
 		Difficulty:  updateData.Difficulty,
@@ -144,8 +148,8 @@ func (m *ModuleService) UpdateModule(token string, id string, updateData model.M
 	return result, nil
 }
 
-func (m *ModuleService) DeleteModule(token string, id string, filter *model.Filter) error {
-	isAdmin, existingModule, err := m.Policy.DeleteModule(token, id)
+func (m *ModuleService) DeleteModule(token string, id string, filter *model.ModuleFilter) error {
+	existingModule, err := m.Policy.DeleteModule(token, id)
 	if err != nil {
 		return err
 	}
@@ -161,7 +165,7 @@ func (m *ModuleService) DeleteModule(token string, id string, filter *model.Filt
 		return nil
 	}
 
-	if isAdmin && filter != nil && !*filter.SoftDelete {
+	if m.Policy.HasPermissions(token, "delete_module_all") && filter != nil && !*filter.SoftDelete {
 		err := m.Repo.HardDeleteModuleByID(id)
 		if err != nil {
 			return err
@@ -181,17 +185,19 @@ func (m *ModuleService) GetModuleById(token string, id string) (*model.Module, e
 	return existingModule, nil
 }
 
-func (m *ModuleService) ListModules(token string, filter *model.Filter, paginate *model.Paginator) ([]*model.ModuleInfo, error) {
-	_, err := m.Policy.ListModules(token)
-	if err != nil {
-		return nil, err
-	}
+func (m *ModuleService) ListModules(token string, filter *model.ModuleFilter, paginate *model.Paginator) ([]*model.ModuleInfo, error) {
+	//err := m.Policy.ListModules(token)
+	//if err != nil {
+	//	return nil, err
+	//}
 
 	m.Validator.Validate(filter.SoftDelete, []string{"IsNull", "IsBoolean"}, "Filter softDelete")
 	if helper.IsNil(filter.Name) == false {
 		m.Validator.Validate(helper.DereferenceArrayIfNeeded(filter.Name.Input), []string{"IsNull", "ArrayType:string"}, "Filter Name input")
 	}
 	m.Validator.Validate(filter.Private, []string{"IsNull", "IsBoolean"}, "Filter Private")
+	m.Validator.Validate(filter.MadeBy, []string{"IsNull", "IsUUID"}, "Filter MadeBy")
+	m.Validator.Validate(filter.SchoolID, []string{"IsNull", "IsUUID"}, "Filter School")
 	m.Validator.Validate(paginate.Amount, []string{"IsInt", "Size:>0", "Size:<101"}, "Paginate Amount")
 	m.Validator.Validate(paginate.Step, []string{"IsInt", "Size:>=0"}, "Paginate Step")
 
@@ -207,6 +213,14 @@ func (m *ModuleService) ListModules(token string, filter *model.Filter, paginate
 	bsonFilter := bson.D{}
 	if m.Policy.HasPermissions(token, "filter_module_softDelete") == true {
 		bsonFilter = append(bsonFilter, bson.E{Key: "softdeleted", Value: helper.DereferenceIfNeeded(filter.SoftDelete)})
+	}
+
+	if m.Policy.HasPermissions(token, "filter_module_school_id") == true {
+		bsonFilter = append(bsonFilter, bson.E{Key: "schoolid", Value: helper.DereferenceIfNeeded(filter.SchoolID)})
+	}
+
+	if m.Policy.HasPermissions(token, "filter_module_made_by") == true {
+		bsonFilter = append(bsonFilter, bson.E{Key: "madeby", Value: helper.DereferenceIfNeeded(filter.MadeBy)})
 	}
 
 	if m.Policy.HasPermissions(token, "filter_module_name") == true && helper.IsNil(filter.Name) == false {
