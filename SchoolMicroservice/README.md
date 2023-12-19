@@ -11,10 +11,16 @@ mutation CreateSchool{
     createSchool(input: {
         name: "Sample School",
         location: "Sample location",
+        has_openai_access: true,
+        openai_key: "<OpenAI Key>"
     }) {
         id
-        name,
-        location,
+        name
+        location
+        has_openai_access
+        openai_key
+        join_code
+        made_by
         created_at
         updated_at
         soft_deleted
@@ -28,7 +34,11 @@ query GetSchool {
     getSchool(id: "your-school-id") {
         id
         name
-        location,
+        location
+        has_openai_access
+        openai_key
+        join_code
+        made_by
         created_at
         updated_at
         soft_deleted
@@ -51,6 +61,7 @@ query ListSchools {
                 type: eq
             }
             made_by: "6c1ce448-670f-47b2-83f7-4d771b01775b"
+            has_openai_access: true
         },
         paginate:{
             Step: 0,
@@ -61,6 +72,7 @@ query ListSchools {
         name
         location
         made_by
+        has_openai_access
     }
 }
 ```
@@ -73,6 +85,8 @@ mutation UpdateSchool {
         input: {
             name: "Updated School Name",
             location: "Updated School Location",
+            has_openai_access: true,
+            openai_key: "<New OpenAI Key>"
         }
     ) {
         id

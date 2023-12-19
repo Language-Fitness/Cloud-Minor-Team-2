@@ -24,13 +24,8 @@ func (m *MockRepository) UpdateClass(id string, updatedClass model.Class) (*mode
 	return args.Get(0).(*model.Class), args.Error(1)
 }
 
-func (m *MockRepository) SoftDeleteClassByID(id string, existingClass model.Class) error {
+func (m *MockRepository) DeleteClass(id string, existingClass model.Class) error {
 	args := m.Called(id, existingClass)
-	return args.Error(0)
-}
-
-func (m *MockRepository) HardDeleteClassByID(id string) error {
-	args := m.Called(id)
 	return args.Error(0)
 }
 

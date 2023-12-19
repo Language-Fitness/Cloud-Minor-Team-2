@@ -15,6 +15,7 @@ type Class struct {
 	Description string        `json:"description"`
 	Difficulty  LanguageLevel `json:"difficulty"`
 	MadeBy      string        `json:"made_by"`
+	OpenaiKey   string        `json:"openai_key"`
 	CreatedAt   *string       `json:"created_at,omitempty"`
 	UpdatedAt   *string       `json:"updated_at,omitempty"`
 	SoftDeleted *bool         `json:"soft_deleted,omitempty"`

@@ -7,10 +7,13 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
+const InvalidActionsMessage = "invalid permissions for this action"
+const InvalidTokenMessage = "invalid token"
+
 type IPolicy interface {
 	CreateClass(bearerToken string) (string, error)
 	UpdateClass(bearerToken string, id string) (*model.Class, error)
-	DeleteClass(bearerToken string, id string) (bool, *model.Class, error)
+	DeleteClass(bearerToken string, id string) (*model.Class, error)
 	GetClass(bearerToken string, id string) (*model.Class, error)
 	ListClasses(bearerToken string) error
 	HasPermissions(bearerToken string, role string) bool
@@ -37,7 +40,7 @@ func (p *Policy) CreateClass(bearerToken string) (string, error) {
 	}
 
 	if !p.hasRole(roles, "create_class") {
-		return "", errors.New("invalid permissions for this action")
+		return "", errors.New(InvalidActionsMessage)
 	}
 
 	return uuid, nil
@@ -51,7 +54,7 @@ func (p *Policy) UpdateClass(bearerToken string, id string) (*model.Class, error
 
 	class, err := p.ClassRepository.GetClassByID(id)
 	if err != nil {
-		return nil, errors.New("invalid permissions for this action")
+		return nil, errors.New(InvalidActionsMessage)
 	}
 
 	if p.hasRole(roles, "update_class") && class.MadeBy == uuid {
@@ -62,29 +65,29 @@ func (p *Policy) UpdateClass(bearerToken string, id string) (*model.Class, error
 		return class, nil
 	}
 
-	return nil, errors.New("invalid permissions for this action")
+	return nil, errors.New(InvalidActionsMessage)
 }
 
-func (p *Policy) DeleteClass(bearerToken string, id string) (bool, *model.Class, error) {
+func (p *Policy) DeleteClass(bearerToken string, id string) (*model.Class, error) {
 	uuid, roles, err2 := p.getSubAndRoles(bearerToken)
 	if err2 != nil {
-		return false, nil, err2
+		return nil, err2
 	}
 
 	class, err := p.ClassRepository.GetClassByID(id)
 	if err != nil {
-		return false, nil, errors.New("invalid permissions for this action")
+		return nil, errors.New(InvalidActionsMessage)
 	}
 
 	if p.hasRole(roles, "delete_class_all") {
-		return true, class, nil
+		return class, nil
 	}
 
 	if p.hasRole(roles, "delete_class") && class.MadeBy == uuid {
-		return false, class, nil
+		return class, nil
 	}
 
-	return false, nil, errors.New("invalid permissions for this action")
+	return nil, errors.New(InvalidActionsMessage)
 }
 
 func (p *Policy) GetClass(bearerToken string, id string) (*model.Class, error) {
@@ -95,14 +98,14 @@ func (p *Policy) GetClass(bearerToken string, id string) (*model.Class, error) {
 
 	class, err := p.ClassRepository.GetClassByID(id)
 	if err != nil {
-		return nil, errors.New("invalid permissions for this action")
+		return nil, errors.New(InvalidActionsMessage)
 	}
 
 	if p.hasRole(roles, "get_class") {
 		return class, nil
 	}
 
-	return nil, errors.New("invalid permissions for this action")
+	return nil, errors.New(InvalidActionsMessage)
 }
 
 func (p *Policy) ListClasses(bearerToken string) error {
@@ -116,7 +119,7 @@ func (p *Policy) ListClasses(bearerToken string) error {
 	}
 
 	if !p.hasRole(roles, "get_classes") {
-		return errors.New("invalid permissions for this action")
+		return errors.New(InvalidActionsMessage)
 	}
 
 	return nil
@@ -143,17 +146,17 @@ func (p *Policy) getSubAndRoles(bearerToken string) (string, []interface{}, erro
 
 	resourceAccess, ok := decodeToken["resource_access"].(map[string]interface{})
 	if !ok {
-		return "", nil, errors.New("invalid token")
+		return "", nil, errors.New(InvalidTokenMessage)
 	}
 
 	userManagementClient, ok := resourceAccess["user-management-client"].(map[string]interface{})
 	if !ok {
-		return "", nil, errors.New("invalid token")
+		return "", nil, errors.New(InvalidTokenMessage)
 	}
 
 	roles, ok := userManagementClient["roles"].([]interface{})
 	if !ok {
-		return "", nil, errors.New("invalid token")
+		return "", nil, errors.New(InvalidTokenMessage)
 	}
 	return sub, roles, nil
 }

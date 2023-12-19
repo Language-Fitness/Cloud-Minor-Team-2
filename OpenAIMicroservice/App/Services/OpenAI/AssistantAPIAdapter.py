@@ -1,6 +1,7 @@
 import base64
 import json
 import logging
+import re
 from io import BytesIO
 from App.Utils.Exceptions.AssistantAPIException import AssistantAPIException
 from App.Services.OpenAI.OpenAIAssistantManager import OpenAIAssistantManager
@@ -22,7 +23,7 @@ class AssistantAPIAdapter:
             self.assistant_manager.create_message(thread.id, request)
 
             run = self.assistant_manager.run_thread(thread.id, assistant.id)
-            token = self.encode_token(run.thread_id, run.assistant_id)
+            token = self.encode_token(run.thread_id, run.assistant_id, "questions", None)
             return token
 
         except AssistantAPIException as e:
@@ -50,7 +51,7 @@ class AssistantAPIAdapter:
             self.assistant_manager.create_message_with_attachment(thread.id, request, file.id)
 
             run = self.assistant_manager.run_thread(thread.id, assistant.id)
-            token = self.encode_token(run.thread_id, run.assistant_id)
+            token = self.encode_token(run.thread_id, run.assistant_id, "file-questions", file.id)
             return token
 
         except AssistantAPIException as e:
@@ -73,7 +74,7 @@ class AssistantAPIAdapter:
             self.assistant_manager.create_message(thread.id, request)
 
             run = self.assistant_manager.run_thread(thread.id, assistant.id)
-            token = self.encode_token(run.thread_id, run.assistant_id)
+            token = self.encode_token(run.thread_id, run.assistant_id, "explanation", None)
             return token
 
         except AssistantAPIException as e:
@@ -95,7 +96,7 @@ class AssistantAPIAdapter:
             self.assistant_manager.create_message(thread.id, request)
 
             run = self.assistant_manager.run_thread(thread.id, assistant.id)
-            token = self.encode_token(run.thread_id, run.assistant_id)
+            token = self.encode_token(run.thread_id, run.assistant_id, "answer", None)
             return token
 
         except AssistantAPIException as e:
@@ -105,17 +106,31 @@ class AssistantAPIAdapter:
             # logging.error(f"Unexpected error in retrieve_generic_response: {e}")
             raise AssistantAPIException("An unexpected error occurred.")
 
-    def retrieve_response(self, token, validation_function):
+    def retrieve_response(self, token, endpoint_id_for_check, validation_function):
         try:
-            thread_id, assistant_id = self.decode_and_check_token(token)
+            thread_id, assistant_id, file_id = self.decode_and_check_token(token, endpoint_id_for_check)
             messages = self.assistant_manager.retrieve_messages(thread_id)
-            json_data = self.get_last_message(messages)
-            json_data = json_data.replace('```json', '').replace('```', '')
-            json_data_dict = json.loads(json_data)
+            last_message_data = self.get_last_message(messages)
+            # json_data = json_data.replace('```json', '').replace('```', '')
+
+            json_pattern = r'\{.*\}'
+
+            # Search for JSON in the string
+            matched_json = re.search(json_pattern, last_message_data, re.DOTALL)
+
+            # Extracting the JSON part
+            extracted_json = matched_json.group(0) if matched_json else None
+
+            print(extracted_json)
+            json_data_dict = json.loads(extracted_json)
 
             validation_function(json_data_dict)
 
             self.assistant_manager.delete_assistant(assistant_id)
+
+            if file_id:
+                self.assistant_manager.delete_file(file_id)
+
             json_data_dict["status"] = "success"
             return json_data_dict
 
@@ -124,58 +139,33 @@ class AssistantAPIAdapter:
             raise AssistantAPIException("Response still pending, please wait.")
 
         except AssistantAPIException as e:
-            logging.error(f"API error in custom_questions_response: {e}")
+            logging.warning(f"API warning in retrieve_response: {e}")
             raise AssistantAPIException(str(e))
 
         except Exception as e:
-            logging.error(f"Unexpected error in custom_questions_response: {e}")
-            raise AssistantAPIException("An unexpected error occurred.")
-
-    # def custom_questions_response(self, token, validation_function):
-    #     try:
-    #         thread_id, assistant_id = self.decode_and_check_token(token)
-    #         messages = self.assistant_manager.retrieve_messages(thread_id)
-    #         json_data = self.get_last_message(messages)
-    #         json_data = json_data.replace('```json', '').replace('```', '')
-    #         json_data_dict = json.loads(json_data)
-    #
-    #         validation_function(json_data_dict)
-    #
-    #         self.assistant_manager.delete_assistant(assistant_id)
-    #         json_data_dict["status"] = "success"
-    #         return json_data_dict
-    #
-    #
-    #     except json.JSONDecodeError:
-    #         logging.error("JSON decoding error in custom_questions_response")
-    #         raise AssistantAPIException("Response still pending, please wait.")
-    #
-    #
-    #     except AssistantAPIException as e:
-    #         logging.error(f"API error in custom_questions_response: {e}")
-    #         raise AssistantAPIException(str(e))
-    #
-    #
-    #     except Exception as e:
-    #         logging.error(f"Unexpected error in custom_questions_response: {e}")
-    #         raise AssistantAPIException("An unexpected error occurred.")
+            logging.error(f"Unexpected API error in retrieve_response: {e}")
+            raise Exception(f"An unexpected error occurred: {e}")
 
     def retrieve_generated_question_response(self, token):
-        return self.retrieve_response(token, self.is_valid_generated_question_json)
+        return self.retrieve_response(token, "answer", self.is_valid_generated_question_json)
 
     def retrieve_generated_questions_response(self, token):
-        return self.retrieve_response(token, self.is_valid_generated_questions_json)
+        return self.retrieve_response(token, "questions", self.is_valid_generated_questions_json)
 
     def retrieve_explanation_response(self, token):
-        return self.retrieve_response(token, self.is_valid_explanation_json)
+        return self.retrieve_response(token, "explanation", self.is_valid_explanation_json)
 
-    def retrieve_custom_questions_response(self, token):
-        return self.retrieve_response(token, self.is_valid_custom_questions_json)
+    def retrieve_questions_from_file_response(self, token):
+        return self.retrieve_response(token, "file-questions", self.is_valid_custom_questions_json)
 
-    def encode_token(self, thread_id, assistant_id):
+    def encode_token(self, thread_id, assistant_id, endpoint_id, file_id):
         try:
-            ids_dict = {'thread_id': thread_id, 'assistant_id': assistant_id}
-            ids_json = json.dumps(ids_dict)
+            json_dict = {'thread_id': thread_id, 'assistant_id': assistant_id, 'endpoint_id': endpoint_id}
+
+            if file_id is not None and file_id.strip():
+                json_dict["file_id"] = file_id
+
+            ids_json = json.dumps(json_dict)
             ids_bytes = ids_json.encode('utf-8')
             encoded_ids = base64.b64encode(ids_bytes)
 
@@ -184,7 +174,7 @@ class AssistantAPIAdapter:
             logging.error(f"Token encoding error: {e}")
             raise AssistantAPIException(f"Token encoding error: {e}")
 
-    def decode_and_check_token(self, token):
+    def decode_and_check_token(self, token, endpoint_id_for_check):
 
         try:
             ids_bytes = base64.b64decode(token)
@@ -192,13 +182,19 @@ class AssistantAPIAdapter:
             ids_dict = json.loads(ids_json)
 
             if not ids_dict.get('thread_id') or not ids_dict.get('thread_id').strip():
-                raise AssistantAPIException("Invalid token: 'thread_id' is missing or empty")
+                raise Exception("Invalid token: 'thread_id' is missing or empty")
             if not ids_dict.get('assistant_id') or not ids_dict.get('assistant_id').strip():
-                raise AssistantAPIException("Invalid token: 'assistant_id' is missing or empty")
+                raise Exception("Invalid token: 'assistant_id' is missing or empty")
+            if not ids_dict.get('endpoint_id') or not ids_dict.get('endpoint_id').strip():
+                raise Exception("Invalid token: 'endpoint_id' is missing or empty")
+
+            file_id = None
+            if 'file_id' in ids_dict and ids_dict['file_id'].strip():
+                file_id = ids_dict['file_id']
 
             self.assistant_manager.retrieve_messages(ids_dict['thread_id'])
 
-            return ids_dict['thread_id'], ids_dict['assistant_id']
+            return ids_dict['thread_id'], ids_dict['assistant_id'], file_id
         except json.JSONDecodeError as e:
             # adding loging with prometheus
             logging.error(f"Token decoding error: {e}")

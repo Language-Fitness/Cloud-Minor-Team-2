@@ -7,6 +7,9 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
+const InvalidActionsMessage = "invalid permissions for this action"
+const InvalidTokenMessage = "invalid token"
+
 type IPolicy interface {
 	CreateSchool(bearerToken string) (string, error)
 	UpdateSchool(bearerToken string, id string) (*model.School, error)
@@ -37,7 +40,7 @@ func (p *Policy) CreateSchool(bearerToken string) (string, error) {
 	}
 
 	if !p.hasRole(roles, "create_school") {
-		return "", errors.New("invalid permissions for this action")
+		return "", errors.New(InvalidActionsMessage)
 	}
 
 	return uuid, nil
@@ -51,7 +54,7 @@ func (p *Policy) UpdateSchool(bearerToken string, id string) (*model.School, err
 
 	school, err := p.SchoolRepository.GetSchoolByID(id)
 	if err != nil {
-		return nil, errors.New("invalid permissions for this action")
+		return nil, errors.New(InvalidActionsMessage)
 	}
 
 	if p.hasRole(roles, "update_school") && school.MadeBy == uuid {
@@ -62,7 +65,7 @@ func (p *Policy) UpdateSchool(bearerToken string, id string) (*model.School, err
 		return school, nil
 	}
 
-	return nil, errors.New("invalid permissions for this action")
+	return nil, errors.New(InvalidActionsMessage)
 }
 
 func (p *Policy) DeleteSchool(bearerToken string, id string) (*model.School, error) {
@@ -73,14 +76,14 @@ func (p *Policy) DeleteSchool(bearerToken string, id string) (*model.School, err
 
 	school, err := p.SchoolRepository.GetSchoolByID(id)
 	if err != nil {
-		return nil, errors.New("invalid permissions for this action")
+		return nil, errors.New(InvalidActionsMessage)
 	}
 
 	if p.hasRole(roles, "delete_school_all") {
 		return school, nil
 	}
 
-	return nil, errors.New("invalid permissions for this action")
+	return nil, errors.New(InvalidActionsMessage)
 }
 
 func (p *Policy) GetSchool(bearerToken string, id string) (*model.School, error) {
@@ -91,14 +94,14 @@ func (p *Policy) GetSchool(bearerToken string, id string) (*model.School, error)
 
 	school, err := p.SchoolRepository.GetSchoolByID(id)
 	if err != nil {
-		return nil, errors.New("invalid permissions for this action")
+		return nil, errors.New(InvalidActionsMessage)
 	}
 
 	if p.hasRole(roles, "get_school") {
 		return school, nil
 	}
 
-	return nil, errors.New("invalid permissions for this action")
+	return nil, errors.New(InvalidActionsMessage)
 }
 
 func (p *Policy) ListSchools(bearerToken string) error {
@@ -112,7 +115,7 @@ func (p *Policy) ListSchools(bearerToken string) error {
 	}
 
 	if !p.hasRole(roles, "get_schools") {
-		return errors.New("invalid permissions for this action")
+		return errors.New(InvalidActionsMessage)
 	}
 
 	return nil
@@ -127,7 +130,7 @@ func (p *Policy) HasPermissions(bearerToken string, role string) bool {
 func (p *Policy) getSubAndRoles(bearerToken string) (string, []interface{}, error) {
 	token, err := p.Token.IntrospectToken(bearerToken)
 	if err != nil || token == false {
-		return "", nil, errors.New("invalid token")
+		return "", nil, errors.New(InvalidTokenMessage)
 	}
 
 	decodeToken, err := p.Token.DecodeToken(bearerToken)
@@ -139,17 +142,17 @@ func (p *Policy) getSubAndRoles(bearerToken string) (string, []interface{}, erro
 
 	resourceAccess, ok := decodeToken["resource_access"].(map[string]interface{})
 	if !ok {
-		return "", nil, errors.New("invalid token")
+		return "", nil, errors.New(InvalidTokenMessage)
 	}
 
 	userManagementClient, ok := resourceAccess["user-management-client"].(map[string]interface{})
 	if !ok {
-		return "", nil, errors.New("invalid token")
+		return "", nil, errors.New(InvalidTokenMessage)
 	}
 
 	roles, ok := userManagementClient["roles"].([]interface{})
 	if !ok {
-		return "", nil, errors.New("invalid token")
+		return "", nil, errors.New(InvalidTokenMessage)
 	}
 	return sub, roles, nil
 }

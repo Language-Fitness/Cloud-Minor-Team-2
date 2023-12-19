@@ -101,6 +101,9 @@ type School
     name: String! @join__field(graph: SCHOOLS)
     location: String! @join__field(graph: SCHOOLS)
     made_by: ID! @join__field(graph: SCHOOLS)
+    has_openai_access: Boolean! @join__field(graph: SCHOOLS)
+    openai_key: String @join__field(graph: SCHOOLS)
+    join_code: ID! @join__field(graph: SCHOOLS)
     created_at: String @join__field(graph: SCHOOLS)
     updated_at: String @join__field(graph: SCHOOLS)
     soft_deleted: Boolean @join__field(graph: SCHOOLS)
@@ -113,6 +116,7 @@ type SchoolInfo
     name: String! @join__field(graph: SCHOOLS)
     location: String! @join__field(graph: SCHOOLS)
     made_by: ID! @join__field(graph: SCHOOLS)
+    has_openai_access: Boolean! @join__field(graph: SCHOOLS)
 }
 
 #input ModuleInput
@@ -140,6 +144,8 @@ input SchoolInput
 {
     name: String!
     location: String!
+    has_openai_access: Boolean!
+    openai_key: String
 }
 
 #input Filter
@@ -171,10 +177,10 @@ type Mutation
 #    deleteModule(id: ID!, filter: Filter): ID @join__field(graph: MODULES)
     createClass(input: ClassInput!): Class @join__field(graph: CLASSES)
     updateClass(id: ID!, input: ClassInput!): Class @join__field(graph: CLASSES)
-    deleteClass(id: ID!, filter: ListClassFilter): ID @join__field(graph: CLASSES)
+    deleteClass(id: ID!): ID @join__field(graph: CLASSES)
     createSchool(input: SchoolInput!): School @join__field(graph: SCHOOLS)
     updateSchool(id: ID!, input: SchoolInput!): School @join__field(graph: SCHOOLS)
-    deleteSchool(id: ID!, filter: ListSchoolFilter): ID @join__field(graph: SCHOOLS)
+    deleteSchool(id: ID!): ID @join__field(graph: SCHOOLS)
 }
 
 # FILTERS
@@ -195,6 +201,7 @@ input ListSchoolFilter
     name: NameFilter
     location: LocationFilter
     made_by: ID
+    has_openai_access: Boolean
 }
 
 input NameFilter

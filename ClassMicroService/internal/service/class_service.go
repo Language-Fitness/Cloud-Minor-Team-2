@@ -8,7 +8,6 @@ import (
 	"example/internal/helper"
 	"example/internal/repository"
 	"example/internal/validation"
-	"fmt"
 	"github.com/google/uuid"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -16,12 +15,14 @@ import (
 	"time"
 )
 
+const ValidationPrefix = "Validation errors: "
+
 // IClassService GOLANG INTERFACE
 // Implements five CRUD methods for query's and mutations on Class.
 type IClassService interface {
 	CreateClass(token string, newClass model.ClassInput) (*model.Class, error)
 	UpdateClass(token string, id string, updatedData model.ClassInput) (*model.Class, error)
-	DeleteClass(token string, id string, filter *model.ListClassFilter) error
+	DeleteClass(token string, id string) error
 	GetClassById(token string, id string) (*model.Class, error)
 	ListClasses(token string, filter *model.ListClassFilter, paginate *model.Paginator) ([]*model.ClassInfo, error)
 }
@@ -52,14 +53,10 @@ func (c *ClassService) CreateClass(token string, newClass model.ClassInput) (*mo
 		return nil, err
 	}
 
-	c.Validator.Validate(newClass.ModuleID, []string{"IsUUID"}, "Module ID")
-	c.Validator.Validate(newClass.Name, []string{"IsString", "Length:<25"}, "Name")
-	c.Validator.Validate(newClass.Description, []string{"IsString", "Length:<50"}, "Description")
-
+	validateNewClass(c.Validator, newClass)
 	validationErrors := c.Validator.GetErrors()
-
 	if len(validationErrors) > 0 {
-		errorMessage := "Validation errors: " + strings.Join(validationErrors, ", ")
+		errorMessage := ValidationPrefix + strings.Join(validationErrors, ", ")
 		c.Validator.ClearErrors()
 		return nil, errors.New(errorMessage)
 	}
@@ -92,13 +89,10 @@ func (c *ClassService) UpdateClass(token string, id string, updatedData model.Cl
 		return nil, err
 	}
 
-	c.Validator.Validate(updatedData.ModuleID, []string{"IsUUID"}, "Module ID")
-	c.Validator.Validate(updatedData.Name, []string{"IsString", "Length:<25"}, "Name")
-	c.Validator.Validate(updatedData.Description, []string{"IsString", "Length:<50"}, "Description")
-
+	validateUpdatedClass(c.Validator, id, updatedData)
 	validationErrors := c.Validator.GetErrors()
 	if len(validationErrors) > 0 {
-		errorMessage := "Validation errors: " + strings.Join(validationErrors, ", ")
+		errorMessage := ValidationPrefix + strings.Join(validationErrors, ", ")
 		c.Validator.ClearErrors()
 		return nil, errors.New(errorMessage)
 	}
@@ -124,8 +118,8 @@ func (c *ClassService) UpdateClass(token string, id string, updatedData model.Cl
 	return result, nil
 }
 
-func (c *ClassService) DeleteClass(token string, id string, filter *model.ListClassFilter) error {
-	isAdmin, existingClass, err := c.Policy.DeleteClass(token, id)
+func (c *ClassService) DeleteClass(token string, id string) error {
+	existingClass, err := c.Policy.DeleteClass(token, id)
 	if err != nil {
 		return err
 	}
@@ -134,15 +128,7 @@ func (c *ClassService) DeleteClass(token string, id string, filter *model.ListCl
 		softDelete := true
 		existingClass.SoftDeleted = &softDelete
 
-		err := c.Repo.SoftDeleteClassByID(id, *existingClass)
-		if err != nil {
-			return err
-		}
-		return nil
-	}
-
-	if isAdmin && filter != nil && !*filter.SoftDelete {
-		err := c.Repo.HardDeleteClassByID(id)
+		err := c.Repo.DeleteClass(id, *existingClass)
 		if err != nil {
 			return err
 		}
@@ -167,53 +153,15 @@ func (c *ClassService) ListClasses(token string, filter *model.ListClassFilter, 
 		return nil, err
 	}
 
-	c.Validator.Validate(filter.SoftDelete, []string{"IsNull", "IsBoolean"}, "Filter softDelete")
-	if helper.IsNil(filter.Name) == false {
-		c.Validator.Validate(helper.DereferenceArrayIfNeeded(
-			filter.Name.Input),
-			[]string{"IsNull", "ArrayType:string"},
-			"Filter Name input")
-	}
-	c.Validator.Validate(filter.ModuleID, []string{"IsNull", "IsUUID"}, "Filter ModuleID")
-	c.Validator.Validate(filter.MadeBy, []string{"IsNull", "IsUUID"}, "Filter Made_By")
-	c.Validator.Validate(paginate.Amount, []string{"IsInt", "Size:>0", "Size:<101"}, "Paginate Amount")
-	c.Validator.Validate(paginate.Step, []string{"IsInt", "Size:>=0"}, "Paginate Step")
-
+	validateListClassFilter(c.Validator, filter, paginate)
 	validationErrors := c.Validator.GetErrors()
 	if len(validationErrors) > 0 {
-		errorMessage := "Validation errors: " + strings.Join(validationErrors, ", ")
+		errorMessage := ValidationPrefix + strings.Join(validationErrors, ", ")
 		c.Validator.ClearErrors()
 		return nil, errors.New(errorMessage)
 	}
 
-	bsonFilter := bson.D{}
-
-	if c.Policy.HasPermissions(token, "filter_class_softDelete") == true && !helper.IsNil(filter.SoftDelete) {
-		bsonFilter = append(bsonFilter, bson.E{Key: "softdeleted", Value: helper.DereferenceIfNeeded(filter.SoftDelete)})
-	} else {
-		bsonFilter = append(bsonFilter, bson.E{Key: "softdeleted", Value: false})
-	}
-
-	if c.Policy.HasPermissions(token, "filter_class_module_id") == true && !helper.IsNil(filter.ModuleID) {
-		bsonFilter = append(bsonFilter, bson.E{Key: "moduleid", Value: helper.DereferenceIfNeeded(filter.ModuleID)})
-	}
-
-	if c.Policy.HasPermissions(token, "filter_class_name") == true && helper.IsNil(filter.Name) == false {
-		bsonFilter = helper.AddFilter(
-			bsonFilter, "name",
-			string(filter.Name.Type),
-			helper.DereferenceArrayIfNeeded(filter.Name.Input))
-	}
-
-	if c.Policy.HasPermissions(token, "filter_class_difficulty") == true && !helper.IsNil(filter.Difficulty) {
-		bsonFilter = append(bsonFilter, bson.E{Key: "difficulty", Value: helper.DereferenceIfNeeded(filter.Difficulty)})
-	}
-
-	if c.Policy.HasPermissions(token, "filter_class_made_by") == true && !helper.IsNil(filter.MadeBy) {
-		bsonFilter = append(bsonFilter, bson.E{Key: "madeby", Value: helper.DereferenceIfNeeded(filter.MadeBy)})
-	}
-
-	fmt.Println(bsonFilter)
+	bsonFilter := buildBsonFilter(c.Policy, token, filter)
 
 	paginateOptions := options.Find().
 		SetSkip(int64(paginate.Step)).
@@ -225,4 +173,62 @@ func (c *ClassService) ListClasses(token string, filter *model.ListClassFilter, 
 	}
 
 	return classes, nil
+}
+
+func validateListClassFilter(validator validation.IValidator, filter *model.ListClassFilter, paginate *model.Paginator) {
+	validator.Validate(filter.SoftDelete, []string{"IsNull", "IsBoolean"}, "Filter softDelete")
+	if helper.IsNil(filter.Name) == false {
+		validator.Validate(helper.DereferenceArrayIfNeeded(
+			filter.Name.Input),
+			[]string{"IsNull", "ArrayType:string"},
+			"Filter Name input")
+	}
+	validator.Validate(filter.ModuleID, []string{"IsNull", "IsUUID"}, "Filter ModuleID")
+	validator.Validate(filter.MadeBy, []string{"IsNull", "IsUUID"}, "Filter Made_By")
+	validator.Validate(paginate.Amount, []string{"IsInt", "Size:>0", "Size:<101"}, "Paginate Amount")
+	validator.Validate(paginate.Step, []string{"IsInt", "Size:>=0"}, "Paginate Step")
+}
+
+func validateUpdatedClass(validator validation.IValidator, id string, updatedData model.ClassInput) {
+	validator.Validate(id, []string{"IsUUID"}, "ID")
+	validator.Validate(updatedData.ModuleID, []string{"IsUUID"}, "Module ID")
+	validator.Validate(updatedData.Name, []string{"IsString", "Length:<25"}, "Name")
+	validator.Validate(updatedData.Description, []string{"IsString", "Length:<50"}, "Description")
+}
+
+func validateNewClass(validator validation.IValidator, newClass model.ClassInput) {
+	validator.Validate(newClass.ModuleID, []string{"IsUUID"}, "Module ID")
+	validator.Validate(newClass.Name, []string{"IsString", "Length:<25"}, "Name")
+	validator.Validate(newClass.Description, []string{"IsString", "Length:<50"}, "Description")
+}
+
+func buildBsonFilter(policy auth.IPolicy, token string, filter *model.ListClassFilter) bson.D {
+	bsonFilter := bson.D{}
+
+	if policy.HasPermissions(token, "filter_class_softDelete") == true && !helper.IsNil(filter.SoftDelete) {
+		bsonFilter = append(bsonFilter, bson.E{Key: "softdeleted", Value: helper.DereferenceIfNeeded(filter.SoftDelete)})
+	} else {
+		bsonFilter = append(bsonFilter, bson.E{Key: "softdeleted", Value: false})
+	}
+
+	if policy.HasPermissions(token, "filter_class_module_id") == true && !helper.IsNil(filter.ModuleID) {
+		bsonFilter = append(bsonFilter, bson.E{Key: "moduleid", Value: helper.DereferenceIfNeeded(filter.ModuleID)})
+	}
+
+	if policy.HasPermissions(token, "filter_class_name") == true && helper.IsNil(filter.Name) == false {
+		bsonFilter = helper.AddFilter(
+			bsonFilter, "name",
+			string(filter.Name.Type),
+			helper.DereferenceArrayIfNeeded(filter.Name.Input))
+	}
+
+	if policy.HasPermissions(token, "filter_class_difficulty") == true && !helper.IsNil(filter.Difficulty) {
+		bsonFilter = append(bsonFilter, bson.E{Key: "difficulty", Value: helper.DereferenceIfNeeded(filter.Difficulty)})
+	}
+
+	if policy.HasPermissions(token, "filter_class_made_by") == true && !helper.IsNil(filter.MadeBy) {
+		bsonFilter = append(bsonFilter, bson.E{Key: "madeby", Value: helper.DereferenceIfNeeded(filter.MadeBy)})
+	}
+
+	return bsonFilter
 }

@@ -173,7 +173,7 @@ func TestSoftDeleteClass(t *testing.T) {
 	}
 
 	// Call the method you want to test.
-	updatedClass, err := repo.UpdateClass("123", updatedClassInput)
+	_ = repo.DeleteClass("123", updatedClassInput)
 
 	// Assert the result and error as needed.
 	if err != nil {
@@ -193,57 +193,8 @@ func TestSoftDeleteClass(t *testing.T) {
 	}
 
 	// Assert that the updated class fields match the expected updates.
-	if *updatedClass.SoftDeleted != *updatedClassInput.SoftDeleted {
+	if *databaseClass.SoftDeleted != *updatedClassInput.SoftDeleted {
 		t.Errorf("Updated class name does not match the expected value")
-	}
-}
-
-func TestHardDeleteClassByID(t *testing.T) {
-	collection, err := database.GetTestCollection()
-	if err != nil {
-		t.Fatalf("Failed to get the test collection: %v", err)
-	}
-
-	err = clearCollection(collection)
-	if err != nil {
-		log.Fatalf("Failed to clear the test collection: %v", err)
-	}
-
-	// Create a new ClassRepository using the test collection.
-	repo := repository.NewClassRepository(collection)
-
-	// Define your test data for an existing class.
-	existingClass := &model.Class{
-		ID:   "123",
-		Name: "Test Class",
-		// Initialize other fields as needed for the existing class.
-	}
-
-	// Insert the existing class into MongoDB.
-	_, err = repo.CreateClass(existingClass)
-	if err != nil {
-		t.Errorf("Error creating the existing class: %v", err)
-	}
-
-	// Call the method you want to test.
-	err = repo.HardDeleteClassByID("123")
-
-	// Assert the error as needed.
-	if err != nil {
-		t.Errorf("Error deleting class: %v", err)
-	}
-
-	ctx, cancel := context.WithTimeout(context.TODO(), time.Second*10) // 10-second timeout
-	defer cancel()
-	// Attempt to fetch the deleted class from MongoDB.
-	filter := bson.M{"id": "123"}
-	var databaseClass model.Class
-
-	err = collection.FindOne(ctx, filter).Decode(&databaseClass)
-
-	// Assert that the error is not nil, indicating the class was deleted.
-	if err == nil {
-		t.Errorf("Class was not deleted as expected")
 	}
 }
 

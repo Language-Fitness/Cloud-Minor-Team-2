@@ -14,8 +14,7 @@ import (
 type ISchoolRepository interface {
 	CreateSchool(newSchool *model.School) (*model.School, error)
 	UpdateSchool(id string, updatedSchool model.School) (*model.School, error)
-	SoftDeleteSchoolByID(id string, existingSchool model.School) error
-	HardDeleteSchoolByID(id string) error
+	DeleteSchool(id string, existingSchool model.School) error
 	GetSchoolByID(id string) (*model.School, error)
 	ListSchools(bsonFilter bson.D, paginateOptions *options.FindOptions) ([]*model.SchoolInfo, error)
 }
@@ -76,7 +75,7 @@ func (r *SchoolRepository) UpdateSchool(id string, updatedSchool model.School) (
 	return &result, nil
 }
 
-func (r *SchoolRepository) SoftDeleteSchoolByID(id string, existingSchool model.School) error {
+func (r *SchoolRepository) DeleteSchool(id string, existingSchool model.School) error {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10) // 10-second timeout
 	defer cancel()
 
@@ -91,20 +90,6 @@ func (r *SchoolRepository) SoftDeleteSchoolByID(id string, existingSchool model.
 		options.FindOneAndUpdate().SetReturnDocument(options.After)).Decode(&result)
 	if err != nil {
 		return err
-	}
-
-	return nil
-}
-
-func (r *SchoolRepository) HardDeleteSchoolByID(id string) error {
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10) // 10-second timeout
-	defer cancel()
-
-	filter := bson.M{"id": id}
-
-	_, err := r.collection.DeleteOne(ctx, filter)
-	if err != nil {
-		return err // Return any MongoDB-related errors.
 	}
 
 	return nil
@@ -138,6 +123,7 @@ func (r *SchoolRepository) ListSchools(bsonFilter bson.D, paginateOptions *optio
 	defer func(cursor *mongo.Cursor, ctx context.Context) {
 		err := cursor.Close(ctx)
 		if err != nil {
+			return
 		}
 	}(cursor, ctx)
 

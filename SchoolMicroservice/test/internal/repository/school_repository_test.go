@@ -5,6 +5,7 @@ import (
 	"example/graph/model"
 	"example/internal/repository"
 	database "example/test/internal/helpers"
+	"github.com/google/uuid"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -32,13 +33,17 @@ func TestCreateSchool(t *testing.T) {
 	location := "This is a sample location."
 	timestamp := time.Now().String()
 	softDeleted := false
+	uuid := uuid.New().String()
 
 	newSchool := &model.School{
-		ID:          "123",
-		Name:        "Test School",
-		Location:    location,
-		CreatedAt:   &timestamp,
-		SoftDeleted: &softDeleted,
+		ID:              "123",
+		Name:            "Test School",
+		Location:        location,
+		CreatedAt:       &timestamp,
+		SoftDeleted:     &softDeleted,
+		MadeBy:          uuid,
+		HasOpenaiAccess: false,
+		JoinCode:        uuid,
 	}
 
 	// Call the method you want to test.
@@ -165,7 +170,7 @@ func TestSoftDeleteSchool(t *testing.T) {
 	}
 
 	// Call the method you want to test.
-	updatedSchool, err := repo.UpdateSchool("123", updatedSchoolInput)
+	err = repo.DeleteSchool("123", updatedSchoolInput)
 
 	// Assert the result and error as needed.
 	if err != nil {
@@ -185,59 +190,10 @@ func TestSoftDeleteSchool(t *testing.T) {
 	}
 
 	// Assert that the updated school fields match the expected updates.
-	if *updatedSchool.SoftDeleted != *updatedSchoolInput.SoftDeleted {
+	if *databaseSchool.SoftDeleted != *updatedSchoolInput.SoftDeleted {
 		t.Errorf("Updated school name does not match the expected value")
 	}
 	// Add similar assertions for other fields you updated.
-}
-
-func TestDeleteSchoolByID(t *testing.T) {
-	collection, err := database.GetTestCollection()
-	if err != nil {
-		t.Fatalf("Failed to get the test collection: %v", err)
-	}
-
-	err = clearCollection(collection)
-	if err != nil {
-		log.Fatalf("Failed to clear the test collection: %v", err)
-	}
-
-	// Create a new SchoolRepository using the test collection.
-	repo := repository.NewSchoolRepository(collection)
-
-	// Define your test data for an existing school.
-	existingSchool := &model.School{
-		ID:   "123",
-		Name: "Test School",
-		// Initialize other fields as needed for the existing school.
-	}
-
-	// Insert the existing school into MongoDB.
-	_, err = repo.CreateSchool(existingSchool)
-	if err != nil {
-		t.Errorf("Error creating the existing school: %v", err)
-	}
-
-	// Call the method you want to test.
-	err = repo.HardDeleteSchoolByID("123")
-
-	// Assert the error as needed.
-	if err != nil {
-		t.Errorf("Error deleting school: %v", err)
-	}
-
-	ctx, cancel := context.WithTimeout(context.TODO(), time.Second*10) // 10-second timeout
-	defer cancel()
-	// Attempt to fetch the deleted school from MongoDB.
-	filter := bson.M{"id": "123"}
-	var databaseSchool model.School
-
-	err = collection.FindOne(ctx, filter).Decode(&databaseSchool)
-
-	// Assert that the error is not nil, indicating the school was deleted.
-	if err == nil {
-		t.Errorf("school was not deleted as expected")
-	}
 }
 
 func TestGetSchoolByID(t *testing.T) {

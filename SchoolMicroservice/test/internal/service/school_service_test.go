@@ -158,7 +158,7 @@ func TestService_UpdateSchool_CatchUpdateError(t *testing.T) {
 	mockValidator.AssertExpectations(t)
 }
 
-func TestService_SoftDeleteSchoolWithoutAdminToken(t *testing.T) {
+func TestService_DeleteSchoolWithoutAdminToken(t *testing.T) {
 	mockRepo := new(mocks.MockRepository)
 	mockValidator := new(mocks.MockValidator)
 	mockPolicy := new(mocks.MockPolicy)
@@ -169,11 +169,11 @@ func TestService_SoftDeleteSchoolWithoutAdminToken(t *testing.T) {
 
 	mockRepo.
 		On(
-			"SoftDeleteSchoolByID",
+			"DeleteSchool",
 			"3a3bd756-6353-4e29-8aba-5b3531bdb9ed", mock.AnythingOfType("model.School")).
 		Return(nil)
 
-	err := service.DeleteSchool(adminToken, "3a3bd756-6353-4e29-8aba-5b3531bdb9ed", nil)
+	err := service.DeleteSchool(adminToken, "3a3bd756-6353-4e29-8aba-5b3531bdb9ed")
 
 	assert.Nil(t, err)
 
@@ -181,7 +181,7 @@ func TestService_SoftDeleteSchoolWithoutAdminToken(t *testing.T) {
 	mockRepo.AssertExpectations(t)
 }
 
-func TestService_SoftDeleteSchool_CatchDeleteError_WithoutAdminToken_AlreadySoftDeleted(t *testing.T) {
+func TestService_DeleteSchool_CatchDeleteError_WithoutAdminToken_AlreadySoftDeleted(t *testing.T) {
 	mockRepo := new(mocks.MockRepository)
 	mockValidator := new(mocks.MockValidator)
 	mockPolicy := new(mocks.MockPolicy)
@@ -190,7 +190,7 @@ func TestService_SoftDeleteSchool_CatchDeleteError_WithoutAdminToken_AlreadySoft
 	mockPolicy.On("DeleteSchool", mock.AnythingOfType("string"), mock.AnythingOfType("string")).
 		Return(&mocks.SoftDeletedMockSchool, nil)
 
-	err := service.DeleteSchool(adminToken, "3a3bd756-6353-4e29-8aba-5b3531bdb9ed", nil)
+	err := service.DeleteSchool(adminToken, "3a3bd756-6353-4e29-8aba-5b3531bdb9ed")
 
 	assert.NotNil(t, err)
 	assert.Equal(t, "school could not be deleted", err.Error())
@@ -199,7 +199,7 @@ func TestService_SoftDeleteSchool_CatchDeleteError_WithoutAdminToken_AlreadySoft
 	mockRepo.AssertExpectations(t)
 }
 
-func TestService_SoftDeleteSchool_CatchDeleteError_WithAdminToken_AlreadySoftDeleted_NoFilter(t *testing.T) {
+func TestService_DeleteSchool_CatchDeleteError_WithAdminToken_AlreadySoftDeleted_NoFilter(t *testing.T) {
 	mockRepo := new(mocks.MockRepository)
 	mockValidator := new(mocks.MockValidator)
 	mockPolicy := new(mocks.MockPolicy)
@@ -208,37 +208,10 @@ func TestService_SoftDeleteSchool_CatchDeleteError_WithAdminToken_AlreadySoftDel
 	mockPolicy.On("DeleteSchool", mock.AnythingOfType("string"), mock.AnythingOfType("string")).
 		Return(&mocks.SoftDeletedMockSchool, nil)
 
-	isSoftDeleted := true
-	filter := model.Filter{SoftDelete: &isSoftDeleted}
-	err := service.DeleteSchool(adminToken, "3a3bd756-6353-4e29-8aba-5b3531bdb9ed", &filter)
+	err := service.DeleteSchool(adminToken, "3a3bd756-6353-4e29-8aba-5b3531bdb9ed")
 
 	assert.NotNil(t, err)
 	assert.Equal(t, "school could not be deleted", err.Error())
-
-	mockPolicy.AssertExpectations(t)
-	mockRepo.AssertExpectations(t)
-}
-
-func TestService_HardDeleteSchool_WithAdminToken_AlreadySoftDeleted_WithFilter(t *testing.T) {
-	mockRepo := new(mocks.MockRepository)
-	mockValidator := new(mocks.MockValidator)
-	mockPolicy := new(mocks.MockPolicy)
-	service := &service2.SchoolService{Validator: mockValidator, Repo: mockRepo, Policy: mockPolicy}
-
-	mockPolicy.On("DeleteSchool", mock.AnythingOfType("string"), mock.AnythingOfType("string")).
-		Return(&mocks.SoftDeletedMockSchool, nil)
-
-	mockRepo.
-		On(
-			"HardDeleteSchoolByID",
-			"3a3bd756-6353-4e29-8aba-5b3531bdb9ed").
-		Return(nil)
-
-	isSoftDeleted := false
-	filter := model.Filter{SoftDelete: &isSoftDeleted}
-	err := service.DeleteSchool(adminToken, "3a3bd756-6353-4e29-8aba-5b3531bdb9ed", &filter)
-
-	assert.Nil(t, err)
 
 	mockPolicy.AssertExpectations(t)
 	mockRepo.AssertExpectations(t)
@@ -274,7 +247,7 @@ func TestService_ListSchools(t *testing.T) {
 
 	mockValidator.On("GetErrors").Return([]string{})
 
-	filter := model.Filter{}
+	filter := model.ListSchoolFilter{}
 	paginate := model.Paginator{}
 	result, err := service.ListSchools(adminToken, &filter, &paginate)
 
@@ -304,7 +277,7 @@ func TestService_ListSchools_CatchRetrieveError(t *testing.T) {
 
 	mockValidator.On("GetErrors").Return([]string{})
 
-	filter := model.Filter{}
+	filter := model.ListSchoolFilter{}
 	paginate := model.Paginator{}
 	result, err := service.ListSchools(adminToken, &filter, &paginate)
 
