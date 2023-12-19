@@ -52,8 +52,6 @@ func (m *ModuleService) CreateModule(token string, newModule model.ModuleInputCr
 	m.Validator.Validate(newModule.SchoolID, []string{"IsUUID"}, "Filter School")
 	m.Validator.Validate(newModule.Name, []string{"IsString", "Length:<25"}, "Name")
 	m.Validator.Validate(newModule.Description, []string{"IsString", "Length:<50"}, "Description")
-	m.Validator.Validate(newModule.Difficulty, []string{"IsInt"}, "Difficulty")
-	m.Validator.Validate(newModule.Category, []string{"IsString"}, "Category")
 	m.Validator.Validate(newModule.Private, []string{"IsBoolean"}, "Private")
 	if newModule.Private {
 		m.Validator.Validate(*newModule.Key, []string{"IsString", "Length:<30"}, "Key")
@@ -105,9 +103,7 @@ func (m *ModuleService) UpdateModule(token string, id string, updateData model.M
 	}
 
 	m.Validator.Validate(updateData.Name, []string{"IsString", "Length:<25"}, "Name")
-	m.Validator.Validate(updateData.Description, []string{"IsString", "Length:<50"}, "Description")
 	m.Validator.Validate(updateData.Difficulty, []string{"IsInt"}, "Difficulty")
-	m.Validator.Validate(updateData.Category, []string{"IsString"}, "Category")
 	m.Validator.Validate(updateData.Private, []string{"IsBoolean"}, "Private")
 	if updateData.Private {
 		m.Validator.Validate(*updateData.Key, []string{"IsString", "Length:<30"}, "Key")
