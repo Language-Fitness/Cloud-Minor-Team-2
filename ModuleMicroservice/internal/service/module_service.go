@@ -200,6 +200,8 @@ func (m *ModuleService) ListModules(token string, filter *model.ModuleFilter, pa
 	bsonFilter := bson.D{}
 	if m.Policy.HasPermissions(token, "filter_module_softDelete") == true && helper.IsNil(filter.SoftDelete) == false {
 		bsonFilter = append(bsonFilter, bson.E{Key: "softdeleted", Value: helper.DereferenceIfNeeded(filter.SoftDelete)})
+	} else {
+		bsonFilter = append(bsonFilter, bson.E{Key: "softdeleted", Value: false})
 	}
 
 	if m.Policy.HasPermissions(token, "filter_module_school_id") == true && helper.IsNil(filter.SchoolID) == false {
@@ -220,8 +222,6 @@ func (m *ModuleService) ListModules(token string, filter *model.ModuleFilter, pa
 
 	if m.Policy.HasPermissions(token, "filter_module_private") == true && helper.IsNil(filter.Private) == false {
 		bsonFilter = append(bsonFilter, bson.E{Key: "private", Value: helper.DereferenceIfNeeded(filter.Private)})
-	} else {
-		bsonFilter = append(bsonFilter, bson.E{Key: "private", Value: false})
 	}
 
 	if m.Policy.HasPermissions(token, "filter_module_category") == true && helper.IsNil(filter.Category) == false {
