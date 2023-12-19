@@ -167,7 +167,7 @@ func TestService_SoftDeleteClassWithoutAdminToken(t *testing.T) {
 
 	mockRepo.
 		On(
-			"SoftDeleteModuleByID",
+			"DeleteModuleByID",
 			"3a3bd756-6353-4e29-8aba-5b3531bdb9ed", mock.AnythingOfType("model.Module")).
 		Return(nil)
 

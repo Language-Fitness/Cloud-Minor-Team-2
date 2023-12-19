@@ -15,8 +15,7 @@ import (
 type IModuleRepository interface {
 	CreateModule(newModule *model.Module) (*model.Module, error)
 	UpdateModule(id string, updatedModule model.Module) (*model.Module, error)
-	SoftDeleteModuleByID(id string, existingModule model.Module) error
-	HardDeleteModuleByID(id string) error
+	DeleteModuleByID(id string, existingModule model.Module) error
 	GetModuleByID(id string) (*model.Module, error)
 	ListModules(bsonFilter bson.D, paginateOptions *options.FindOptions) ([]*model.ModuleInfo, error)
 }
@@ -77,7 +76,7 @@ func (r *ModuleRepository) UpdateModule(id string, updatedModule model.Module) (
 	return &result, nil
 }
 
-func (r *ModuleRepository) SoftDeleteModuleByID(id string, existingModule model.Module) error {
+func (r *ModuleRepository) DeleteModuleByID(id string, existingModule model.Module) error {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
 	defer cancel()
 
@@ -92,20 +91,6 @@ func (r *ModuleRepository) SoftDeleteModuleByID(id string, existingModule model.
 		options.FindOneAndUpdate().SetReturnDocument(options.After)).Decode(&result)
 	if err != nil {
 		return err
-	}
-
-	return nil
-}
-
-func (r *ModuleRepository) HardDeleteModuleByID(id string) error {
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10) // 10-second timeout
-	defer cancel()
-
-	filter := bson.M{"id": id}
-
-	_, err := r.collection.DeleteOne(ctx, filter)
-	if err != nil {
-		return err // Return any MongoDB-related errors.
 	}
 
 	return nil

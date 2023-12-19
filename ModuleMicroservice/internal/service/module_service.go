@@ -153,21 +153,13 @@ func (m *ModuleService) DeleteModule(token string, id string, filter *model.Modu
 		softDelete := true
 		existingModule.SoftDeleted = &softDelete
 
-		err := m.Repo.SoftDeleteModuleByID(id, *existingModule)
+		err := m.Repo.DeleteModuleByID(id, *existingModule)
 		if err != nil {
 			return err
 		}
 		return nil
 	}
-
-	if m.Policy.HasPermissions(token, "delete_module_all") && filter != nil && !*filter.SoftDelete {
-		err := m.Repo.HardDeleteModuleByID(id)
-		if err != nil {
-			return err
-		}
-		return nil
-	}
-
+	
 	return errors.New("module could not be deleted")
 }
 
