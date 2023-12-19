@@ -4,13 +4,15 @@
 mutation CreateModule {
     createModule(input: {
         name: "Sample Module 2",
+        school_id: "9154f86e-9eb5-11ee-8c90-0242ac120002"
         description: "This is a sample module.",
-        difficulty: 1,
-        category: "Sample Category",
+        difficulty: B2,
+        category: Woordenschat,
         private: true,
         key: "sample-key"
     }) {
         id
+        school_id
         name
         description
         difficulty
@@ -30,6 +32,7 @@ mutation CreateModule {
 query GetModule {
     getModule(id: "your-module-id") {
         id
+        school_id
         name
         description
         difficulty
@@ -47,8 +50,26 @@ query GetModule {
 ### Get all Module
 ```graphql
 query ListModules {
-    listModules {
+    listModules(
+        filter: {
+            school_id: "<school-id>"
+            made_by: "<user-id>"
+            softDelete: false
+            name: {
+                input: "input"
+                type: eq
+            }
+            difficulty: B2
+            category: Woordenschat
+            private: false
+        },
+        paginate: {
+            amount: 10,
+            Step: 0
+        }
+    ) {
         id
+        school_id
         name
         description
         difficulty
@@ -67,13 +88,14 @@ mutation UpdateModule {
         input: {
             name: "Updated Module Name",
             description: "Updated description",
-            difficulty: 2,
-            category: "Updated Category",
+            difficulty: C1,
+            category: Werkwoordvervoegingen,
             private: true,
             key: "updated-key"
         }
     ) {
         id
+        school_id
         name
         description
         difficulty
