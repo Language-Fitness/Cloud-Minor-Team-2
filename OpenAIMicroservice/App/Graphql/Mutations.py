@@ -6,21 +6,6 @@ from App.Utils.Exceptions import ValidationException, AssistantAPIException
 from .Validators import validate_minimum_int, validate_string, validate_answer_options, validate_file
 
 
-# class GenerateOpenAnswerQuestions(graphene.Mutation):
-#     class Arguments:
-#         subject = SubjectEnum(required=True)
-#         level = LevelEnum(required=True)
-#         amount_questions = graphene.Int(required=True)
-#
-#     token = graphene.String()
-#
-#     def mutate(self, info, subject, level, amount_questions):
-#         adapter = AssistantAPIAdapter()
-#         token = adapter.generate_open_answer_questions(subject, level, amount_questions)
-#
-#         return GenerateOpenAnswerQuestions(token=token)
-
-
 class GenerateMultipleChoiceQuestions(graphene.Mutation):
     class Arguments:
         question_subject = SubjectEnum(required=True)
@@ -135,6 +120,21 @@ class GenerateMultipleChoiceAnswer(graphene.Mutation):
         except Exception:
             # Generic error for unexpected exceptions
             raise GraphQLError("An unexpected error occurred. Please try again later.")
+
+
+# class GenerateOpenAnswerQuestions(graphene.Mutation):
+#     class Arguments:
+#         subject = SubjectEnum(required=True)
+#         level = LevelEnum(required=True)
+#         amount_questions = graphene.Int(required=True)
+#
+#     token = graphene.String()
+#
+#     def mutate(self, info, subject, level, amount_questions):
+#         adapter = AssistantAPIAdapter()
+#         token = adapter.generate_open_answer_questions(subject, level, amount_questions)
+#
+#         return GenerateOpenAnswerQuestions(token=token)
 
 
 class Mutation(graphene.ObjectType):
