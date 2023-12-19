@@ -186,10 +186,10 @@ func (m *ModuleService) GetModuleById(token string, id string) (*model.Module, e
 }
 
 func (m *ModuleService) ListModules(token string, filter *model.ModuleFilter, paginate *model.Paginator) ([]*model.ModuleInfo, error) {
-	//err := m.Policy.ListModules(token)
-	//if err != nil {
-	//	return nil, err
-	//}
+	err := m.Policy.ListModules(token)
+	if err != nil {
+		return nil, err
+	}
 
 	m.Validator.Validate(filter.SoftDelete, []string{"IsNull", "IsBoolean"}, "Filter softDelete")
 	if helper.IsNil(filter.Name) == false {
@@ -211,15 +211,15 @@ func (m *ModuleService) ListModules(token string, filter *model.ModuleFilter, pa
 	fmt.Println(helper.DereferenceIfNeeded(filter.SoftDelete))
 
 	bsonFilter := bson.D{}
-	if m.Policy.HasPermissions(token, "filter_module_softDelete") == true {
+	if m.Policy.HasPermissions(token, "filter_module_softDelete") == true && helper.IsNil(filter.SoftDelete) == false {
 		bsonFilter = append(bsonFilter, bson.E{Key: "softdeleted", Value: helper.DereferenceIfNeeded(filter.SoftDelete)})
 	}
 
-	if m.Policy.HasPermissions(token, "filter_module_school_id") == true {
+	if m.Policy.HasPermissions(token, "filter_module_school_id") == true && helper.IsNil(filter.SchoolID) == false {
 		bsonFilter = append(bsonFilter, bson.E{Key: "schoolid", Value: helper.DereferenceIfNeeded(filter.SchoolID)})
 	}
 
-	if m.Policy.HasPermissions(token, "filter_module_made_by") == true {
+	if m.Policy.HasPermissions(token, "filter_module_made_by") == true && helper.IsNil(filter.MadeBy) == false {
 		bsonFilter = append(bsonFilter, bson.E{Key: "madeby", Value: helper.DereferenceIfNeeded(filter.MadeBy)})
 	}
 
@@ -227,15 +227,15 @@ func (m *ModuleService) ListModules(token string, filter *model.ModuleFilter, pa
 		bsonFilter = helper.AddFilter(bsonFilter, "name", string(filter.Name.Type), helper.DereferenceArrayIfNeeded(filter.Name.Input))
 	}
 
-	if m.Policy.HasPermissions(token, "filter_module_difficulty") == true {
+	if m.Policy.HasPermissions(token, "filter_module_difficulty") == true && helper.IsNil(filter.Difficulty) == false {
 		bsonFilter = append(bsonFilter, bson.E{Key: "difficulty", Value: helper.DereferenceIfNeeded(filter.Difficulty)})
 	}
 
-	if m.Policy.HasPermissions(token, "filter_module_private") == true {
+	if m.Policy.HasPermissions(token, "filter_module_private") == true && helper.IsNil(filter.Private) == false {
 		bsonFilter = append(bsonFilter, bson.E{Key: "private", Value: helper.DereferenceIfNeeded(filter.Private)})
 	}
 
-	if m.Policy.HasPermissions(token, "filter_module_category") == true {
+	if m.Policy.HasPermissions(token, "filter_module_category") == true && helper.IsNil(filter.Category) == false {
 		bsonFilter = append(bsonFilter, bson.E{Key: "category", Value: helper.DereferenceIfNeeded(filter.Category)})
 	}
 
