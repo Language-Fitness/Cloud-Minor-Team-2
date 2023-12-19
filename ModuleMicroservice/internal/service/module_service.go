@@ -103,7 +103,6 @@ func (m *ModuleService) UpdateModule(token string, id string, updateData model.M
 	}
 
 	m.Validator.Validate(updateData.Name, []string{"IsString", "Length:<25"}, "Name")
-	m.Validator.Validate(updateData.Difficulty, []string{"IsInt"}, "Difficulty")
 	m.Validator.Validate(updateData.Private, []string{"IsBoolean"}, "Private")
 	if updateData.Private {
 		m.Validator.Validate(*updateData.Key, []string{"IsString", "Length:<30"}, "Key")
