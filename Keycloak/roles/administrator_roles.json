@@ -60,6 +60,9 @@
     "name": "filter_module_category"
   },
   {
+    "name": "filter_module_made_by"
+  },
+  {
     "name": "filter_class_softDelete"
   },
   {
