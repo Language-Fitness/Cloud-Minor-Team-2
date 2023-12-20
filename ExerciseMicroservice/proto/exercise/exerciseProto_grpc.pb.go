@@ -18,194 +18,266 @@ import (
 // Requires gRPC-Go v1.32.0 or later.
 const _ = grpc.SupportPackageIsVersion7
 
-// ExerciseServiceClient is the client API for ExerciseService service.
+// GrpcResultClient is the client API for GrpcResult service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
-type ExerciseServiceClient interface {
-	Delete(ctx context.Context, in *ExerciseRequest, opts ...grpc.CallOption) (*Exercise, error)
-	SoftDelete(ctx context.Context, in *ExerciseRequest, opts ...grpc.CallOption) (*Exercise, error)
-	DeleteOne(ctx context.Context, in *ExerciseOneRequest, opts ...grpc.CallOption) (*Exercise, error)
-	SoftDeleteOne(ctx context.Context, in *ExerciseOneRequest, opts ...grpc.CallOption) (*Exercise, error)
+type GrpcResultClient interface {
+	DeleteByModule(ctx context.Context, in *DeleteByModuleRequest, opts ...grpc.CallOption) (*Response, error)
+	SoftDeleteByModule(ctx context.Context, in *DeleteByModuleRequest, opts ...grpc.CallOption) (*Response, error)
+	DeleteByClass(ctx context.Context, in *DeleteByClassRequest, opts ...grpc.CallOption) (*Response, error)
+	SoftDeleteByClass(ctx context.Context, in *DeleteByClassRequest, opts ...grpc.CallOption) (*Response, error)
+	DeleteByUser(ctx context.Context, in *DeleteByUserRequest, opts ...grpc.CallOption) (*Response, error)
+	SoftDeleteByUser(ctx context.Context, in *DeleteByUserRequest, opts ...grpc.CallOption) (*Response, error)
 }
 
-type exerciseServiceClient struct {
+type grpcResultClient struct {
 	cc grpc.ClientConnInterface
 }
 
-func NewExerciseServiceClient(cc grpc.ClientConnInterface) ExerciseServiceClient {
-	return &exerciseServiceClient{cc}
+func NewGrpcResultClient(cc grpc.ClientConnInterface) GrpcResultClient {
+	return &grpcResultClient{cc}
 }
 
-func (c *exerciseServiceClient) Delete(ctx context.Context, in *ExerciseRequest, opts ...grpc.CallOption) (*Exercise, error) {
-	out := new(Exercise)
-	err := c.cc.Invoke(ctx, "/ExerciseService/Delete", in, out, opts...)
+func (c *grpcResultClient) DeleteByModule(ctx context.Context, in *DeleteByModuleRequest, opts ...grpc.CallOption) (*Response, error) {
+	out := new(Response)
+	err := c.cc.Invoke(ctx, "/GrpcResult/DeleteByModule", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *exerciseServiceClient) SoftDelete(ctx context.Context, in *ExerciseRequest, opts ...grpc.CallOption) (*Exercise, error) {
-	out := new(Exercise)
-	err := c.cc.Invoke(ctx, "/ExerciseService/SoftDelete", in, out, opts...)
+func (c *grpcResultClient) SoftDeleteByModule(ctx context.Context, in *DeleteByModuleRequest, opts ...grpc.CallOption) (*Response, error) {
+	out := new(Response)
+	err := c.cc.Invoke(ctx, "/GrpcResult/SoftDeleteByModule", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *exerciseServiceClient) DeleteOne(ctx context.Context, in *ExerciseOneRequest, opts ...grpc.CallOption) (*Exercise, error) {
-	out := new(Exercise)
-	err := c.cc.Invoke(ctx, "/ExerciseService/DeleteOne", in, out, opts...)
+func (c *grpcResultClient) DeleteByClass(ctx context.Context, in *DeleteByClassRequest, opts ...grpc.CallOption) (*Response, error) {
+	out := new(Response)
+	err := c.cc.Invoke(ctx, "/GrpcResult/DeleteByClass", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *exerciseServiceClient) SoftDeleteOne(ctx context.Context, in *ExerciseOneRequest, opts ...grpc.CallOption) (*Exercise, error) {
-	out := new(Exercise)
-	err := c.cc.Invoke(ctx, "/ExerciseService/SoftDeleteOne", in, out, opts...)
+func (c *grpcResultClient) SoftDeleteByClass(ctx context.Context, in *DeleteByClassRequest, opts ...grpc.CallOption) (*Response, error) {
+	out := new(Response)
+	err := c.cc.Invoke(ctx, "/GrpcResult/SoftDeleteByClass", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-// ExerciseServiceServer is the server API for ExerciseService service.
-// All implementations must embed UnimplementedExerciseServiceServer
+func (c *grpcResultClient) DeleteByUser(ctx context.Context, in *DeleteByUserRequest, opts ...grpc.CallOption) (*Response, error) {
+	out := new(Response)
+	err := c.cc.Invoke(ctx, "/GrpcResult/DeleteByUser", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *grpcResultClient) SoftDeleteByUser(ctx context.Context, in *DeleteByUserRequest, opts ...grpc.CallOption) (*Response, error) {
+	out := new(Response)
+	err := c.cc.Invoke(ctx, "/GrpcResult/SoftDeleteByUser", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// GrpcResultServer is the server API for GrpcResult service.
+// All implementations must embed UnimplementedGrpcResultServer
 // for forward compatibility
-type ExerciseServiceServer interface {
-	Delete(context.Context, *ExerciseRequest) (*Exercise, error)
-	SoftDelete(context.Context, *ExerciseRequest) (*Exercise, error)
-	DeleteOne(context.Context, *ExerciseOneRequest) (*Exercise, error)
-	SoftDeleteOne(context.Context, *ExerciseOneRequest) (*Exercise, error)
-	mustEmbedUnimplementedExerciseServiceServer()
+type GrpcResultServer interface {
+	DeleteByModule(context.Context, *DeleteByModuleRequest) (*Response, error)
+	SoftDeleteByModule(context.Context, *DeleteByModuleRequest) (*Response, error)
+	DeleteByClass(context.Context, *DeleteByClassRequest) (*Response, error)
+	SoftDeleteByClass(context.Context, *DeleteByClassRequest) (*Response, error)
+	DeleteByUser(context.Context, *DeleteByUserRequest) (*Response, error)
+	SoftDeleteByUser(context.Context, *DeleteByUserRequest) (*Response, error)
+	mustEmbedUnimplementedGrpcResultServer()
 }
 
-// UnimplementedExerciseServiceServer must be embedded to have forward compatible implementations.
-type UnimplementedExerciseServiceServer struct {
+// UnimplementedGrpcResultServer must be embedded to have forward compatible implementations.
+type UnimplementedGrpcResultServer struct {
 }
 
-func (UnimplementedExerciseServiceServer) Delete(context.Context, *ExerciseRequest) (*Exercise, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method Delete not implemented")
+func (UnimplementedGrpcResultServer) DeleteByModule(context.Context, *DeleteByModuleRequest) (*Response, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteByModule not implemented")
 }
-func (UnimplementedExerciseServiceServer) SoftDelete(context.Context, *ExerciseRequest) (*Exercise, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method SoftDelete not implemented")
+func (UnimplementedGrpcResultServer) SoftDeleteByModule(context.Context, *DeleteByModuleRequest) (*Response, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SoftDeleteByModule not implemented")
 }
-func (UnimplementedExerciseServiceServer) DeleteOne(context.Context, *ExerciseOneRequest) (*Exercise, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method DeleteOne not implemented")
+func (UnimplementedGrpcResultServer) DeleteByClass(context.Context, *DeleteByClassRequest) (*Response, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteByClass not implemented")
 }
-func (UnimplementedExerciseServiceServer) SoftDeleteOne(context.Context, *ExerciseOneRequest) (*Exercise, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method SoftDeleteOne not implemented")
+func (UnimplementedGrpcResultServer) SoftDeleteByClass(context.Context, *DeleteByClassRequest) (*Response, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SoftDeleteByClass not implemented")
 }
-func (UnimplementedExerciseServiceServer) mustEmbedUnimplementedExerciseServiceServer() {}
+func (UnimplementedGrpcResultServer) DeleteByUser(context.Context, *DeleteByUserRequest) (*Response, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteByUser not implemented")
+}
+func (UnimplementedGrpcResultServer) SoftDeleteByUser(context.Context, *DeleteByUserRequest) (*Response, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SoftDeleteByUser not implemented")
+}
+func (UnimplementedGrpcResultServer) mustEmbedUnimplementedGrpcResultServer() {}
 
-// UnsafeExerciseServiceServer may be embedded to opt out of forward compatibility for this service.
-// Use of this interface is not recommended, as added methods to ExerciseServiceServer will
+// UnsafeGrpcResultServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to GrpcResultServer will
 // result in compilation errors.
-type UnsafeExerciseServiceServer interface {
-	mustEmbedUnimplementedExerciseServiceServer()
+type UnsafeGrpcResultServer interface {
+	mustEmbedUnimplementedGrpcResultServer()
 }
 
-func RegisterExerciseServiceServer(s grpc.ServiceRegistrar, srv ExerciseServiceServer) {
-	s.RegisterService(&ExerciseService_ServiceDesc, srv)
+func RegisterGrpcResultServer(s grpc.ServiceRegistrar, srv GrpcResultServer) {
+	s.RegisterService(&GrpcResult_ServiceDesc, srv)
 }
 
-func _ExerciseService_Delete_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(ExerciseRequest)
+func _GrpcResult_DeleteByModule_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteByModuleRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(ExerciseServiceServer).Delete(ctx, in)
+		return srv.(GrpcResultServer).DeleteByModule(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/ExerciseService/Delete",
+		FullMethod: "/GrpcResult/DeleteByModule",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ExerciseServiceServer).Delete(ctx, req.(*ExerciseRequest))
+		return srv.(GrpcResultServer).DeleteByModule(ctx, req.(*DeleteByModuleRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _ExerciseService_SoftDelete_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(ExerciseRequest)
+func _GrpcResult_SoftDeleteByModule_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteByModuleRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(ExerciseServiceServer).SoftDelete(ctx, in)
+		return srv.(GrpcResultServer).SoftDeleteByModule(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/ExerciseService/SoftDelete",
+		FullMethod: "/GrpcResult/SoftDeleteByModule",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ExerciseServiceServer).SoftDelete(ctx, req.(*ExerciseRequest))
+		return srv.(GrpcResultServer).SoftDeleteByModule(ctx, req.(*DeleteByModuleRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _ExerciseService_DeleteOne_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(ExerciseOneRequest)
+func _GrpcResult_DeleteByClass_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteByClassRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(ExerciseServiceServer).DeleteOne(ctx, in)
+		return srv.(GrpcResultServer).DeleteByClass(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/ExerciseService/DeleteOne",
+		FullMethod: "/GrpcResult/DeleteByClass",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ExerciseServiceServer).DeleteOne(ctx, req.(*ExerciseOneRequest))
+		return srv.(GrpcResultServer).DeleteByClass(ctx, req.(*DeleteByClassRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _ExerciseService_SoftDeleteOne_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(ExerciseOneRequest)
+func _GrpcResult_SoftDeleteByClass_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteByClassRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(ExerciseServiceServer).SoftDeleteOne(ctx, in)
+		return srv.(GrpcResultServer).SoftDeleteByClass(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/ExerciseService/SoftDeleteOne",
+		FullMethod: "/GrpcResult/SoftDeleteByClass",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ExerciseServiceServer).SoftDeleteOne(ctx, req.(*ExerciseOneRequest))
+		return srv.(GrpcResultServer).SoftDeleteByClass(ctx, req.(*DeleteByClassRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-// ExerciseService_ServiceDesc is the grpc.ServiceDesc for ExerciseService service.
+func _GrpcResult_DeleteByUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteByUserRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GrpcResultServer).DeleteByUser(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/GrpcResult/DeleteByUser",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GrpcResultServer).DeleteByUser(ctx, req.(*DeleteByUserRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _GrpcResult_SoftDeleteByUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteByUserRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GrpcResultServer).SoftDeleteByUser(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/GrpcResult/SoftDeleteByUser",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GrpcResultServer).SoftDeleteByUser(ctx, req.(*DeleteByUserRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+// GrpcResult_ServiceDesc is the grpc.ServiceDesc for GrpcResult service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
-var ExerciseService_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "ExerciseService",
-	HandlerType: (*ExerciseServiceServer)(nil),
+var GrpcResult_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "GrpcResult",
+	HandlerType: (*GrpcResultServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "Delete",
-			Handler:    _ExerciseService_Delete_Handler,
+			MethodName: "DeleteByModule",
+			Handler:    _GrpcResult_DeleteByModule_Handler,
 		},
 		{
-			MethodName: "SoftDelete",
-			Handler:    _ExerciseService_SoftDelete_Handler,
+			MethodName: "SoftDeleteByModule",
+			Handler:    _GrpcResult_SoftDeleteByModule_Handler,
 		},
 		{
-			MethodName: "DeleteOne",
-			Handler:    _ExerciseService_DeleteOne_Handler,
+			MethodName: "DeleteByClass",
+			Handler:    _GrpcResult_DeleteByClass_Handler,
 		},
 		{
-			MethodName: "SoftDeleteOne",
-			Handler:    _ExerciseService_SoftDeleteOne_Handler,
+			MethodName: "SoftDeleteByClass",
+			Handler:    _GrpcResult_SoftDeleteByClass_Handler,
+		},
+		{
+			MethodName: "DeleteByUser",
+			Handler:    _GrpcResult_DeleteByUser_Handler,
+		},
+		{
+			MethodName: "SoftDeleteByUser",
+			Handler:    _GrpcResult_SoftDeleteByUser_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
