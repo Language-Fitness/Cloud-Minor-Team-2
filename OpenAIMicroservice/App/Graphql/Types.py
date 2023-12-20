@@ -30,10 +30,6 @@ class ResponseExplanation(graphene.ObjectType):
     status = graphene.String(description="Status of the response")
     explanation = graphene.Field(Explanation, description="Explanation field")
 
-class ResponseAnswer(graphene.ObjectType):
-    status = graphene.String(description="Status of the response")
-    question = graphene.Field(MultipleChoiceQuestion, description="Multiple choice field")
-
 class LevelEnum(graphene.Enum):
     A1 = "A1"
     A2 = "A2"

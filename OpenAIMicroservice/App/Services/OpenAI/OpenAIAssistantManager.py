@@ -3,7 +3,7 @@ import logging
 import os
 from openai import OpenAI, NotFoundError, AuthenticationError
 from dotenv import load_dotenv
-from App.Utils.Exceptions.AssistantAPIException import AssistantAPIException
+from Utils.Exceptions.AssistantAPIException import AssistantAPIException
 
 
 class OpenAIAssistantManager:
@@ -37,9 +37,6 @@ class OpenAIAssistantManager:
     def delete_assistant(self, assistant_id):
         try:
             self.client.beta.assistants.delete(assistant_id)
-        except Exception as e:
-            print(f"Caught an exception: {type(e).__name__}")
-            print(f"Exception details: {e}")
         except AuthenticationError:
             logging.error("Invalid OPENAI_API_KEY provided")
             raise AssistantAPIException ("Request could not be fulfilled. Please provide an valid OpenAI API key in CMS.")

@@ -1,9 +1,10 @@
 import graphene
 from graphql import GraphQLError
-from App.Services.OpenAI.AssistantAPIAdapter import AssistantAPIAdapter
+from Services.OpenAI.AssistantAPIAdapter import AssistantAPIAdapter
 from .Types import SubjectEnum, LevelEnum
-from App.Utils.Exceptions import ValidationException, AssistantAPIException
-from .Validators import validate_minimum_int, validate_string, validate_answer_options, validate_file
+from Utils.Exceptions.ValidationException import ValidationException
+from Utils.Exceptions.AssistantAPIException import AssistantAPIException
+from .Validators import validate_minimum_int, validate_string, validate_file
 
 
 class GenerateMultipleChoiceQuestions(graphene.Mutation):
@@ -90,38 +91,6 @@ class GenerateExplanation(graphene.Mutation):
             raise GraphQLError("An unexpected error occurred. Please try again later.")
 
 
-class GenerateMultipleChoiceAnswer(graphene.Mutation):
-    class Arguments:
-        question_level = LevelEnum(required=True)
-        question_subject = SubjectEnum(required=True)
-        question_text = graphene.String(required=True)
-        answer_options = graphene.List(graphene.String, required=True)
-
-    token = graphene.String()
-
-    def mutate(self, info, question_level, question_subject, question_text, answer_options):
-        try:
-            # validate given string
-            validate_string("question_text", question_text)
-
-            # validate given answer options
-            validate_answer_options(answer_options)
-
-            adapter = AssistantAPIAdapter()
-            token = adapter.generate_multiple_choice_answer(question_level, question_subject, question_text,
-                                                            answer_options)
-
-            return GenerateExplanation(token=token)
-
-        except ValidationException as e:
-            raise GraphQLError(str(e))
-        except AssistantAPIException as e:
-            raise GraphQLError(str(e))
-        except Exception:
-            # Generic error for unexpected exceptions
-            raise GraphQLError("An unexpected error occurred. Please try again later.")
-
-
 # class GenerateOpenAnswerQuestions(graphene.Mutation):
 #     class Arguments:
 #         subject = SubjectEnum(required=True)
@@ -142,4 +111,3 @@ class Mutation(graphene.ObjectType):
     # generate_open_answer_questions = GenerateOpenAnswerQuestions.Field()
     read_multiple_choice_questions_from_file = ReadMultipleChoiceQuestionsFromFile.Field()
     generate_multiple_choice_questions = GenerateMultipleChoiceQuestions.Field()
-    generate_multiple_choice_answer = GenerateMultipleChoiceAnswer.Field()
