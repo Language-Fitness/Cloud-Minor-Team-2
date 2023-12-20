@@ -5,7 +5,6 @@ import re
 from io import BytesIO
 from Utils.Exceptions.AssistantAPIException import AssistantAPIException
 from Services.OpenAI.OpenAIAssistantManager import OpenAIAssistantManager
-import os
 
 class AssistantAPIAdapter:
     def __init__(self):
@@ -13,7 +12,6 @@ class AssistantAPIAdapter:
 
     def generate_multiple_choice_questions(self, question_subject, question_level, amount_questions):
         try:
-            print(os.getcwd())
             assistant_json = self.assistant_manager.load_assistant(
                 "Services/OpenAI/Assistants/MultipleChoiceQuestionAssistant.json")
             assistant = self.assistant_manager.create_assistant(assistant_json)
@@ -103,7 +101,6 @@ class AssistantAPIAdapter:
             if file_id:
                 self.assistant_manager.delete_file(file_id)
 
-            json_data_dict["status"] = "success"
             return json_data_dict
 
         except AssistantAPIException as e:

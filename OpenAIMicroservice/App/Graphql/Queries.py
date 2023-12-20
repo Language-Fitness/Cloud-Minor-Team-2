@@ -22,13 +22,13 @@ class Query(ObjectType):
             adapter = AssistantAPIAdapter()
             response = adapter.retrieve_generated_multiple_choice_questions_response(token)
 
-            return response
+            return ResponseMultipleChoiceQuestion(status="success", message="Question(s) retrieved successfully", questions=response['questions'])
         except ValidationException as e:
-            raise GraphQLError(str(e))
+            return ResponseMultipleChoiceQuestion(status="error", message=str(e))
         except AssistantAPIException as e:
-            raise GraphQLError(str(e))
+            return ResponseMultipleChoiceQuestion(status="error", message=str(e))
         except Exception as e:
-            raise GraphQLError("An unexpected error occurred. Please try again later.")
+            return ResponseMultipleChoiceQuestion(status="error", message="An unexpected error occurred. Please try again later.")
 
     async def resolve_retrieve_multiple_choice_questions_from_file(self, info, token):
 
@@ -39,16 +39,16 @@ class Query(ObjectType):
             adapter = AssistantAPIAdapter()
             response = adapter.retrieve_multiple_choice_questions_from_file_response(token)
 
-            return response
+            return ResponseMultipleChoiceQuestion(status="success", message="Question(s) retrieved successfully", questions=response['questions'])
 
         except ValidationException as e:
-            raise GraphQLError(str(e))
+            return ResponseMultipleChoiceQuestion(status="error", message=str(e))
 
         except AssistantAPIException as e:
-            raise GraphQLError(str(e))
+            return ResponseMultipleChoiceQuestion(status="error", message=str(e))
 
         except Exception as e:
-            raise GraphQLError("An unexpected error occurred. Please try again later.")
+            return ResponseMultipleChoiceQuestion(status="error", message="An unexpected error occurred. Please try again later.")
 
     async def resolve_retrieve_explanation(self, info, token):
 
@@ -59,16 +59,17 @@ class Query(ObjectType):
             adapter = AssistantAPIAdapter()
             response = adapter.retrieve_explanation_response(token)
 
-            return response
+            return ResponseExplanation(status="success", message="Question(s) retrieved successfully", explanation=response["explanation"])
 
         except ValidationException as e:
-            raise GraphQLError(str(e))
+            return ResponseExplanation(status="error", message=str(e))
 
         except AssistantAPIException as e:
-            raise GraphQLError(str(e))
+            return ResponseExplanation(status="error", message=str(e))
 
         except Exception as e:
-            raise GraphQLError("An unexpected error occurred. Please try again later.")
+            return ResponseExplanation(status="error", message="An unexpected error occurred. Please try again later.")
+
 
 
         # async def resolve_retrieve_open_answer_questions(self, info, token):
