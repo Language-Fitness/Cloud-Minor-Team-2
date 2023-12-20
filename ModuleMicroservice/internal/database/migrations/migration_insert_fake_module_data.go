@@ -28,7 +28,7 @@ type FakeModule struct {
 func Init() {
 	fmt.Println("test")
 
-	randomModules := GenerateRandomModules(5000)
+	randomModules := GenerateRandomModules(100000)
 
 	collection, _ := database.GetCollection()
 	for _, module := range randomModules {

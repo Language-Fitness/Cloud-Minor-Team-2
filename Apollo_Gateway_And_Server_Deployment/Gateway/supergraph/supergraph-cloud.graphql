@@ -22,7 +22,7 @@ directive @link(url: String, as: String, for: link__Purpose, import: [link__Impo
 scalar join__FieldSet
 
 enum join__Graph {
-#    MODULES @join__graph(name: "modules", url: "http://module-microservice-service:8081/query")
+    MODULES @join__graph(name: "modules", url: "http://module-microservice-service:8081/query")
     CLASSES @join__graph(name: "classes", url: "http://class-microservice-service:8082/query")
     SCHOOLS @join__graph(name: "schools", url: "http://school-microservice-service:8083/query")
 }
@@ -41,33 +41,35 @@ enum link__Purpose {
     EXECUTION
 }
 
-#type Module
-#@join__type(graph: MODULES, key: "id")
-#{
-#    id: ID!
-#    name: String! @join__field(graph: MODULES)
-#    description: String! @join__field(graph: MODULES)
-#    difficulty: Int! @join__field(graph: MODULES)
-#    category: String! @join__field(graph: MODULES)
-#    made_by: String! @join__field(graph: MODULES)
-#    private: Boolean! @join__field(graph: MODULES)
-#    key: String @join__field(graph: MODULES)
-#    created_at: String @join__field(graph: MODULES)
-#    updated_at: String @join__field(graph: MODULES)
-#    soft_deleted: Boolean @join__field(graph: MODULES)
-#}
-#
-#type ModuleInfo
-#@join__type(graph: MODULES, key: "id")
-#{
-#    id: ID!
-#    name: String! @join__field(graph: MODULES)
-#    description: String! @join__field(graph: MODULES)
-#    difficulty: Int! @join__field(graph: MODULES)
-#    category: String! @join__field(graph: MODULES)
-#    made_by: String! @join__field(graph: MODULES)
-#    private: Boolean! @join__field(graph: MODULES)
-#}
+type Module
+@join__type(graph: MODULES, key: "id")
+{
+    id: ID!
+    school_id: ID! @join__field(graph: MODULES)
+    name: String! @join__field(graph: MODULES)
+    description: String! @join__field(graph: MODULES)
+    difficulty: LanguageLevel! @join__field(graph: MODULES)
+    category: Category! @join__field(graph: MODULES)
+    made_by: String! @join__field(graph: MODULES)
+    private: Boolean! @join__field(graph: MODULES)
+    key: String @join__field(graph: MODULES)
+    created_at: String @join__field(graph: MODULES)
+    updated_at: String @join__field(graph: MODULES)
+    soft_deleted: Boolean @join__field(graph: MODULES)
+}
+
+type ModuleInfo
+@join__type(graph: MODULES, key: "id")
+{
+    id: ID!
+    school_id: String! @join__field(graph: MODULES)
+    name: String! @join__field(graph: MODULES)
+    description: String! @join__field(graph: MODULES)
+    difficulty: LanguageLevel! @join__field(graph: MODULES)
+    category: Category! @join__field(graph: MODULES)
+    made_by: String! @join__field(graph: MODULES)
+    private: Boolean! @join__field(graph: MODULES)
+}
 
 type Class
 @join__type(graph: CLASSES, key: "id")
@@ -119,16 +121,28 @@ type SchoolInfo
     has_openai_access: Boolean! @join__field(graph: SCHOOLS)
 }
 
-#input ModuleInput
-#@join__type(graph: MODULES)
-#{
-#    name: String!
-#    description: String!
-#    difficulty: Int!
-#    category: String!
-#    private: Boolean!
-#    key: String
-#}
+input ModuleInputCreate
+@join__type(graph: MODULES)
+{
+    name: String!
+    school_id: String!
+    description: String!
+    difficulty: LanguageLevel!
+    category: Category!
+    private: Boolean!
+    key: String
+}
+
+input ModuleInputUpdate
+@join__type(graph: MODULES)
+{
+    name: String!
+    description: String!
+    difficulty: LanguageLevel!
+    category: Category!
+    private: Boolean!
+    key: String
+}
 
 input ClassInput
 @join__type(graph: CLASSES)
@@ -159,9 +173,10 @@ input SchoolInput
 type Query
 @join__type(graph: CLASSES)
 @join__type(graph: SCHOOLS)
+@join__type(graph: MODULES)
 {
-#    getModule(id: ID!): Module @join__field(graph: MODULES)
-#    listModules: [ModuleInfo] @join__field(graph: MODULES)
+    getModule(id: ID!): Module @join__field(graph: MODULES)
+    listModules(filter: ModuleFilter, paginate: Paginator): [ModuleInfo] @join__field(graph: MODULES)
     getClass(id: ID!): Class @join__field(graph: CLASSES)
     listClasses(filter: ListClassFilter, paginate: Paginator): [ClassInfo] @join__field(graph: CLASSES)
     getSchool(id: ID!): School @join__field(graph: SCHOOLS)
@@ -171,10 +186,11 @@ type Query
 type Mutation
 @join__type(graph: CLASSES)
 @join__type(graph: SCHOOLS)
+@join__type(graph: MODULES)
 {
-#    createModule(input: ModuleInput!): Module @join__field(graph: MODULES)
-#    updateModule(id: ID!, input: ModuleInput!): Module @join__field(graph: MODULES)
-#    deleteModule(id: ID!, filter: Filter): ID @join__field(graph: MODULES)
+    createModule(input: ModuleInputCreate!): Module @join__field(graph: MODULES)
+    updateModule(id: ID!, input: ModuleInputUpdate!): Module @join__field(graph: MODULES)
+    deleteModule(id: ID!, filter: ModuleFilter): ID @join__field(graph: MODULES)
     createClass(input: ClassInput!): Class @join__field(graph: CLASSES)
     updateClass(id: ID!, input: ClassInput!): Class @join__field(graph: CLASSES)
     deleteClass(id: ID!): ID @join__field(graph: CLASSES)
@@ -184,6 +200,18 @@ type Mutation
 }
 
 # FILTERS
+input ModuleFilter
+@join__type(graph: MODULES)
+{
+    school_id: String
+    made_by: String
+    softDelete: Boolean
+    name: NameFilter
+    difficulty: LanguageLevel
+    category: Category
+    private: Boolean
+}
+
 input ListClassFilter
 @join__type(graph: CLASSES)
 {
@@ -207,6 +235,7 @@ input ListSchoolFilter
 input NameFilter
 @join__type(graph: CLASSES)
 @join__type(graph: SCHOOLS)
+@join__type(graph: MODULES)
 {
     input: [String]!
     type: NameFilterTypes!
@@ -223,6 +252,7 @@ input LocationFilter
 input Paginator
 @join__type(graph: CLASSES)
 @join__type(graph: SCHOOLS)
+@join__type(graph: MODULES)
 {
     amount: Int!
     Step: Int!
@@ -230,6 +260,7 @@ input Paginator
 
 enum LanguageLevel
 @join__type(graph: CLASSES)
+@join__type(graph: MODULES)
 {
     A1
     A2
@@ -239,9 +270,22 @@ enum LanguageLevel
     C2
 }
 
+enum Category
+@join__type(graph: MODULES)
+{
+    Grammatica
+    Spelling
+    Woordenschat
+    Uitdrukkingen
+    Interpunctie
+    Werkwoordvervoegingen
+    Fast_Track
+}
+
 enum NameFilterTypes
 @join__type(graph: CLASSES)
 @join__type(graph: SCHOOLS)
+@join__type(graph: MODULES)
 {
     eq
     ne

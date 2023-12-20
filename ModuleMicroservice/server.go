@@ -3,7 +3,6 @@ package main
 import (
 	"Module/graph"
 	"Module/internal/auth"
-	"Module/internal/database/migrations"
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/joho/godotenv"
@@ -25,7 +24,7 @@ func main() {
 		log.Fatal("Error loading .env file")
 	}
 
-	migrations.Init()
+	//migrations.Init()
 
 	tokenMiddleware := auth.Middleware
 

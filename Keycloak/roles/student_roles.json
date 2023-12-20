@@ -19,5 +19,8 @@
   },
   {
     "name:": "filter_class_module_id"
+  },
+  {
+    "name": "filter_module_school_id"
   }
 ]
