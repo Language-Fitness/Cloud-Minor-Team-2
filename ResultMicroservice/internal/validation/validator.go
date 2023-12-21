@@ -1,6 +1,7 @@
 package validation
 
 import (
+	"ResultMicroservice/internal/helper"
 	"fmt"
 	"strings"
 )
@@ -8,7 +9,7 @@ import (
 // IValidator GOLANG INTERFACE
 // Implements a method for validating input with Validate and to get all the errors with GetErrors.
 type IValidator interface {
-	Validate(input interface{}, arr []string)
+	Validate(input interface{}, arr []string, name string)
 	GetErrors() []string
 	ClearErrors()
 }
@@ -22,44 +23,51 @@ type Validator struct {
 // NewValidator GOLANG FACTORY
 // Returns a Validator implementing IValidator.
 func NewValidator() IValidator {
+	fmt.Println("initilizing validator")
+
 	return &Validator{}
 }
 
-func (v *Validator) Validate(input interface{}, arr []string) {
+func (v *Validator) Validate(input interface{}, arr []string, name string) {
 	rules := NewRules()
 
 	functionMap := map[string]any{
-		"IsInt":      func(input interface{}, params string) { rules.IsInt(input) },
-		"IsString":   func(input interface{}, params string) { rules.IsString(input) },
-		"IsUUID":     func(input interface{}, params string) { rules.IsUUID(input) },
-		"IsBoolean":  func(input interface{}, params string) { rules.IsBoolean(input) },
-		"IsDatetime": func(input interface{}, params string) { rules.IsDatetime(input) },
-		"IsArray":    func(input interface{}, params string) { rules.IsArray(input) },
-		"ArrayType": func(input interface{}, params string) {
+		"IsInt":      func(input interface{}, params string, name string) { rules.IsInt(input, name) },
+		"IsString":   func(input interface{}, params string, name string) { rules.IsString(input, name) },
+		"IsUUID":     func(input interface{}, params string, name string) { rules.IsUUID(input, name) },
+		"IsBoolean":  func(input interface{}, params string, name string) { rules.IsBoolean(input, name) },
+		"IsDatetime": func(input interface{}, params string, name string) { rules.IsDatetime(input, name) },
+		"IsArray":    func(input interface{}, params string, name string) { rules.IsArray(input, name) },
+		"ArrayType": func(input interface{}, params string, name string) {
 			s := strings.Split(params, ":")
-			rules.ArrayType(input, s[1])
+			rules.ArrayType(input, s[1], name)
 		},
-		"Length": func(input interface{}, params string) {
+		"Length": func(input interface{}, params string, name string) {
 			s := strings.Split(params, ":")
-			fmt.Println(s[1])
-			rules.Length(input, s[1])
+			rules.Length(input, s[1], name)
+		},
+		"Size": func(input interface{}, params string, name string) {
+			s := strings.Split(params, ":")
+			rules.Size(input, s[1], name)
 		},
 	}
 
-	fmt.Println("Input received:", input)
+	if helper.ContainsString(arr, "IsNull") == true && helper.IsNil(input) {
+		return
+	}
+
+	fmt.Println("error here")
 
 	for _, value := range arr {
-
 		functionName := value
 
-		// Check if value contains a colon and extract the part before it
 		if parts := strings.Split(value, ":"); len(parts) > 1 {
 			functionName = parts[0]
 		}
 
 		if fn, exists := functionMap[functionName]; exists {
-			if fn, ok := fn.(func(interface{}, string)); ok {
-				fn(input, value)
+			if fn, ok := fn.(func(interface{}, string, string)); ok {
+				fn(helper.DereferenceIfNeeded(input), value, name)
 			}
 		}
 	}

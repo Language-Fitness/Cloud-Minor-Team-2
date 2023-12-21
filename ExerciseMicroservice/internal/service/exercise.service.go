@@ -3,6 +3,7 @@ package service
 import (
 	"ExerciseMicroservice/graph/model"
 	"ExerciseMicroservice/internal/auth"
+	"ExerciseMicroservice/internal/helper"
 	"ExerciseMicroservice/internal/repository"
 	"ExerciseMicroservice/internal/validation"
 	"errors"
@@ -13,6 +14,8 @@ import (
 	"strings"
 	"time"
 )
+
+const ValidationPrefix = "Validation errors: "
 
 // IExerciseService GOLANG INTERFACE
 // Implements five CRUD methods for queries and mutations on Exercise.
@@ -48,18 +51,10 @@ func (e *ExerciseService) CreateExercise(token string, newExercise model.Exercis
 		return nil, err
 	}
 
-	e.Validator.Validate(newExercise.ClassID, []string{"IsString"}, "ClassID")
-	e.Validator.Validate(newExercise.Name, []string{"IsString", "Length:<25"}, "Name")
-	e.Validator.Validate(newExercise.Question, []string{"IsString", "Length:<50"}, "Question")
-	e.Validator.Validate(newExercise.Answers, []string{"IsArray"}, "Answers")
-	e.Validator.Validate(newExercise.PosCorrectAnswer, []string{"IsInt"}, "PosCorrectAnswer")
-	e.Validator.Validate(newExercise.QuestionTypeID, []string{"IsString"}, "QuestionTypeID")
-	e.Validator.Validate(newExercise.Difficulty, []string{"IsInt"}, "Difficulty")
-	e.Validator.Validate(newExercise.ModuleID, []string{"IsString"}, "ModuleID")
-
+	validateNewExercise(e.Validator, newExercise)
 	validationErrors := e.Validator.GetErrors()
 	if len(validationErrors) > 0 {
-		errorMessage := "Validation errors: " + strings.Join(validationErrors, ", ")
+		errorMessage := ValidationPrefix + strings.Join(validationErrors, ", ")
 		e.Validator.ClearErrors()
 		return nil, errors.New(errorMessage)
 	}
@@ -85,7 +80,6 @@ func (e *ExerciseService) CreateExercise(token string, newExercise model.Exercis
 		return nil, err
 	}
 
-	e.Validator.ClearErrors()
 	return result, nil
 }
 
@@ -95,19 +89,10 @@ func (e *ExerciseService) UpdateExercise(token string, id string, updateData mod
 		return nil, err
 	}
 
-	// Validate exercise update input fields here...
-	e.Validator.Validate(updateData.ClassID, []string{"IsString"}, "ClassID")
-	e.Validator.Validate(updateData.Name, []string{"IsString", "Length:<25"}, "Name")
-	e.Validator.Validate(updateData.Question, []string{"IsString", "Length:<50"}, "Question")
-	e.Validator.Validate(updateData.Answers, []string{"IsArray"}, "Answers")
-	e.Validator.Validate(updateData.PosCorrectAnswer, []string{"IsInt"}, "PosCorrectAnswer")
-	e.Validator.Validate(updateData.QuestionTypeID, []string{"IsString"}, "QuestionTypeID")
-	e.Validator.Validate(updateData.Difficulty, []string{"IsInt"}, "Difficulty")
-	e.Validator.Validate(updateData.ModuleID, []string{"IsString"}, "ModuleID")
-
+	validateUpdatedExercise(e.Validator, id, updateData)
 	validationErrors := e.Validator.GetErrors()
 	if len(validationErrors) > 0 {
-		errorMessage := "Validation errors: " + strings.Join(validationErrors, ", ")
+		errorMessage := ValidationPrefix + strings.Join(validationErrors, ", ")
 		e.Validator.ClearErrors()
 		return nil, errors.New(errorMessage)
 	}
@@ -132,7 +117,6 @@ func (e *ExerciseService) UpdateExercise(token string, id string, updateData mod
 		return nil, err
 	}
 
-	e.Validator.ClearErrors()
 	return result, nil
 }
 
@@ -145,6 +129,7 @@ func (e *ExerciseService) DeleteExercise(token string, id string, filter *model.
 	if !existingExercise.SoftDeleted {
 		existingExercise.SoftDeleted = true
 
+		//TODO nog naar kijken  want delete moet update met hard delete variable zijn
 		err := e.Repo.SoftDeleteExerciseByID(id, *existingExercise)
 		if err != nil {
 			return err
@@ -152,7 +137,7 @@ func (e *ExerciseService) DeleteExercise(token string, id string, filter *model.
 		return nil
 	}
 
-	if isAdmin && filter != nil && !*filter.SoftDelete {
+	if isAdmin && filter != nil && !helper.IsNil(filter.SoftDelete) {
 		err := e.Repo.HardDeleteExerciseByID(id)
 		if err != nil {
 			return err
@@ -173,67 +158,89 @@ func (e *ExerciseService) GetExerciseById(token string, id string) (*model.Exerc
 }
 
 func (e *ExerciseService) ListExercises(token string, filter *model.ExerciseFilter, paginate *model.Paginator) ([]*model.Exercise, error) {
-	// Validate filter input fields here...
-	e.Validator.Validate(filter.SoftDelete, []string{"IsNull", "IsBoolean"}, "Filter SoftDelete")
-	e.Validator.Validate(filter.Name, []string{"IsNull", "IsString"}, "Filter Name")
-	e.Validator.Validate(filter.Difficulty, []string{"IsNull", "IsFloat64"}, "Filter Difficulty")
-	e.Validator.Validate(filter.QuestionTypeID, []string{"IsNull", "IsString"}, "Filter QuestionTypeID")
-	e.Validator.Validate(filter.ClassID, []string{"IsNull", "IsString"}, "Filter ClassID")
-	e.Validator.Validate(filter.ModuleID, []string{"IsNull", "IsString"}, "Filter ModuleID")
-	e.Validator.Validate(filter.MadeBy, []string{"IsNull", "IsString"}, "Filter MadeBy")
+	_, err := e.Policy.ListExercises(token)
+	if err != nil {
+		return nil, err
+	}
 
-	//todo reduce cognitive complexity to many if statements (sonarlint)
+	validateListExerciseFilter(e.Validator, filter, paginate)
 	validationErrors := e.Validator.GetErrors()
 	if len(validationErrors) > 0 {
-		errorMessage := "Validation errors: " + strings.Join(validationErrors, ", ")
+		errorMessage := ValidationPrefix + strings.Join(validationErrors, ", ")
 		e.Validator.ClearErrors()
 		return nil, errors.New(errorMessage)
 	}
 
-	// Check if the user has permission to list exercises
-	if !e.Policy.HasPermissions(token, "list_exercises") {
-		return nil, errors.New("unauthorized: user does not have permission to list exercises")
-	}
-
-	bsonFilter := bson.D{}
-
-	// Add conditions to bsonFilter based on the filter fields...
-	if e.Policy.HasPermissions(token, "filter_exercise_SoftDelete") && filter.SoftDelete != nil {
-		bsonFilter = append(bsonFilter, bson.E{Key: "softdeleted", Value: *filter.SoftDelete})
-	}
-
-	if e.Policy.HasPermissions(token, "filter_exercise_Name") && filter.Name != nil {
-		bsonFilter = append(bsonFilter, bson.E{Key: "name", Value: *filter.Name})
-	}
-
-	if e.Policy.HasPermissions(token, "filter_exercise_Difficulty") && filter.Difficulty != nil {
-		bsonFilter = append(bsonFilter, bson.E{Key: "difficulty", Value: *filter.Difficulty})
-	}
-
-	if e.Policy.HasPermissions(token, "filter_exercise_QuestionTypeID") && filter.QuestionTypeID != nil {
-		bsonFilter = append(bsonFilter, bson.E{Key: "questiontypeid", Value: *filter.QuestionTypeID})
-	}
-
-	if e.Policy.HasPermissions(token, "filter_exercise_ClassID") && filter.ClassID != nil {
-		bsonFilter = append(bsonFilter, bson.E{Key: "classid", Value: *filter.ClassID})
-	}
-
-	if e.Policy.HasPermissions(token, "filter_exercise_ModuleID") && filter.ModuleID != nil {
-		bsonFilter = append(bsonFilter, bson.E{Key: "moduleid", Value: *filter.ModuleID})
-	}
-
-	if e.Policy.HasPermissions(token, "filter_exercise_MadeBy") && filter.MadeBy != nil {
-		bsonFilter = append(bsonFilter, bson.E{Key: "madeby", Value: *filter.MadeBy})
-	}
+	bsonFilter := buildBsonFilterForListExercise(e.Policy, token, filter)
 
 	paginateOptions := options.Find().
 		SetSkip(int64(paginate.Step)).
 		SetLimit(int64(paginate.Amount))
 
-	exercises, err := e.Repo.ListExercises(bsonFilter, paginateOptions)
-	if err != nil {
-		return nil, err
+	exercises, err2 := e.Repo.ListExercises(bsonFilter, paginateOptions)
+	if err2 != nil {
+		return nil, err2
 	}
 
 	return exercises, nil
+}
+
+func validateListExerciseFilter(validator validation.IValidator, filter *model.ExerciseFilter, paginate *model.Paginator) {
+	validator.Validate(filter.SoftDelete, []string{"IsNull", "IsBoolean"}, "Filter SoftDelete")
+	if helper.IsNil(filter.Name) == false {
+		validator.Validate(helper.DereferenceArrayIfNeeded(
+			filter.Name.Input),
+			[]string{"IsNull", "IsString"},
+			"Filter Name input")
+	}
+	validator.Validate(filter.Difficulty, []string{"IsNull", "IsString"}, "Filter Difficulty")
+	validator.Validate(filter.QuestionTypeID, []string{"IsNull", "IsString"}, "Filter QuestionTypeID")
+	validator.Validate(filter.ClassID, []string{"IsNull", "IsString"}, "Filter ClassID")
+	validator.Validate(filter.ModuleID, []string{"IsNull", "IsString"}, "Filter ModuleID")
+	validator.Validate(filter.MadeBy, []string{"IsNull", "IsString"}, "Filter MadeBy")
+	validator.Validate(paginate.Amount, []string{"IsInt", "Size:>0", "Size:<101"}, "Paginate Amount")
+	validator.Validate(paginate.Step, []string{"IsInt", "Size:>=0"}, "Paginate Step")
+}
+
+func validateUpdatedExercise(validator validation.IValidator, id string, updatedData model.ExerciseInput) {
+	validator.Validate(id, []string{"IsUUID"}, "ID")
+	validator.Validate(updatedData.ClassID, []string{"IsString"}, "ClassID")
+	validator.Validate(updatedData.Name, []string{"IsString", "Length:<25"}, "Name")
+	validator.Validate(updatedData.Question, []string{"IsString", "Length:<50"}, "Question")
+	validator.Validate(updatedData.Answers, []string{"IsArray"}, "Answers")
+	validator.Validate(updatedData.PosCorrectAnswer, []string{"IsInt"}, "PosCorrectAnswer")
+	validator.Validate(updatedData.QuestionTypeID, []string{"IsString"}, "QuestionTypeID")
+	validator.Validate(updatedData.Difficulty, []string{"IsInt"}, "Difficulty")
+	validator.Validate(updatedData.ModuleID, []string{"IsString"}, "ModuleID")
+}
+
+func validateNewExercise(validator validation.IValidator, newExercise model.ExerciseInput) {
+	validator.Validate(newExercise.ClassID, []string{"IsString"}, "ClassID")
+	validator.Validate(newExercise.Name, []string{"IsString", "Length:<25"}, "Name")
+	validator.Validate(newExercise.Question, []string{"IsString", "Length:<50"}, "Question")
+	validator.Validate(newExercise.Answers, []string{"IsArray"}, "Answers")
+	validator.Validate(newExercise.PosCorrectAnswer, []string{"IsInt"}, "PosCorrectAnswer")
+	validator.Validate(newExercise.QuestionTypeID, []string{"IsString"}, "QuestionTypeID")
+	validator.Validate(newExercise.Difficulty, []string{"IsInt"}, "Difficulty")
+	validator.Validate(newExercise.ModuleID, []string{"IsString"}, "ModuleID")
+}
+
+func buildBsonFilterForListExercise(policy auth.IExercisePolicy, token string, filter *model.ExerciseFilter) bson.D {
+	bsonFilter := bson.D{}
+
+	appendCondition := func(key string, value interface{}) {
+		if value != nil && policy.HasPermissions(token, "filter_exercise_"+key) {
+			bsonFilter = append(bsonFilter, bson.E{Key: key, Value: value})
+		}
+	}
+
+	appendCondition("softdeleted", filter.SoftDelete)
+	appendCondition("name", filter.Name)
+	appendCondition("difficulty", filter.Difficulty)
+	appendCondition("questiontypeid", filter.QuestionTypeID)
+	appendCondition("classid", filter.ClassID)
+	appendCondition("moduleid", filter.ModuleID)
+	appendCondition("madeby", filter.MadeBy)
+
+	return bsonFilter
 }

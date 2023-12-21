@@ -176,7 +176,7 @@ func TestSoftDeleteModule(t *testing.T) {
 	}
 
 	// Call the method you want to test.
-	updatedModule, err := repo.UpdateModule("123", updatedModuleInput)
+	_ = repo.DeleteModuleByID("123", updatedModuleInput)
 
 	// Assert the result and error as needed.
 	if err != nil {
@@ -196,59 +196,10 @@ func TestSoftDeleteModule(t *testing.T) {
 	}
 
 	// Assert that the updated module fields match the expected updates.
-	if *updatedModule.SoftDeleted != *updatedModuleInput.SoftDeleted {
+	if *databaseModule.SoftDeleted != *updatedModuleInput.SoftDeleted {
 		t.Errorf("Updated module name does not match the expected value")
 	}
 	// Add similar assertions for other fields you updated.
-}
-
-func TestHardDeleteModuleByID(t *testing.T) {
-	collection, err := database.GetTestCollection()
-	if err != nil {
-		t.Fatalf("Failed to get the test collection: %v", err)
-	}
-
-	err = clearCollection(collection)
-	if err != nil {
-		log.Fatalf("Failed to clear the test collection: %v", err)
-	}
-
-	// Create a new ModuleRepository using the test collection.
-	repo := repository.NewModuleRepository(collection)
-
-	// Define your test data for an existing module.
-	existingModule := &model.Module{
-		ID:   "123",
-		Name: "Test Module",
-		// Initialize other fields as needed for the existing module.
-	}
-
-	// Insert the existing module into MongoDB.
-	_, err = repo.CreateModule(existingModule)
-	if err != nil {
-		t.Errorf("Error creating the existing module: %v", err)
-	}
-
-	// Call the method you want to test.
-	err = repo.HardDeleteModuleByID("123")
-
-	// Assert the error as needed.
-	if err != nil {
-		t.Errorf("Error deleting module: %v", err)
-	}
-
-	ctx, cancel := context.WithTimeout(context.TODO(), time.Second*10) // 10-second timeout
-	defer cancel()
-	// Attempt to fetch the deleted module from MongoDB.
-	filter := bson.M{"id": "123"}
-	var databaseModule model.Module
-
-	err = collection.FindOne(ctx, filter).Decode(&databaseModule)
-
-	// Assert that the error is not nil, indicating the module was deleted.
-	if err == nil {
-		t.Errorf("Module was not deleted as expected")
-	}
 }
 
 func TestGetModuleByID(t *testing.T) {
