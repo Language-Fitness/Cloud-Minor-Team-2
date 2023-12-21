@@ -1,0 +1,73 @@
+# GraphQL schema example
+#
+# https://gqlgen.com/getting-started/
+
+type SagaAction {
+  user_id: ID!
+  user_name: String!
+}
+
+type SuccessMessage {
+  id: ID!
+  text: String!
+  status: SagaObjectStatus!
+  object_id: ID!
+  object_type: SagaObjectTypes!
+}
+
+# Steps?
+# 1. First init the saga object.
+# 2. Find all possible children if any.
+# 3. Then loop thru children and find those if any.
+# 4. Then Start looping again thru every thing and start with the bottom children like a binary three.
+# 5. Then start deleting -> soft deleting the items and change object_status from Exist to Deleted if success.
+# 6. Then reloop again thru the items to check if all object_status are Deleted.
+# 7. Then if everything is deleted save object and return success message.
+# 8. If not everything is deleted reloop the step 4. and 5. but un delete every item.
+
+type SagaObject {
+  id: ID!
+  copy: SagaObject
+  object_id: ID!
+  object_type: SagaObjectTypes!
+  created_at: String!
+  updated_at: String
+  status: SagaObjectStatusProgress
+  object_status: SagaObjectStatus!
+  action: SagaAction!
+  parent_id: ID
+  children: [SagaObject]
+}
+
+input SagaFilter {
+  soft_deleted: Boolean!
+  object_id: String!
+  object_type: SagaObjectTypes!
+}
+
+type Mutation {
+  deleteSchool(filter: SagaFilter): SuccessMessage
+  deleteClass(filter: SagaFilter): SuccessMessage
+  deleteExercise(filter: SagaFilter): SuccessMessage
+  deleteResult(filter: SagaFilter): SuccessMessage
+  deleteModule(filter: SagaFilter): SuccessMessage
+}
+
+enum SagaObjectTypes {
+  School
+  Class
+  Exercise
+  Result
+  Module
+}
+
+enum SagaObjectStatusProgress {
+  Started
+  InProgress
+  Finished
+}
+
+enum SagaObjectStatus {
+  Exist
+  Deleted
+}

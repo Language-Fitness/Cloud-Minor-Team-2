@@ -1,0 +1,20 @@
+services:
+  api:
+    container_name: go-saga
+    restart: always
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: go-saga
+    ports:
+      - "8083:8083"
+
+  mongodb:
+    container_name: mongodb
+    image: mongo
+    ports:
+      - "27019:27019"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+    command: mongod --quiet
