@@ -10,6 +10,13 @@ import (
 
 type ISagaService interface {
 	InitSagaSteps(token string, filter *model.SagaFilter) (*model.SuccessMessage, error)
+	initializeSagaObject(token string, filter *model.SagaFilter) (model.SagaObject, error)
+	findAllChildren(sagaObject model.SagaObject) ([]model.SagaObject, error)
+	findBottomChildren(sagaObject model.SagaObject) ([]model.SagaObject, error)
+	softDeleteItems(items []model.SagaObject) error
+	areAllItemsDeleted(items []model.SagaObject) bool
+	undeleteItems(items []model.SagaObject) error
+	saveSagaObject(sagaObject model.SagaObject) error
 }
 
 // SagaService GOLANG STRUCT
@@ -29,7 +36,6 @@ func NewSagaService(collection *mongo.Collection) ISagaService {
 }
 
 func (s SagaService) InitSagaSteps(token string, filter *model.SagaFilter) (*model.SuccessMessage, error) {
-
 	sagaObject, err := s.initializeSagaObject(token, filter)
 	if err != nil {
 		return nil, err
@@ -133,5 +139,3 @@ func (s SagaService) saveSagaObject(sagaObject model.SagaObject) error {
 	// Example: save saga object to MongoDB
 	return nil
 }
-
-
