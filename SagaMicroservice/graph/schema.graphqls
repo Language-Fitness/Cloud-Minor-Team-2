@@ -2,11 +2,6 @@
 #
 # https://gqlgen.com/getting-started/
 
-type SagaAction {
-  user_id: ID!
-  user_name: String!
-}
-
 type SuccessMessage {
   id: ID!
   text: String!
@@ -34,7 +29,7 @@ type SagaObject {
   updated_at: String
   status: SagaObjectStatusProgress
   object_status: SagaObjectStatus!
-  action: SagaAction!
+  action_done_by: ID!
   parent_id: ID
   children: [SagaObject]
 }

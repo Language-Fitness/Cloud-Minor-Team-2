@@ -53,13 +53,8 @@ type ComplexityRoot struct {
 	Query struct {
 	}
 
-	SagaAction struct {
-		UserID   func(childComplexity int) int
-		UserName func(childComplexity int) int
-	}
-
 	SagaObject struct {
-		Action       func(childComplexity int) int
+		ActionDoneBy func(childComplexity int) int
 		Children     func(childComplexity int) int
 		Copy         func(childComplexity int) int
 		CreatedAt    func(childComplexity int) int
@@ -116,26 +111,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.DeleteObject(childComplexity, args["filter"].(*model.SagaFilter)), true
 
-	case "SagaAction.user_id":
-		if e.complexity.SagaAction.UserID == nil {
+	case "SagaObject.action_done_by":
+		if e.complexity.SagaObject.ActionDoneBy == nil {
 			break
 		}
 
-		return e.complexity.SagaAction.UserID(childComplexity), true
-
-	case "SagaAction.user_name":
-		if e.complexity.SagaAction.UserName == nil {
-			break
-		}
-
-		return e.complexity.SagaAction.UserName(childComplexity), true
-
-	case "SagaObject.action":
-		if e.complexity.SagaObject.Action == nil {
-			break
-		}
-
-		return e.complexity.SagaObject.Action(childComplexity), true
+		return e.complexity.SagaObject.ActionDoneBy(childComplexity), true
 
 	case "SagaObject.children":
 		if e.complexity.SagaObject.Children == nil {
@@ -628,94 +609,6 @@ func (ec *executionContext) fieldContext_Query___schema(ctx context.Context, fie
 	return fc, nil
 }
 
-func (ec *executionContext) _SagaAction_user_id(ctx context.Context, field graphql.CollectedField, obj *model.SagaAction) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_SagaAction_user_id(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.UserID, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	fc.Result = res
-	return ec.marshalNID2string(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_SagaAction_user_id(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "SagaAction",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type ID does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _SagaAction_user_name(ctx context.Context, field graphql.CollectedField, obj *model.SagaAction) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_SagaAction_user_name(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.UserName, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_SagaAction_user_name(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "SagaAction",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
 func (ec *executionContext) _SagaObject_id(ctx context.Context, field graphql.CollectedField, obj *model.SagaObject) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_SagaObject_id(ctx, field)
 	if err != nil {
@@ -812,8 +705,8 @@ func (ec *executionContext) fieldContext_SagaObject_copy(ctx context.Context, fi
 				return ec.fieldContext_SagaObject_status(ctx, field)
 			case "object_status":
 				return ec.fieldContext_SagaObject_object_status(ctx, field)
-			case "action":
-				return ec.fieldContext_SagaObject_action(ctx, field)
+			case "action_done_by":
+				return ec.fieldContext_SagaObject_action_done_by(ctx, field)
 			case "parent_id":
 				return ec.fieldContext_SagaObject_parent_id(ctx, field)
 			case "children":
@@ -1083,8 +976,8 @@ func (ec *executionContext) fieldContext_SagaObject_object_status(ctx context.Co
 	return fc, nil
 }
 
-func (ec *executionContext) _SagaObject_action(ctx context.Context, field graphql.CollectedField, obj *model.SagaObject) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_SagaObject_action(ctx, field)
+func (ec *executionContext) _SagaObject_action_done_by(ctx context.Context, field graphql.CollectedField, obj *model.SagaObject) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_SagaObject_action_done_by(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -1097,7 +990,7 @@ func (ec *executionContext) _SagaObject_action(ctx context.Context, field graphq
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Action, nil
+		return obj.ActionDoneBy, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1109,25 +1002,19 @@ func (ec *executionContext) _SagaObject_action(ctx context.Context, field graphq
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.SagaAction)
+	res := resTmp.(string)
 	fc.Result = res
-	return ec.marshalNSagaAction2ᚖsagaᚋgraphᚋmodelᚐSagaAction(ctx, field.Selections, res)
+	return ec.marshalNID2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_SagaObject_action(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_SagaObject_action_done_by(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "SagaObject",
 		Field:      field,
 		IsMethod:   false,
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "user_id":
-				return ec.fieldContext_SagaAction_user_id(ctx, field)
-			case "user_name":
-				return ec.fieldContext_SagaAction_user_name(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type SagaAction", field.Name)
+			return nil, errors.New("field of type ID does not have child fields")
 		},
 	}
 	return fc, nil
@@ -1226,8 +1113,8 @@ func (ec *executionContext) fieldContext_SagaObject_children(ctx context.Context
 				return ec.fieldContext_SagaObject_status(ctx, field)
 			case "object_status":
 				return ec.fieldContext_SagaObject_object_status(ctx, field)
-			case "action":
-				return ec.fieldContext_SagaObject_action(ctx, field)
+			case "action_done_by":
+				return ec.fieldContext_SagaObject_action_done_by(ctx, field)
 			case "parent_id":
 				return ec.fieldContext_SagaObject_parent_id(ctx, field)
 			case "children":
@@ -3377,50 +3264,6 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 	return out
 }
 
-var sagaActionImplementors = []string{"SagaAction"}
-
-func (ec *executionContext) _SagaAction(ctx context.Context, sel ast.SelectionSet, obj *model.SagaAction) graphql.Marshaler {
-	fields := graphql.CollectFields(ec.OperationContext, sel, sagaActionImplementors)
-
-	out := graphql.NewFieldSet(fields)
-	deferred := make(map[string]*graphql.FieldSet)
-	for i, field := range fields {
-		switch field.Name {
-		case "__typename":
-			out.Values[i] = graphql.MarshalString("SagaAction")
-		case "user_id":
-			out.Values[i] = ec._SagaAction_user_id(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
-		case "user_name":
-			out.Values[i] = ec._SagaAction_user_name(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
-		default:
-			panic("unknown field " + strconv.Quote(field.Name))
-		}
-	}
-	out.Dispatch(ctx)
-	if out.Invalids > 0 {
-		return graphql.Null
-	}
-
-	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
-
-	for label, dfs := range deferred {
-		ec.processDeferredGroup(graphql.DeferredGroup{
-			Label:    label,
-			Path:     graphql.GetPath(ctx),
-			FieldSet: dfs,
-			Context:  ctx,
-		})
-	}
-
-	return out
-}
-
 var sagaObjectImplementors = []string{"SagaObject"}
 
 func (ec *executionContext) _SagaObject(ctx context.Context, sel ast.SelectionSet, obj *model.SagaObject) graphql.Marshaler {
@@ -3463,8 +3306,8 @@ func (ec *executionContext) _SagaObject(ctx context.Context, sel ast.SelectionSe
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
-		case "action":
-			out.Values[i] = ec._SagaObject_action(ctx, field, obj)
+		case "action_done_by":
+			out.Values[i] = ec._SagaObject_action_done_by(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
@@ -3908,16 +3751,6 @@ func (ec *executionContext) marshalNID2string(ctx context.Context, sel ast.Selec
 		}
 	}
 	return res
-}
-
-func (ec *executionContext) marshalNSagaAction2ᚖsagaᚋgraphᚋmodelᚐSagaAction(ctx context.Context, sel ast.SelectionSet, v *model.SagaAction) graphql.Marshaler {
-	if v == nil {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
-		}
-		return graphql.Null
-	}
-	return ec._SagaAction(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalNSagaObjectStatus2sagaᚋgraphᚋmodelᚐSagaObjectStatus(ctx context.Context, v interface{}) (model.SagaObjectStatus, error) {

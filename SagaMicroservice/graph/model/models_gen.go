@@ -8,11 +8,6 @@ import (
 	"strconv"
 )
 
-type SagaAction struct {
-	UserID   string `json:"user_id"`
-	UserName string `json:"user_name"`
-}
-
 type SagaFilter struct {
 	SoftDeleted bool            `json:"soft_deleted"`
 	ObjectID    string          `json:"object_id"`
@@ -28,7 +23,7 @@ type SagaObject struct {
 	UpdatedAt    *string                   `json:"updated_at,omitempty"`
 	Status       *SagaObjectStatusProgress `json:"status,omitempty"`
 	ObjectStatus SagaObjectStatus          `json:"object_status"`
-	Action       *SagaAction               `json:"action"`
+	ActionDoneBy string                    `json:"action_done_by"`
 	ParentID     *string                   `json:"parent_id,omitempty"`
 	Children     []*SagaObject             `json:"children,omitempty"`
 }
