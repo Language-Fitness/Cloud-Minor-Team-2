@@ -6,33 +6,20 @@ package graph
 
 import (
 	"context"
-	"fmt"
 	"saga/graph/model"
+	"saga/internal/auth"
 )
 
-// DeleteSchool is the resolver for the deleteSchool field.
-func (r *mutationResolver) DeleteSchool(ctx context.Context, filter *model.SagaFilter) (*model.SuccessMessage, error) {
-	panic(fmt.Errorf("not implemented: DeleteSchool - deleteSchool"))
-}
+// DeleteObject is the resolver for the deleteObject field.
+func (r *mutationResolver) DeleteObject(ctx context.Context, filter *model.SagaFilter) (*model.SuccessMessage, error) {
+	token := auth.TokenFromContext(ctx)
 
-// DeleteClass is the resolver for the deleteClass field.
-func (r *mutationResolver) DeleteClass(ctx context.Context, filter *model.SagaFilter) (*model.SuccessMessage, error) {
-	panic(fmt.Errorf("not implemented: DeleteClass - deleteClass"))
-}
+	sagaObject, err := r.Service.InitSagaSteps(token, filter)
+	if err != nil {
+		return nil, err
+	}
 
-// DeleteExercise is the resolver for the deleteExercise field.
-func (r *mutationResolver) DeleteExercise(ctx context.Context, filter *model.SagaFilter) (*model.SuccessMessage, error) {
-	panic(fmt.Errorf("not implemented: DeleteExercise - deleteExercise"))
-}
-
-// DeleteResult is the resolver for the deleteResult field.
-func (r *mutationResolver) DeleteResult(ctx context.Context, filter *model.SagaFilter) (*model.SuccessMessage, error) {
-	panic(fmt.Errorf("not implemented: DeleteResult - deleteResult"))
-}
-
-// DeleteModule is the resolver for the deleteModule field.
-func (r *mutationResolver) DeleteModule(ctx context.Context, filter *model.SagaFilter) (*model.SuccessMessage, error) {
-	panic(fmt.Errorf("not implemented: DeleteModule - deleteModule"))
+	return sagaObject, nil
 }
 
 // Mutation returns MutationResolver implementation.

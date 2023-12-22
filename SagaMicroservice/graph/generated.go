@@ -47,11 +47,7 @@ type DirectiveRoot struct {
 
 type ComplexityRoot struct {
 	Mutation struct {
-		DeleteClass    func(childComplexity int, filter *model.SagaFilter) int
-		DeleteExercise func(childComplexity int, filter *model.SagaFilter) int
-		DeleteModule   func(childComplexity int, filter *model.SagaFilter) int
-		DeleteResult   func(childComplexity int, filter *model.SagaFilter) int
-		DeleteSchool   func(childComplexity int, filter *model.SagaFilter) int
+		DeleteObject func(childComplexity int, filter *model.SagaFilter) int
 	}
 
 	Query struct {
@@ -86,11 +82,7 @@ type ComplexityRoot struct {
 }
 
 type MutationResolver interface {
-	DeleteSchool(ctx context.Context, filter *model.SagaFilter) (*model.SuccessMessage, error)
-	DeleteClass(ctx context.Context, filter *model.SagaFilter) (*model.SuccessMessage, error)
-	DeleteExercise(ctx context.Context, filter *model.SagaFilter) (*model.SuccessMessage, error)
-	DeleteResult(ctx context.Context, filter *model.SagaFilter) (*model.SuccessMessage, error)
-	DeleteModule(ctx context.Context, filter *model.SagaFilter) (*model.SuccessMessage, error)
+	DeleteObject(ctx context.Context, filter *model.SagaFilter) (*model.SuccessMessage, error)
 }
 
 type executableSchema struct {
@@ -112,65 +104,17 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 	_ = ec
 	switch typeName + "." + field {
 
-	case "Mutation.deleteClass":
-		if e.complexity.Mutation.DeleteClass == nil {
+	case "Mutation.deleteObject":
+		if e.complexity.Mutation.DeleteObject == nil {
 			break
 		}
 
-		args, err := ec.field_Mutation_deleteClass_args(context.TODO(), rawArgs)
+		args, err := ec.field_Mutation_deleteObject_args(context.TODO(), rawArgs)
 		if err != nil {
 			return 0, false
 		}
 
-		return e.complexity.Mutation.DeleteClass(childComplexity, args["filter"].(*model.SagaFilter)), true
-
-	case "Mutation.deleteExercise":
-		if e.complexity.Mutation.DeleteExercise == nil {
-			break
-		}
-
-		args, err := ec.field_Mutation_deleteExercise_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Mutation.DeleteExercise(childComplexity, args["filter"].(*model.SagaFilter)), true
-
-	case "Mutation.deleteModule":
-		if e.complexity.Mutation.DeleteModule == nil {
-			break
-		}
-
-		args, err := ec.field_Mutation_deleteModule_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Mutation.DeleteModule(childComplexity, args["filter"].(*model.SagaFilter)), true
-
-	case "Mutation.deleteResult":
-		if e.complexity.Mutation.DeleteResult == nil {
-			break
-		}
-
-		args, err := ec.field_Mutation_deleteResult_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Mutation.DeleteResult(childComplexity, args["filter"].(*model.SagaFilter)), true
-
-	case "Mutation.deleteSchool":
-		if e.complexity.Mutation.DeleteSchool == nil {
-			break
-		}
-
-		args, err := ec.field_Mutation_deleteSchool_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Mutation.DeleteSchool(childComplexity, args["filter"].(*model.SagaFilter)), true
+		return e.complexity.Mutation.DeleteObject(childComplexity, args["filter"].(*model.SagaFilter)), true
 
 	case "SagaAction.user_id":
 		if e.complexity.SagaAction.UserID == nil {
@@ -423,67 +367,7 @@ var parsedSchema = gqlparser.MustLoadSchema(sources...)
 
 // region    ***************************** args.gotpl *****************************
 
-func (ec *executionContext) field_Mutation_deleteClass_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 *model.SagaFilter
-	if tmp, ok := rawArgs["filter"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
-		arg0, err = ec.unmarshalOSagaFilter2ᚖsagaᚋgraphᚋmodelᚐSagaFilter(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["filter"] = arg0
-	return args, nil
-}
-
-func (ec *executionContext) field_Mutation_deleteExercise_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 *model.SagaFilter
-	if tmp, ok := rawArgs["filter"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
-		arg0, err = ec.unmarshalOSagaFilter2ᚖsagaᚋgraphᚋmodelᚐSagaFilter(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["filter"] = arg0
-	return args, nil
-}
-
-func (ec *executionContext) field_Mutation_deleteModule_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 *model.SagaFilter
-	if tmp, ok := rawArgs["filter"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
-		arg0, err = ec.unmarshalOSagaFilter2ᚖsagaᚋgraphᚋmodelᚐSagaFilter(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["filter"] = arg0
-	return args, nil
-}
-
-func (ec *executionContext) field_Mutation_deleteResult_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 *model.SagaFilter
-	if tmp, ok := rawArgs["filter"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
-		arg0, err = ec.unmarshalOSagaFilter2ᚖsagaᚋgraphᚋmodelᚐSagaFilter(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["filter"] = arg0
-	return args, nil
-}
-
-func (ec *executionContext) field_Mutation_deleteSchool_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_Mutation_deleteObject_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
 	var arg0 *model.SagaFilter
@@ -551,8 +435,8 @@ func (ec *executionContext) field___Type_fields_args(ctx context.Context, rawArg
 
 // region    **************************** field.gotpl *****************************
 
-func (ec *executionContext) _Mutation_deleteSchool(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Mutation_deleteSchool(ctx, field)
+func (ec *executionContext) _Mutation_deleteObject(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_deleteObject(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -565,7 +449,7 @@ func (ec *executionContext) _Mutation_deleteSchool(ctx context.Context, field gr
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().DeleteSchool(rctx, fc.Args["filter"].(*model.SagaFilter))
+		return ec.resolvers.Mutation().DeleteObject(rctx, fc.Args["filter"].(*model.SagaFilter))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -579,7 +463,7 @@ func (ec *executionContext) _Mutation_deleteSchool(ctx context.Context, field gr
 	return ec.marshalOSuccessMessage2ᚖsagaᚋgraphᚋmodelᚐSuccessMessage(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Mutation_deleteSchool(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Mutation_deleteObject(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Mutation",
 		Field:      field,
@@ -608,263 +492,7 @@ func (ec *executionContext) fieldContext_Mutation_deleteSchool(ctx context.Conte
 		}
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Mutation_deleteSchool_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
-		ec.Error(ctx, err)
-		return fc, err
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Mutation_deleteClass(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Mutation_deleteClass(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().DeleteClass(rctx, fc.Args["filter"].(*model.SagaFilter))
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*model.SuccessMessage)
-	fc.Result = res
-	return ec.marshalOSuccessMessage2ᚖsagaᚋgraphᚋmodelᚐSuccessMessage(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Mutation_deleteClass(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Mutation",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "id":
-				return ec.fieldContext_SuccessMessage_id(ctx, field)
-			case "text":
-				return ec.fieldContext_SuccessMessage_text(ctx, field)
-			case "status":
-				return ec.fieldContext_SuccessMessage_status(ctx, field)
-			case "object_id":
-				return ec.fieldContext_SuccessMessage_object_id(ctx, field)
-			case "object_type":
-				return ec.fieldContext_SuccessMessage_object_type(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type SuccessMessage", field.Name)
-		},
-	}
-	defer func() {
-		if r := recover(); r != nil {
-			err = ec.Recover(ctx, r)
-			ec.Error(ctx, err)
-		}
-	}()
-	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Mutation_deleteClass_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
-		ec.Error(ctx, err)
-		return fc, err
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Mutation_deleteExercise(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Mutation_deleteExercise(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().DeleteExercise(rctx, fc.Args["filter"].(*model.SagaFilter))
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*model.SuccessMessage)
-	fc.Result = res
-	return ec.marshalOSuccessMessage2ᚖsagaᚋgraphᚋmodelᚐSuccessMessage(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Mutation_deleteExercise(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Mutation",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "id":
-				return ec.fieldContext_SuccessMessage_id(ctx, field)
-			case "text":
-				return ec.fieldContext_SuccessMessage_text(ctx, field)
-			case "status":
-				return ec.fieldContext_SuccessMessage_status(ctx, field)
-			case "object_id":
-				return ec.fieldContext_SuccessMessage_object_id(ctx, field)
-			case "object_type":
-				return ec.fieldContext_SuccessMessage_object_type(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type SuccessMessage", field.Name)
-		},
-	}
-	defer func() {
-		if r := recover(); r != nil {
-			err = ec.Recover(ctx, r)
-			ec.Error(ctx, err)
-		}
-	}()
-	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Mutation_deleteExercise_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
-		ec.Error(ctx, err)
-		return fc, err
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Mutation_deleteResult(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Mutation_deleteResult(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().DeleteResult(rctx, fc.Args["filter"].(*model.SagaFilter))
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*model.SuccessMessage)
-	fc.Result = res
-	return ec.marshalOSuccessMessage2ᚖsagaᚋgraphᚋmodelᚐSuccessMessage(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Mutation_deleteResult(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Mutation",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "id":
-				return ec.fieldContext_SuccessMessage_id(ctx, field)
-			case "text":
-				return ec.fieldContext_SuccessMessage_text(ctx, field)
-			case "status":
-				return ec.fieldContext_SuccessMessage_status(ctx, field)
-			case "object_id":
-				return ec.fieldContext_SuccessMessage_object_id(ctx, field)
-			case "object_type":
-				return ec.fieldContext_SuccessMessage_object_type(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type SuccessMessage", field.Name)
-		},
-	}
-	defer func() {
-		if r := recover(); r != nil {
-			err = ec.Recover(ctx, r)
-			ec.Error(ctx, err)
-		}
-	}()
-	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Mutation_deleteResult_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
-		ec.Error(ctx, err)
-		return fc, err
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Mutation_deleteModule(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Mutation_deleteModule(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().DeleteModule(rctx, fc.Args["filter"].(*model.SagaFilter))
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*model.SuccessMessage)
-	fc.Result = res
-	return ec.marshalOSuccessMessage2ᚖsagaᚋgraphᚋmodelᚐSuccessMessage(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Mutation_deleteModule(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Mutation",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "id":
-				return ec.fieldContext_SuccessMessage_id(ctx, field)
-			case "text":
-				return ec.fieldContext_SuccessMessage_text(ctx, field)
-			case "status":
-				return ec.fieldContext_SuccessMessage_status(ctx, field)
-			case "object_id":
-				return ec.fieldContext_SuccessMessage_object_id(ctx, field)
-			case "object_type":
-				return ec.fieldContext_SuccessMessage_object_type(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type SuccessMessage", field.Name)
-		},
-	}
-	defer func() {
-		if r := recover(); r != nil {
-			err = ec.Recover(ctx, r)
-			ec.Error(ctx, err)
-		}
-	}()
-	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Mutation_deleteModule_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+	if fc.Args, err = ec.field_Mutation_deleteObject_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -3672,25 +3300,9 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Mutation")
-		case "deleteSchool":
+		case "deleteObject":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Mutation_deleteSchool(ctx, field)
-			})
-		case "deleteClass":
-			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Mutation_deleteClass(ctx, field)
-			})
-		case "deleteExercise":
-			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Mutation_deleteExercise(ctx, field)
-			})
-		case "deleteResult":
-			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Mutation_deleteResult(ctx, field)
-			})
-		case "deleteModule":
-			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Mutation_deleteModule(ctx, field)
+				return ec._Mutation_deleteObject(ctx, field)
 			})
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))

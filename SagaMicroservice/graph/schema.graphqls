@@ -46,11 +46,7 @@ input SagaFilter {
 }
 
 type Mutation {
-  deleteSchool(filter: SagaFilter): SuccessMessage
-  deleteClass(filter: SagaFilter): SuccessMessage
-  deleteExercise(filter: SagaFilter): SuccessMessage
-  deleteResult(filter: SagaFilter): SuccessMessage
-  deleteModule(filter: SagaFilter): SuccessMessage
+  deleteObject(filter: SagaFilter): SuccessMessage
 }
 
 enum SagaObjectTypes {
