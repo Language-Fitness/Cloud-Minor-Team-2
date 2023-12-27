@@ -3,8 +3,6 @@ package service
 import (
 	"fmt"
 	"go.mongodb.org/mongo-driver/mongo"
-	"google.golang.org/grpc"
-	"log"
 	"saga/graph/model"
 	"saga/internal/auth"
 	"saga/internal/validation"
@@ -33,16 +31,7 @@ type SagaService struct {
 
 // NewSagaService GOLANG FACTORY
 // Returns a SagaService implementing ISagaService.
-func NewSagaService(collection *mongo.Collection) ISagaService {
-	conn, err := grpc.Dial("localhost:9090" /*We need a certificate for this shit! grpc.WithTransportCredentials()*/)
-	if err != nil {
-		log.Fatalf("failed to dial: %v", err)
-	}
-	defer conn.Close()
-
-	// Create a gRPC client using the connection
-	grpcClient := pb.NewGRPCSagaServiceClient(conn)
-
+func NewSagaService(grpcClient pb.GRPCSagaServiceClient, collection *mongo.Collection) ISagaService {
 	return &SagaService{
 		Validator:  validation.NewValidator(),
 		Policy:     auth.NewPolicy(),
