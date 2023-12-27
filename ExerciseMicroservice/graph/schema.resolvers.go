@@ -6,33 +6,68 @@ package graph
 
 import (
 	"ExerciseMicroservice/graph/model"
+	"ExerciseMicroservice/internal/auth"
 	"context"
-	"fmt"
 )
 
 // CreateExercise is the resolver for the CreateExercise field.
 func (r *mutationResolver) CreateExercise(ctx context.Context, exercise model.ExerciseInput) (*model.Exercise, error) {
-	panic(fmt.Errorf("not implemented: CreateExercise - CreateExercise"))
+	token := auth.TokenFromContext(ctx)
+
+	createdExercise, err := r.Service.CreateExercise(token, exercise)
+	if err != nil {
+		return nil, err
+	}
+
+	return createdExercise, nil
 }
 
 // UpdateExercise is the resolver for the UpdateExercise field.
-func (r *mutationResolver) UpdateExercise(ctx context.Context, exercise model.ExerciseInput) (*model.Exercise, error) {
-	panic(fmt.Errorf("not implemented: UpdateExercise - UpdateExercise"))
+func (r *mutationResolver) UpdateExercise(ctx context.Context, id string, exercise model.ExerciseInput) (*model.Exercise, error) {
+	token := auth.TokenFromContext(ctx)
+
+	updatedExercise, err := r.Service.UpdateExercise(token, id, exercise)
+	if err != nil {
+		return nil, err
+	}
+
+	return updatedExercise, nil
 }
 
 // DeleteExercise is the resolver for the DeleteExercise field.
 func (r *mutationResolver) DeleteExercise(ctx context.Context, userID string, filter model.ExerciseFilter) (*model.Exercise, error) {
-	panic(fmt.Errorf("not implemented: DeleteExercise - DeleteExercise"))
+	token := auth.TokenFromContext(ctx)
+
+	err := r.Service.DeleteExercise(token, userID, &filter)
+	if err != nil {
+		return nil, err
+	}
+
+	return nil, nil
 }
 
 // GetExercise is the resolver for the GetExercise field.
-func (r *queryResolver) GetExercise(ctx context.Context, exerciseID string) ([]*model.Exercise, error) {
-	panic(fmt.Errorf("not implemented: GetExercise - GetExercise"))
+func (r *queryResolver) GetExercise(ctx context.Context, exerciseID string) (*model.Exercise, error) {
+	token := auth.TokenFromContext(ctx)
+
+	exercise, err := r.Service.GetExerciseById(token, exerciseID)
+	if err != nil {
+		return nil, err
+	}
+
+	return exercise, nil
 }
 
 // ListExercise is the resolver for the ListExercise field.
 func (r *queryResolver) ListExercise(ctx context.Context, filter model.ExerciseFilter, paginator model.Paginator) ([]*model.Exercise, error) {
-	panic(fmt.Errorf("not implemented: ListExercise - ListExercise"))
+	token := auth.TokenFromContext(ctx)
+
+	exercises, err := r.Service.ListExercises(token, &filter, &paginator)
+	if err != nil {
+		return nil, err
+	}
+
+	return exercises, nil
 }
 
 // Mutation returns MutationResolver implementation.

@@ -3,13 +3,13 @@ package service
 import (
 	"ExerciseMicroservice/graph/model"
 	"ExerciseMicroservice/internal/auth"
+	"ExerciseMicroservice/internal/database"
 	"ExerciseMicroservice/internal/helper"
 	"ExerciseMicroservice/internal/repository"
 	"ExerciseMicroservice/internal/validation"
 	"errors"
 	"github.com/google/uuid"
 	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"strings"
 	"time"
@@ -37,7 +37,8 @@ type ExerciseService struct {
 
 // NewExerciseService GOLANG FACTORY
 // Returns an ExerciseService implementing IExerciseService.
-func NewExerciseService(collection *mongo.Collection) IExerciseService {
+func NewExerciseService() IExerciseService {
+	collection, _ := database.GetCollection()
 	return &ExerciseService{
 		Validator: validation.NewValidator(),
 		Repo:      repository.NewExerciseRepository(collection),

@@ -1,7 +1,7 @@
 package validation
 
 import (
-	"ResultMicroservice/internal/helper"
+	"Module/internal/helper"
 	"fmt"
 	"strings"
 )

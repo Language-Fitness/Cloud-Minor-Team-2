@@ -2,6 +2,21 @@
 #
 # https://gqlgen.com/getting-started/
 
+input ResultFilter {
+    softDelete: Boolean
+    exerciseId: ID
+    userId: ID
+    classId: ID
+    moduleId: ID
+    input: String
+    result: String
+}
+
+input Paginator {
+    amount: Int!
+    step: Int!
+}
+
 type Result {
     id: ID!
     exercise_id: ID!

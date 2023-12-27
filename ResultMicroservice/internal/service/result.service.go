@@ -8,30 +8,28 @@ import (
 	"ResultMicroservice/internal/validation"
 	"errors"
 	"github.com/google/uuid"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo/options"
 	"strings"
 	"time"
 )
 
-const (
-	valErrorBase = "Validation errors: "
-)
+const ValidationPrefix = "Validation errors: "
 
 // IResultService GOLANG INTERFACE
 // Implements CRUD methods for queries and mutations on Result.
 type IResultService interface {
-	CreateResult(bearerToken string, newResult model.InputResult) (*model.Result, error)
-	UpdateResult(bearerToken string, id string, updateData model.InputResult) (*model.Result, error)
-	DeleteResult(bearerToken string, id string) error
-	GetResultById(bearerToken string, id string) (*model.Result, error)
-	ListResults(bearerToken string) ([]*model.Result, error) //TODO: implement
-
-	// Saga methods
-	SoftDeleteByUser(bearerToken string, userID string) (string, bool, error)
-	SoftDeleteByClass(bearerToken string, classID string) (string, bool, error)
-	SoftDeleteByModule(bearerToken string, moduleID string) (string, bool, error)
-	DeleteByUser(bearerToken string, userID string) (string, bool, error)
-	DeleteByClass(bearerToken string, classID string) (string, bool, error)
-	DeleteByModule(bearerToken string, moduleID string) (string, bool, error)
+	CreateResult(token string, newResult model.InputResult) (*model.Result, error)
+	UpdateResult(token string, id string, updateData model.InputResult) (*model.Result, error)
+	DeleteResult(token string, id string) error
+	GetResultById(token string, id string) (*model.Result, error)
+	ListResults(token string, filter *model.ResultFilter, paginate *model.Paginator) ([]*model.Result, error)
+	SoftDeleteByUser(token string, userID string) (string, bool, error)
+	SoftDeleteByClass(token string, classID string) (string, bool, error)
+	SoftDeleteByModule(token string, moduleID string) (string, bool, error)
+	DeleteByUser(token string, userID string) (string, bool, error)
+	DeleteByClass(token string, classID string) (string, bool, error)
+	DeleteByModule(token string, moduleID string) (string, bool, error)
 }
 
 // ResultService GOLANG STRUCT
@@ -54,13 +52,64 @@ func NewResultService() IResultService {
 	}
 }
 
-func (r *ResultService) ListResults(bearerToken string) ([]*model.Result, error) {
-	//TODO implement me
-	panic("implement me")
+func (r *ResultService) ListResults(token string, filter *model.ResultFilter, paginate *model.Paginator) ([]*model.Result, error) {
+	err := r.ResultPolicy.ListResult(token)
+	if err != nil {
+		return nil, err
+	}
+
+	validateListResultFilter(r.Validator, filter, paginate)
+	validationErrors := r.Validator.GetErrors()
+	if len(validationErrors) > 0 {
+		errorMessage := ValidationPrefix + strings.Join(validationErrors, ", ")
+		r.Validator.ClearErrors()
+		return nil, errors.New(errorMessage)
+	}
+
+	bsonFilter := buildBsonFilterForListResult(r.ResultPolicy, token, filter)
+
+	paginateOptions := options.Find().
+		SetSkip(int64(paginate.Step)).
+		SetLimit(int64(paginate.Amount))
+
+	results, err2 := r.Repo.ListResults(bsonFilter, paginateOptions)
+	if err2 != nil {
+		return nil, err2
+	}
+
+	return results, nil
 }
 
-func (r *ResultService) CreateResult(bearerToken string, newResult model.InputResult) (*model.Result, error) {
-	err := r.ResultPolicy.CreateResult(bearerToken)
+func validateListResultFilter(validator validation.IValidator, filter *model.ResultFilter, paginate *model.Paginator) {
+	validator.Validate(filter.SoftDelete, []string{"IsNull", "IsBoolean"}, "Filter SoftDelete")
+	validator.Validate(filter.ExerciseID, []string{"IsNull", "IsString"}, "Filter ExerciseID")
+	validator.Validate(filter.UserID, []string{"IsNull", "IsString"}, "Filter UserID")
+	validator.Validate(filter.ClassID, []string{"IsNull", "IsString"}, "Filter ClassID")
+	validator.Validate(filter.ModuleID, []string{"IsNull", "IsString"}, "Filter ModuleID")
+	validator.Validate(paginate.Amount, []string{"IsInt", "Size:>0", "Size:<101"}, "Paginate Amount")
+	validator.Validate(paginate.Step, []string{"IsInt", "Size:>=0"}, "Paginate Step")
+}
+
+func buildBsonFilterForListResult(policy auth.IResultPolicy, token string, filter *model.ResultFilter) bson.D {
+	bsonFilter := bson.D{}
+
+	appendCondition := func(key string, value interface{}) {
+		if value != nil && policy.HasPermissions(token, "filter_result_"+key) {
+			bsonFilter = append(bsonFilter, bson.E{Key: key, Value: value})
+		}
+	}
+
+	appendCondition("softdeleted", filter.SoftDelete)
+	appendCondition("exerciseid", filter.ExerciseID)
+	appendCondition("userid", filter.UserID)
+	appendCondition("classid", filter.ClassID)
+	appendCondition("moduleid", filter.ModuleID)
+
+	return bsonFilter
+}
+
+func (r *ResultService) CreateResult(token string, newResult model.InputResult) (*model.Result, error) {
+	err := r.ResultPolicy.CreateResult(token)
 	if err != nil {
 		return nil, err
 	}
@@ -69,7 +118,7 @@ func (r *ResultService) CreateResult(bearerToken string, newResult model.InputRe
 
 	validationErrors := r.Validator.GetErrors()
 	if len(validationErrors) > 0 {
-		errorMessage := valErrorBase + strings.Join(validationErrors, ", ")
+		errorMessage := ValidationPrefix + strings.Join(validationErrors, ", ")
 		r.Validator.ClearErrors()
 		return nil, errors.New(errorMessage)
 	}
@@ -96,18 +145,18 @@ func (r *ResultService) CreateResult(bearerToken string, newResult model.InputRe
 	return result, nil
 }
 
-func (r *ResultService) UpdateResult(bearerToken string, id string, updateData model.InputResult) (*model.Result, error) {
-	result, err := r.ResultPolicy.UpdateResult(bearerToken, id)
+func (r *ResultService) UpdateResult(token string, id string, updateData model.InputResult) (*model.Result, error) {
+	result, err := r.ResultPolicy.UpdateResult(token, id)
 	if err != nil {
 		return nil, err
 	}
 
 	r.ValidateResult(&updateData)
-	r.Validator.Validate(id, []string{"IsUUID"})
+	r.Validator.Validate(id, []string{"IsUUID"}, "ID")
 
 	validationErrors := r.Validator.GetErrors()
 	if len(validationErrors) > 0 {
-		errorMessage := valErrorBase + strings.Join(validationErrors, ", ")
+		errorMessage := ValidationPrefix + strings.Join(validationErrors, ", ")
 		r.Validator.ClearErrors()
 		return nil, errors.New(errorMessage)
 	}
@@ -135,17 +184,17 @@ func (r *ResultService) UpdateResult(bearerToken string, id string, updateData m
 	return updatedResult, nil
 }
 
-func (r *ResultService) DeleteResult(bearerToken string, id string) error {
-	err := r.ResultPolicy.DeleteResult(bearerToken, id)
+func (r *ResultService) DeleteResult(token string, id string) error {
+	err := r.ResultPolicy.DeleteResult(token, id)
 	if err != nil {
 		return err
 	}
 
-	r.Validator.Validate(id, []string{"IsUUID"})
+	r.Validator.Validate(id, []string{"IsUUID"}, "ID")
 
 	validationErrors := r.Validator.GetErrors()
 	if len(validationErrors) > 0 {
-		errorMessage := valErrorBase + strings.Join(validationErrors, ", ")
+		errorMessage := ValidationPrefix + strings.Join(validationErrors, ", ")
 		r.Validator.ClearErrors()
 		return errors.New(errorMessage)
 	}
@@ -158,17 +207,17 @@ func (r *ResultService) DeleteResult(bearerToken string, id string) error {
 	return nil
 }
 
-func (r *ResultService) GetResultById(bearerToken string, id string) (*model.Result, error) {
-	err := r.ResultPolicy.GetResultByID(bearerToken, id)
+func (r *ResultService) GetResultById(token string, id string) (*model.Result, error) {
+	err := r.ResultPolicy.GetResultByID(token, id)
 	if err != nil {
 		return nil, err
 	}
 
-	r.Validator.Validate(id, []string{"IsUUID"})
+	r.Validator.Validate(id, []string{"IsUUID"}, "ID")
 
 	validationErrors := r.Validator.GetErrors()
 	if len(validationErrors) > 0 {
-		errorMessage := valErrorBase + strings.Join(validationErrors, ", ")
+		errorMessage := ValidationPrefix + strings.Join(validationErrors, ", ")
 		r.Validator.ClearErrors()
 		return nil, errors.New(errorMessage)
 	}
@@ -183,17 +232,17 @@ func (r *ResultService) GetResultById(bearerToken string, id string) (*model.Res
 
 // Saga grpc methods
 
-func (r *ResultService) SoftDeleteByUser(bearerToken string, userID string) (string, bool, error) {
-	err := r.ResultPolicy.SoftDeleteByUser(bearerToken, userID)
+func (r *ResultService) SoftDeleteByUser(token string, userID string) (string, bool, error) {
+	err := r.ResultPolicy.SoftDeleteByUser(token, userID)
 	if err != nil {
 		return userID, false, err
 	}
 
-	r.Validator.Validate(userID, []string{"IsUUID"})
+	r.Validator.Validate(userID, []string{"IsUUID"}, "ID")
 
 	validationErrors := r.Validator.GetErrors()
 	if len(validationErrors) > 0 {
-		errorMessage := valErrorBase + strings.Join(validationErrors, ", ")
+		errorMessage := ValidationPrefix + strings.Join(validationErrors, ", ")
 		r.Validator.ClearErrors()
 		return userID, false, errors.New(errorMessage)
 	}
@@ -206,17 +255,17 @@ func (r *ResultService) SoftDeleteByUser(bearerToken string, userID string) (str
 	return userID, true, nil
 }
 
-func (r *ResultService) SoftDeleteByClass(bearerToken string, classID string) (string, bool, error) {
-	err := r.ResultPolicy.SoftDeleteByClass(bearerToken, classID)
+func (r *ResultService) SoftDeleteByClass(token string, classID string) (string, bool, error) {
+	err := r.ResultPolicy.SoftDeleteByClass(token, classID)
 	if err != nil {
 		return classID, false, err
 	}
 
-	r.Validator.Validate(classID, []string{"IsUUID"})
+	r.Validator.Validate(classID, []string{"IsUUID"}, "ID")
 
 	validationErrors := r.Validator.GetErrors()
 	if len(validationErrors) > 0 {
-		errorMessage := valErrorBase + strings.Join(validationErrors, ", ")
+		errorMessage := ValidationPrefix + strings.Join(validationErrors, ", ")
 		r.Validator.ClearErrors()
 		return classID, false, errors.New(errorMessage)
 	}
@@ -229,17 +278,17 @@ func (r *ResultService) SoftDeleteByClass(bearerToken string, classID string) (s
 	return classID, true, nil
 }
 
-func (r *ResultService) SoftDeleteByModule(bearerToken string, moduleID string) (string, bool, error) {
-	err := r.ResultPolicy.SoftDeleteByModule(bearerToken, moduleID)
+func (r *ResultService) SoftDeleteByModule(token string, moduleID string) (string, bool, error) {
+	err := r.ResultPolicy.SoftDeleteByModule(token, moduleID)
 	if err != nil {
 		return moduleID, false, err
 	}
 
-	r.Validator.Validate(moduleID, []string{"IsUUID"})
+	r.Validator.Validate(moduleID, []string{"IsUUID"}, "ID")
 
 	validationErrors := r.Validator.GetErrors()
 	if len(validationErrors) > 0 {
-		errorMessage := valErrorBase + strings.Join(validationErrors, ", ")
+		errorMessage := ValidationPrefix + strings.Join(validationErrors, ", ")
 		r.Validator.ClearErrors()
 		return moduleID, false, errors.New(errorMessage)
 	}
@@ -252,17 +301,17 @@ func (r *ResultService) SoftDeleteByModule(bearerToken string, moduleID string) 
 	return moduleID, true, nil
 }
 
-func (r *ResultService) DeleteByUser(bearerToken string, userID string) (string, bool, error) {
-	err := r.ResultPolicy.DeleteByUser(bearerToken, userID)
+func (r *ResultService) DeleteByUser(token string, userID string) (string, bool, error) {
+	err := r.ResultPolicy.DeleteByUser(token, userID)
 	if err != nil {
 		return userID, false, err
 	}
 
-	r.Validator.Validate(userID, []string{"IsUUID"})
+	r.Validator.Validate(userID, []string{"IsUUID"}, "ID")
 
 	validationErrors := r.Validator.GetErrors()
 	if len(validationErrors) > 0 {
-		errorMessage := valErrorBase + strings.Join(validationErrors, ", ")
+		errorMessage := ValidationPrefix + strings.Join(validationErrors, ", ")
 		r.Validator.ClearErrors()
 		return userID, false, errors.New(errorMessage)
 	}
@@ -275,17 +324,17 @@ func (r *ResultService) DeleteByUser(bearerToken string, userID string) (string,
 	return userID, true, nil
 }
 
-func (r *ResultService) DeleteByClass(bearerToken string, classID string) (string, bool, error) {
-	err := r.ResultPolicy.DeleteByClass(bearerToken, classID)
+func (r *ResultService) DeleteByClass(token string, classID string) (string, bool, error) {
+	err := r.ResultPolicy.DeleteByClass(token, classID)
 	if err != nil {
 		return classID, false, err
 	}
 
-	r.Validator.Validate(classID, []string{"IsUUID"})
+	r.Validator.Validate(classID, []string{"IsUUID"}, "ID")
 
 	validationErrors := r.Validator.GetErrors()
 	if len(validationErrors) > 0 {
-		errorMessage := valErrorBase + strings.Join(validationErrors, ", ")
+		errorMessage := ValidationPrefix + strings.Join(validationErrors, ", ")
 		r.Validator.ClearErrors()
 		return classID, false, errors.New(errorMessage)
 	}
@@ -298,17 +347,17 @@ func (r *ResultService) DeleteByClass(bearerToken string, classID string) (strin
 	return classID, true, nil
 }
 
-func (r *ResultService) DeleteByModule(bearerToken string, moduleID string) (string, bool, error) {
-	err := r.ResultPolicy.DeleteByModule(bearerToken, moduleID)
+func (r *ResultService) DeleteByModule(token string, moduleID string) (string, bool, error) {
+	err := r.ResultPolicy.DeleteByModule(token, moduleID)
 	if err != nil {
 		return moduleID, false, err
 	}
 
-	r.Validator.Validate(moduleID, []string{"IsUUID"})
+	r.Validator.Validate(moduleID, []string{"IsUUID"}, "ID")
 
 	validationErrors := r.Validator.GetErrors()
 	if len(validationErrors) > 0 {
-		errorMessage := valErrorBase + strings.Join(validationErrors, ", ")
+		errorMessage := ValidationPrefix + strings.Join(validationErrors, ", ")
 		r.Validator.ClearErrors()
 		return moduleID, false, errors.New(errorMessage)
 	}
@@ -322,10 +371,10 @@ func (r *ResultService) DeleteByModule(bearerToken string, moduleID string) (str
 }
 
 func (r *ResultService) ValidateResult(result *model.InputResult) {
-	r.Validator.Validate(result.ExerciseID, []string{"IsUUID"})
-	r.Validator.Validate(result.UserID, []string{"IsUUID"})
-	r.Validator.Validate(result.ClassID, []string{"IsUUID"})
-	r.Validator.Validate(result.ModuleID, []string{"IsUUID"})
-	r.Validator.Validate(result.Input, []string{"IsString"})
-	r.Validator.Validate(result.Result, []string{"IsString"})
+	r.Validator.Validate(result.ExerciseID, []string{"IsUUID"}, "ExerciseID")
+	r.Validator.Validate(result.UserID, []string{"IsUUID"}, "UserID")
+	r.Validator.Validate(result.ClassID, []string{"IsUUID"}, "ClassID")
+	r.Validator.Validate(result.ModuleID, []string{"IsUUID"}, "ModuleID")
+	r.Validator.Validate(result.Input, []string{"IsString"}, "Input")
+	r.Validator.Validate(result.Result, []string{"IsString"}, "Result")
 }
