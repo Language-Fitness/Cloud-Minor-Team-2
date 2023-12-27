@@ -25,7 +25,6 @@ type SagaObject struct {
 	ObjectStatus SagaObjectStatus          `json:"object_status"`
 	ActionDoneBy string                    `json:"action_done_by"`
 	ParentID     *string                   `json:"parent_id,omitempty"`
-	Children     []*SagaObject             `json:"children,omitempty"`
 }
 
 type SuccessMessage struct {

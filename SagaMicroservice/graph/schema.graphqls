@@ -31,7 +31,6 @@ type SagaObject {
   object_status: SagaObjectStatus!
   action_done_by: ID!
   parent_id: ID
-  children: [SagaObject]
 }
 
 input SagaFilter {

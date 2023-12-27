@@ -55,7 +55,6 @@ type ComplexityRoot struct {
 
 	SagaObject struct {
 		ActionDoneBy func(childComplexity int) int
-		Children     func(childComplexity int) int
 		Copy         func(childComplexity int) int
 		CreatedAt    func(childComplexity int) int
 		ID           func(childComplexity int) int
@@ -117,13 +116,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.SagaObject.ActionDoneBy(childComplexity), true
-
-	case "SagaObject.children":
-		if e.complexity.SagaObject.Children == nil {
-			break
-		}
-
-		return e.complexity.SagaObject.Children(childComplexity), true
 
 	case "SagaObject.copy":
 		if e.complexity.SagaObject.Copy == nil {
@@ -709,8 +701,6 @@ func (ec *executionContext) fieldContext_SagaObject_copy(ctx context.Context, fi
 				return ec.fieldContext_SagaObject_action_done_by(ctx, field)
 			case "parent_id":
 				return ec.fieldContext_SagaObject_parent_id(ctx, field)
-			case "children":
-				return ec.fieldContext_SagaObject_children(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type SagaObject", field.Name)
 		},
@@ -1056,71 +1046,6 @@ func (ec *executionContext) fieldContext_SagaObject_parent_id(ctx context.Contex
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type ID does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _SagaObject_children(ctx context.Context, field graphql.CollectedField, obj *model.SagaObject) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_SagaObject_children(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Children, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.([]*model.SagaObject)
-	fc.Result = res
-	return ec.marshalOSagaObject2ᚕᚖsagaᚋgraphᚋmodelᚐSagaObject(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_SagaObject_children(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "SagaObject",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "id":
-				return ec.fieldContext_SagaObject_id(ctx, field)
-			case "copy":
-				return ec.fieldContext_SagaObject_copy(ctx, field)
-			case "object_id":
-				return ec.fieldContext_SagaObject_object_id(ctx, field)
-			case "object_type":
-				return ec.fieldContext_SagaObject_object_type(ctx, field)
-			case "created_at":
-				return ec.fieldContext_SagaObject_created_at(ctx, field)
-			case "updated_at":
-				return ec.fieldContext_SagaObject_updated_at(ctx, field)
-			case "status":
-				return ec.fieldContext_SagaObject_status(ctx, field)
-			case "object_status":
-				return ec.fieldContext_SagaObject_object_status(ctx, field)
-			case "action_done_by":
-				return ec.fieldContext_SagaObject_action_done_by(ctx, field)
-			case "parent_id":
-				return ec.fieldContext_SagaObject_parent_id(ctx, field)
-			case "children":
-				return ec.fieldContext_SagaObject_children(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type SagaObject", field.Name)
 		},
 	}
 	return fc, nil
@@ -3313,8 +3238,6 @@ func (ec *executionContext) _SagaObject(ctx context.Context, sel ast.SelectionSe
 			}
 		case "parent_id":
 			out.Values[i] = ec._SagaObject_parent_id(ctx, field, obj)
-		case "children":
-			out.Values[i] = ec._SagaObject_children(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -4089,47 +4012,6 @@ func (ec *executionContext) unmarshalOSagaFilter2ᚖsagaᚋgraphᚋmodelᚐSagaF
 	}
 	res, err := ec.unmarshalInputSagaFilter(ctx, v)
 	return &res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) marshalOSagaObject2ᚕᚖsagaᚋgraphᚋmodelᚐSagaObject(ctx context.Context, sel ast.SelectionSet, v []*model.SagaObject) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	ret := make(graphql.Array, len(v))
-	var wg sync.WaitGroup
-	isLen1 := len(v) == 1
-	if !isLen1 {
-		wg.Add(len(v))
-	}
-	for i := range v {
-		i := i
-		fc := &graphql.FieldContext{
-			Index:  &i,
-			Result: &v[i],
-		}
-		ctx := graphql.WithFieldContext(ctx, fc)
-		f := func(i int) {
-			defer func() {
-				if r := recover(); r != nil {
-					ec.Error(ctx, ec.Recover(ctx, r))
-					ret = nil
-				}
-			}()
-			if !isLen1 {
-				defer wg.Done()
-			}
-			ret[i] = ec.marshalOSagaObject2ᚖsagaᚋgraphᚋmodelᚐSagaObject(ctx, sel, v[i])
-		}
-		if isLen1 {
-			f(i)
-		} else {
-			go f(i)
-		}
-
-	}
-	wg.Wait()
-
-	return ret
 }
 
 func (ec *executionContext) marshalOSagaObject2ᚖsagaᚋgraphᚋmodelᚐSagaObject(ctx context.Context, sel ast.SelectionSet, v *model.SagaObject) graphql.Marshaler {

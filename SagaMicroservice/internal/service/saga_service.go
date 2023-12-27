@@ -3,16 +3,19 @@ package service
 import (
 	"fmt"
 	"go.mongodb.org/mongo-driver/mongo"
+	"google.golang.org/grpc"
+	"log"
 	"saga/graph/model"
 	"saga/internal/auth"
 	"saga/internal/validation"
+	"saga/proto/pb"
 	"time"
 )
 
 type ISagaService interface {
 	InitSagaSteps(token string, filter *model.SagaFilter) (*model.SuccessMessage, error)
 	initializeSagaObject(token string, filter *model.SagaFilter) (model.SagaObject, error)
-	findAllChildren(sagaObject model.SagaObject) (model.SagaObject, error)
+	findAllChildren(sagaObject model.SagaObject) ([]model.SagaObject, error)
 	findBottomChildren(sagaObject model.SagaObject) (model.SagaObject, error)
 	softDeleteItems(items []model.SagaObject) error
 	areAllItemsDeleted(items []model.SagaObject) bool
@@ -23,16 +26,27 @@ type ISagaService interface {
 // SagaService GOLANG STRUCT
 // Contains two interfaces for a Validator and a Repo.
 type SagaService struct {
-	Validator validation.IValidator
-	Policy    auth.IPolicy
+	Validator  validation.IValidator
+	Policy     auth.IPolicy
+	grpcClient pb.GRPCSagaServiceClient
 }
 
 // NewSagaService GOLANG FACTORY
 // Returns a SagaService implementing ISagaService.
 func NewSagaService(collection *mongo.Collection) ISagaService {
+	conn, err := grpc.Dial("localhost:9090" /*We need a certificate for this shit! grpc.WithTransportCredentials()*/)
+	if err != nil {
+		log.Fatalf("failed to dial: %v", err)
+	}
+	defer conn.Close()
+
+	// Create a gRPC client using the connection
+	grpcClient := pb.NewGRPCSagaServiceClient(conn)
+
 	return &SagaService{
-		Validator: validation.NewValidator(),
-		Policy:    auth.NewPolicy(),
+		Validator:  validation.NewValidator(),
+		Policy:     auth.NewPolicy(),
+		grpcClient: grpcClient,
 	}
 }
 
@@ -43,13 +57,13 @@ func (s SagaService) InitSagaSteps(token string, filter *model.SagaFilter) (*mod
 	}
 
 	// Step 2: Find all possible children
-	sagaObject, err = s.findAllChildren(sagaObject)
+	children, err := s.findAllChildren(sagaObject)
 	if err != nil {
 		return nil, err
 	}
 
 	// Step 3: Loop through children and find those, if any
-	for _, child := range sagaObject.Children {
+	for _, child := range children {
 		// Your logic for finding children
 		fmt.Println(child)
 	}
@@ -110,7 +124,7 @@ func (s SagaService) initializeSagaObject(token string, filter *model.SagaFilter
 	return sagaObject, nil
 }
 
-func (s SagaService) findAllChildren(sagaObject model.SagaObject) (model.SagaObject, error) {
+func (s SagaService) findAllChildren(sagaObject model.SagaObject) ([]model.SagaObject, error) {
 	// Step 2 logic here
 	// Example: return a slice of ChildType
 
@@ -132,7 +146,7 @@ func (s SagaService) findAllChildren(sagaObject model.SagaObject) (model.SagaObj
 	// We should be able to recall this function from a for loop to get all the
 	// children of the classes with exercises
 
-	return sagaObject, nil
+	return nil, nil
 }
 
 func (s SagaService) findBottomChildren(sagaObject model.SagaObject) (model.SagaObject, error) {
