@@ -1,7 +1,7 @@
 package validation
 
 import (
-	"Module/internal/helper"
+	"ResultMicroservice/internal/helper"
 	"fmt"
 	"github.com/google/uuid"
 	"reflect"
