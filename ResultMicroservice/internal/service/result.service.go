@@ -8,6 +8,8 @@ import (
 	"ResultMicroservice/internal/validation"
 	"errors"
 	"github.com/google/uuid"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo/options"
 	"strings"
 	"time"
 )
@@ -21,7 +23,7 @@ type IResultService interface {
 	UpdateResult(token string, id string, updateData model.InputResult) (*model.Result, error)
 	DeleteResult(token string, id string) error
 	GetResultById(token string, id string) (*model.Result, error)
-	ListResults(token string) ([]*model.Result, error)
+	ListResults(token string, filter *model.ResultFilter, paginate *model.Paginator) ([]*model.Result, error)
 	SoftDeleteByUser(token string, userID string) (string, bool, error)
 	SoftDeleteByClass(token string, classID string) (string, bool, error)
 	SoftDeleteByModule(token string, moduleID string) (string, bool, error)
@@ -50,14 +52,60 @@ func NewResultService() IResultService {
 	}
 }
 
-func (r *ResultService) ListResults(token string) ([]*model.Result, error) {
+func (r *ResultService) ListResults(token string, filter *model.ResultFilter, paginate *model.Paginator) ([]*model.Result, error) {
 	err := r.ResultPolicy.ListResult(token)
 	if err != nil {
 		return nil, err
 	}
 
-	// Implement the logic to list results
-	panic("implement me")
+	validateListResultFilter(r.Validator, filter, paginate)
+	validationErrors := r.Validator.GetErrors()
+	if len(validationErrors) > 0 {
+		errorMessage := ValidationPrefix + strings.Join(validationErrors, ", ")
+		r.Validator.ClearErrors()
+		return nil, errors.New(errorMessage)
+	}
+
+	bsonFilter := buildBsonFilterForListResult(r.ResultPolicy, token, filter)
+
+	paginateOptions := options.Find().
+		SetSkip(int64(paginate.Step)).
+		SetLimit(int64(paginate.Amount))
+
+	results, err2 := r.Repo.ListResults(bsonFilter, paginateOptions)
+	if err2 != nil {
+		return nil, err2
+	}
+
+	return results, nil
+}
+
+func validateListResultFilter(validator validation.IValidator, filter *model.ResultFilter, paginate *model.Paginator) {
+	validator.Validate(filter.SoftDelete, []string{"IsNull", "IsBoolean"}, "Filter SoftDelete")
+	validator.Validate(filter.ExerciseID, []string{"IsNull", "IsString"}, "Filter ExerciseID")
+	validator.Validate(filter.UserID, []string{"IsNull", "IsString"}, "Filter UserID")
+	validator.Validate(filter.ClassID, []string{"IsNull", "IsString"}, "Filter ClassID")
+	validator.Validate(filter.ModuleID, []string{"IsNull", "IsString"}, "Filter ModuleID")
+	validator.Validate(paginate.Amount, []string{"IsInt", "Size:>0", "Size:<101"}, "Paginate Amount")
+	validator.Validate(paginate.Step, []string{"IsInt", "Size:>=0"}, "Paginate Step")
+}
+
+func buildBsonFilterForListResult(policy auth.IResultPolicy, token string, filter *model.ResultFilter) bson.D {
+	bsonFilter := bson.D{}
+
+	appendCondition := func(key string, value interface{}) {
+		if value != nil && policy.HasPermissions(token, "filter_result_"+key) {
+			bsonFilter = append(bsonFilter, bson.E{Key: key, Value: value})
+		}
+	}
+
+	appendCondition("softdeleted", filter.SoftDelete)
+	appendCondition("exerciseid", filter.ExerciseID)
+	appendCondition("userid", filter.UserID)
+	appendCondition("classid", filter.ClassID)
+	appendCondition("moduleid", filter.ModuleID)
+
+	return bsonFilter
 }
 
 func (r *ResultService) CreateResult(token string, newResult model.InputResult) (*model.Result, error) {
@@ -104,7 +152,7 @@ func (r *ResultService) UpdateResult(token string, id string, updateData model.I
 	}
 
 	r.ValidateResult(&updateData)
-	r.Validator.Validate(id, []string{"IsUUID"})
+	r.Validator.Validate(id, []string{"IsUUID"}, "ID")
 
 	validationErrors := r.Validator.GetErrors()
 	if len(validationErrors) > 0 {
@@ -142,7 +190,7 @@ func (r *ResultService) DeleteResult(token string, id string) error {
 		return err
 	}
 
-	r.Validator.Validate(id, []string{"IsUUID"})
+	r.Validator.Validate(id, []string{"IsUUID"}, "ID")
 
 	validationErrors := r.Validator.GetErrors()
 	if len(validationErrors) > 0 {
@@ -165,7 +213,7 @@ func (r *ResultService) GetResultById(token string, id string) (*model.Result, e
 		return nil, err
 	}
 
-	r.Validator.Validate(id, []string{"IsUUID"})
+	r.Validator.Validate(id, []string{"IsUUID"}, "ID")
 
 	validationErrors := r.Validator.GetErrors()
 	if len(validationErrors) > 0 {
@@ -190,7 +238,7 @@ func (r *ResultService) SoftDeleteByUser(token string, userID string) (string, b
 		return userID, false, err
 	}
 
-	r.Validator.Validate(userID, []string{"IsUUID"})
+	r.Validator.Validate(userID, []string{"IsUUID"}, "ID")
 
 	validationErrors := r.Validator.GetErrors()
 	if len(validationErrors) > 0 {
@@ -213,7 +261,7 @@ func (r *ResultService) SoftDeleteByClass(token string, classID string) (string,
 		return classID, false, err
 	}
 
-	r.Validator.Validate(classID, []string{"IsUUID"})
+	r.Validator.Validate(classID, []string{"IsUUID"}, "ID")
 
 	validationErrors := r.Validator.GetErrors()
 	if len(validationErrors) > 0 {
@@ -236,7 +284,7 @@ func (r *ResultService) SoftDeleteByModule(token string, moduleID string) (strin
 		return moduleID, false, err
 	}
 
-	r.Validator.Validate(moduleID, []string{"IsUUID"})
+	r.Validator.Validate(moduleID, []string{"IsUUID"}, "ID")
 
 	validationErrors := r.Validator.GetErrors()
 	if len(validationErrors) > 0 {
@@ -259,7 +307,7 @@ func (r *ResultService) DeleteByUser(token string, userID string) (string, bool,
 		return userID, false, err
 	}
 
-	r.Validator.Validate(userID, []string{"IsUUID"})
+	r.Validator.Validate(userID, []string{"IsUUID"}, "ID")
 
 	validationErrors := r.Validator.GetErrors()
 	if len(validationErrors) > 0 {
@@ -282,7 +330,7 @@ func (r *ResultService) DeleteByClass(token string, classID string) (string, boo
 		return classID, false, err
 	}
 
-	r.Validator.Validate(classID, []string{"IsUUID"})
+	r.Validator.Validate(classID, []string{"IsUUID"}, "ID")
 
 	validationErrors := r.Validator.GetErrors()
 	if len(validationErrors) > 0 {
@@ -305,7 +353,7 @@ func (r *ResultService) DeleteByModule(token string, moduleID string) (string, b
 		return moduleID, false, err
 	}
 
-	r.Validator.Validate(moduleID, []string{"IsUUID"})
+	r.Validator.Validate(moduleID, []string{"IsUUID"}, "ID")
 
 	validationErrors := r.Validator.GetErrors()
 	if len(validationErrors) > 0 {
@@ -323,10 +371,10 @@ func (r *ResultService) DeleteByModule(token string, moduleID string) (string, b
 }
 
 func (r *ResultService) ValidateResult(result *model.InputResult) {
-	r.Validator.Validate(result.ExerciseID, []string{"IsUUID"})
-	r.Validator.Validate(result.UserID, []string{"IsUUID"})
-	r.Validator.Validate(result.ClassID, []string{"IsUUID"})
-	r.Validator.Validate(result.ModuleID, []string{"IsUUID"})
-	r.Validator.Validate(result.Input, []string{"IsString"})
-	r.Validator.Validate(result.Result, []string{"IsString"})
+	r.Validator.Validate(result.ExerciseID, []string{"IsUUID"}, "ExerciseID")
+	r.Validator.Validate(result.UserID, []string{"IsUUID"}, "UserID")
+	r.Validator.Validate(result.ClassID, []string{"IsUUID"}, "ClassID")
+	r.Validator.Validate(result.ModuleID, []string{"IsUUID"}, "ModuleID")
+	r.Validator.Validate(result.Input, []string{"IsString"}, "Input")
+	r.Validator.Validate(result.Result, []string{"IsString"}, "Result")
 }

@@ -13,6 +13,7 @@ type IResultPolicy interface {
 	DeleteResult(bearerToken string, id string) error
 	GetResultByID(bearerToken string, id string) error
 	ListResult(bearerToken string) error //TODO: implement
+	HasPermissions(bearerToken string, role string) bool
 
 	// Saga GRPC functions
 	SoftDeleteByUser(bearerToken string, userID string) error
@@ -190,6 +191,12 @@ func (p *ResultPolicy) DeleteByModule(bearerToken string, moduleID string) error
 	}
 
 	return nil
+}
+
+func (p *ResultPolicy) HasPermissions(bearerToken string, role string) bool {
+	_, roles, _ := p.getSubAndRoles(bearerToken)
+
+	return p.hasRole(roles, role)
 }
 
 func (p *ResultPolicy) getSubAndRoles(bearerToken string) (string, []interface{}, error) {
