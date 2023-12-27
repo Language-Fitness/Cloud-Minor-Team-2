@@ -61,7 +61,7 @@ func (r *queryResolver) GetExercise(ctx context.Context, exerciseID string) (*mo
 // ListExercise is the resolver for the ListExercise field.
 func (r *queryResolver) ListExercise(ctx context.Context, filter model.ExerciseFilter, paginator model.Paginator) ([]*model.Exercise, error) {
 	token := auth.TokenFromContext(ctx)
-	
+
 	exercises, err := r.Service.ListExercises(token, &filter, &paginator)
 	if err != nil {
 		return nil, err

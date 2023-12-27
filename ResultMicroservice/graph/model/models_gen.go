@@ -11,6 +11,11 @@ type InputResult struct {
 	Result     string `json:"result"`
 }
 
+type Paginator struct {
+	Amount int `json:"amount"`
+	Step   int `json:"step"`
+}
+
 type Result struct {
 	ID          string `json:"id"`
 	ExerciseID  string `json:"exercise_id"`
@@ -22,4 +27,14 @@ type Result struct {
 	CreatedAt   string `json:"created_at"`
 	UpdatedAt   string `json:"updated_at"`
 	SoftDeleted bool   `json:"soft_deleted"`
+}
+
+type ResultFilter struct {
+	SoftDelete *bool   `json:"softDelete,omitempty"`
+	ExerciseID *string `json:"exerciseId,omitempty"`
+	UserID     *string `json:"userId,omitempty"`
+	ClassID    *string `json:"classId,omitempty"`
+	ModuleID   *string `json:"moduleId,omitempty"`
+	Input      *string `json:"input,omitempty"`
+	Result     *string `json:"result,omitempty"`
 }
