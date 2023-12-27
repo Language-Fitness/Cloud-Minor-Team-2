@@ -66,13 +66,13 @@ input ExerciseInput {
 }
 
 type Query {
-  GetExercise(ExerciseId: ID!): [Exercise]
+  GetExercise(ExerciseId: ID!): Exercise
   ListExercise(filter: ExerciseFilter!, paginator: Paginator!): [Exercise]
 }
 
 type Mutation {
   CreateExercise(exercise: ExerciseInput!): Exercise
-  UpdateExercise(exercise: ExerciseInput!): Exercise
+  UpdateExercise(id: ID!, exercise: ExerciseInput!): Exercise
   DeleteExercise(UserID: ID!, filter: ExerciseFilter!): Exercise
 }
 

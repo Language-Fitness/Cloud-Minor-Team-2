@@ -66,7 +66,7 @@ type ComplexityRoot struct {
 	Mutation struct {
 		CreateExercise func(childComplexity int, exercise model.ExerciseInput) int
 		DeleteExercise func(childComplexity int, userID string, filter model.ExerciseFilter) int
-		UpdateExercise func(childComplexity int, exercise model.ExerciseInput) int
+		UpdateExercise func(childComplexity int, id string, exercise model.ExerciseInput) int
 	}
 
 	Query struct {
@@ -77,11 +77,11 @@ type ComplexityRoot struct {
 
 type MutationResolver interface {
 	CreateExercise(ctx context.Context, exercise model.ExerciseInput) (*model.Exercise, error)
-	UpdateExercise(ctx context.Context, exercise model.ExerciseInput) (*model.Exercise, error)
+	UpdateExercise(ctx context.Context, id string, exercise model.ExerciseInput) (*model.Exercise, error)
 	DeleteExercise(ctx context.Context, userID string, filter model.ExerciseFilter) (*model.Exercise, error)
 }
 type QueryResolver interface {
-	GetExercise(ctx context.Context, exerciseID string) ([]*model.Exercise, error)
+	GetExercise(ctx context.Context, exerciseID string) (*model.Exercise, error)
 	ListExercise(ctx context.Context, filter model.ExerciseFilter, paginator model.Paginator) ([]*model.Exercise, error)
 }
 
@@ -229,7 +229,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.UpdateExercise(childComplexity, args["exercise"].(model.ExerciseInput)), true
+		return e.complexity.Mutation.UpdateExercise(childComplexity, args["id"].(string), args["exercise"].(model.ExerciseInput)), true
 
 	case "Query.GetExercise":
 		if e.complexity.Query.GetExercise == nil {
@@ -425,15 +425,24 @@ func (ec *executionContext) field_Mutation_DeleteExercise_args(ctx context.Conte
 func (ec *executionContext) field_Mutation_UpdateExercise_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 model.ExerciseInput
-	if tmp, ok := rawArgs["exercise"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("exercise"))
-		arg0, err = ec.unmarshalNExerciseInput2ExerciseMicroserviceᚋgraphᚋmodelᚐExerciseInput(ctx, tmp)
+	var arg0 string
+	if tmp, ok := rawArgs["id"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+		arg0, err = ec.unmarshalNID2string(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["exercise"] = arg0
+	args["id"] = arg0
+	var arg1 model.ExerciseInput
+	if tmp, ok := rawArgs["exercise"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("exercise"))
+		arg1, err = ec.unmarshalNExerciseInput2ExerciseMicroserviceᚋgraphᚋmodelᚐExerciseInput(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["exercise"] = arg1
 	return args, nil
 }
 
@@ -1195,7 +1204,7 @@ func (ec *executionContext) _Mutation_UpdateExercise(ctx context.Context, field 
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().UpdateExercise(rctx, fc.Args["exercise"].(model.ExerciseInput))
+		return ec.resolvers.Mutation().UpdateExercise(rctx, fc.Args["id"].(string), fc.Args["exercise"].(model.ExerciseInput))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1364,9 +1373,9 @@ func (ec *executionContext) _Query_GetExercise(ctx context.Context, field graphq
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.([]*model.Exercise)
+	res := resTmp.(*model.Exercise)
 	fc.Result = res
-	return ec.marshalOExercise2ᚕᚖExerciseMicroserviceᚋgraphᚋmodelᚐExercise(ctx, field.Selections, res)
+	return ec.marshalOExercise2ᚖExerciseMicroserviceᚋgraphᚋmodelᚐExercise(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Query_GetExercise(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {

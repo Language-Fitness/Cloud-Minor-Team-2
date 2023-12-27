@@ -12,26 +12,22 @@ import (
 	"time"
 )
 
-const (
-	valErrorBase = "Validation errors: "
-)
+const ValidationPrefix = "Validation errors: "
 
 // IResultService GOLANG INTERFACE
 // Implements CRUD methods for queries and mutations on Result.
 type IResultService interface {
-	CreateResult(bearerToken string, newResult model.InputResult) (*model.Result, error)
-	UpdateResult(bearerToken string, id string, updateData model.InputResult) (*model.Result, error)
-	DeleteResult(bearerToken string, id string) error
-	GetResultById(bearerToken string, id string) (*model.Result, error)
-	ListResults(bearerToken string) ([]*model.Result, error) //TODO: implement
-
-	// Saga methods
-	SoftDeleteByUser(bearerToken string, userID string) (string, bool, error)
-	SoftDeleteByClass(bearerToken string, classID string) (string, bool, error)
-	SoftDeleteByModule(bearerToken string, moduleID string) (string, bool, error)
-	DeleteByUser(bearerToken string, userID string) (string, bool, error)
-	DeleteByClass(bearerToken string, classID string) (string, bool, error)
-	DeleteByModule(bearerToken string, moduleID string) (string, bool, error)
+	CreateResult(token string, newResult model.InputResult) (*model.Result, error)
+	UpdateResult(token string, id string, updateData model.InputResult) (*model.Result, error)
+	DeleteResult(token string, id string) error
+	GetResultById(token string, id string) (*model.Result, error)
+	ListResults(token string) ([]*model.Result, error)
+	SoftDeleteByUser(token string, userID string) (string, bool, error)
+	SoftDeleteByClass(token string, classID string) (string, bool, error)
+	SoftDeleteByModule(token string, moduleID string) (string, bool, error)
+	DeleteByUser(token string, userID string) (string, bool, error)
+	DeleteByClass(token string, classID string) (string, bool, error)
+	DeleteByModule(token string, moduleID string) (string, bool, error)
 }
 
 // ResultService GOLANG STRUCT
@@ -54,13 +50,18 @@ func NewResultService() IResultService {
 	}
 }
 
-func (r *ResultService) ListResults(bearerToken string) ([]*model.Result, error) {
-	//TODO implement me
+func (r *ResultService) ListResults(token string) ([]*model.Result, error) {
+	err := r.ResultPolicy.ListResult(token)
+	if err != nil {
+		return nil, err
+	}
+
+	// Implement the logic to list results
 	panic("implement me")
 }
 
-func (r *ResultService) CreateResult(bearerToken string, newResult model.InputResult) (*model.Result, error) {
-	err := r.ResultPolicy.CreateResult(bearerToken)
+func (r *ResultService) CreateResult(token string, newResult model.InputResult) (*model.Result, error) {
+	err := r.ResultPolicy.CreateResult(token)
 	if err != nil {
 		return nil, err
 	}
@@ -69,7 +70,7 @@ func (r *ResultService) CreateResult(bearerToken string, newResult model.InputRe
 
 	validationErrors := r.Validator.GetErrors()
 	if len(validationErrors) > 0 {
-		errorMessage := valErrorBase + strings.Join(validationErrors, ", ")
+		errorMessage := ValidationPrefix + strings.Join(validationErrors, ", ")
 		r.Validator.ClearErrors()
 		return nil, errors.New(errorMessage)
 	}
@@ -96,8 +97,8 @@ func (r *ResultService) CreateResult(bearerToken string, newResult model.InputRe
 	return result, nil
 }
 
-func (r *ResultService) UpdateResult(bearerToken string, id string, updateData model.InputResult) (*model.Result, error) {
-	result, err := r.ResultPolicy.UpdateResult(bearerToken, id)
+func (r *ResultService) UpdateResult(token string, id string, updateData model.InputResult) (*model.Result, error) {
+	result, err := r.ResultPolicy.UpdateResult(token, id)
 	if err != nil {
 		return nil, err
 	}
@@ -107,7 +108,7 @@ func (r *ResultService) UpdateResult(bearerToken string, id string, updateData m
 
 	validationErrors := r.Validator.GetErrors()
 	if len(validationErrors) > 0 {
-		errorMessage := valErrorBase + strings.Join(validationErrors, ", ")
+		errorMessage := ValidationPrefix + strings.Join(validationErrors, ", ")
 		r.Validator.ClearErrors()
 		return nil, errors.New(errorMessage)
 	}
@@ -135,8 +136,8 @@ func (r *ResultService) UpdateResult(bearerToken string, id string, updateData m
 	return updatedResult, nil
 }
 
-func (r *ResultService) DeleteResult(bearerToken string, id string) error {
-	err := r.ResultPolicy.DeleteResult(bearerToken, id)
+func (r *ResultService) DeleteResult(token string, id string) error {
+	err := r.ResultPolicy.DeleteResult(token, id)
 	if err != nil {
 		return err
 	}
@@ -145,7 +146,7 @@ func (r *ResultService) DeleteResult(bearerToken string, id string) error {
 
 	validationErrors := r.Validator.GetErrors()
 	if len(validationErrors) > 0 {
-		errorMessage := valErrorBase + strings.Join(validationErrors, ", ")
+		errorMessage := ValidationPrefix + strings.Join(validationErrors, ", ")
 		r.Validator.ClearErrors()
 		return errors.New(errorMessage)
 	}
@@ -158,8 +159,8 @@ func (r *ResultService) DeleteResult(bearerToken string, id string) error {
 	return nil
 }
 
-func (r *ResultService) GetResultById(bearerToken string, id string) (*model.Result, error) {
-	err := r.ResultPolicy.GetResultByID(bearerToken, id)
+func (r *ResultService) GetResultById(token string, id string) (*model.Result, error) {
+	err := r.ResultPolicy.GetResultByID(token, id)
 	if err != nil {
 		return nil, err
 	}
@@ -168,7 +169,7 @@ func (r *ResultService) GetResultById(bearerToken string, id string) (*model.Res
 
 	validationErrors := r.Validator.GetErrors()
 	if len(validationErrors) > 0 {
-		errorMessage := valErrorBase + strings.Join(validationErrors, ", ")
+		errorMessage := ValidationPrefix + strings.Join(validationErrors, ", ")
 		r.Validator.ClearErrors()
 		return nil, errors.New(errorMessage)
 	}
@@ -183,8 +184,8 @@ func (r *ResultService) GetResultById(bearerToken string, id string) (*model.Res
 
 // Saga grpc methods
 
-func (r *ResultService) SoftDeleteByUser(bearerToken string, userID string) (string, bool, error) {
-	err := r.ResultPolicy.SoftDeleteByUser(bearerToken, userID)
+func (r *ResultService) SoftDeleteByUser(token string, userID string) (string, bool, error) {
+	err := r.ResultPolicy.SoftDeleteByUser(token, userID)
 	if err != nil {
 		return userID, false, err
 	}
@@ -193,7 +194,7 @@ func (r *ResultService) SoftDeleteByUser(bearerToken string, userID string) (str
 
 	validationErrors := r.Validator.GetErrors()
 	if len(validationErrors) > 0 {
-		errorMessage := valErrorBase + strings.Join(validationErrors, ", ")
+		errorMessage := ValidationPrefix + strings.Join(validationErrors, ", ")
 		r.Validator.ClearErrors()
 		return userID, false, errors.New(errorMessage)
 	}
@@ -206,8 +207,8 @@ func (r *ResultService) SoftDeleteByUser(bearerToken string, userID string) (str
 	return userID, true, nil
 }
 
-func (r *ResultService) SoftDeleteByClass(bearerToken string, classID string) (string, bool, error) {
-	err := r.ResultPolicy.SoftDeleteByClass(bearerToken, classID)
+func (r *ResultService) SoftDeleteByClass(token string, classID string) (string, bool, error) {
+	err := r.ResultPolicy.SoftDeleteByClass(token, classID)
 	if err != nil {
 		return classID, false, err
 	}
@@ -216,7 +217,7 @@ func (r *ResultService) SoftDeleteByClass(bearerToken string, classID string) (s
 
 	validationErrors := r.Validator.GetErrors()
 	if len(validationErrors) > 0 {
-		errorMessage := valErrorBase + strings.Join(validationErrors, ", ")
+		errorMessage := ValidationPrefix + strings.Join(validationErrors, ", ")
 		r.Validator.ClearErrors()
 		return classID, false, errors.New(errorMessage)
 	}
@@ -229,8 +230,8 @@ func (r *ResultService) SoftDeleteByClass(bearerToken string, classID string) (s
 	return classID, true, nil
 }
 
-func (r *ResultService) SoftDeleteByModule(bearerToken string, moduleID string) (string, bool, error) {
-	err := r.ResultPolicy.SoftDeleteByModule(bearerToken, moduleID)
+func (r *ResultService) SoftDeleteByModule(token string, moduleID string) (string, bool, error) {
+	err := r.ResultPolicy.SoftDeleteByModule(token, moduleID)
 	if err != nil {
 		return moduleID, false, err
 	}
@@ -239,7 +240,7 @@ func (r *ResultService) SoftDeleteByModule(bearerToken string, moduleID string) 
 
 	validationErrors := r.Validator.GetErrors()
 	if len(validationErrors) > 0 {
-		errorMessage := valErrorBase + strings.Join(validationErrors, ", ")
+		errorMessage := ValidationPrefix + strings.Join(validationErrors, ", ")
 		r.Validator.ClearErrors()
 		return moduleID, false, errors.New(errorMessage)
 	}
@@ -252,8 +253,8 @@ func (r *ResultService) SoftDeleteByModule(bearerToken string, moduleID string) 
 	return moduleID, true, nil
 }
 
-func (r *ResultService) DeleteByUser(bearerToken string, userID string) (string, bool, error) {
-	err := r.ResultPolicy.DeleteByUser(bearerToken, userID)
+func (r *ResultService) DeleteByUser(token string, userID string) (string, bool, error) {
+	err := r.ResultPolicy.DeleteByUser(token, userID)
 	if err != nil {
 		return userID, false, err
 	}
@@ -262,7 +263,7 @@ func (r *ResultService) DeleteByUser(bearerToken string, userID string) (string,
 
 	validationErrors := r.Validator.GetErrors()
 	if len(validationErrors) > 0 {
-		errorMessage := valErrorBase + strings.Join(validationErrors, ", ")
+		errorMessage := ValidationPrefix + strings.Join(validationErrors, ", ")
 		r.Validator.ClearErrors()
 		return userID, false, errors.New(errorMessage)
 	}
@@ -275,8 +276,8 @@ func (r *ResultService) DeleteByUser(bearerToken string, userID string) (string,
 	return userID, true, nil
 }
 
-func (r *ResultService) DeleteByClass(bearerToken string, classID string) (string, bool, error) {
-	err := r.ResultPolicy.DeleteByClass(bearerToken, classID)
+func (r *ResultService) DeleteByClass(token string, classID string) (string, bool, error) {
+	err := r.ResultPolicy.DeleteByClass(token, classID)
 	if err != nil {
 		return classID, false, err
 	}
@@ -285,7 +286,7 @@ func (r *ResultService) DeleteByClass(bearerToken string, classID string) (strin
 
 	validationErrors := r.Validator.GetErrors()
 	if len(validationErrors) > 0 {
-		errorMessage := valErrorBase + strings.Join(validationErrors, ", ")
+		errorMessage := ValidationPrefix + strings.Join(validationErrors, ", ")
 		r.Validator.ClearErrors()
 		return classID, false, errors.New(errorMessage)
 	}
@@ -298,8 +299,8 @@ func (r *ResultService) DeleteByClass(bearerToken string, classID string) (strin
 	return classID, true, nil
 }
 
-func (r *ResultService) DeleteByModule(bearerToken string, moduleID string) (string, bool, error) {
-	err := r.ResultPolicy.DeleteByModule(bearerToken, moduleID)
+func (r *ResultService) DeleteByModule(token string, moduleID string) (string, bool, error) {
+	err := r.ResultPolicy.DeleteByModule(token, moduleID)
 	if err != nil {
 		return moduleID, false, err
 	}
@@ -308,7 +309,7 @@ func (r *ResultService) DeleteByModule(bearerToken string, moduleID string) (str
 
 	validationErrors := r.Validator.GetErrors()
 	if len(validationErrors) > 0 {
-		errorMessage := valErrorBase + strings.Join(validationErrors, ", ")
+		errorMessage := ValidationPrefix + strings.Join(validationErrors, ", ")
 		r.Validator.ClearErrors()
 		return moduleID, false, errors.New(errorMessage)
 	}
