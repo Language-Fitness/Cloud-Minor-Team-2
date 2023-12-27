@@ -14,7 +14,6 @@ import (
 func (r *mutationResolver) CreateExercise(ctx context.Context, exercise model.ExerciseInput) (*model.Exercise, error) {
 	token := auth.TokenFromContext(ctx)
 
-	// Implement the logic to create an exercise using your service
 	createdExercise, err := r.Service.CreateExercise(token, exercise)
 	if err != nil {
 		return nil, err
@@ -51,7 +50,6 @@ func (r *mutationResolver) DeleteExercise(ctx context.Context, userID string, fi
 func (r *queryResolver) GetExercise(ctx context.Context, exerciseID string) (*model.Exercise, error) {
 	token := auth.TokenFromContext(ctx)
 
-	// Implement the logic to get an exercise by ID using your service
 	exercise, err := r.Service.GetExerciseById(token, exerciseID)
 	if err != nil {
 		return nil, err
@@ -63,8 +61,7 @@ func (r *queryResolver) GetExercise(ctx context.Context, exerciseID string) (*mo
 // ListExercise is the resolver for the ListExercise field.
 func (r *queryResolver) ListExercise(ctx context.Context, filter model.ExerciseFilter, paginator model.Paginator) ([]*model.Exercise, error) {
 	token := auth.TokenFromContext(ctx)
-
-	// Implement the logic to list exercises based on the filter and paginator using your service
+	
 	exercises, err := r.Service.ListExercises(token, &filter, &paginator)
 	if err != nil {
 		return nil, err
