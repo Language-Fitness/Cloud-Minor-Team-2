@@ -46,7 +46,7 @@ func main() {
 	//grpcClient := pb.NewGRPCSagaServiceClient(conn)
 	////migrations.Init()
 
-	conn, err := grpc.Dial("0.0.0.0:9091", grpc.WithTransportCredentials(insecure.NewCredentials()))
+	conn, err := grpc.Dial("host.docker.internal:9091", grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		//log.Fatalf("failed to dial gRPC server: %v", err)
 		log.Printf("failed to dial gRPC server: %v", err)
