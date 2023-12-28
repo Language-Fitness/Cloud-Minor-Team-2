@@ -34,19 +34,6 @@ func main() {
 		log.Fatal("Error loading .env file")
 	}
 
-	//// Initialize gRPC connection
-	// TODO Dial is something that a grpc client uses to connect to a grpc server, but this seems to be a server
-	//conn, err := grpc.Dial("localhost:9091", grpc.WithInsecure())
-	//if err != nil {
-	//	log.Fatalf("failed to dial gRPC server: %v", err)
-	//}
-	//defer conn.Close()
-
-	// Create a gRPC client using the connection
-	// Create a new gRPC server instance
-	grpcServer := grpc.NewServer()
-	pb.RegisterGRPCSagaServiceServer(grpcServer, &rpc.Server{})
-
 	// Initialize GraphQL server
 	graphQLServer := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{Resolvers: graph.NewResolver()}))
 
@@ -76,6 +63,27 @@ func main() {
 	msHandler := handlers.LoggingHandler(os.Stdout, r)
 	// handler = corsMiddleware(handler)
 
+	grpcSagaServer()
+
+	// Start the HTTP server
+	log.Printf("Server is running on http://localhost:%s", port)
+	log.Fatal(http.ListenAndServe(":"+port, msHandler))
+}
+
+func grpcSagaServer() {
+	//// Initialize gRPC connection
+	// TODO Dial is something that a grpc client uses to connect to a grpc server, but this seems to be a server
+	//conn, err := grpc.Dial("localhost:9091", grpc.WithInsecure())
+	//if err != nil {
+	//	log.Fatalf("failed to dial gRPC server: %v", err)
+	//}
+	//defer conn.Close()
+
+	// Create a gRPC client using the connection
+	// Create a new gRPC server instance
+	grpcServer := grpc.NewServer()
+	pb.RegisterGRPCSagaServiceServer(grpcServer, &rpc.Server{})
+
 	// ServeMux for gRPC
 	grpcMux := http.NewServeMux()
 	grpcMux.Handle("/", grpcServer)
@@ -87,8 +95,4 @@ func main() {
 			log.Fatalf("failed to serve gRPC server: %v", err)
 		}
 	}()
-
-	// Start the HTTP server
-	log.Printf("Server is running on http://localhost:%s", port)
-	log.Fatal(http.ListenAndServe(":"+port, msHandler))
 }
