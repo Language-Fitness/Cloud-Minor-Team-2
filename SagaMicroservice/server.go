@@ -16,7 +16,6 @@ import (
 	"saga/graph"
 	"saga/internal/auth"
 	"saga/proto/pb"
-	"time"
 )
 
 const defaultPort = "8083"
@@ -65,11 +64,6 @@ func main() {
 	//grpcClient := pb.NewGRPCSagaServiceClient(conn)
 	////migrations.Init()
 
-	// If the user doesn't have a context with a deadline, create one
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
-	fmt.Println("Creating context...")
-	defer cancel()
-
 	fmt.Println("Setting opts for gRPC dial...")
 	opts := []grpc.DialOption{
 		grpc.WithReturnConnectionError(), // Add the WithReturnConnectionError option
@@ -77,21 +71,13 @@ func main() {
 	}
 
 	fmt.Println("Dialing gRPC server...")
-	conn, err := grpc.DialContext(ctx, "host.docker.internal:9091", opts...)
+	conn, err := grpc.DialContext(context.Background(), "host.docker.internal:9091", opts...)
 	if err != nil {
 		fmt.Printf("failed to dial gRPC server: %v\n", err)
 		log.Printf("failed to dial gRPC server: %v", err)
 	}
 	fmt.Println("Dialing gRPC server...done")
-	defer func(conn *grpc.ClientConn) {
-		err := conn.Close()
-		if err != nil {
-			fmt.Printf("error closing connection: %v\n", err)
-			log.Printf("error closing connection: %v", err)
-		}
-	}(conn)
-
-	conn, err = nil, fmt.Errorf("%v: %v", ctx.Err(), err)
+	defer conn.Close()
 
 	fmt.Println("Creating gRPC client...")
 	// Create a gRPC client using the connection
@@ -109,7 +95,6 @@ func main() {
 	response, err := client.FindObject(context.Background(), &request)
 	if err != nil {
 		//log.Fatalf("failed to call FindObject RPC: %v", err)
-
 		log.Printf("failed to call FindObject RPC: %v", err)
 	}
 
