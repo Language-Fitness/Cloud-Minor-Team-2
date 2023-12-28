@@ -13,6 +13,7 @@ import (
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"google.golang.org/grpc"
 	"log"
+	"net"
 	"net/http"
 	"os"
 )
@@ -79,20 +80,30 @@ func grpcSagaServer() {
 	//}
 	//defer conn.Close()
 
+	lis, err := net.Listen("tcp", ":9091") // Define your gRPC server address and port
+	if err != nil {
+		log.Fatalf("Failed to listen: %v", err)
+	}
+
 	// Create a gRPC client using the connection
 	// Create a new gRPC server instance
 	grpcServer := grpc.NewServer()
 	pb.RegisterGRPCSagaServiceServer(grpcServer, &rpc.Server{})
 
-	// ServeMux for gRPC
-	grpcMux := http.NewServeMux()
-	grpcMux.Handle("/", grpcServer)
+	//// ServeMux for gRPC
+	//grpcMux := http.NewServeMux()
+	//grpcMux.Handle("/", grpcServer)
+	//
+	//// Start the gRPC server
+	//go func() {
+	//	log.Printf("gRPC server is running on :9091")
+	//	if err := http.ListenAndServe(":9091", grpcMux); err != nil {
+	//		log.Fatalf("failed to serve gRPC server: %v", err)
+	//	}
+	//}()
 
-	// Start the gRPC server
-	go func() {
-		log.Printf("gRPC server is running on :9091")
-		if err := http.ListenAndServe(":9091", grpcMux); err != nil {
-			log.Fatalf("failed to serve gRPC server: %v", err)
-		}
-	}()
+	log.Printf("server listening at %v", lis.Addr())
+	if err := grpcServer.Serve(lis); err != nil {
+		log.Fatalf("Failed to serve: %v", err)
+	}
 }

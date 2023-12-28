@@ -13,6 +13,7 @@ import (
 	"saga/graph"
 	"saga/internal/auth"
 	"saga/proto/pb"
+	"time"
 
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/playground"
@@ -45,9 +46,10 @@ func main() {
 	//grpcClient := pb.NewGRPCSagaServiceClient(conn)
 	////migrations.Init()
 
-	conn, err := grpc.Dial("host.docker.internal:9091", grpc.WithTransportCredentials(insecure.NewCredentials()))
+	conn, err := grpc.Dial("0.0.0.0:9091", grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
-		log.Fatalf("failed to dial gRPC server: %v", err)
+		//log.Fatalf("failed to dial gRPC server: %v", err)
+		log.Printf("failed to dial gRPC server: %v", err)
 	}
 	defer conn.Close()
 
@@ -62,9 +64,15 @@ func main() {
 		ObjectStatus: pb.SagaObjectStatus_EXIST,
 	}
 
-	response, err := client.FindObject(context.Background(), request)
+	// If the user doesn't have a context with a deadline, create one
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	defer cancel()
+
+	log.Println("Calling FindObject RPC...")
+	response, err := client.FindObject(ctx, request)
 	if err != nil {
-		log.Fatalf("failed to call FindObject RPC: %v", err)
+		//log.Fatalf("failed to call FindObject RPC: %v", err)
+		log.Printf("failed to call FindObject RPC: %v", err)
 	}
 
 	fmt.Println(response)
