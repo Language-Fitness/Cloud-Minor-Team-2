@@ -17,7 +17,7 @@ type IResultRepository interface {
 	UpdateResult(id string, updatedResult model.Result) (*model.Result, error)
 	DeleteResultByID(id string) error
 	GetResultByID(id string) (*model.Result, error)
-	ListResults() ([]*model.Result, error) //TODO: implement
+	ListResults(bsonFilter bson.D, paginateOptions *options.FindOptions) ([]*model.Result, error)
 	//Saga GRPC
 	//Todo has to be soft deleted, before it can be hard deleted
 	SoftDeleteByUser(userID string) error
@@ -44,9 +44,33 @@ func NewResultRepository(collection *mongo.Collection) IResultRepository {
 	}
 }
 
-func (r *ResultRepository) ListResults() ([]*model.Result, error) {
-	//TODO implement me
-	panic("implement me")
+func (r *ResultRepository) ListResults(bsonFilter bson.D, paginateOptions *options.FindOptions) ([]*model.Result, error) {
+	ctx, cancel := context.WithTimeout(context.TODO(), time.Second*10) // 10-second timeout
+	defer cancel()
+
+	var results []*model.Result
+
+	cursor, err := r.collection.Find(ctx, bsonFilter, paginateOptions)
+	if err != nil {
+		return nil, err // Return any MongoDB-related errors.
+	}
+
+	defer func(cursor *mongo.Cursor, ctx context.Context) {
+		err := cursor.Close(ctx)
+		if err != nil {
+			return
+		}
+	}(cursor, ctx)
+
+	for cursor.Next(ctx) {
+		var result model.Result
+		if err := cursor.Decode(&result); err != nil {
+			return nil, err
+		}
+		results = append(results, &result)
+	}
+
+	return results, nil
 }
 
 func (r *ResultRepository) CreateResult(newResult *model.Result) (*model.Result, error) {
