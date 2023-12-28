@@ -6,6 +6,7 @@ import (
 	"github.com/joho/godotenv"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 	"log"
 	"net/http"
 	"os"
@@ -44,7 +45,7 @@ func main() {
 	//grpcClient := pb.NewGRPCSagaServiceClient(conn)
 	////migrations.Init()
 
-	conn, err := grpc.Dial("host.docker.internal:9091", grpc.WithInsecure())
+	conn, err := grpc.Dial("host.docker.internal:9091", grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		log.Fatalf("failed to dial gRPC server: %v", err)
 	}
