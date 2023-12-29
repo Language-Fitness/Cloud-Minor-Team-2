@@ -2,6 +2,8 @@ package main
 
 import (
 	"ExerciseMicroservice/graph"
+	"ExerciseMicroservice/internal/auth"
+	"github.com/joho/godotenv"
 	"log"
 	"net/http"
 	"os"
@@ -10,18 +12,24 @@ import (
 	"github.com/99designs/gqlgen/graphql/playground"
 )
 
-const defaultPort = "8080"
+const defaultPort = "8084"
 
 func main() {
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = defaultPort
 	}
-	//todo fix this
+
+	if err := godotenv.Load(); err != nil {
+		log.Fatal("Error loading .env file")
+	}
+
+	tokenMiddleware := auth.Middleware
+
 	srv := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{}}))
 
+	http.Handle("/query", tokenMiddleware(srv))
 	http.Handle("/", playground.Handler("GraphQL playground", "/query"))
-	http.Handle("/query", srv)
 
 	log.Printf("connect to http://localhost:%s/ for GraphQL playground", port)
 	log.Fatal(http.ListenAndServe(":"+port, nil))
