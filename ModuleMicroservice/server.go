@@ -3,8 +3,9 @@ package main
 import (
 	"Module/graph"
 	"Module/internal/auth"
+	"Module/internal/database"
+	"Module/internal/service"
 	"Module/proto/pb"
-	"Module/rpc"
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/gorilla/handlers"
@@ -67,7 +68,7 @@ func main() {
 	grpcSagaServer()
 
 	// Start the HTTP server
-	log.Printf("Server is running on http://localhost:%s", port)
+	log.Printf("SagaService is running on http://localhost:%s", port)
 	log.Fatal(http.ListenAndServe(":"+port, msHandler))
 }
 
@@ -87,20 +88,10 @@ func grpcSagaServer() {
 
 	// Create a gRPC client using the connection
 	// Create a new gRPC server instance
-	grpcServer := grpc.NewServer()
-	pb.RegisterGRPCSagaServiceServer(grpcServer, &rpc.Server{})
 
-	//// ServeMux for gRPC
-	//grpcMux := http.NewServeMux()
-	//grpcMux.Handle("/", grpcServer)
-	//
-	//// Start the gRPC server
-	//go func() {
-	//	log.Printf("gRPC server is running on :9091")
-	//	if err := http.ListenAndServe(":9091", grpcMux); err != nil {
-	//		log.Fatalf("failed to serve gRPC server: %v", err)
-	//	}
-	//}()
+	grpcServer := grpc.NewServer()
+	collection, _ := database.GetCollection()
+	pb.RegisterGRPCSagaServiceServer(grpcServer, service.NewSagaService(collection))
 
 	log.Printf("server listening at %v", lis.Addr())
 	if err := grpcServer.Serve(lis); err != nil {
