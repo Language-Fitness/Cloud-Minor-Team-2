@@ -11,12 +11,12 @@ import * as fs from "fs";
 import * as path from "path";
 
 
-// const keycloakServer        = 'http://localhost:8888';
-const keycloakServer        = 'https://example-keycloak-bramterlouw-dev.apps.ocp2-inholland.joran-bergfeld.com/';
+const keycloakServer        = 'http://localhost:8888';
+// const keycloakServer        = 'https://example-keycloak-bramterlouw-dev.apps.ocp2-inholland.joran-bergfeld.com/';
 const masterRealm           = 'master';
 const projectRealm          = 'cloud-project';
 const adminClientId         = 'admin-cli';
-const adminClientSecret     = '0TfR2sgyQoPOXpxl7LzPNQo4KbTwFqPe';
+const adminClientSecret     = 'KwJpmg3AXCbrGnPeCD2TvBm9scaUI0e3';
 const adminTokenEndpoint    = `${keycloakServer}/realms/${masterRealm}/protocol/openid-connect/token`;
 const clientTokenEndpoint   = `${keycloakServer}/realms/${projectRealm}/protocol/openid-connect/token`;
 
