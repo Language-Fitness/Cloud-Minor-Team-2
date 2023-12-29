@@ -1,8 +1,11 @@
 package service
 
 import (
+	"Module/graph/model"
+	"Module/internal/helper"
 	"Module/proto/pb"
 	"context"
+	"fmt"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
@@ -19,8 +22,23 @@ func NewSagaService(collection *mongo.Collection) *SagaService {
 
 // FindObject implements the FindObject RPC method
 func (s *SagaService) FindObject(ctx context.Context, req *pb.ObjectRequest) (*pb.ObjectResponse, error) {
-	// Implement your logic to find the object based on the request
-	// For demonstration purposes, let's just return a sample response
+
+	filter := model.ModuleFilter{
+		MadeBy: helper.StringPointer(req.ObjectId),
+	}
+
+	paginate := model.Paginator{
+		Amount: 100,
+		Step:   0,
+	}
+
+	modules, err := s.service.ListModules(req.BearerToken, helper.ModuleFilterPointer(filter), helper.PaginatorPointer(paginate))
+	if err != nil {
+		return nil, err
+	}
+
+	fmt.Println(modules)
+
 	response := &pb.ObjectResponse{
 		Objects: []*pb.SagaObject{
 			{
