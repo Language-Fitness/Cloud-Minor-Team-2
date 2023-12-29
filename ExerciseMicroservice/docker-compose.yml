@@ -7,7 +7,7 @@ services:
       dockerfile: Dockerfile
     image: graph-api
     ports:
-      - "8082:8082"
+      - "8084:8084"
 
   mongodb:
     container_name: mongodb

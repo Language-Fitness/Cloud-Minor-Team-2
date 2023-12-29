@@ -9,7 +9,7 @@ services:
       dockerfile: Dockerfile
     image: graph-api-test
     ports:
-      - "8082:8082"
+      - "8084:8084"
     depends_on:
       - mongodb_test
     environment:
