@@ -8,11 +8,9 @@ package pb
 
 import (
 	context "context"
-	_ "fmt"
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
-	_ "saga/internal/helper"
 )
 
 // This is a compile-time assertion to ensure that this generated file
@@ -46,9 +44,6 @@ func NewGRPCSagaServiceClient(cc grpc.ClientConnInterface) GRPCSagaServiceClient
 
 func (c *gRPCSagaServiceClient) FindObject(ctx context.Context, in *ObjectRequest, opts ...grpc.CallOption) (*ObjectResponse, error) {
 	out := new(ObjectResponse)
-	//fmt.Println(helper.DereferenceIfNeeded(&in))
-	//fmt.Println(helper.DereferenceIfNeeded(&out))
-	//fmt.Println(helper.DereferenceArrayIfNeeded(opts))
 	err := c.cc.Invoke(ctx, GRPCSagaService_FindObject_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err

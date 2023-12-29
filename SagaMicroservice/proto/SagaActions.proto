@@ -29,8 +29,9 @@ service gRPCSagaService {
 // Request message for getting a user
 message ObjectRequest {
   string object_id = 1;
-  SagaObjectType object_type = 2;
-  SagaObjectStatus object_status = 3;
+  string bearer_token = 2;
+  SagaObjectType object_type = 3;
+  SagaObjectStatus object_status = 4;
 }
 
 message ObjectResponse {
