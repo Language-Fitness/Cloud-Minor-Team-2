@@ -26,7 +26,7 @@ func main() {
 
 	tokenMiddleware := auth.Middleware
 
-	srv := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{}}))
+	srv := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{Resolvers: graph.NewResolver()}))
 
 	http.Handle("/query", tokenMiddleware(srv))
 	http.Handle("/", playground.Handler("GraphQL playground", "/query"))
