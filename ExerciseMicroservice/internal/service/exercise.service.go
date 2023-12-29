@@ -194,7 +194,6 @@ func validateListExerciseFilter(validator validation.IValidator, filter *model.E
 			[]string{"IsNull", "IsString"},
 			"Filter Name input")
 	}
-	validator.Validate(filter.Difficulty, []string{"IsNull", "IsString"}, "Filter Difficulty")
 	validator.Validate(filter.QuestionTypeID, []string{"IsNull", "IsString"}, "Filter QuestionTypeID")
 	validator.Validate(filter.ClassID, []string{"IsNull", "IsString"}, "Filter ClassID")
 	validator.Validate(filter.ModuleID, []string{"IsNull", "IsString"}, "Filter ModuleID")
@@ -208,10 +207,9 @@ func validateUpdatedExercise(validator validation.IValidator, id string, updated
 	validator.Validate(updatedData.ClassID, []string{"IsString"}, "ClassID")
 	validator.Validate(updatedData.Name, []string{"IsString", "Length:<25"}, "Name")
 	validator.Validate(updatedData.Question, []string{"IsString", "Length:<50"}, "Question")
-	validator.Validate(updatedData.Answers, []string{"IsArray"}, "Answers")
+	validator.Validate(updatedData.Answers, []string{"IsString"}, "Answers")
 	validator.Validate(updatedData.PosCorrectAnswer, []string{"IsInt"}, "PosCorrectAnswer")
 	validator.Validate(updatedData.QuestionTypeID, []string{"IsString"}, "QuestionTypeID")
-	validator.Validate(updatedData.Difficulty, []string{"IsInt"}, "Difficulty")
 	validator.Validate(updatedData.ModuleID, []string{"IsString"}, "ModuleID")
 }
 
@@ -219,10 +217,9 @@ func validateNewExercise(validator validation.IValidator, newExercise model.Exer
 	validator.Validate(newExercise.ClassID, []string{"IsString"}, "ClassID")
 	validator.Validate(newExercise.Name, []string{"IsString", "Length:<25"}, "Name")
 	validator.Validate(newExercise.Question, []string{"IsString", "Length:<50"}, "Question")
-	validator.Validate(newExercise.Answers, []string{"IsArray"}, "Answers")
+	validator.Validate(newExercise.Answers, []string{"IsString"}, "Answers")
 	validator.Validate(newExercise.PosCorrectAnswer, []string{"IsInt"}, "PosCorrectAnswer")
 	validator.Validate(newExercise.QuestionTypeID, []string{"IsString"}, "QuestionTypeID")
-	validator.Validate(newExercise.Difficulty, []string{"IsInt"}, "Difficulty")
 	validator.Validate(newExercise.ModuleID, []string{"IsString"}, "ModuleID")
 }
 
