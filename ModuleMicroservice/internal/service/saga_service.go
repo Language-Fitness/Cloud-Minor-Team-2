@@ -37,17 +37,29 @@ func (s *SagaService) FindObject(ctx context.Context, req *pb.ObjectRequest) (*p
 		return nil, err
 	}
 
+	fmt.Println("test modules:")
 	fmt.Println(modules)
+	fmt.Println("test 1")
+	fmt.Println("test 2")
+
+	for i := range modules {
+		fmt.Println(*modules[i])
+	}
 
 	response := &pb.ObjectResponse{
-		Objects: []*pb.SagaObject{
-			{
-				ObjectId:     "sample_object_id",
-				ObjectType:   pb.SagaObjectType_SCHOOL,
-				ObjectStatus: pb.SagaObjectStatus_EXIST,
-			},
-		},
+		Objects: make([]*pb.SagaObject, len(modules)),
 	}
+
+	for i := range modules {
+		object := &pb.SagaObject{
+			ObjectId:     fmt.Sprintf(modules[i].ID),
+			ObjectType:   pb.SagaObjectType_MODULE,
+			ObjectStatus: pb.SagaObjectStatus_EXIST,
+		}
+
+		response.Objects[i] = object
+	}
+
 	return response, nil
 }
 

@@ -36,6 +36,8 @@ func main() {
 		log.Fatal("Error loading .env file")
 	}
 
+	//migrations.Init()
+
 	// Initialize GraphQL server
 	graphQLServer := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{Resolvers: graph.NewResolver()}))
 
@@ -65,11 +67,14 @@ func main() {
 	msHandler := handlers.LoggingHandler(os.Stdout, r)
 	// handler = corsMiddleware(handler)
 
-	grpcSagaServer()
+	go grpcSagaServer()
 
-	// Start the HTTP server
-	log.Printf("SagaService is running on http://localhost:%s", port)
-	log.Fatal(http.ListenAndServe(":"+port, msHandler))
+	//// Start the HTTP server
+	//log.Printf("SagaService is running on http://localhost:%s", port)
+	//log.Fatal(http.ListenAndServe(":"+port, msHandler))
+
+	log.Printf("SagaService is running on http://localhost:%s", defaultPort)
+	log.Fatal(http.ListenAndServe(":"+defaultPort, msHandler))
 }
 
 func grpcSagaServer() {

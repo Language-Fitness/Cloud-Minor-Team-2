@@ -173,10 +173,13 @@ func (m *ModuleService) GetModuleById(token string, id string) (*model.Module, e
 }
 
 func (m *ModuleService) ListModules(token string, filter *model.ModuleFilter, paginate *model.Paginator) ([]*model.ModuleInfo, error) {
-	err := m.Policy.ListModules(token)
-	if err != nil {
-		return nil, err
-	}
+	//err := m.Policy.ListModules(token)
+	//if err != nil {
+	//	return nil, err
+	//}
+
+	fmt.Println(filter)
+	fmt.Println("init")
 
 	m.Validator.Validate(filter.SoftDelete, []string{"IsNull", "IsBoolean"}, "Filter softDelete")
 	if helper.IsNil(filter.Name) == false {
@@ -194,7 +197,7 @@ func (m *ModuleService) ListModules(token string, filter *model.ModuleFilter, pa
 		m.Validator.ClearErrors()
 		return nil, errors.New(errorMessage)
 	}
-
+	fmt.Println("init2")
 	fmt.Println(helper.DereferenceIfNeeded(filter.SoftDelete))
 
 	bsonFilter := bson.D{}
@@ -208,6 +211,8 @@ func (m *ModuleService) ListModules(token string, filter *model.ModuleFilter, pa
 		bsonFilter = append(bsonFilter, bson.E{Key: "schoolid", Value: helper.DereferenceIfNeeded(filter.SchoolID)})
 	}
 
+	fmt.Println(m.Policy.HasPermissions(token, "filter_school_made_by"))
+	fmt.Println("filter_module_made_by")
 	if m.Policy.HasPermissions(token, "filter_module_made_by") == true && helper.IsNil(filter.MadeBy) == false {
 		bsonFilter = append(bsonFilter, bson.E{Key: "madeby", Value: helper.DereferenceIfNeeded(filter.MadeBy)})
 	}
@@ -228,12 +233,14 @@ func (m *ModuleService) ListModules(token string, filter *model.ModuleFilter, pa
 		bsonFilter = append(bsonFilter, bson.E{Key: "category", Value: helper.DereferenceIfNeeded(filter.Category)})
 	}
 
+	fmt.Println("init3")
 	fmt.Println(bsonFilter)
 
 	paginateOptions := options.Find().
 		SetSkip(int64(paginate.Step)).
 		SetLimit(int64(paginate.Amount))
 
+	fmt.Println("init4")
 	modules, err := m.Repo.ListModules(bsonFilter, paginateOptions)
 	if err != nil {
 		return nil, err
