@@ -8,9 +8,11 @@ import (
 	"ExerciseMicroservice/internal/repository"
 	"ExerciseMicroservice/internal/validation"
 	"errors"
+	"fmt"
 	"github.com/google/uuid"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo/options"
+	"reflect"
 	"strings"
 	"time"
 )
@@ -164,6 +166,8 @@ func (e *ExerciseService) ListExercises(token string, filter *model.ExerciseFilt
 		return nil, err
 	}
 
+	fmt.Println("filter: ", filter)
+
 	validateListExerciseFilter(e.Validator, filter, paginate)
 	validationErrors := e.Validator.GetErrors()
 	if len(validationErrors) > 0 {
@@ -172,11 +176,16 @@ func (e *ExerciseService) ListExercises(token string, filter *model.ExerciseFilt
 		return nil, errors.New(errorMessage)
 	}
 
-	bsonFilter := buildBsonFilterForListExercise(e.Policy, token, filter)
+	bsonFilter, errs := buildBsonFilterForListExercise(e.Policy, token, filter)
+	if len(errs) > 0 {
+		return nil, helper.AggregateErrors(errs)
+	}
 
 	paginateOptions := options.Find().
 		SetSkip(int64(paginate.Step)).
 		SetLimit(int64(paginate.Amount))
+
+	fmt.Println("bsonFilter: ", bsonFilter)
 
 	exercises, err2 := e.Repo.ListExercises(bsonFilter, paginateOptions)
 	if err2 != nil {
@@ -213,6 +222,7 @@ func validateUpdatedExercise(validator validation.IValidator, id string, updated
 	validator.Validate(updatedData.ModuleID, []string{"IsString"}, "ModuleID")
 }
 
+// todo look if they need to be Dereferenced
 func validateNewExercise(validator validation.IValidator, newExercise model.ExerciseInput) {
 	validator.Validate(newExercise.ClassID, []string{"IsString"}, "ClassID")
 	validator.Validate(newExercise.Name, []string{"IsString", "Length:<25"}, "Name")
@@ -223,12 +233,17 @@ func validateNewExercise(validator validation.IValidator, newExercise model.Exer
 	validator.Validate(newExercise.ModuleID, []string{"IsString"}, "ModuleID")
 }
 
-func buildBsonFilterForListExercise(policy auth.IExercisePolicy, token string, filter *model.ExerciseFilter) bson.D {
+func buildBsonFilterForListExercise(policy auth.IExercisePolicy, token string, filter *model.ExerciseFilter) (bson.D, []error) {
 	bsonFilter := bson.D{}
+	//list of errors
+	var errs []error
 
 	appendCondition := func(key string, value interface{}) {
-		if value != nil && policy.HasPermissions(token, "filter_exercise_"+key) {
+
+		if value != nil && !reflect.ValueOf(value).IsZero() && policy.HasPermissions(token, "filter_exercise_"+key) {
 			bsonFilter = append(bsonFilter, bson.E{Key: key, Value: value})
+		} else if value != nil && !reflect.ValueOf(value).IsZero() && !policy.HasPermissions(token, "filter_exercise_"+key) {
+			errs = append(errs, errors.New("invalid permissions for filter_exercise_"+key+" action"))
 		}
 	}
 
@@ -240,5 +255,5 @@ func buildBsonFilterForListExercise(policy auth.IExercisePolicy, token string, f
 	appendCondition("module_id", filter.ModuleID)
 	appendCondition("madeby", filter.MadeBy)
 
-	return bsonFilter
+	return bsonFilter, errs
 }
