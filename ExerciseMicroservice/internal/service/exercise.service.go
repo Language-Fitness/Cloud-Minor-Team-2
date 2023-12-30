@@ -235,9 +235,9 @@ func buildBsonFilterForListExercise(policy auth.IExercisePolicy, token string, f
 	appendCondition("softdeleted", filter.SoftDelete)
 	appendCondition("name", filter.Name)
 	appendCondition("difficulty", filter.Difficulty)
-	appendCondition("questiontypeid", filter.QuestionTypeID)
-	appendCondition("classid", filter.ClassID)
-	appendCondition("moduleid", filter.ModuleID)
+	appendCondition("question_type_id", filter.QuestionTypeID)
+	appendCondition("class_id", filter.ClassID)
+	appendCondition("module_id", filter.ModuleID)
 	appendCondition("madeby", filter.MadeBy)
 
 	return bsonFilter

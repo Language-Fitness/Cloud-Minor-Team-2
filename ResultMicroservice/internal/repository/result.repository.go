@@ -18,14 +18,6 @@ type IResultRepository interface {
 	DeleteResultByID(id string) error
 	GetResultByID(id string) (*model.Result, error)
 	ListResults(bsonFilter bson.D, paginateOptions *options.FindOptions) ([]*model.Result, error)
-	//Saga GRPC
-	//Todo has to be soft deleted, before it can be hard deleted
-	SoftDeleteByUser(userID string) error
-	SoftDeleteByClass(classID string) error
-	SoftDeleteByModule(moduleID string) error
-	DeleteByUser(userID string) error
-	DeleteByClass(classID string) error
-	DeleteByModule(moduleID string) error
 }
 
 // ResultRepository GOLANG STRUCT
@@ -150,101 +142,4 @@ func (r *ResultRepository) GetResultByID(id string) (*model.Result, error) {
 	}
 
 	return &result, nil
-}
-
-// SoftDeleteByClass GOLANG METHOD
-// Soft deletes all results associated with a given class ID.
-func (r *ResultRepository) SoftDeleteByClass(classID string) error {
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
-	defer cancel()
-
-	filter := bson.M{"class_id": classID}
-	update := bson.M{"$set": bson.M{"soft_deleted": true, "updated_at": time.Now().Format(time.RFC3339)}}
-
-	_, err := r.collection.UpdateMany(ctx, filter, update)
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-// SoftDeleteByUser GOLANG METHOD
-// Soft deletes all results associated with a given user ID.
-func (r *ResultRepository) SoftDeleteByUser(userID string) error {
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
-	defer cancel()
-
-	filter := bson.M{"user_id": userID}
-	update := bson.M{"$set": bson.M{"soft_deleted": true, "updated_at": time.Now().Format(time.RFC3339)}}
-
-	_, err := r.collection.UpdateMany(ctx, filter, update)
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-// SoftDeleteByModule GOLANG METHOD
-// Soft deletes all results associated with a given module ID.
-func (r *ResultRepository) SoftDeleteByModule(moduleID string) error {
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
-	defer cancel()
-
-	filter := bson.M{"module_id": moduleID}
-	update := bson.M{"$set": bson.M{"soft_deleted": true, "updated_at": time.Now().Format(time.RFC3339)}}
-
-	_, err := r.collection.UpdateMany(ctx, filter, update)
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-// DeleteByClass GOLANG METHOD
-// Deletes all results associated with a given class ID.
-func (r *ResultRepository) DeleteByClass(classID string) error {
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
-	defer cancel()
-
-	filter := bson.M{"class_id": classID}
-
-	_, err := r.collection.DeleteMany(ctx, filter)
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-// DeleteByUser GOLANG METHOD
-// Deletes all results associated with a given user ID.
-func (r *ResultRepository) DeleteByUser(userID string) error {
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
-	defer cancel()
-
-	filter := bson.M{"user_id": userID}
-
-	_, err := r.collection.DeleteMany(ctx, filter)
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (r *ResultRepository) DeleteByModule(moduleID string) error {
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
-	defer cancel()
-
-	filter := bson.M{"module_id": moduleID}
-
-	_, err := r.collection.DeleteMany(ctx, filter)
-	if err != nil {
-		return err
-	}
-
-	return nil
 }

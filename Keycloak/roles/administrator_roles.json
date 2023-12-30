@@ -27,6 +27,9 @@
     "name": "get_classes_all"
   },
   {
+    "name": "get_exercises_all"
+  },
+  {
     "name": "update_school_all"
   },
   {
