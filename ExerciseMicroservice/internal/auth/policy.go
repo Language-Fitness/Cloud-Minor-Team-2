@@ -7,6 +7,8 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
+const InvalidTokenMessage = "invalid token"
+
 type IExercisePolicy interface {
 	CreateExercise(bearerToken string) (string, error)
 	UpdateExercise(bearerToken string, id string) (*model.Exercise, error)
@@ -17,7 +19,7 @@ type IExercisePolicy interface {
 }
 
 type ExercisePolicy struct {
-	Token              ITokenProvider
+	Token              IToken
 	ExerciseRepository repository.IExerciseRepository
 }
 
@@ -129,6 +131,10 @@ func (p *ExercisePolicy) HasPermissions(bearerToken string, role string) bool {
 }
 
 func (p *ExercisePolicy) getSubAndRoles(bearerToken string) (string, []interface{}, error) {
+	token, err := p.Token.IntrospectToken(bearerToken)
+	if err != nil || token == false {
+		return "", nil, errors.New("invalid token introspect")
+	}
 
 	decodeToken, err := p.Token.DecodeToken(bearerToken)
 	if err != nil {
@@ -139,17 +145,17 @@ func (p *ExercisePolicy) getSubAndRoles(bearerToken string) (string, []interface
 
 	resourceAccess, ok := decodeToken["resource_access"].(map[string]interface{})
 	if !ok {
-		return "", nil, errors.New("invalid token")
+		return "", nil, errors.New(InvalidTokenMessage)
 	}
 
 	userManagementClient, ok := resourceAccess["user-management-client"].(map[string]interface{})
 	if !ok {
-		return "", nil, errors.New("invalid token")
+		return "", nil, errors.New(InvalidTokenMessage)
 	}
 
 	roles, ok := userManagementClient["roles"].([]interface{})
 	if !ok {
-		return "", nil, errors.New("invalid token")
+		return "", nil, errors.New(InvalidTokenMessage)
 	}
 	return sub, roles, nil
 }

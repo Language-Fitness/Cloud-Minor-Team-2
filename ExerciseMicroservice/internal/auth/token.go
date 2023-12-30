@@ -9,33 +9,33 @@ import (
 	"strings"
 )
 
-type ITokenProvider interface {
+type IToken interface {
 	IntrospectToken(bearerToken string) (bool, error)
 	DecodeToken(token string) (map[string]interface{}, error)
 	GenerateBasicAuthHeader() string
 }
 
-type TokenProvider struct {
+type Token struct {
 	ClientID     string
 	ClientSecret string
 	Endpoint     string
 }
 
-func NewToken() ITokenProvider {
+func NewToken() IToken {
 	clientID := getKeycloakClientId()
 	clientSecret := getKeycloakClientSecret()
 	endpoint := getKeycloakHost()
 
-	tokenProvider := TokenProvider{
+	token := Token{
 		ClientID:     clientID,
 		ClientSecret: clientSecret,
 		Endpoint:     endpoint,
 	}
 
-	return &tokenProvider
+	return &token
 }
 
-func (a *TokenProvider) IntrospectToken(bearerToken string) (bool, error) {
+func (a *Token) IntrospectToken(bearerToken string) (bool, error) {
 	authHeader := a.GenerateBasicAuthHeader()
 
 	reqBody := fmt.Sprintf("token_type_hint=requesting_party_token&token=%s", bearerToken)
@@ -73,7 +73,7 @@ func (a *TokenProvider) IntrospectToken(bearerToken string) (bool, error) {
 	return active, nil
 }
 
-func (a *TokenProvider) DecodeToken(token string) (map[string]interface{}, error) {
+func (a *Token) DecodeToken(token string) (map[string]interface{}, error) {
 	// JWTs are typically in the format "header.payload.signature"
 	parts := strings.Split(token, ".")
 	if len(parts) != 3 {
@@ -96,7 +96,7 @@ func (a *TokenProvider) DecodeToken(token string) (map[string]interface{}, error
 	return claims, nil
 }
 
-func (a *TokenProvider) GenerateBasicAuthHeader() string {
+func (a *Token) GenerateBasicAuthHeader() string {
 	authString := fmt.Sprintf("%s:%s", a.ClientID, a.ClientSecret)
 	authHeader := base64.StdEncoding.EncodeToString([]byte(authString))
 	return fmt.Sprintf("Basic %s", authHeader)
