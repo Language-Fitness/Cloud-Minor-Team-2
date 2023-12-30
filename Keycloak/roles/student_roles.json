@@ -23,4 +23,7 @@
   {
     "name": "filter_module_school_id"
   }
+  {
+    "name": "filter_exercise_class_id"
+  }
 ]

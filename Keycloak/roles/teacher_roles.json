@@ -35,4 +35,19 @@
   {
     "name": "filter_class_module_id"
   }
+  {
+    "name": "filter_exercise_name"
+  },
+  {
+    "name": "filter_exercise_difficulty"
+  },
+  {
+    "name": "filter_exercise_module_id"
+  },
+  {
+    "name": "filter_exercise_class_id"
+  },
+  {
+    "name": "filter_exercise_question_type_id"
+  }
 ]
