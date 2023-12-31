@@ -82,5 +82,11 @@
   },
   {
     "name": "filter_school_made_by"
+  },
+  {
+    "name": "filter_exercise_softDelete"
+  },
+  {
+    "name": "filter_exercise_made_by"
   }
 ]
