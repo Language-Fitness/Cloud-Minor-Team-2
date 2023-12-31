@@ -265,7 +265,6 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 	inputUnmarshalMap := graphql.BuildUnmarshalerMap(
 		ec.unmarshalInputExerciseFilter,
 		ec.unmarshalInputExerciseInput,
-		ec.unmarshalInputNameFilter,
 		ec.unmarshalInputPaginator,
 	)
 	first := true
@@ -3419,13 +3418,22 @@ func (ec *executionContext) unmarshalInputExerciseFilter(ctx context.Context, ob
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"softDelete", "name", "difficulty", "question_type_id", "class_Id", "module_id", "made_by"}
+	fieldsInOrder := [...]string{"name", "softDelete", "difficulty", "question_type_id", "class_Id", "module_id", "made_by"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
 			continue
 		}
 		switch k {
+		case "name":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Name = data
 		case "softDelete":
 			var err error
 
@@ -3435,20 +3443,11 @@ func (ec *executionContext) unmarshalInputExerciseFilter(ctx context.Context, ob
 				return it, err
 			}
 			it.SoftDelete = data
-		case "name":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
-			data, err := ec.unmarshalONameFilter2ᚖExerciseMicroserviceᚋgraphᚋmodelᚐNameFilter(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.Name = data
 		case "difficulty":
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("difficulty"))
-			data, err := ec.unmarshalOFloat2ᚖfloat64(ctx, v)
+			data, err := ec.unmarshalOdifficulty2ᚖExerciseMicroserviceᚋgraphᚋmodelᚐDifficulty(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -3581,44 +3580,6 @@ func (ec *executionContext) unmarshalInputExerciseInput(ctx context.Context, obj
 				return it, err
 			}
 			it.Difficulty = data
-		}
-	}
-
-	return it, nil
-}
-
-func (ec *executionContext) unmarshalInputNameFilter(ctx context.Context, obj interface{}) (model.NameFilter, error) {
-	var it model.NameFilter
-	asMap := map[string]interface{}{}
-	for k, v := range obj.(map[string]interface{}) {
-		asMap[k] = v
-	}
-
-	fieldsInOrder := [...]string{"input", "type"}
-	for _, k := range fieldsInOrder {
-		v, ok := asMap[k]
-		if !ok {
-			continue
-		}
-		switch k {
-		case "input":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-			data, err := ec.unmarshalNString2ᚕᚖstring(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.Input = data
-		case "type":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("type"))
-			data, err := ec.unmarshalNNameFilterTypes2ExerciseMicroserviceᚋgraphᚋmodelᚐNameFilterTypes(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.Type = data
 		}
 	}
 
@@ -4293,16 +4254,6 @@ func (ec *executionContext) marshalNInt2int(ctx context.Context, sel ast.Selecti
 	return res
 }
 
-func (ec *executionContext) unmarshalNNameFilterTypes2ExerciseMicroserviceᚋgraphᚋmodelᚐNameFilterTypes(ctx context.Context, v interface{}) (model.NameFilterTypes, error) {
-	var res model.NameFilterTypes
-	err := res.UnmarshalGQL(v)
-	return res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) marshalNNameFilterTypes2ExerciseMicroserviceᚋgraphᚋmodelᚐNameFilterTypes(ctx context.Context, sel ast.SelectionSet, v model.NameFilterTypes) graphql.Marshaler {
-	return v
-}
-
 func (ec *executionContext) unmarshalNPaginator2ExerciseMicroserviceᚋgraphᚋmodelᚐPaginator(ctx context.Context, v interface{}) (model.Paginator, error) {
 	res, err := ec.unmarshalInputPaginator(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -4321,32 +4272,6 @@ func (ec *executionContext) marshalNString2string(ctx context.Context, sel ast.S
 		}
 	}
 	return res
-}
-
-func (ec *executionContext) unmarshalNString2ᚕᚖstring(ctx context.Context, v interface{}) ([]*string, error) {
-	var vSlice []interface{}
-	if v != nil {
-		vSlice = graphql.CoerceList(v)
-	}
-	var err error
-	res := make([]*string, len(vSlice))
-	for i := range vSlice {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
-		res[i], err = ec.unmarshalOString2ᚖstring(ctx, vSlice[i])
-		if err != nil {
-			return nil, err
-		}
-	}
-	return res, nil
-}
-
-func (ec *executionContext) marshalNString2ᚕᚖstring(ctx context.Context, sel ast.SelectionSet, v []*string) graphql.Marshaler {
-	ret := make(graphql.Array, len(v))
-	for i := range v {
-		ret[i] = ec.marshalOString2ᚖstring(ctx, sel, v[i])
-	}
-
-	return ret
 }
 
 func (ec *executionContext) marshalN__Directive2githubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐDirective(ctx context.Context, sel ast.SelectionSet, v introspection.Directive) graphql.Marshaler {
@@ -4686,22 +4611,6 @@ func (ec *executionContext) marshalOExercise2ᚖExerciseMicroserviceᚋgraphᚋm
 	return ec._Exercise(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalOFloat2ᚖfloat64(ctx context.Context, v interface{}) (*float64, error) {
-	if v == nil {
-		return nil, nil
-	}
-	res, err := graphql.UnmarshalFloatContext(ctx, v)
-	return &res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) marshalOFloat2ᚖfloat64(ctx context.Context, sel ast.SelectionSet, v *float64) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	res := graphql.MarshalFloatContext(*v)
-	return graphql.WrapContextMarshaler(ctx, res)
-}
-
 func (ec *executionContext) unmarshalOID2ᚖstring(ctx context.Context, v interface{}) (*string, error) {
 	if v == nil {
 		return nil, nil
@@ -4716,14 +4625,6 @@ func (ec *executionContext) marshalOID2ᚖstring(ctx context.Context, sel ast.Se
 	}
 	res := graphql.MarshalID(*v)
 	return res
-}
-
-func (ec *executionContext) unmarshalONameFilter2ᚖExerciseMicroserviceᚋgraphᚋmodelᚐNameFilter(ctx context.Context, v interface{}) (*model.NameFilter, error) {
-	if v == nil {
-		return nil, nil
-	}
-	res, err := ec.unmarshalInputNameFilter(ctx, v)
-	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) unmarshalOString2ᚖstring(ctx context.Context, v interface{}) (*string, error) {
@@ -4942,6 +4843,22 @@ func (ec *executionContext) marshalO__Type2ᚖgithubᚗcomᚋ99designsᚋgqlgen�
 		return graphql.Null
 	}
 	return ec.___Type(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalOdifficulty2ᚖExerciseMicroserviceᚋgraphᚋmodelᚐDifficulty(ctx context.Context, v interface{}) (*model.Difficulty, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var res = new(model.Difficulty)
+	err := res.UnmarshalGQL(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOdifficulty2ᚖExerciseMicroserviceᚋgraphᚋmodelᚐDifficulty(ctx context.Context, sel ast.SelectionSet, v *model.Difficulty) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return v
 }
 
 // endregion ***************************** type.gotpl *****************************

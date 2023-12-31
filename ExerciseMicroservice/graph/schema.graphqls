@@ -3,30 +3,18 @@
 # https://gqlgen.com/getting-started/
 
 input ExerciseFilter {
+  name: String
   softDelete: Boolean
-  name: NameFilter
-  difficulty: Float
+  difficulty: difficulty
   question_type_id: ID
   class_Id: ID
   module_id: ID
   made_by: ID
 }
 
-input NameFilter {
-  input: [String]!
-  type: NameFilterTypes!
-}
-
 input Paginator {
   amount: Int!
   Step: Int!
-}
-
-enum NameFilterTypes {
-  eq
-  ne
-  starts
-  ends
 }
 
 enum difficulty{

@@ -25,9 +25,9 @@ type Exercise struct {
 }
 
 type ExerciseFilter struct {
+	Name           *string     `json:"name,omitempty"`
 	SoftDelete     *bool       `json:"softDelete,omitempty"`
-	Name           *NameFilter `json:"name,omitempty"`
-	Difficulty     *float64    `json:"difficulty,omitempty"`
+	Difficulty     *Difficulty `json:"difficulty,omitempty"`
 	QuestionTypeID *string     `json:"question_type_id,omitempty"`
 	ClassID        *string     `json:"class_Id,omitempty"`
 	ModuleID       *string     `json:"module_id,omitempty"`
@@ -45,59 +45,9 @@ type ExerciseInput struct {
 	Difficulty       Difficulty `json:"difficulty"`
 }
 
-type NameFilter struct {
-	Input []*string       `json:"input"`
-	Type  NameFilterTypes `json:"type"`
-}
-
 type Paginator struct {
 	Amount int `json:"amount"`
 	Step   int `json:"Step"`
-}
-
-type NameFilterTypes string
-
-const (
-	NameFilterTypesEq     NameFilterTypes = "eq"
-	NameFilterTypesNe     NameFilterTypes = "ne"
-	NameFilterTypesStarts NameFilterTypes = "starts"
-	NameFilterTypesEnds   NameFilterTypes = "ends"
-)
-
-var AllNameFilterTypes = []NameFilterTypes{
-	NameFilterTypesEq,
-	NameFilterTypesNe,
-	NameFilterTypesStarts,
-	NameFilterTypesEnds,
-}
-
-func (e NameFilterTypes) IsValid() bool {
-	switch e {
-	case NameFilterTypesEq, NameFilterTypesNe, NameFilterTypesStarts, NameFilterTypesEnds:
-		return true
-	}
-	return false
-}
-
-func (e NameFilterTypes) String() string {
-	return string(e)
-}
-
-func (e *NameFilterTypes) UnmarshalGQL(v interface{}) error {
-	str, ok := v.(string)
-	if !ok {
-		return fmt.Errorf("enums must be strings")
-	}
-
-	*e = NameFilterTypes(str)
-	if !e.IsValid() {
-		return fmt.Errorf("%s is not a valid NameFilterTypes", str)
-	}
-	return nil
-}
-
-func (e NameFilterTypes) MarshalGQL(w io.Writer) {
-	fmt.Fprint(w, strconv.Quote(e.String()))
 }
 
 type Difficulty string
