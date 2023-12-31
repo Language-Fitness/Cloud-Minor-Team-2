@@ -135,10 +135,7 @@ func (r *ExerciseRepository) ListExercises(bsonFilter bson.D, paginateOptions *o
 		return nil, err
 	}
 	defer func(cursor *mongo.Cursor, ctx context.Context) {
-		err := cursor.Close(ctx)
-		if err != nil {
-			// Handle closing error if needed
-		}
+		cursor.Close(ctx)
 	}(cursor, ctx)
 
 	// Decode results

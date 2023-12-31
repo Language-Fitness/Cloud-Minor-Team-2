@@ -67,6 +67,7 @@ func (e *ExerciseService) CreateExercise(token string, newExercise model.Exercis
 	exerciseToInsert := &model.Exercise{
 		ID:               uuid.New().String(),
 		ClassID:          newExercise.ClassID,
+		ModuleID:         newExercise.ModuleID,
 		Name:             newExercise.Name,
 		Question:         newExercise.Question,
 		Answers:          newExercise.Answers,
@@ -197,12 +198,7 @@ func (e *ExerciseService) ListExercises(token string, filter *model.ExerciseFilt
 
 func validateListExerciseFilter(validator validation.IValidator, filter *model.ExerciseFilter, paginate *model.Paginator) {
 	validator.Validate(filter.SoftDelete, []string{"IsNull", "IsBoolean"}, "Filter SoftDelete")
-	if helper.IsNil(filter.Name) == false {
-		validator.Validate(helper.DereferenceArrayIfNeeded(
-			filter.Name.Input),
-			[]string{"IsNull", "IsString"},
-			"Filter Name input")
-	}
+	validator.Validate(filter.Name, []string{"IsNull", "IsString"}, "Filter Name")
 	validator.Validate(filter.QuestionTypeID, []string{"IsNull", "IsString"}, "Filter QuestionTypeID")
 	validator.Validate(filter.ClassID, []string{"IsNull", "IsString"}, "Filter ClassID")
 	validator.Validate(filter.ModuleID, []string{"IsNull", "IsString"}, "Filter ModuleID")
@@ -238,22 +234,28 @@ func buildBsonFilterForListExercise(policy auth.IExercisePolicy, token string, f
 	//list of errors
 	var errs []error
 
-	appendCondition := func(key string, value interface{}) {
+	appendCondition := func(key string, value interface{}, dbKey string) bool {
 
 		if value != nil && !reflect.ValueOf(value).IsZero() && policy.HasPermissions(token, "filter_exercise_"+key) {
-			bsonFilter = append(bsonFilter, bson.E{Key: key, Value: value})
+			bsonFilter = append(bsonFilter, bson.E{Key: dbKey, Value: helper.DereferenceIfNeeded(value)})
+			return true
 		} else if value != nil && !reflect.ValueOf(value).IsZero() && !policy.HasPermissions(token, "filter_exercise_"+key) {
-			errs = append(errs, errors.New("invalid permissions for filter_exercise_"+key+" action"))
+			errs = append(errs, errors.New("invalid permissions for filter_exercise_"+key+" action, "))
+			return false
 		}
+		return false
 	}
 
-	appendCondition("softdeleted", filter.SoftDelete)
-	appendCondition("name", filter.Name)
-	appendCondition("difficulty", filter.Difficulty)
-	appendCondition("question_type_id", filter.QuestionTypeID)
-	appendCondition("class_id", filter.ClassID)
-	appendCondition("module_id", filter.ModuleID)
-	appendCondition("madeby", filter.MadeBy)
+	b := appendCondition("softdeleted", filter.SoftDelete, "softdeleted")
+	if b == false {
+		bsonFilter = append(bsonFilter, bson.E{Key: "softdeleted", Value: false})
+	}
+	appendCondition("name", filter.Name, "name")
+	appendCondition("difficulty", filter.Difficulty, "difficulty")
+	appendCondition("question_type_id", filter.QuestionTypeID, "questiontypeid")
+	appendCondition("class_id", filter.ClassID, "classid")
+	appendCondition("module_id", filter.ModuleID, "moduleid")
+	appendCondition("made_by", filter.MadeBy, "madeby")
 
 	return bsonFilter, errs
 }
