@@ -35,15 +35,15 @@ func (r *mutationResolver) UpdateExercise(ctx context.Context, id string, exerci
 }
 
 // DeleteExercise is the resolver for the DeleteExercise field.
-func (r *mutationResolver) DeleteExercise(ctx context.Context, userID string, filter model.ExerciseFilter) (*model.Exercise, error) {
+func (r *mutationResolver) DeleteExercise(ctx context.Context, exerciseID string) (*model.Exercise, error) {
 	token := auth.TokenFromContext(ctx)
 
-	err := r.Service.DeleteExercise(token, userID, &filter)
+	result, err := r.Service.DeleteExercise(token, exerciseID)
 	if err != nil {
 		return nil, err
 	}
 
-	return nil, nil
+	return result, nil
 }
 
 // GetExercise is the resolver for the GetExercise field.

@@ -61,7 +61,7 @@ type Query {
 type Mutation {
   CreateExercise(exercise: ExerciseInput!): Exercise
   UpdateExercise(id: ID!, exercise: ExerciseInput!): Exercise
-  DeleteExercise(UserID: ID!, filter: ExerciseFilter!): Exercise
+  DeleteExercise(ExerciseID: ID!): Exercise
 }
 
 

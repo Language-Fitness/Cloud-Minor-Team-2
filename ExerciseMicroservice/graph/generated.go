@@ -65,7 +65,7 @@ type ComplexityRoot struct {
 
 	Mutation struct {
 		CreateExercise func(childComplexity int, exercise model.ExerciseInput) int
-		DeleteExercise func(childComplexity int, userID string, filter model.ExerciseFilter) int
+		DeleteExercise func(childComplexity int, exerciseID string) int
 		UpdateExercise func(childComplexity int, id string, exercise model.ExerciseInput) int
 	}
 
@@ -78,7 +78,7 @@ type ComplexityRoot struct {
 type MutationResolver interface {
 	CreateExercise(ctx context.Context, exercise model.ExerciseInput) (*model.Exercise, error)
 	UpdateExercise(ctx context.Context, id string, exercise model.ExerciseInput) (*model.Exercise, error)
-	DeleteExercise(ctx context.Context, userID string, filter model.ExerciseFilter) (*model.Exercise, error)
+	DeleteExercise(ctx context.Context, exerciseID string) (*model.Exercise, error)
 }
 type QueryResolver interface {
 	GetExercise(ctx context.Context, exerciseID string) (*model.Exercise, error)
@@ -217,7 +217,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.DeleteExercise(childComplexity, args["UserID"].(string), args["filter"].(model.ExerciseFilter)), true
+		return e.complexity.Mutation.DeleteExercise(childComplexity, args["ExerciseID"].(string)), true
 
 	case "Mutation.UpdateExercise":
 		if e.complexity.Mutation.UpdateExercise == nil {
@@ -401,23 +401,14 @@ func (ec *executionContext) field_Mutation_DeleteExercise_args(ctx context.Conte
 	var err error
 	args := map[string]interface{}{}
 	var arg0 string
-	if tmp, ok := rawArgs["UserID"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("UserID"))
+	if tmp, ok := rawArgs["ExerciseID"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("ExerciseID"))
 		arg0, err = ec.unmarshalNID2string(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["UserID"] = arg0
-	var arg1 model.ExerciseFilter
-	if tmp, ok := rawArgs["filter"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
-		arg1, err = ec.unmarshalNExerciseFilter2ExerciseMicroserviceᚋgraphᚋmodelᚐExerciseFilter(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["filter"] = arg1
+	args["ExerciseID"] = arg0
 	return args, nil
 }
 
@@ -1283,7 +1274,7 @@ func (ec *executionContext) _Mutation_DeleteExercise(ctx context.Context, field 
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().DeleteExercise(rctx, fc.Args["UserID"].(string), fc.Args["filter"].(model.ExerciseFilter))
+		return ec.resolvers.Mutation().DeleteExercise(rctx, fc.Args["ExerciseID"].(string))
 	})
 	if err != nil {
 		ec.Error(ctx, err)

@@ -75,7 +75,7 @@ func (p *ExercisePolicy) DeleteExercise(bearerToken string, id string) (bool, *m
 
 	exercise, err := p.ExerciseRepository.GetExerciseByID(id)
 	if err != nil {
-		return false, nil, errors.New("invalid permissions for this action")
+		return false, nil, errors.New("exercise not found")
 	}
 
 	if p.hasRole(roles, "delete_exercise_all") {

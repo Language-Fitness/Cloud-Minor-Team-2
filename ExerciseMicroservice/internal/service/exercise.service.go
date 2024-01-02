@@ -24,7 +24,7 @@ const ValidationPrefix = "Validation errors: "
 type IExerciseService interface {
 	CreateExercise(token string, newExercise model.ExerciseInput) (*model.Exercise, error)
 	UpdateExercise(token string, id string, updateData model.ExerciseInput) (*model.Exercise, error)
-	DeleteExercise(token string, id string, filter *model.ExerciseFilter) error
+	DeleteExercise(token string, id string) (*model.Exercise, error)
 	GetExerciseById(token string, id string) (*model.Exercise, error)
 	ListExercises(token string, filter *model.ExerciseFilter, paginate *model.Paginator) ([]*model.Exercise, error)
 }
@@ -124,25 +124,25 @@ func (e *ExerciseService) UpdateExercise(token string, id string, updateData mod
 	return result, nil
 }
 
-func (e *ExerciseService) DeleteExercise(token string, id string, filter *model.ExerciseFilter) error {
+func (e *ExerciseService) DeleteExercise(token string, id string) (*model.Exercise, error) {
 	_, existingExercise, err := e.Policy.DeleteExercise(token, id)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	if !existingExercise.SoftDeleted {
-		existingExercise.SoftDeleted = true
-		//datetime
-		existingExercise.UpdatedAt = time.Now().String()
-
-		_, err := e.Repo.UpdateExercise(id, *existingExercise)
-		if err != nil {
-			return err
-		}
-		return nil
+	if existingExercise.SoftDeleted {
+		return nil, errors.New("exercise could not be deleted")
 	}
 
-	return errors.New("exercise could not be deleted")
+	existingExercise.SoftDeleted = true
+	existingExercise.UpdatedAt = time.Now().String()
+
+	result, err := e.Repo.UpdateExercise(id, *existingExercise)
+	if err != nil {
+		return nil, err
+	}
+
+	return result, nil
 }
 
 func (e *ExerciseService) GetExerciseById(token string, id string) (*model.Exercise, error) {
