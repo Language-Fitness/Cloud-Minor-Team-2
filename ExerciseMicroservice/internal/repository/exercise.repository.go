@@ -14,8 +14,6 @@ import (
 type IExerciseRepository interface {
 	CreateExercise(newExercise *model.Exercise) (*model.Exercise, error)
 	UpdateExercise(id string, updatedExercise model.Exercise) (*model.Exercise, error)
-	SoftDeleteExerciseByID(id string, existingExercise model.Exercise) error
-	HardDeleteExerciseByID(id string) error
 	GetExerciseByID(id string) (*model.Exercise, error)
 	ListExercises(bsonFilter bson.D, paginateOptions *options.FindOptions) ([]*model.Exercise, error)
 }
@@ -74,39 +72,6 @@ func (r *ExerciseRepository) UpdateExercise(id string, updatedExercise model.Exe
 	}
 
 	return &result, nil
-}
-
-func (r *ExerciseRepository) SoftDeleteExerciseByID(id string, existingExercise model.Exercise) error {
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
-	defer cancel()
-
-	filter := bson.M{"id": id}
-	update := bson.M{"$set": existingExercise}
-
-	err := r.collection.FindOneAndUpdate(
-		ctx,
-		filter,
-		update,
-		options.FindOneAndUpdate().SetReturnDocument(options.After)).Decode(&existingExercise)
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (r *ExerciseRepository) HardDeleteExerciseByID(id string) error {
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10) // 10-second timeout
-	defer cancel()
-
-	filter := bson.M{"id": id}
-
-	_, err := r.collection.DeleteOne(ctx, filter)
-	if err != nil {
-		return err
-	}
-
-	return nil
 }
 
 func (r *ExerciseRepository) GetExerciseByID(id string) (*model.Exercise, error) {

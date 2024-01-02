@@ -125,24 +125,17 @@ func (e *ExerciseService) UpdateExercise(token string, id string, updateData mod
 }
 
 func (e *ExerciseService) DeleteExercise(token string, id string, filter *model.ExerciseFilter) error {
-	isAdmin, existingExercise, err := e.Policy.DeleteExercise(token, id)
+	_, existingExercise, err := e.Policy.DeleteExercise(token, id)
 	if err != nil {
 		return err
 	}
 
 	if !existingExercise.SoftDeleted {
 		existingExercise.SoftDeleted = true
+		//datetime
+		existingExercise.UpdatedAt = time.Now().String()
 
-		//TODO nog naar kijken  want delete moet update met hard delete variable zijn
-		err := e.Repo.SoftDeleteExerciseByID(id, *existingExercise)
-		if err != nil {
-			return err
-		}
-		return nil
-	}
-
-	if isAdmin && filter != nil && !helper.IsNil(filter.SoftDelete) {
-		err := e.Repo.HardDeleteExerciseByID(id)
+		_, err := e.Repo.UpdateExercise(id, *existingExercise)
 		if err != nil {
 			return err
 		}
