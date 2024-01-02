@@ -35,12 +35,14 @@ func main() {
 	http.Handle("/query", tokenMiddleware(srv))
 	http.Handle("/", playground.Handler("GraphQL playground", "/query"))
 
+	go grpcSagaServer()
+
 	log.Printf("connect to http://localhost:%s/ for GraphQL playground", port)
 	log.Fatal(http.ListenAndServe(":"+port, nil))
 }
 
 func grpcSagaServer() {
-	lis, err := net.Listen("tcp", ":9091")
+	lis, err := net.Listen("tcp", ":9092")
 	if err != nil {
 		log.Fatalf("Failed to listen: %v", err)
 	}
