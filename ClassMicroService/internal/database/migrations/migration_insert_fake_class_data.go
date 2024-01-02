@@ -65,6 +65,7 @@ func GenerateRandomClasses(n int) []FakeClass {
 		return nil
 	}
 
+	fakeClassWithIdSet.ID = "962c8541-e4be-4c06-9875-d4184b367dca"
 	fakeClassWithIdSet.ModuleID = "09d6be4b-da77-4be0-9094-445e1a5e639a"
 	fakeClassWithIdSet.MadeBy = "0e520bea-a96b-47cc-96bc-83633e47c58e"
 	fakeClassWithIdSet.SoftDeleted = false
