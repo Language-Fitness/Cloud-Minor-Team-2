@@ -1,22 +1,21 @@
 package service
 
 import (
-	"Module/graph/model"
-	"Module/internal/helper"
-	"Module/proto/pb"
+	"Class/graph/model"
+	"Class/internal/helper"
+	"Class/proto/pb"
 	"context"
 	"fmt"
-	"go.mongodb.org/mongo-driver/mongo"
 )
 
 type SagaService struct {
 	pb.UnimplementedGRPCSagaServiceServer
-	service IModuleService
+	service IClassService
 }
 
-func NewSagaService(collection *mongo.Collection) *SagaService {
+func NewSagaService() *SagaService {
 	return &SagaService{
-		service: NewModuleService(collection),
+		service: NewClassService(),
 	}
 }
 
@@ -34,8 +33,8 @@ func (s *SagaService) FindSagaObject(context.Context, *pb.ObjectRequest) (*pb.Sa
 // FindSagaObjectChildren implements the FindSagaObjectChildren RPC method
 func (s *SagaService) FindSagaObjectChildren(ctx context.Context, req *pb.ObjectRequest) (*pb.ObjectResponse, error) {
 
-	filter := model.ModuleFilter{
-		MadeBy: helper.StringPointer(req.ObjectId),
+	filter := model.ListClassFilter{
+		ModuleID: helper.StringPointer(req.ObjectId),
 	}
 
 	paginate := model.Paginator{
@@ -43,27 +42,24 @@ func (s *SagaService) FindSagaObjectChildren(ctx context.Context, req *pb.Object
 		Step:   0,
 	}
 
-	modules, err := s.service.ListModules(req.BearerToken, helper.ModuleFilterPointer(filter), helper.PaginatorPointer(paginate))
+	classes, err := s.service.ListClasses(req.BearerToken, helper.ListClassFilterPointer(filter), helper.PaginatorPointer(paginate))
 	if err != nil {
 		return nil, err
 	}
 
-	fmt.Println("test modules:")
-	fmt.Println(modules)
-	fmt.Println("test 1")
-	fmt.Println("test 2")
+	fmt.Println(classes)
 
-	for i := range modules {
-		fmt.Println(*modules[i])
+	for i := range classes {
+		fmt.Println(*classes[i])
 	}
 
 	response := &pb.ObjectResponse{
-		Objects: make([]*pb.SagaObject, len(modules)),
+		Objects: make([]*pb.SagaObject, len(classes)),
 	}
 
-	for i := range modules {
+	for i := range classes {
 		object := &pb.SagaObject{
-			ObjectId:     fmt.Sprintf(modules[i].ID),
+			ObjectId:     fmt.Sprintf(classes[i].ID),
 			ObjectType:   pb.SagaObjectType_MODULE,
 			ObjectStatus: pb.SagaObjectStatus_EXIST,
 		}

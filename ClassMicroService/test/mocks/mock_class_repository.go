@@ -1,7 +1,7 @@
 package mocks
 
 import (
-	"example/graph/model"
+	"Class/graph/model"
 	"github.com/stretchr/testify/mock"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"

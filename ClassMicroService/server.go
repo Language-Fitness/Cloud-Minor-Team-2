@@ -1,10 +1,14 @@
 package main
 
 import (
-	"example/graph"
-	"example/internal/auth"
+	"Class/graph"
+	"Class/internal/auth"
+	"Class/internal/service"
+	"Class/proto/pb"
 	"github.com/joho/godotenv"
+	"google.golang.org/grpc"
 	"log"
+	"net"
 	"net/http"
 	"os"
 
@@ -33,4 +37,19 @@ func main() {
 
 	log.Printf("connect to http://localhost:%s/ for GraphQL playground", port)
 	log.Fatal(http.ListenAndServe(":"+port, nil))
+}
+
+func grpcSagaServer() {
+	lis, err := net.Listen("tcp", ":9091")
+	if err != nil {
+		log.Fatalf("Failed to listen: %v", err)
+	}
+
+	grpcServer := grpc.NewServer()
+	pb.RegisterGRPCSagaServiceServer(grpcServer, service.NewSagaService())
+
+	log.Printf("server listening at %v", lis.Addr())
+	if err := grpcServer.Serve(lis); err != nil {
+		log.Fatalf("Failed to serve: %v", err)
+	}
 }

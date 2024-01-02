@@ -1,8 +1,8 @@
 package auth
 
 import (
-	"example/internal/auth"
-	"example/test/mocks"
+	"Class/internal/auth"
+	"Class/test/mocks"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"testing"

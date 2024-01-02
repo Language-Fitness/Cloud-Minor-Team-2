@@ -1,9 +1,9 @@
 package mocks
 
 import (
-	"example/graph/model"
-	"example/internal/auth"
-	"example/internal/repository"
+	"Class/graph/model"
+	"Class/internal/auth"
+	"Class/internal/repository"
 	"github.com/stretchr/testify/mock"
 )
 

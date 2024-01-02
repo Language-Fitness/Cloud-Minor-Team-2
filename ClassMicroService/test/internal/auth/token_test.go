@@ -1,7 +1,7 @@
 package auth
 
 import (
-	auth2 "example/internal/auth"
+	auth2 "Class/internal/auth"
 	"fmt"
 	"testing"
 )

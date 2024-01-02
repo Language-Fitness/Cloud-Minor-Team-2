@@ -21,7 +21,8 @@ enum SagaObjectStatus {
 // Define gRPC User Service
 service gRPCSagaService {
   // RPC method to get user information
-  rpc FindObject (ObjectRequest) returns (ObjectResponse);
+  rpc FindSagaObject (ObjectRequest) returns (SagaObject);
+  rpc FindSagaObjectChildren (ObjectRequest) returns (ObjectResponse);
   rpc DeleteObject (ObjectRequest) returns (ObjectResponse);
   rpc UnDeleteObject (ObjectRequest) returns (ObjectResponse);
 }

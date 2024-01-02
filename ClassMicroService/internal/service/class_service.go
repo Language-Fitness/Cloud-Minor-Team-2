@@ -1,13 +1,13 @@
 package service
 
 import (
+	"Class/graph/model"
+	"Class/internal/auth"
+	"Class/internal/database"
+	"Class/internal/helper"
+	"Class/internal/repository"
+	"Class/internal/validation"
 	"errors"
-	"example/graph/model"
-	"example/internal/auth"
-	"example/internal/database"
-	"example/internal/helper"
-	"example/internal/repository"
-	"example/internal/validation"
 	"github.com/google/uuid"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -148,10 +148,10 @@ func (c *ClassService) GetClassById(token string, id string) (*model.Class, erro
 }
 
 func (c *ClassService) ListClasses(token string, filter *model.ListClassFilter, paginate *model.Paginator) ([]*model.ClassInfo, error) {
-	err := c.Policy.ListClasses(token)
-	if err != nil {
-		return nil, err
-	}
+	//err := c.Policy.ListClasses(token)
+	//if err != nil {
+	//	return nil, err
+	//}
 
 	validateListClassFilter(c.Validator, filter, paginate)
 	validationErrors := c.Validator.GetErrors()

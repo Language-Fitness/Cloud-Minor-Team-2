@@ -3,11 +3,11 @@
 package graph
 
 import (
+	"Class/graph/model"
 	"bytes"
 	"context"
 	"embed"
 	"errors"
-	"example/graph/model"
 	"fmt"
 	"strconv"
 	"sync"
@@ -55,7 +55,6 @@ type ComplexityRoot struct {
 		MadeBy      func(childComplexity int) int
 		ModuleID    func(childComplexity int) int
 		Name        func(childComplexity int) int
-		OpenaiKey   func(childComplexity int) int
 		SoftDeleted func(childComplexity int) int
 		UpdatedAt   func(childComplexity int) int
 	}
@@ -158,13 +157,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Class.Name(childComplexity), true
-
-	case "Class.openai_key":
-		if e.complexity.Class.OpenaiKey == nil {
-			break
-		}
-
-		return e.complexity.Class.OpenaiKey(childComplexity), true
 
 	case "Class.soft_deleted":
 		if e.complexity.Class.SoftDeleted == nil {
@@ -416,7 +408,7 @@ func (ec *executionContext) field_Mutation_createClass_args(ctx context.Context,
 	var arg0 model.ClassInput
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg0, err = ec.unmarshalNClassInput2exampleᚋgraphᚋmodelᚐClassInput(ctx, tmp)
+		arg0, err = ec.unmarshalNClassInput2ClassᚋgraphᚋmodelᚐClassInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -455,7 +447,7 @@ func (ec *executionContext) field_Mutation_updateClass_args(ctx context.Context,
 	var arg1 model.ClassInput
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg1, err = ec.unmarshalNClassInput2exampleᚋgraphᚋmodelᚐClassInput(ctx, tmp)
+		arg1, err = ec.unmarshalNClassInput2ClassᚋgraphᚋmodelᚐClassInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -500,7 +492,7 @@ func (ec *executionContext) field_Query_listClasses_args(ctx context.Context, ra
 	var arg0 *model.ListClassFilter
 	if tmp, ok := rawArgs["filter"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
-		arg0, err = ec.unmarshalOListClassFilter2ᚖexampleᚋgraphᚋmodelᚐListClassFilter(ctx, tmp)
+		arg0, err = ec.unmarshalOListClassFilter2ᚖClassᚋgraphᚋmodelᚐListClassFilter(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -509,7 +501,7 @@ func (ec *executionContext) field_Query_listClasses_args(ctx context.Context, ra
 	var arg1 *model.Paginator
 	if tmp, ok := rawArgs["paginate"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("paginate"))
-		arg1, err = ec.unmarshalOPaginator2ᚖexampleᚋgraphᚋmodelᚐPaginator(ctx, tmp)
+		arg1, err = ec.unmarshalOPaginator2ᚖClassᚋgraphᚋmodelᚐPaginator(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -760,7 +752,7 @@ func (ec *executionContext) _Class_difficulty(ctx context.Context, field graphql
 	}
 	res := resTmp.(model.LanguageLevel)
 	fc.Result = res
-	return ec.marshalNLanguageLevel2exampleᚋgraphᚋmodelᚐLanguageLevel(ctx, field.Selections, res)
+	return ec.marshalNLanguageLevel2ClassᚋgraphᚋmodelᚐLanguageLevel(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Class_difficulty(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -808,50 +800,6 @@ func (ec *executionContext) _Class_made_by(ctx context.Context, field graphql.Co
 }
 
 func (ec *executionContext) fieldContext_Class_made_by(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Class",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Class_openai_key(ctx context.Context, field graphql.CollectedField, obj *model.Class) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Class_openai_key(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.OpenaiKey, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Class_openai_key(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Class",
 		Field:      field,
@@ -1191,7 +1139,7 @@ func (ec *executionContext) _ClassInfo_difficulty(ctx context.Context, field gra
 	}
 	res := resTmp.(model.LanguageLevel)
 	fc.Result = res
-	return ec.marshalNLanguageLevel2exampleᚋgraphᚋmodelᚐLanguageLevel(ctx, field.Selections, res)
+	return ec.marshalNLanguageLevel2ClassᚋgraphᚋmodelᚐLanguageLevel(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_ClassInfo_difficulty(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -1276,7 +1224,7 @@ func (ec *executionContext) _Mutation_createClass(ctx context.Context, field gra
 	}
 	res := resTmp.(*model.Class)
 	fc.Result = res
-	return ec.marshalOClass2ᚖexampleᚋgraphᚋmodelᚐClass(ctx, field.Selections, res)
+	return ec.marshalOClass2ᚖClassᚋgraphᚋmodelᚐClass(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Mutation_createClass(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -1299,8 +1247,6 @@ func (ec *executionContext) fieldContext_Mutation_createClass(ctx context.Contex
 				return ec.fieldContext_Class_difficulty(ctx, field)
 			case "made_by":
 				return ec.fieldContext_Class_made_by(ctx, field)
-			case "openai_key":
-				return ec.fieldContext_Class_openai_key(ctx, field)
 			case "created_at":
 				return ec.fieldContext_Class_created_at(ctx, field)
 			case "updated_at":
@@ -1350,7 +1296,7 @@ func (ec *executionContext) _Mutation_updateClass(ctx context.Context, field gra
 	}
 	res := resTmp.(*model.Class)
 	fc.Result = res
-	return ec.marshalOClass2ᚖexampleᚋgraphᚋmodelᚐClass(ctx, field.Selections, res)
+	return ec.marshalOClass2ᚖClassᚋgraphᚋmodelᚐClass(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Mutation_updateClass(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -1373,8 +1319,6 @@ func (ec *executionContext) fieldContext_Mutation_updateClass(ctx context.Contex
 				return ec.fieldContext_Class_difficulty(ctx, field)
 			case "made_by":
 				return ec.fieldContext_Class_made_by(ctx, field)
-			case "openai_key":
-				return ec.fieldContext_Class_openai_key(ctx, field)
 			case "created_at":
 				return ec.fieldContext_Class_created_at(ctx, field)
 			case "updated_at":
@@ -1476,7 +1420,7 @@ func (ec *executionContext) _Query_getClass(ctx context.Context, field graphql.C
 	}
 	res := resTmp.(*model.Class)
 	fc.Result = res
-	return ec.marshalOClass2ᚖexampleᚋgraphᚋmodelᚐClass(ctx, field.Selections, res)
+	return ec.marshalOClass2ᚖClassᚋgraphᚋmodelᚐClass(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Query_getClass(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -1499,8 +1443,6 @@ func (ec *executionContext) fieldContext_Query_getClass(ctx context.Context, fie
 				return ec.fieldContext_Class_difficulty(ctx, field)
 			case "made_by":
 				return ec.fieldContext_Class_made_by(ctx, field)
-			case "openai_key":
-				return ec.fieldContext_Class_openai_key(ctx, field)
 			case "created_at":
 				return ec.fieldContext_Class_created_at(ctx, field)
 			case "updated_at":
@@ -1550,7 +1492,7 @@ func (ec *executionContext) _Query_listClasses(ctx context.Context, field graphq
 	}
 	res := resTmp.([]*model.ClassInfo)
 	fc.Result = res
-	return ec.marshalOClassInfo2ᚕᚖexampleᚋgraphᚋmodelᚐClassInfo(ctx, field.Selections, res)
+	return ec.marshalOClassInfo2ᚕᚖClassᚋgraphᚋmodelᚐClassInfo(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Query_listClasses(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -3538,7 +3480,7 @@ func (ec *executionContext) unmarshalInputClassInput(ctx context.Context, obj in
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("difficulty"))
-			data, err := ec.unmarshalNLanguageLevel2exampleᚋgraphᚋmodelᚐLanguageLevel(ctx, v)
+			data, err := ec.unmarshalNLanguageLevel2ClassᚋgraphᚋmodelᚐLanguageLevel(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -3585,7 +3527,7 @@ func (ec *executionContext) unmarshalInputListClassFilter(ctx context.Context, o
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
-			data, err := ec.unmarshalONameFilter2ᚖexampleᚋgraphᚋmodelᚐNameFilter(ctx, v)
+			data, err := ec.unmarshalONameFilter2ᚖClassᚋgraphᚋmodelᚐNameFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -3594,7 +3536,7 @@ func (ec *executionContext) unmarshalInputListClassFilter(ctx context.Context, o
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("difficulty"))
-			data, err := ec.unmarshalOLanguageLevel2ᚖexampleᚋgraphᚋmodelᚐLanguageLevel(ctx, v)
+			data, err := ec.unmarshalOLanguageLevel2ᚖClassᚋgraphᚋmodelᚐLanguageLevel(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -3641,7 +3583,7 @@ func (ec *executionContext) unmarshalInputNameFilter(ctx context.Context, obj in
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("type"))
-			data, err := ec.unmarshalNNameFilterTypes2exampleᚋgraphᚋmodelᚐNameFilterTypes(ctx, v)
+			data, err := ec.unmarshalNNameFilterTypes2ClassᚋgraphᚋmodelᚐNameFilterTypes(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -3736,11 +3678,6 @@ func (ec *executionContext) _Class(ctx context.Context, sel ast.SelectionSet, ob
 			}
 		case "made_by":
 			out.Values[i] = ec._Class_made_by(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
-		case "openai_key":
-			out.Values[i] = ec._Class_openai_key(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
@@ -4320,7 +4257,7 @@ func (ec *executionContext) marshalNBoolean2bool(ctx context.Context, sel ast.Se
 	return res
 }
 
-func (ec *executionContext) unmarshalNClassInput2exampleᚋgraphᚋmodelᚐClassInput(ctx context.Context, v interface{}) (model.ClassInput, error) {
+func (ec *executionContext) unmarshalNClassInput2ClassᚋgraphᚋmodelᚐClassInput(ctx context.Context, v interface{}) (model.ClassInput, error) {
 	res, err := ec.unmarshalInputClassInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
@@ -4355,23 +4292,23 @@ func (ec *executionContext) marshalNInt2int(ctx context.Context, sel ast.Selecti
 	return res
 }
 
-func (ec *executionContext) unmarshalNLanguageLevel2exampleᚋgraphᚋmodelᚐLanguageLevel(ctx context.Context, v interface{}) (model.LanguageLevel, error) {
+func (ec *executionContext) unmarshalNLanguageLevel2ClassᚋgraphᚋmodelᚐLanguageLevel(ctx context.Context, v interface{}) (model.LanguageLevel, error) {
 	var res model.LanguageLevel
 	err := res.UnmarshalGQL(v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalNLanguageLevel2exampleᚋgraphᚋmodelᚐLanguageLevel(ctx context.Context, sel ast.SelectionSet, v model.LanguageLevel) graphql.Marshaler {
+func (ec *executionContext) marshalNLanguageLevel2ClassᚋgraphᚋmodelᚐLanguageLevel(ctx context.Context, sel ast.SelectionSet, v model.LanguageLevel) graphql.Marshaler {
 	return v
 }
 
-func (ec *executionContext) unmarshalNNameFilterTypes2exampleᚋgraphᚋmodelᚐNameFilterTypes(ctx context.Context, v interface{}) (model.NameFilterTypes, error) {
+func (ec *executionContext) unmarshalNNameFilterTypes2ClassᚋgraphᚋmodelᚐNameFilterTypes(ctx context.Context, v interface{}) (model.NameFilterTypes, error) {
 	var res model.NameFilterTypes
 	err := res.UnmarshalGQL(v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalNNameFilterTypes2exampleᚋgraphᚋmodelᚐNameFilterTypes(ctx context.Context, sel ast.SelectionSet, v model.NameFilterTypes) graphql.Marshaler {
+func (ec *executionContext) marshalNNameFilterTypes2ClassᚋgraphᚋmodelᚐNameFilterTypes(ctx context.Context, sel ast.SelectionSet, v model.NameFilterTypes) graphql.Marshaler {
 	return v
 }
 
@@ -4695,14 +4632,14 @@ func (ec *executionContext) marshalOBoolean2ᚖbool(ctx context.Context, sel ast
 	return res
 }
 
-func (ec *executionContext) marshalOClass2ᚖexampleᚋgraphᚋmodelᚐClass(ctx context.Context, sel ast.SelectionSet, v *model.Class) graphql.Marshaler {
+func (ec *executionContext) marshalOClass2ᚖClassᚋgraphᚋmodelᚐClass(ctx context.Context, sel ast.SelectionSet, v *model.Class) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
 	return ec._Class(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalOClassInfo2ᚕᚖexampleᚋgraphᚋmodelᚐClassInfo(ctx context.Context, sel ast.SelectionSet, v []*model.ClassInfo) graphql.Marshaler {
+func (ec *executionContext) marshalOClassInfo2ᚕᚖClassᚋgraphᚋmodelᚐClassInfo(ctx context.Context, sel ast.SelectionSet, v []*model.ClassInfo) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
@@ -4729,7 +4666,7 @@ func (ec *executionContext) marshalOClassInfo2ᚕᚖexampleᚋgraphᚋmodelᚐCl
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalOClassInfo2ᚖexampleᚋgraphᚋmodelᚐClassInfo(ctx, sel, v[i])
+			ret[i] = ec.marshalOClassInfo2ᚖClassᚋgraphᚋmodelᚐClassInfo(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -4743,7 +4680,7 @@ func (ec *executionContext) marshalOClassInfo2ᚕᚖexampleᚋgraphᚋmodelᚐCl
 	return ret
 }
 
-func (ec *executionContext) marshalOClassInfo2ᚖexampleᚋgraphᚋmodelᚐClassInfo(ctx context.Context, sel ast.SelectionSet, v *model.ClassInfo) graphql.Marshaler {
+func (ec *executionContext) marshalOClassInfo2ᚖClassᚋgraphᚋmodelᚐClassInfo(ctx context.Context, sel ast.SelectionSet, v *model.ClassInfo) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
@@ -4766,7 +4703,7 @@ func (ec *executionContext) marshalOID2ᚖstring(ctx context.Context, sel ast.Se
 	return res
 }
 
-func (ec *executionContext) unmarshalOLanguageLevel2ᚖexampleᚋgraphᚋmodelᚐLanguageLevel(ctx context.Context, v interface{}) (*model.LanguageLevel, error) {
+func (ec *executionContext) unmarshalOLanguageLevel2ᚖClassᚋgraphᚋmodelᚐLanguageLevel(ctx context.Context, v interface{}) (*model.LanguageLevel, error) {
 	if v == nil {
 		return nil, nil
 	}
@@ -4775,14 +4712,14 @@ func (ec *executionContext) unmarshalOLanguageLevel2ᚖexampleᚋgraphᚋmodel�
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalOLanguageLevel2ᚖexampleᚋgraphᚋmodelᚐLanguageLevel(ctx context.Context, sel ast.SelectionSet, v *model.LanguageLevel) graphql.Marshaler {
+func (ec *executionContext) marshalOLanguageLevel2ᚖClassᚋgraphᚋmodelᚐLanguageLevel(ctx context.Context, sel ast.SelectionSet, v *model.LanguageLevel) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
 	return v
 }
 
-func (ec *executionContext) unmarshalOListClassFilter2ᚖexampleᚋgraphᚋmodelᚐListClassFilter(ctx context.Context, v interface{}) (*model.ListClassFilter, error) {
+func (ec *executionContext) unmarshalOListClassFilter2ᚖClassᚋgraphᚋmodelᚐListClassFilter(ctx context.Context, v interface{}) (*model.ListClassFilter, error) {
 	if v == nil {
 		return nil, nil
 	}
@@ -4790,7 +4727,7 @@ func (ec *executionContext) unmarshalOListClassFilter2ᚖexampleᚋgraphᚋmodel
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) unmarshalONameFilter2ᚖexampleᚋgraphᚋmodelᚐNameFilter(ctx context.Context, v interface{}) (*model.NameFilter, error) {
+func (ec *executionContext) unmarshalONameFilter2ᚖClassᚋgraphᚋmodelᚐNameFilter(ctx context.Context, v interface{}) (*model.NameFilter, error) {
 	if v == nil {
 		return nil, nil
 	}
@@ -4798,7 +4735,7 @@ func (ec *executionContext) unmarshalONameFilter2ᚖexampleᚋgraphᚋmodelᚐNa
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) unmarshalOPaginator2ᚖexampleᚋgraphᚋmodelᚐPaginator(ctx context.Context, v interface{}) (*model.Paginator, error) {
+func (ec *executionContext) unmarshalOPaginator2ᚖClassᚋgraphᚋmodelᚐPaginator(ctx context.Context, v interface{}) (*model.Paginator, error) {
 	if v == nil {
 		return nil, nil
 	}

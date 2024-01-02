@@ -1,7 +1,7 @@
 package validation
 
 import (
-	"example/internal/validation"
+	"Class/internal/validation"
 	"fmt"
 	"reflect"
 	"testing"

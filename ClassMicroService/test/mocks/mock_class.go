@@ -1,7 +1,7 @@
 package mocks
 
 import (
-	"example/graph/model"
+	"Class/graph/model"
 	"time"
 )
 

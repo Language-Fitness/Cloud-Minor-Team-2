@@ -1,9 +1,9 @@
 package auth
 
 import (
+	"Class/graph/model"
+	"Class/internal/repository"
 	"errors"
-	"example/graph/model"
-	"example/internal/repository"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
@@ -132,10 +132,10 @@ func (p *Policy) HasPermissions(bearerToken string, role string) bool {
 }
 
 func (p *Policy) getSubAndRoles(bearerToken string) (string, []interface{}, error) {
-	token, err := p.Token.IntrospectToken(bearerToken)
-	if err != nil || token == false {
-		return "", nil, errors.New("invalid token introspect")
-	}
+	//token, err := p.Token.IntrospectToken(bearerToken)
+	//if err != nil || token == false {
+	//	return "", nil, errors.New("invalid token introspect")
+	//}
 
 	decodeToken, err := p.Token.DecodeToken(bearerToken)
 	if err != nil {

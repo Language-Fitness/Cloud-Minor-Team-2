@@ -1,7 +1,7 @@
 package validation
 
 import (
-	"example/internal/helper"
+	"Class/internal/helper"
 	"fmt"
 	"github.com/google/uuid"
 	"reflect"

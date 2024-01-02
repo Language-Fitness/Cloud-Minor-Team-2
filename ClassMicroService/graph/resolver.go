@@ -1,8 +1,8 @@
 package graph
 
 import (
-	"example/graph/model"
-	"example/internal/service"
+	"Class/graph/model"
+	"Class/internal/service"
 )
 
 // This file will not be regenerated automatically.

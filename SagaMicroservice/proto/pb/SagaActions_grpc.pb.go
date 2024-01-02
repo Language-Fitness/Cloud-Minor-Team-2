@@ -19,9 +19,10 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	GRPCSagaService_FindObject_FullMethodName     = "/proto.gRPCSagaService/FindObject"
-	GRPCSagaService_DeleteObject_FullMethodName   = "/proto.gRPCSagaService/DeleteObject"
-	GRPCSagaService_UnDeleteObject_FullMethodName = "/proto.gRPCSagaService/UnDeleteObject"
+	GRPCSagaService_FindSagaObject_FullMethodName         = "/proto.gRPCSagaService/FindSagaObject"
+	GRPCSagaService_FindSagaObjectChildren_FullMethodName = "/proto.gRPCSagaService/FindSagaObjectChildren"
+	GRPCSagaService_DeleteObject_FullMethodName           = "/proto.gRPCSagaService/DeleteObject"
+	GRPCSagaService_UnDeleteObject_FullMethodName         = "/proto.gRPCSagaService/UnDeleteObject"
 )
 
 // GRPCSagaServiceClient is the client API for GRPCSagaService service.
@@ -29,7 +30,8 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type GRPCSagaServiceClient interface {
 	// RPC method to get user information
-	FindObject(ctx context.Context, in *ObjectRequest, opts ...grpc.CallOption) (*ObjectResponse, error)
+	FindSagaObject(ctx context.Context, in *ObjectRequest, opts ...grpc.CallOption) (*SagaObject, error)
+	FindSagaObjectChildren(ctx context.Context, in *ObjectRequest, opts ...grpc.CallOption) (*ObjectResponse, error)
 	DeleteObject(ctx context.Context, in *ObjectRequest, opts ...grpc.CallOption) (*ObjectResponse, error)
 	UnDeleteObject(ctx context.Context, in *ObjectRequest, opts ...grpc.CallOption) (*ObjectResponse, error)
 }
@@ -42,9 +44,18 @@ func NewGRPCSagaServiceClient(cc grpc.ClientConnInterface) GRPCSagaServiceClient
 	return &gRPCSagaServiceClient{cc}
 }
 
-func (c *gRPCSagaServiceClient) FindObject(ctx context.Context, in *ObjectRequest, opts ...grpc.CallOption) (*ObjectResponse, error) {
+func (c *gRPCSagaServiceClient) FindSagaObject(ctx context.Context, in *ObjectRequest, opts ...grpc.CallOption) (*SagaObject, error) {
+	out := new(SagaObject)
+	err := c.cc.Invoke(ctx, GRPCSagaService_FindSagaObject_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *gRPCSagaServiceClient) FindSagaObjectChildren(ctx context.Context, in *ObjectRequest, opts ...grpc.CallOption) (*ObjectResponse, error) {
 	out := new(ObjectResponse)
-	err := c.cc.Invoke(ctx, GRPCSagaService_FindObject_FullMethodName, in, out, opts...)
+	err := c.cc.Invoke(ctx, GRPCSagaService_FindSagaObjectChildren_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -74,7 +85,8 @@ func (c *gRPCSagaServiceClient) UnDeleteObject(ctx context.Context, in *ObjectRe
 // for forward compatibility
 type GRPCSagaServiceServer interface {
 	// RPC method to get user information
-	FindObject(context.Context, *ObjectRequest) (*ObjectResponse, error)
+	FindSagaObject(context.Context, *ObjectRequest) (*SagaObject, error)
+	FindSagaObjectChildren(context.Context, *ObjectRequest) (*ObjectResponse, error)
 	DeleteObject(context.Context, *ObjectRequest) (*ObjectResponse, error)
 	UnDeleteObject(context.Context, *ObjectRequest) (*ObjectResponse, error)
 	mustEmbedUnimplementedGRPCSagaServiceServer()
@@ -84,8 +96,11 @@ type GRPCSagaServiceServer interface {
 type UnimplementedGRPCSagaServiceServer struct {
 }
 
-func (UnimplementedGRPCSagaServiceServer) FindObject(context.Context, *ObjectRequest) (*ObjectResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method FindObject not implemented")
+func (UnimplementedGRPCSagaServiceServer) FindSagaObject(context.Context, *ObjectRequest) (*SagaObject, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method FindSagaObject not implemented")
+}
+func (UnimplementedGRPCSagaServiceServer) FindSagaObjectChildren(context.Context, *ObjectRequest) (*ObjectResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method FindSagaObjectChildren not implemented")
 }
 func (UnimplementedGRPCSagaServiceServer) DeleteObject(context.Context, *ObjectRequest) (*ObjectResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteObject not implemented")
@@ -106,20 +121,38 @@ func RegisterGRPCSagaServiceServer(s grpc.ServiceRegistrar, srv GRPCSagaServiceS
 	s.RegisterService(&GRPCSagaService_ServiceDesc, srv)
 }
 
-func _GRPCSagaService_FindObject_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _GRPCSagaService_FindSagaObject_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(ObjectRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(GRPCSagaServiceServer).FindObject(ctx, in)
+		return srv.(GRPCSagaServiceServer).FindSagaObject(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: GRPCSagaService_FindObject_FullMethodName,
+		FullMethod: GRPCSagaService_FindSagaObject_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(GRPCSagaServiceServer).FindObject(ctx, req.(*ObjectRequest))
+		return srv.(GRPCSagaServiceServer).FindSagaObject(ctx, req.(*ObjectRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _GRPCSagaService_FindSagaObjectChildren_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ObjectRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GRPCSagaServiceServer).FindSagaObjectChildren(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: GRPCSagaService_FindSagaObjectChildren_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GRPCSagaServiceServer).FindSagaObjectChildren(ctx, req.(*ObjectRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -168,8 +201,12 @@ var GRPCSagaService_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*GRPCSagaServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "FindObject",
-			Handler:    _GRPCSagaService_FindObject_Handler,
+			MethodName: "FindSagaObject",
+			Handler:    _GRPCSagaService_FindSagaObject_Handler,
+		},
+		{
+			MethodName: "FindSagaObjectChildren",
+			Handler:    _GRPCSagaService_FindSagaObjectChildren_Handler,
 		},
 		{
 			MethodName: "DeleteObject",

@@ -1,10 +1,10 @@
 package graph
 
 import (
+	"Class/graph/model"
+	"Class/internal/repository"
+	database "Class/test/internal/helpers"
 	"context"
-	"example/graph/model"
-	"example/internal/repository"
-	database "example/test/internal/helpers"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"

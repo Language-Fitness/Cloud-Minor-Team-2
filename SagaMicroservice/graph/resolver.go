@@ -5,7 +5,6 @@ import (
 	"saga/internal/auth"
 	"saga/internal/database"
 	"saga/internal/service"
-	"saga/proto/pb"
 )
 
 // This file will not be regenerated automatically.
@@ -18,11 +17,11 @@ type Resolver struct {
 	Policy      auth.IPolicy
 }
 
-func NewResolver(grpcClient pb.GRPCSagaServiceClient) *Resolver {
+func NewResolver() *Resolver {
 	collection, _ := database.GetCollection()
 
 	return &Resolver{
-		Service:     service.NewSagaService(grpcClient, collection),
+		Service:     service.NewSagaService(collection),
 		SagaObjects: []*model.SagaObject{},
 		Policy:      auth.NewPolicy(),
 	}

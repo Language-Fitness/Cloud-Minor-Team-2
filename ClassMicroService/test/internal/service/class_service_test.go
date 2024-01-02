@@ -1,10 +1,10 @@
 package service
 
 import (
+	"Class/graph/model"
+	service2 "Class/internal/service"
+	"Class/test/mocks"
 	"errors"
-	"example/graph/model"
-	service2 "example/internal/service"
-	"example/test/mocks"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"testing"

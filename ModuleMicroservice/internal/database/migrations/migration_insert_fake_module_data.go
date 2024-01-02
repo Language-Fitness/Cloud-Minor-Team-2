@@ -17,7 +17,7 @@ type FakeModule struct {
 	Description string `faker:"sentence"`
 	Difficulty  string `faker:"oneof:A1,A2,B1,B2,C1,C2"`
 	Category    string `faker:"oneof:Grammatica,Spelling,Woordenschat,Uitdrukkingen,Interpunctie,Werkwoordvervoegingen,Fast_Track"`
-	MadeBy      string `faker:"uuid_hyphenated"`
+	MadeBy      string
 	Private     bool
 	Key         string `faker:"uuid_hyphenated"`
 	CreatedAt   *string
@@ -28,7 +28,7 @@ type FakeModule struct {
 func Init() {
 	fmt.Println("test")
 
-	randomModules := GenerateRandomModules(100000)
+	randomModules := GenerateRandomModules(10)
 
 	collection, _ := database.GetCollection()
 	for _, module := range randomModules {
@@ -54,12 +54,29 @@ func GenerateRandomModules(n int) []FakeModule {
 		}
 
 		module.Private = false
+		module.MadeBy = "0e520bea-a96b-47cc-96bc-83633e47c58e"
 		module.SoftDeleted = false
 		module.CreatedAt = generateRandomDate()
 		module.UpdatedAt = generateRandomDate()
 
 		modules = append(modules, module)
 	}
+
+	fakeModuleWithIdSet := FakeModule{}
+	err := faker.FakeData(&fakeModuleWithIdSet)
+	if err != nil {
+		fmt.Println("Error:", err)
+		return nil
+	}
+
+	fakeModuleWithIdSet.ID = "09d6be4b-da77-4be0-9094-445e1a5e639a"
+	fakeModuleWithIdSet.Private = false
+	fakeModuleWithIdSet.MadeBy = "0e520bea-a96b-47cc-96bc-83633e47c58e"
+	fakeModuleWithIdSet.SoftDeleted = false
+	fakeModuleWithIdSet.CreatedAt = generateRandomDate()
+	fakeModuleWithIdSet.UpdatedAt = generateRandomDate()
+
+	modules = append(modules, fakeModuleWithIdSet)
 
 	return modules
 }
