@@ -16,16 +16,6 @@ class ResponseMultipleChoiceQuestion(graphene.ObjectType):
     questions = graphene.List(MultipleChoiceQuestion, description="Multiple choice array")
 
 
-# class OpenAnswerQuestion(graphene.ObjectType):
-#     type = graphene.String(description="Type question")
-#     question_subject = graphene.String(description="Question subject")
-#     question_text = graphene.String(description="Question text")
-#     answer = graphene.String(description="Correct answer")
-#
-# class ResponseOpenAnswerQuestion(graphene.ObjectType):
-#     status = graphene.String(description="Status of the response")
-#     questions = graphene.List(OpenAnswerQuestion, description="Open answer array")
-
 class Explanation(graphene.ObjectType):
     info = graphene.String(description="Information for explanation")
     tips = graphene.String(description="Tips for next time")
@@ -59,7 +49,6 @@ class TokenResponse(graphene.ObjectType):
     status = graphene.String(description="Status of the response")
     message = graphene.String(description="Message")
     token = graphene.String(description="Token")
-
 
 
 class TokenData(graphene.ObjectType):

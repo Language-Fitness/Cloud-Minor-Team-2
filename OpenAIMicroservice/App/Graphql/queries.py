@@ -20,13 +20,15 @@ class Query(ObjectType):
             adapter = AssistantAPIAdapter()
             response = adapter.retrieve_generated_multiple_choice_questions_response(token)
 
-            return ResponseMultipleChoiceQuestion(status="success", message="Question(s) retrieved successfully", questions=response['questions'])
+            return ResponseMultipleChoiceQuestion(status="success", message="Question(s) retrieved successfully",
+                                                  questions=response['questions'])
         except ValidationException as e:
             return ResponseMultipleChoiceQuestion(status="error", message=str(e))
         except AssistantAPIException as e:
             return ResponseMultipleChoiceQuestion(status="error", message=str(e))
         except Exception as e:
-            return ResponseMultipleChoiceQuestion(status="error", message="An unexpected error occurred. Please try again later.")
+            return ResponseMultipleChoiceQuestion(status="error",
+                                                  message="An unexpected error occurred. Please try again later.")
 
     async def resolve_retrieve_multiple_choice_questions_from_file(self, info, token):
 
@@ -37,7 +39,8 @@ class Query(ObjectType):
             adapter = AssistantAPIAdapter()
             response = adapter.retrieve_multiple_choice_questions_from_file_response(token)
 
-            return ResponseMultipleChoiceQuestion(status="success", message="Question(s) retrieved successfully", questions=response['questions'])
+            return ResponseMultipleChoiceQuestion(status="success", message="Question(s) retrieved successfully",
+                                                  questions=response['questions'])
 
         except ValidationException as e:
             return ResponseMultipleChoiceQuestion(status="error", message=str(e))
@@ -46,7 +49,8 @@ class Query(ObjectType):
             return ResponseMultipleChoiceQuestion(status="error", message=str(e))
 
         except Exception as e:
-            return ResponseMultipleChoiceQuestion(status="error", message="An unexpected error occurred. Please try again later.")
+            return ResponseMultipleChoiceQuestion(status="error",
+                                                  message="An unexpected error occurred. Please try again later.")
 
     async def resolve_retrieve_explanation(self, info, token):
 
@@ -57,7 +61,8 @@ class Query(ObjectType):
             adapter = AssistantAPIAdapter()
             response = adapter.retrieve_explanation_response(token)
 
-            return ResponseExplanation(status="success", message="Explanation retrieved successfully", explanation=response["explanation"])
+            return ResponseExplanation(status="success", message="Explanation retrieved successfully",
+                                       explanation=response["explanation"])
 
         except ValidationException as e:
             return ResponseExplanation(status="error", message=str(e))
