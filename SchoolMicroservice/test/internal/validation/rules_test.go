@@ -1,9 +1,9 @@
 package validation
 
 import (
-	"example/internal/validation"
 	"fmt"
 	"reflect"
+	"school/internal/validation"
 	"testing"
 )
 

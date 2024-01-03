@@ -2,15 +2,15 @@ package graph
 
 import (
 	"context"
-	"example/graph/model"
-	"example/internal/repository"
-	database "example/test/internal/helpers"
 	"github.com/google/uuid"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"log"
 	"reflect"
+	"school/graph/model"
+	"school/internal/repository"
+	database "school/test/internal/helpers"
 	"testing"
 	"time"
 )

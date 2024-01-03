@@ -1,12 +1,12 @@
 package main
 
 import (
-	"example/graph"
-	"example/internal/auth"
 	"github.com/joho/godotenv"
 	"log"
 	"net/http"
 	"os"
+	"school/graph"
+	"school/internal/auth"
 
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/playground"

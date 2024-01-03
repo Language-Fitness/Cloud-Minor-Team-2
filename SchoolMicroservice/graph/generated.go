@@ -7,7 +7,7 @@ import (
 	"context"
 	"embed"
 	"errors"
-	"example/graph/model"
+	"school/graph/model"
 	"fmt"
 	"strconv"
 	"sync"

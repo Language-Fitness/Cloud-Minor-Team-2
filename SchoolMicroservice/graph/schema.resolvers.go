@@ -6,8 +6,8 @@ package graph
 
 import (
 	"context"
-	"example/graph/model"
-	"example/internal/auth"
+	"school/graph/model"
+	"school/internal/auth"
 )
 
 // CreateSchool is the resolver for the createSchool field.

@@ -1,8 +1,8 @@
 package validation
 
 import (
-	"example/internal/helper"
 	"fmt"
+	"school/internal/helper"
 	"strings"
 )
 

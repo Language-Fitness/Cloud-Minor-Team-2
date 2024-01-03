@@ -71,6 +71,7 @@ async function init() {
     // Get all roles in realm for realm-client, filter for manage-users role, and assign to service account of created client
     const realmManagementRoles  = await getAllClientRolesInRealm(adminToken, projectRealm, realmManagementClient.id);
     const manageUsersRole       = realmManagementRoles.find(role => role.name === 'manage-users');
+    const viewUsersRole         = realmManagementRoles.find(role => role.name === 'view-users')
     await addRoleMappingsToEntity(adminToken, projectRealm, 'users', serviceAccount.id, realmManagementClient.id, [manageUsersRole])
 
     // Create groups in the project realm
@@ -83,6 +84,34 @@ async function init() {
     const studentGroup = groups.find(group => group.name === 'permissions_student')
     const teacherGroup = groups.find(group => group.name === 'permissions_teacher')
     const adminGroup = groups.find(group => group.name === 'permissions_administrator')
+
+    // Add role to view user attributes to groups
+    await addRoleMappingsToEntity(
+        adminToken,
+        projectRealm,
+        'groups',
+        studentGroup.id,
+        createdClient.id,
+        [viewUsersRole]
+    )
+
+    await addRoleMappingsToEntity(
+        adminToken,
+        projectRealm,
+        'groups',
+        teacherGroup.id,
+        createdClient.id,
+        [viewUsersRole]
+    )
+
+    await addRoleMappingsToEntity(
+        adminToken,
+        projectRealm,
+        'groups',
+        adminGroup.id,
+        createdClient.id,
+        [viewUsersRole]
+    )
 
     // Loop through all files with roles, create them and assign to designated group
     try {

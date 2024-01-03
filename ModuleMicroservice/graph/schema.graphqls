@@ -10,6 +10,7 @@ type Module {
   difficulty: LanguageLevel!
   category: Category!
   made_by: String!
+  made_by_name: String!
   private: Boolean!
   key: String
   created_at: String
@@ -25,6 +26,7 @@ type ModuleInfo {
   difficulty: LanguageLevel!
   category: Category!
   made_by: String!
+  made_by_name: String!
   private: Boolean!
 }
 
@@ -61,6 +63,7 @@ input ModuleInputUpdate {
 input ModuleFilter {
   school_id: String
   made_by: String
+  made_by_name: String
   softDelete: Boolean
   name: NameFilter
   difficulty: LanguageLevel

@@ -1,11 +1,11 @@
 package validation
 
 import (
-	"example/internal/helper"
 	"fmt"
 	"github.com/google/uuid"
 	"reflect"
 	"regexp"
+	"school/internal/helper"
 	"strconv"
 	"time"
 )

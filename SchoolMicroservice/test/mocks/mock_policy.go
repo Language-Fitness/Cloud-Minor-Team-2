@@ -1,10 +1,10 @@
 package mocks
 
 import (
-	"example/graph/model"
-	"example/internal/auth"
-	"example/internal/repository"
 	"github.com/stretchr/testify/mock"
+	"school/graph/model"
+	"school/internal/auth"
+	"school/internal/repository"
 )
 
 type MockPolicy struct {

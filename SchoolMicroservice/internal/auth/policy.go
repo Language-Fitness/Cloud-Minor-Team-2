@@ -2,9 +2,9 @@ package auth
 
 import (
 	"errors"
-	"example/graph/model"
-	"example/internal/repository"
 	"go.mongodb.org/mongo-driver/mongo"
+	"school/graph/model"
+	"school/internal/repository"
 )
 
 const InvalidActionsMessage = "invalid permissions for this action"

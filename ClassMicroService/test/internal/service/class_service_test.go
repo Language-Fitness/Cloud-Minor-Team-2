@@ -239,7 +239,7 @@ func TestService_ListClasses(t *testing.T) {
 	mockPolicy := new(mocks.MockPolicy)
 	service := &service2.ClassService{Validator: mockValidator, Repo: mockRepo, Policy: mockPolicy}
 
-	mockPolicy.On("ListClasses", mock.AnythingOfType("string")).Return(nil)
+	//mockPolicy.On("ListClasses", mock.AnythingOfType("string")).Return(nil)
 
 	mockPolicy.On("HasPermissions", mock.AnythingOfType("string"), mock.AnythingOfType("string")).
 		Return(true)

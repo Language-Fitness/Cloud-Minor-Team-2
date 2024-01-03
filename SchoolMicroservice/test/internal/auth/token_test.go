@@ -1,8 +1,8 @@
 package auth
 
 import (
-	auth2 "example/internal/auth"
 	"fmt"
+	auth2 "school/internal/auth"
 	"testing"
 )
 

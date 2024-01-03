@@ -2,15 +2,15 @@ package service
 
 import (
 	"errors"
-	"example/graph/model"
-	"example/internal/auth"
-	"example/internal/database"
-	"example/internal/helper"
-	"example/internal/repository"
-	"example/internal/validation"
 	"github.com/google/uuid"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo/options"
+	"school/graph/model"
+	"school/internal/auth"
+	"school/internal/database"
+	"school/internal/helper"
+	"school/internal/repository"
+	"school/internal/validation"
 	"strings"
 	"time"
 )
