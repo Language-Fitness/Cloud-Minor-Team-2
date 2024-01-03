@@ -16,6 +16,7 @@ type Module struct {
 	Difficulty  LanguageLevel `json:"difficulty"`
 	Category    Category      `json:"category"`
 	MadeBy      string        `json:"made_by"`
+	MadeByName  string        `json:"made_by_name"`
 	Private     bool          `json:"private"`
 	Key         *string       `json:"key,omitempty"`
 	CreatedAt   *string       `json:"created_at,omitempty"`
@@ -26,6 +27,7 @@ type Module struct {
 type ModuleFilter struct {
 	SchoolID   *string        `json:"school_id,omitempty"`
 	MadeBy     *string        `json:"made_by,omitempty"`
+	MadeByName *NameFilter    `json:"made_by_name,omitempty"`
 	SoftDelete *bool          `json:"softDelete,omitempty"`
 	Name       *NameFilter    `json:"name,omitempty"`
 	Difficulty *LanguageLevel `json:"difficulty,omitempty"`
@@ -41,6 +43,7 @@ type ModuleInfo struct {
 	Difficulty  LanguageLevel `json:"difficulty"`
 	Category    Category      `json:"category"`
 	MadeBy      string        `json:"made_by"`
+	MadeByName  string        `json:"made_by_name"`
 	Private     bool          `json:"private"`
 }
 

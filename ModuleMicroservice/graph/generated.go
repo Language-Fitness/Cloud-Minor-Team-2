@@ -55,6 +55,7 @@ type ComplexityRoot struct {
 		ID          func(childComplexity int) int
 		Key         func(childComplexity int) int
 		MadeBy      func(childComplexity int) int
+		MadeByName  func(childComplexity int) int
 		Name        func(childComplexity int) int
 		Private     func(childComplexity int) int
 		SchoolID    func(childComplexity int) int
@@ -68,6 +69,7 @@ type ComplexityRoot struct {
 		Difficulty  func(childComplexity int) int
 		ID          func(childComplexity int) int
 		MadeBy      func(childComplexity int) int
+		MadeByName  func(childComplexity int) int
 		Name        func(childComplexity int) int
 		Private     func(childComplexity int) int
 		SchoolID    func(childComplexity int) int
@@ -163,6 +165,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Module.MadeBy(childComplexity), true
 
+	case "Module.made_by_name":
+		if e.complexity.Module.MadeByName == nil {
+			break
+		}
+
+		return e.complexity.Module.MadeByName(childComplexity), true
+
 	case "Module.name":
 		if e.complexity.Module.Name == nil {
 			break
@@ -232,6 +241,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.ModuleInfo.MadeBy(childComplexity), true
+
+	case "ModuleInfo.made_by_name":
+		if e.complexity.ModuleInfo.MadeByName == nil {
+			break
+		}
+
+		return e.complexity.ModuleInfo.MadeByName(childComplexity), true
 
 	case "ModuleInfo.name":
 		if e.complexity.ModuleInfo.Name == nil {
@@ -906,6 +922,50 @@ func (ec *executionContext) fieldContext_Module_made_by(ctx context.Context, fie
 	return fc, nil
 }
 
+func (ec *executionContext) _Module_made_by_name(ctx context.Context, field graphql.CollectedField, obj *model.Module) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Module_made_by_name(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.MadeByName, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Module_made_by_name(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Module",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Module_private(ctx context.Context, field graphql.CollectedField, obj *model.Module) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Module_private(ctx, field)
 	if err != nil {
@@ -1422,6 +1482,50 @@ func (ec *executionContext) fieldContext_ModuleInfo_made_by(ctx context.Context,
 	return fc, nil
 }
 
+func (ec *executionContext) _ModuleInfo_made_by_name(ctx context.Context, field graphql.CollectedField, obj *model.ModuleInfo) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ModuleInfo_made_by_name(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.MadeByName, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ModuleInfo_made_by_name(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ModuleInfo",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _ModuleInfo_private(ctx context.Context, field graphql.CollectedField, obj *model.ModuleInfo) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_ModuleInfo_private(ctx, field)
 	if err != nil {
@@ -1516,6 +1620,8 @@ func (ec *executionContext) fieldContext_Mutation_createModule(ctx context.Conte
 				return ec.fieldContext_Module_category(ctx, field)
 			case "made_by":
 				return ec.fieldContext_Module_made_by(ctx, field)
+			case "made_by_name":
+				return ec.fieldContext_Module_made_by_name(ctx, field)
 			case "private":
 				return ec.fieldContext_Module_private(ctx, field)
 			case "key":
@@ -1594,6 +1700,8 @@ func (ec *executionContext) fieldContext_Mutation_updateModule(ctx context.Conte
 				return ec.fieldContext_Module_category(ctx, field)
 			case "made_by":
 				return ec.fieldContext_Module_made_by(ctx, field)
+			case "made_by_name":
+				return ec.fieldContext_Module_made_by_name(ctx, field)
 			case "private":
 				return ec.fieldContext_Module_private(ctx, field)
 			case "key":
@@ -1724,6 +1832,8 @@ func (ec *executionContext) fieldContext_Query_getModule(ctx context.Context, fi
 				return ec.fieldContext_Module_category(ctx, field)
 			case "made_by":
 				return ec.fieldContext_Module_made_by(ctx, field)
+			case "made_by_name":
+				return ec.fieldContext_Module_made_by_name(ctx, field)
 			case "private":
 				return ec.fieldContext_Module_private(ctx, field)
 			case "key":
@@ -1802,6 +1912,8 @@ func (ec *executionContext) fieldContext_Query_listModules(ctx context.Context, 
 				return ec.fieldContext_ModuleInfo_category(ctx, field)
 			case "made_by":
 				return ec.fieldContext_ModuleInfo_made_by(ctx, field)
+			case "made_by_name":
+				return ec.fieldContext_ModuleInfo_made_by_name(ctx, field)
 			case "private":
 				return ec.fieldContext_ModuleInfo_private(ctx, field)
 			}
@@ -3731,7 +3843,7 @@ func (ec *executionContext) unmarshalInputModuleFilter(ctx context.Context, obj 
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"school_id", "made_by", "softDelete", "name", "difficulty", "category", "private"}
+	fieldsInOrder := [...]string{"school_id", "made_by", "made_by_name", "softDelete", "name", "difficulty", "category", "private"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -3756,6 +3868,15 @@ func (ec *executionContext) unmarshalInputModuleFilter(ctx context.Context, obj 
 				return it, err
 			}
 			it.MadeBy = data
+		case "made_by_name":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("made_by_name"))
+			data, err := ec.unmarshalONameFilter2ᚖModuleᚋgraphᚋmodelᚐNameFilter(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.MadeByName = data
 		case "softDelete":
 			var err error
 
@@ -4094,6 +4215,11 @@ func (ec *executionContext) _Module(ctx context.Context, sel ast.SelectionSet, o
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
+		case "made_by_name":
+			out.Values[i] = ec._Module_made_by_name(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
 		case "private":
 			out.Values[i] = ec._Module_private(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
@@ -4173,6 +4299,11 @@ func (ec *executionContext) _ModuleInfo(ctx context.Context, sel ast.SelectionSe
 			}
 		case "made_by":
 			out.Values[i] = ec._ModuleInfo_made_by(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "made_by_name":
+			out.Values[i] = ec._ModuleInfo_made_by_name(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}

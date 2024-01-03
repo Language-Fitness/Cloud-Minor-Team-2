@@ -63,7 +63,7 @@ input ModuleInputUpdate {
 input ModuleFilter {
   school_id: String
   made_by: String
-  made_by_name: String
+  made_by_name: NameFilter
   softDelete: Boolean
   name: NameFilter
   difficulty: LanguageLevel

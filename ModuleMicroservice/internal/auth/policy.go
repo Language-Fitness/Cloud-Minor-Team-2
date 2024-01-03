@@ -120,7 +120,7 @@ func (p *Policy) ListModules(bearerToken string) error {
 	return nil
 }
 
-// @TODO  self note haspermissions gooit geen error  als de token invalid is
+// HasPermissions @TODO  self note haspermissions gooit geen error  als de token invalid is
 func (p *Policy) HasPermissions(bearerToken string, role string) bool {
 	_, roles, _ := p.getSubAndRoles(bearerToken)
 

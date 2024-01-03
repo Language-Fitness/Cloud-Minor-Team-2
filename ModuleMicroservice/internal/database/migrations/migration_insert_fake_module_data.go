@@ -18,6 +18,7 @@ type FakeModule struct {
 	Difficulty  string `faker:"oneof:A1,A2,B1,B2,C1,C2"`
 	Category    string `faker:"oneof:Grammatica,Spelling,Woordenschat,Uitdrukkingen,Interpunctie,Werkwoordvervoegingen,Fast_Track"`
 	MadeBy      string
+	MadeByName  string
 	Private     bool
 	Key         string `faker:"uuid_hyphenated"`
 	CreatedAt   *string
@@ -55,6 +56,7 @@ func GenerateRandomModules(n int) []FakeModule {
 
 		module.Private = false
 		module.MadeBy = "0e520bea-a96b-47cc-96bc-83633e47c58e"
+		module.MadeByName = "Bram Lastname"
 		module.SoftDeleted = false
 		module.CreatedAt = generateRandomDate()
 		module.UpdatedAt = generateRandomDate()
@@ -72,6 +74,7 @@ func GenerateRandomModules(n int) []FakeModule {
 	fakeModuleWithIdSet.ID = "09d6be4b-da77-4be0-9094-445e1a5e639a"
 	fakeModuleWithIdSet.Private = false
 	fakeModuleWithIdSet.MadeBy = "0e520bea-a96b-47cc-96bc-83633e47c58e"
+	fakeModuleWithIdSet.MadeByName = "Merlin Lastname"
 	fakeModuleWithIdSet.SoftDeleted = false
 	fakeModuleWithIdSet.CreatedAt = generateRandomDate()
 	fakeModuleWithIdSet.UpdatedAt = generateRandomDate()
