@@ -8,6 +8,7 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 	"log"
+	"os"
 	"saga/graph/model"
 	"saga/internal/auth"
 	"saga/internal/repository"
@@ -24,7 +25,6 @@ type ISagaService interface {
 	softDeleteItems(items []model.SagaObject) error
 	areAllItemsDeleted(items []model.SagaObject) bool
 	undeleteItems(items []model.SagaObject) error
-	saveSagaObject(sagaObject model.SagaObject) error
 }
 
 // SagaService GOLANG STRUCT
@@ -87,12 +87,6 @@ func (s SagaService) InitSagaSteps(token string, filter *model.SagaFilter) (*mod
 	//	}
 	//}
 
-	// Step 8: Save the object and return success message
-	//if err := s.saveSagaObject(sagaObject); err != nil {
-	//	// Handle rollback logic or return an error
-	//	return nil, err
-	//}
-
 	successMessage := &model.SuccessMessage{
 		ID:         "1",
 		Text:       "Operation successful",
@@ -104,27 +98,8 @@ func (s SagaService) InitSagaSteps(token string, filter *model.SagaFilter) (*mod
 	return successMessage, nil
 }
 
-func createGRPCClient() (pb.GRPCSagaServiceClient, *grpc.ClientConn, error) {
-	opts := []grpc.DialOption{
-		grpc.WithReturnConnectionError(), // Add the WithReturnConnectionError option
-		grpc.WithTransportCredentials(insecure.NewCredentials()),
-	}
-
-	conn, err := grpc.DialContext(context.Background(), "host.docker.internal:9091", opts...)
-	if err != nil {
-		fmt.Printf("failed to dial gRPC server: %v\n", err)
-		log.Printf("failed to dial gRPC server: %v", err)
-		return nil, nil, err
-	}
-
-	fmt.Println("Creating gRPC client...")
-	// Create a gRPC client using the connection
-	client := pb.NewGRPCSagaServiceClient(conn)
-	return client, conn, nil
-}
-
 func (s SagaService) initializeSagaObject(token string, filter *model.SagaFilter) (*model.SagaObject, error) {
-	client, conn, err := createGRPCClient()
+	client, conn, err := createGRPCClient(filter.ObjectType)
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -166,7 +141,7 @@ func (s SagaService) initializeSagaObject(token string, filter *model.SagaFilter
 }
 
 func (s SagaService) findAllChildren(sagaObject *model.SagaObject) ([]model.SagaObject, error) {
-	client, conn, err := createGRPCClient()
+	client, conn, err := createGRPCClient(sagaObject.ObjectType)
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -239,8 +214,38 @@ func (s SagaService) undeleteItems(items []model.SagaObject) error {
 	return nil
 }
 
-func (s SagaService) saveSagaObject(sagaObject model.SagaObject) error {
-	// Step 8 logic here
-	// Example: save saga object to MongoDB
-	return nil
+func getHostByType(sagaType model.SagaObjectTypes) string {
+	switch sagaType {
+	case model.SagaObjectTypesModule:
+		return os.Getenv("MODULE_MS_GRPC_HOST")
+	case model.SagaObjectTypesClass:
+		return os.Getenv("CLASS_MS_GRPC_HOST")
+	case model.SagaObjectTypesExercise:
+		return os.Getenv("EXERCISE_MS_GRPC_HOST")
+	case model.SagaObjectTypesSchool:
+		return os.Getenv("SCHOOL_MS_GRPC_HOST")
+	case model.SagaObjectTypesResult:
+		return os.Getenv("EXERCISE_MS_GRPC_HOST")
+	default:
+		return os.Getenv("MODULE_MS_GRPC_HOST")
+	}
+}
+
+func createGRPCClient(sagaType model.SagaObjectTypes) (pb.GRPCSagaServiceClient, *grpc.ClientConn, error) {
+	opts := []grpc.DialOption{
+		grpc.WithReturnConnectionError(), // Add the WithReturnConnectionError option
+		grpc.WithTransportCredentials(insecure.NewCredentials()),
+	}
+
+	conn, err := grpc.DialContext(context.Background(), getHostByType(sagaType), opts...)
+	if err != nil {
+		fmt.Printf("failed to dial gRPC server: %v\n", err)
+		log.Printf("failed to dial gRPC server: %v", err)
+		return nil, nil, err
+	}
+
+	fmt.Println("Creating gRPC client...")
+	// Create a gRPC client using the connection
+	client := pb.NewGRPCSagaServiceClient(conn)
+	return client, conn, nil
 }
