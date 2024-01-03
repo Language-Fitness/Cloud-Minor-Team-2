@@ -21,10 +21,15 @@ func NewSagaService(collection *mongo.Collection) *SagaService {
 }
 
 // FindSagaObject implements the FindSagaObject RPC method
-func (s *SagaService) FindSagaObject(context.Context, *pb.ObjectRequest) (*pb.SagaObject, error) {
+func (s *SagaService) FindSagaObject(ctx context.Context, req *pb.ObjectRequest) (*pb.SagaObject, error) {
+	module, err := s.service.GetModuleById(req.BearerToken, req.ObjectId)
+	if err != nil {
+		return nil, err
+	}
+
 	response := &pb.SagaObject{
-		ObjectId:     "0e520bea-a96b-47cc-96bc-83633e47c58e",
-		ObjectType:   pb.SagaObjectType_SCHOOL,
+		ObjectId:     module.ID,
+		ObjectType:   pb.SagaObjectType_MODULE,
 		ObjectStatus: pb.SagaObjectStatus_EXIST,
 	}
 

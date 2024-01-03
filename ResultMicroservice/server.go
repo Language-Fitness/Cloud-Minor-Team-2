@@ -2,12 +2,7 @@ package main
 
 import (
 	"ResultMicroservice/graph"
-	"ResultMicroservice/proto/result_pb"
-	"ResultMicroservice/rpc"
-	"fmt"
-	"google.golang.org/grpc"
 	"log"
-	"net"
 	"net/http"
 	"os"
 
@@ -46,21 +41,21 @@ func grpcServer() {
 	//server := grpc.NewServer(grpc.Creds(creds))
 
 	// Create a new gRPC server without TLS
-	server := grpc.NewServer()
-
-	// Register the server with the generated protobuf code
-	result_pb.RegisterGrpcResultServer(server, &rpc.ResultServer{})
-
-	// Create a listener on a specific port
-	lis, err := net.Listen("tcp", ":50051")
-	if err != nil {
-		log.Fatalf("Failed to listen: %v", err)
-	}
-
-	fmt.Println("grpc Result Server is listening on port 50051...")
-
-	// Serve the gRPC server
-	if err := server.Serve(lis); err != nil {
-		log.Fatalf("Failed to serve: %v", err)
-	}
+	//server := grpc.NewServer()
+	//
+	//// Register the server with the generated protobuf code
+	//result_pb.RegisterGrpcResultServer(server, &rpc.ResultServer{})
+	//
+	//// Create a listener on a specific port
+	//lis, err := net.Listen("tcp", ":50051")
+	//if err != nil {
+	//	log.Fatalf("Failed to listen: %v", err)
+	//}
+	//
+	//fmt.Println("grpc Result Server is listening on port 50051...")
+	//
+	//// Serve the gRPC server
+	//if err := server.Serve(lis); err != nil {
+	//	log.Fatalf("Failed to serve: %v", err)
+	//}
 }
