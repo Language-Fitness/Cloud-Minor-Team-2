@@ -5,23 +5,8 @@ namespace: bramterlouw-dev
 
 resources:
   - assets/gateway.yml
-#  - assets/supergraph.yml
-#  - assets/subgraph-products.yml
-#  - assets/subgraph-customers.yml
 
 images:
   - name: gateway_image
     newName: quay.io/bramterlouw/gateway
     newTag: latest
-#  - name: apollo-supergraph
-#    newName: quay.io/bramterlouw/apollo-supergraph
-#    newTag: latest
-#  - name: apollo-subgraph-products
-#    newName: quay.io/bramterlouw/apollo-subgraph-products
-#    newTag: latest
-#  - name: apollo-subgraph-customers
-#    newName: quay.io/bramterlouw/apollo-subgraph-customers
-#    newTag: latest
-
-#patches:
-#  - assets/nodejs-imagestream-patch.yml

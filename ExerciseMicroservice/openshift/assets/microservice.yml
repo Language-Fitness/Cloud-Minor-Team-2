@@ -1,0 +1,60 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: exercise-microservice
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: exercise-microservice
+  template:
+    metadata:
+      labels:
+        app: exercise-microservice
+    spec:
+      containers:
+        - name: exercise-microservice
+          image: microservice_image
+          ports:
+            - containerPort: 8084
+          readinessProbe:
+            timeoutSeconds: 3
+            initialDelaySeconds: 5
+            httpGet:
+              path: "/health/ready"
+              port: 8084
+          livenessProbe:
+            timeoutSeconds: 3
+            initialDelaySeconds: 30
+            httpGet:
+              path: "/health/live"
+              port: 8084
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: exercise-microservice-service
+  annotations:
+    description: Exposes and load balances the application pods
+  labels:
+    app: exercise-microservice
+spec:
+  ports:
+    - name: http
+      port: 8084
+      targetPort: 8084
+  selector:
+    app: exercise-microservice
+---
+kind: Route
+apiVersion: route.openshift.io/v1
+metadata:
+  name: exercise-microservice-route
+  labels:
+    app: exercise-microservice
+spec:
+  port:
+    targetPort: 8084
+  to:
+    kind: Service
+    name: exercise-microservice-service

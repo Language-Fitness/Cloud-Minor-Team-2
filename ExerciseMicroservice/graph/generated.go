@@ -906,9 +906,9 @@ func (ec *executionContext) _Exercise_difficulty(ctx context.Context, field grap
 		}
 		return graphql.Null
 	}
-	res := resTmp.(model.Difficulty)
+	res := resTmp.(model.LanguageLevel)
 	fc.Result = res
-	return ec.marshalNdifficulty2ExerciseMicroserviceᚋgraphᚋmodelᚐDifficulty(ctx, field.Selections, res)
+	return ec.marshalNLanguageLevel2ExerciseMicroserviceᚋgraphᚋmodelᚐLanguageLevel(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Exercise_difficulty(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -918,7 +918,7 @@ func (ec *executionContext) fieldContext_Exercise_difficulty(ctx context.Context
 		IsMethod:   false,
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type difficulty does not have child fields")
+			return nil, errors.New("field of type LanguageLevel does not have child fields")
 		},
 	}
 	return fc, nil
@@ -3438,7 +3438,7 @@ func (ec *executionContext) unmarshalInputExerciseFilter(ctx context.Context, ob
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("difficulty"))
-			data, err := ec.unmarshalOdifficulty2ᚖExerciseMicroserviceᚋgraphᚋmodelᚐDifficulty(ctx, v)
+			data, err := ec.unmarshalOLanguageLevel2ᚖExerciseMicroserviceᚋgraphᚋmodelᚐLanguageLevel(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -3566,7 +3566,7 @@ func (ec *executionContext) unmarshalInputExerciseInput(ctx context.Context, obj
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("difficulty"))
-			data, err := ec.unmarshalNdifficulty2ExerciseMicroserviceᚋgraphᚋmodelᚐDifficulty(ctx, v)
+			data, err := ec.unmarshalNLanguageLevel2ExerciseMicroserviceᚋgraphᚋmodelᚐLanguageLevel(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -4245,6 +4245,16 @@ func (ec *executionContext) marshalNInt2int(ctx context.Context, sel ast.Selecti
 	return res
 }
 
+func (ec *executionContext) unmarshalNLanguageLevel2ExerciseMicroserviceᚋgraphᚋmodelᚐLanguageLevel(ctx context.Context, v interface{}) (model.LanguageLevel, error) {
+	var res model.LanguageLevel
+	err := res.UnmarshalGQL(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNLanguageLevel2ExerciseMicroserviceᚋgraphᚋmodelᚐLanguageLevel(ctx context.Context, sel ast.SelectionSet, v model.LanguageLevel) graphql.Marshaler {
+	return v
+}
+
 func (ec *executionContext) unmarshalNPaginator2ExerciseMicroserviceᚋgraphᚋmodelᚐPaginator(ctx context.Context, v interface{}) (model.Paginator, error) {
 	res, err := ec.unmarshalInputPaginator(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -4518,16 +4528,6 @@ func (ec *executionContext) marshalN__TypeKind2string(ctx context.Context, sel a
 	return res
 }
 
-func (ec *executionContext) unmarshalNdifficulty2ExerciseMicroserviceᚋgraphᚋmodelᚐDifficulty(ctx context.Context, v interface{}) (model.Difficulty, error) {
-	var res model.Difficulty
-	err := res.UnmarshalGQL(v)
-	return res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) marshalNdifficulty2ExerciseMicroserviceᚋgraphᚋmodelᚐDifficulty(ctx context.Context, sel ast.SelectionSet, v model.Difficulty) graphql.Marshaler {
-	return v
-}
-
 func (ec *executionContext) unmarshalOBoolean2bool(ctx context.Context, v interface{}) (bool, error) {
 	res, err := graphql.UnmarshalBoolean(v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -4616,6 +4616,22 @@ func (ec *executionContext) marshalOID2ᚖstring(ctx context.Context, sel ast.Se
 	}
 	res := graphql.MarshalID(*v)
 	return res
+}
+
+func (ec *executionContext) unmarshalOLanguageLevel2ᚖExerciseMicroserviceᚋgraphᚋmodelᚐLanguageLevel(ctx context.Context, v interface{}) (*model.LanguageLevel, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var res = new(model.LanguageLevel)
+	err := res.UnmarshalGQL(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOLanguageLevel2ᚖExerciseMicroserviceᚋgraphᚋmodelᚐLanguageLevel(ctx context.Context, sel ast.SelectionSet, v *model.LanguageLevel) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return v
 }
 
 func (ec *executionContext) unmarshalOString2ᚖstring(ctx context.Context, v interface{}) (*string, error) {
@@ -4834,22 +4850,6 @@ func (ec *executionContext) marshalO__Type2ᚖgithubᚗcomᚋ99designsᚋgqlgen�
 		return graphql.Null
 	}
 	return ec.___Type(ctx, sel, v)
-}
-
-func (ec *executionContext) unmarshalOdifficulty2ᚖExerciseMicroserviceᚋgraphᚋmodelᚐDifficulty(ctx context.Context, v interface{}) (*model.Difficulty, error) {
-	if v == nil {
-		return nil, nil
-	}
-	var res = new(model.Difficulty)
-	err := res.UnmarshalGQL(v)
-	return res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) marshalOdifficulty2ᚖExerciseMicroserviceᚋgraphᚋmodelᚐDifficulty(ctx context.Context, sel ast.SelectionSet, v *model.Difficulty) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	return v
 }
 
 // endregion ***************************** type.gotpl *****************************

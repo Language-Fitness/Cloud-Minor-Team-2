@@ -25,6 +25,7 @@ enum join__Graph {
     MODULES @join__graph(name: "modules", url: "http://module-microservice-service:8081/query")
     CLASSES @join__graph(name: "classes", url: "http://class-microservice-service:8082/query")
     SCHOOLS @join__graph(name: "schools", url: "http://school-microservice-service:8083/query")
+    EXERCISES @join__graph(name: "exercises", url: "http://exercise-microservice-service:8084/query")
 }
 
 scalar link__Import
@@ -121,6 +122,24 @@ type SchoolInfo
     has_openai_access: Boolean! @join__field(graph: SCHOOLS)
 }
 
+type Exercise
+@join__type(graph: EXERCISES, key: "id")
+{
+    id: ID!
+    class_Id: ID!
+    module_id: ID!
+    name: String!
+    question: String!
+    answers: String!
+    pos_correct_answer: Int!
+    question_type_id: ID!
+    difficulty: LanguageLevel!
+    created_at: String!
+    updated_at: String!
+    soft_deleted: Boolean!
+    made_by: ID!
+}
+
 input ModuleInputCreate
 @join__type(graph: MODULES)
 {
@@ -162,18 +181,24 @@ input SchoolInput
     openai_key: String
 }
 
-#input Filter
-#@join__type(graph: MODULES)
-#@join__type(graph: CLASSES)
-#@join__type(graph: SCHOOLS)
-#{
-#    softDelete: Boolean
-#}
+input ExerciseInput
+@join__type(graph: EXERCISES)
+{
+    class_Id: ID!
+    module_id: ID!
+    name: String!
+    question: String!
+    answers: String!
+    pos_correct_answer: Int!
+    question_type_id: ID!
+    difficulty: LanguageLevel!
+}
 
 type Query
 @join__type(graph: CLASSES)
 @join__type(graph: SCHOOLS)
 @join__type(graph: MODULES)
+@join__type(graph: EXERCISES)
 {
     getModule(id: ID!): Module @join__field(graph: MODULES)
     listModules(filter: ModuleFilter, paginate: Paginator): [ModuleInfo] @join__field(graph: MODULES)
@@ -181,12 +206,15 @@ type Query
     listClasses(filter: ListClassFilter, paginate: Paginator): [ClassInfo] @join__field(graph: CLASSES)
     getSchool(id: ID!): School @join__field(graph: SCHOOLS)
     listSchools(filter: ListSchoolFilter, paginate: Paginator): [SchoolInfo] @join__field(graph: SCHOOLS)
+    GetExercise(ExerciseId: ID!): Exercise @join__field(graph: EXERCISES)
+    ListExercise(filter: ExerciseFilter!, paginator: Paginator!): [Exercise] @join__field(graph: EXERCISES)
 }
 
 type Mutation
 @join__type(graph: CLASSES)
 @join__type(graph: SCHOOLS)
 @join__type(graph: MODULES)
+@join__type(graph: EXERCISES)
 {
     createModule(input: ModuleInputCreate!): Module @join__field(graph: MODULES)
     updateModule(id: ID!, input: ModuleInputUpdate!): Module @join__field(graph: MODULES)
@@ -197,6 +225,9 @@ type Mutation
     createSchool(input: SchoolInput!): School @join__field(graph: SCHOOLS)
     updateSchool(id: ID!, input: SchoolInput!): School @join__field(graph: SCHOOLS)
     deleteSchool(id: ID!): ID @join__field(graph: SCHOOLS)
+    CreateExercise(exercise: ExerciseInput!): Exercise @join__field(graph: EXERCISES)
+    UpdateExercise(id: ID!, exercise: ExerciseInput!): Exercise @join__field(graph: EXERCISES)
+    DeleteExercise(ExerciseID: ID!): Exercise @join__field(graph: EXERCISES)
 }
 
 # FILTERS
@@ -210,6 +241,18 @@ input ModuleFilter
     difficulty: LanguageLevel
     category: Category
     private: Boolean
+}
+
+input ExerciseFilter
+@join__type(graph: EXERCISES)
+{
+    name: String
+    softDelete: Boolean
+    difficulty: LanguageLevel
+    question_type_id: ID
+    class_Id: ID
+    module_id: ID
+    made_by: ID
 }
 
 input ListClassFilter
@@ -253,6 +296,7 @@ input Paginator
 @join__type(graph: CLASSES)
 @join__type(graph: SCHOOLS)
 @join__type(graph: MODULES)
+@join__type(graph: EXERCISES)
 {
     amount: Int!
     Step: Int!
@@ -261,6 +305,7 @@ input Paginator
 enum LanguageLevel
 @join__type(graph: CLASSES)
 @join__type(graph: MODULES)
+@join__type(graph: EXERCISES)
 {
     A1
     A2

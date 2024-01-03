@@ -9,40 +9,40 @@ import (
 )
 
 type Exercise struct {
-	ID               string     `json:"id"`
-	ClassID          string     `json:"class_Id"`
-	ModuleID         string     `json:"module_id"`
-	Name             string     `json:"name"`
-	Question         string     `json:"question"`
-	Answers          string     `json:"answers"`
-	PosCorrectAnswer int        `json:"pos_correct_answer"`
-	QuestionTypeID   string     `json:"question_type_id"`
-	Difficulty       Difficulty `json:"difficulty"`
-	CreatedAt        string     `json:"created_at"`
-	UpdatedAt        string     `json:"updated_at"`
-	SoftDeleted      bool       `json:"soft_deleted"`
-	MadeBy           string     `json:"made_by"`
+	ID               string        `json:"id"`
+	ClassID          string        `json:"class_Id"`
+	ModuleID         string        `json:"module_id"`
+	Name             string        `json:"name"`
+	Question         string        `json:"question"`
+	Answers          string        `json:"answers"`
+	PosCorrectAnswer int           `json:"pos_correct_answer"`
+	QuestionTypeID   string        `json:"question_type_id"`
+	Difficulty       LanguageLevel `json:"difficulty"`
+	CreatedAt        string        `json:"created_at"`
+	UpdatedAt        string        `json:"updated_at"`
+	SoftDeleted      bool          `json:"soft_deleted"`
+	MadeBy           string        `json:"made_by"`
 }
 
 type ExerciseFilter struct {
-	Name           *string     `json:"name,omitempty"`
-	SoftDelete     *bool       `json:"softDelete,omitempty"`
-	Difficulty     *Difficulty `json:"difficulty,omitempty"`
-	QuestionTypeID *string     `json:"question_type_id,omitempty"`
-	ClassID        *string     `json:"class_Id,omitempty"`
-	ModuleID       *string     `json:"module_id,omitempty"`
-	MadeBy         *string     `json:"made_by,omitempty"`
+	Name           *string        `json:"name,omitempty"`
+	SoftDelete     *bool          `json:"softDelete,omitempty"`
+	Difficulty     *LanguageLevel `json:"difficulty,omitempty"`
+	QuestionTypeID *string        `json:"question_type_id,omitempty"`
+	ClassID        *string        `json:"class_Id,omitempty"`
+	ModuleID       *string        `json:"module_id,omitempty"`
+	MadeBy         *string        `json:"made_by,omitempty"`
 }
 
 type ExerciseInput struct {
-	ClassID          string     `json:"class_Id"`
-	ModuleID         string     `json:"module_id"`
-	Name             string     `json:"name"`
-	Question         string     `json:"question"`
-	Answers          string     `json:"answers"`
-	PosCorrectAnswer int        `json:"pos_correct_answer"`
-	QuestionTypeID   string     `json:"question_type_id"`
-	Difficulty       Difficulty `json:"difficulty"`
+	ClassID          string        `json:"class_Id"`
+	ModuleID         string        `json:"module_id"`
+	Name             string        `json:"name"`
+	Question         string        `json:"question"`
+	Answers          string        `json:"answers"`
+	PosCorrectAnswer int           `json:"pos_correct_answer"`
+	QuestionTypeID   string        `json:"question_type_id"`
+	Difficulty       LanguageLevel `json:"difficulty"`
 }
 
 type Paginator struct {
@@ -50,51 +50,51 @@ type Paginator struct {
 	Step   int `json:"Step"`
 }
 
-type Difficulty string
+type LanguageLevel string
 
 const (
-	DifficultyA1 Difficulty = "A1"
-	DifficultyA2 Difficulty = "A2"
-	DifficultyB1 Difficulty = "B1"
-	DifficultyB2 Difficulty = "B2"
-	DifficultyC1 Difficulty = "C1"
-	DifficultyC2 Difficulty = "C2"
+	LanguageLevelA1 LanguageLevel = "A1"
+	LanguageLevelA2 LanguageLevel = "A2"
+	LanguageLevelB1 LanguageLevel = "B1"
+	LanguageLevelB2 LanguageLevel = "B2"
+	LanguageLevelC1 LanguageLevel = "C1"
+	LanguageLevelC2 LanguageLevel = "C2"
 )
 
-var AllDifficulty = []Difficulty{
-	DifficultyA1,
-	DifficultyA2,
-	DifficultyB1,
-	DifficultyB2,
-	DifficultyC1,
-	DifficultyC2,
+var AllLanguageLevel = []LanguageLevel{
+	LanguageLevelA1,
+	LanguageLevelA2,
+	LanguageLevelB1,
+	LanguageLevelB2,
+	LanguageLevelC1,
+	LanguageLevelC2,
 }
 
-func (e Difficulty) IsValid() bool {
+func (e LanguageLevel) IsValid() bool {
 	switch e {
-	case DifficultyA1, DifficultyA2, DifficultyB1, DifficultyB2, DifficultyC1, DifficultyC2:
+	case LanguageLevelA1, LanguageLevelA2, LanguageLevelB1, LanguageLevelB2, LanguageLevelC1, LanguageLevelC2:
 		return true
 	}
 	return false
 }
 
-func (e Difficulty) String() string {
+func (e LanguageLevel) String() string {
 	return string(e)
 }
 
-func (e *Difficulty) UnmarshalGQL(v interface{}) error {
+func (e *LanguageLevel) UnmarshalGQL(v interface{}) error {
 	str, ok := v.(string)
 	if !ok {
 		return fmt.Errorf("enums must be strings")
 	}
 
-	*e = Difficulty(str)
+	*e = LanguageLevel(str)
 	if !e.IsValid() {
-		return fmt.Errorf("%s is not a valid difficulty", str)
+		return fmt.Errorf("%s is not a valid LanguageLevel", str)
 	}
 	return nil
 }
 
-func (e Difficulty) MarshalGQL(w io.Writer) {
+func (e LanguageLevel) MarshalGQL(w io.Writer) {
 	fmt.Fprint(w, strconv.Quote(e.String()))
 }

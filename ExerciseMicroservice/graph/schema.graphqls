@@ -5,7 +5,7 @@
 input ExerciseFilter {
   name: String
   softDelete: Boolean
-  difficulty: difficulty
+  difficulty: LanguageLevel
   question_type_id: ID
   class_Id: ID
   module_id: ID
@@ -17,7 +17,7 @@ input Paginator {
   Step: Int!
 }
 
-enum difficulty{
+enum LanguageLevel{
   A1
   A2
   B1
@@ -35,7 +35,7 @@ type Exercise {
   answers: String!
   pos_correct_answer: Int!
   question_type_id: ID!
-  difficulty: difficulty!
+  difficulty: LanguageLevel!
   created_at: String!
   updated_at: String!
   soft_deleted: Boolean!
@@ -50,7 +50,7 @@ input ExerciseInput {
   answers: String!
   pos_correct_answer: Int!
   question_type_id: ID!
-  difficulty: difficulty!
+  difficulty: LanguageLevel!
 }
 
 type Query {
