@@ -1,60 +1,60 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: class-microservice
+  name: openai-microservice
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: class-microservice
+      app: openai-microservice
   template:
     metadata:
       labels:
-        app: class-microservice
+        app: openai-microservice
     spec:
       containers:
-        - name: class-microservice
+        - name: openai-microservice
           image: microservice_image
           ports:
-            - containerPort: 8082
-          readinessProbe:
-            timeoutSeconds: 3
-            initialDelaySeconds: 5
-            httpGet:
-              path: "/health/ready"
-              port: 8082
-          livenessProbe:
-            timeoutSeconds: 3
-            initialDelaySeconds: 30
-            httpGet:
-              path: "/health/live"
-              port: 8082
+            - containerPort: 4000
+#          readinessProbe:
+#            timeoutSeconds: 3
+#            initialDelaySeconds: 10
+#            httpGet:
+#              path: "/health/ready"
+#              port: 4000
+#          livenessProbe:
+#            timeoutSeconds: 3
+#            initialDelaySeconds: 30
+#            httpGet:
+#              path: "/health/live"
+#              port: 4000
 ---
 kind: Service
 apiVersion: v1
 metadata:
-  name: class-microservice-service
+  name: openai-microservice-service
   annotations:
     description: Exposes and load balances the application pods
   labels:
-    app: class-microservice
+    app: openai-microservice
 spec:
   ports:
     - name: http
-      port: 8082
-      targetPort: 8082
+      port: 4000
+      targetPort: 4000
   selector:
-    app: class-microservice
+    app: openai-microservice
 ---
 kind: Route
 apiVersion: route.openshift.io/v1
 metadata:
-  name: class-microservice-route
+  name: openai-microservice-route
   labels:
-    app: class-microservice
+    app: openai-microservice
 spec:
   port:
-    targetPort: 8082
+    targetPort: 4000
   to:
     kind: Service
-    name: class-microservice-service
+    name: openai-microservice-service
