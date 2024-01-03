@@ -28,5 +28,8 @@
   },
   {
     "name": "filter_module_made_by_name"
+  },
+  {
+    "name": "openai_generate_explanation"
   }
 ]
