@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from starlette_graphene3 import GraphQLApp, make_graphiql_handler
-from Graphql.Schema import schema as graphene_schema
+from Graphql.schema import schema as graphene_schema
+import uvicorn
 
 app = FastAPI()
 
@@ -16,5 +17,4 @@ app.add_route(
 )
 
 if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run(app, host="localhost", port=4000)
+    uvicorn.run(app, host="0.0.0.0", port=4000)

@@ -9,18 +9,21 @@ from Utils.Exceptions.AssistantAPIException import AssistantAPIException
 class OpenAIAssistantManager:
 
     def __init__(self):
-        # tijdelijk no touchy
+        self.client = None
+
+    def load_client(self):
         load_dotenv()
         api_key = os.getenv("OPENAI_API_KEY")
 
         if not api_key:
-            raise ValueError("No OPENAI_API_KEY found in environment variables.")
-
+            raise AuthenticationError
 
         self.client = OpenAI(api_key=api_key)
 
     def create_assistant(self, assistant_json_object):
         try:
+            self.load_client()
+
             return self.client.beta.assistants.create(
                 instructions=assistant_json_object['instructions'],
                 name=assistant_json_object['name'],
@@ -29,45 +32,39 @@ class OpenAIAssistantManager:
             )
         except AuthenticationError:
             logging.error("Invalid OPENAI_API_KEY provided")
-            raise AssistantAPIException ("Request could not be fulfilled. Please provide an valid OpenAI API key in CMS.")
+            raise AssistantAPIException(
+                "Request could not be fulfilled. Please provide an valid OpenAI API key in CMS.")
         except Exception as e:
             logging.error(f"Message could not be created. check fields json fields in assistant json. error: {e}")
             raise Exception(f"Message could not be created. check fields json fields in assistant json. error: {e}")
 
     def delete_assistant(self, assistant_id):
         try:
+            self.load_client()
+
             self.client.beta.assistants.delete(assistant_id)
         except AuthenticationError:
             logging.error("Invalid OPENAI_API_KEY provided")
-            raise AssistantAPIException ("Request could not be fulfilled. Please provide an valid OpenAI API key in CMS.")
+            raise AssistantAPIException(
+                "Request could not be fulfilled. Please provide an valid OpenAI API key in CMS.")
         except NotFoundError:
             logging.info(f"Assistant: {assistant_id} already deleted or does not exist")
         except Exception as e:
             logging.error(f"An unexpected error occurred while deleting assistant({assistant_id}). error: {e}")
             raise Exception(f"An unexpected error occurred while deleting assistant({assistant_id}). error: {e}")
 
-
     def create_thread(self):
         try:
+            self.load_client()
+
             return self.client.beta.threads.create()
         except AuthenticationError:
             logging.error("Invalid OPENAI_API_KEY provided")
-            raise AssistantAPIException ("Request could not be fulfilled. Please provide an valid OpenAI API key in CMS.")
+            raise AssistantAPIException(
+                "Request could not be fulfilled. Please provide an valid OpenAI API key in CMS.")
         except Exception as e:
             logging.error(f"An unexpected error occurred while creating thread. error: {e}")
             raise Exception(f"An unexpected error occurred while creating thread. error: {e}")
-
-    def delete_thread(self, thread_id):
-        try:
-            self.client.beta.threads.delete(thread_id)
-        except AuthenticationError:
-            logging.error("Invalid OPENAI_API_KEY provided")
-            raise AssistantAPIException ("Request could not be fulfilled. Please provide an valid OpenAI API key in CMS.")
-        except NotFoundError:
-            logging.info(f"Thread: {thread_id} already deleted or does not exist")
-        except Exception as e:
-            logging.error(f"An unexpected error occurred while deleting a thread: ({thread_id}). error: {e}")
-            raise Exception(f"An unexpected error occurred while deleting a thread: ({thread_id}). error: {e}")
 
     def create_message_with_attachment(self, thread_id, message, file_id):
         try:
@@ -79,13 +76,18 @@ class OpenAIAssistantManager:
             )
         except AuthenticationError:
             logging.error("Invalid OPENAI_API_KEY provided")
-            raise AssistantAPIException ("Request could not be fulfilled. Please provide an valid OpenAI API key in CMS.")
+            raise AssistantAPIException(
+                "Request could not be fulfilled. Please provide an valid OpenAI API key in CMS.")
         except Exception as e:
-            logging.error(f"Message could not be created. thread_id: ({thread_id}), message: ({message}) and file_id: ({file_id}). error: {e}")
-            raise Exception(f"Message could not be created. thread_id: ({thread_id}), message: ({message}) and file_id: ({file_id}). error: {e}")
+            logging.error(
+                f"Message could not be created. thread_id: ({thread_id}), message: ({message}) and file_id: ({file_id}). error: {e}")
+            raise Exception(
+                f"Message could not be created. thread_id: ({thread_id}), message: ({message}) and file_id: ({file_id}). error: {e}")
 
     def create_message(self, thread_id, message):
         try:
+            self.load_client()
+
             return self.client.beta.threads.messages.create(
                 thread_id=thread_id,
                 role="user",
@@ -93,20 +95,24 @@ class OpenAIAssistantManager:
             )
         except AuthenticationError:
             logging.error("Invalid OPENAI_API_KEY provided")
-            raise AssistantAPIException ("Request could not be fulfilled. Please provide an valid OpenAI API key in CMS.")
+            raise AssistantAPIException(
+                "Request could not be fulfilled. Please provide an valid OpenAI API key in CMS.")
         except Exception as e:
             logging.error(f"Message could not be created. check thread_id and message. error: {e}")
             raise Exception(f"Message could not be created. check thread_id and message. error: {e}")
 
     def create_file(self, filename, file_like_object):
         try:
+            self.load_client()
+
             return self.client.files.create(
                 file=(filename, file_like_object),
                 purpose="assistants"
             )
         except AuthenticationError:
             logging.error("Invalid OPENAI_API_KEY provided")
-            raise AssistantAPIException ("Request could not be fulfilled. Please provide an valid OpenAI API key in CMS.")
+            raise AssistantAPIException(
+                "Request could not be fulfilled. Please provide an valid OpenAI API key in CMS.")
         except Exception as e:
             logging.error(f"An unexpected error occurred while creating the file. error: {e}")
             raise Exception(f"An unexpected error occurred while creating the file. error: {e}")
@@ -116,7 +122,8 @@ class OpenAIAssistantManager:
             self.client.files.delete(file_id)
         except AuthenticationError:
             logging.error("Invalid OPENAI_API_KEY provided")
-            raise AssistantAPIException ("Request could not be fulfilled. Please provide an valid OpenAI API key in CMS.")
+            raise AssistantAPIException(
+                "Request could not be fulfilled. Please provide an valid OpenAI API key in CMS.")
         except NotFoundError as e:
             logging.info(f"File: {file_id} already deleted or does not exist. error: {e}")
         except Exception as e:
@@ -131,30 +138,22 @@ class OpenAIAssistantManager:
             )
         except AuthenticationError:
             logging.error("Invalid OPENAI_API_KEY provided")
-            raise AssistantAPIException ("Request could not be fulfilled. Please provide an valid OpenAI API key in CMS.")
+            raise AssistantAPIException(
+                "Request could not be fulfilled. Please provide an valid OpenAI API key in CMS.")
         except Exception as e:
             raise Exception(f"Thread could not be run. check thread_id and assistant_id. error: {e}")
 
-    def retrieve_assistant(self, assistant_id):
-        try:
-            return self.client.beta.assistants.retrieve(
-                assistant_id=assistant_id
-            )
-        except AuthenticationError:
-            logging.error("Invalid OPENAI_API_KEY provided")
-            raise AssistantAPIException ("Request could not be fulfilled. Please provide an valid OpenAI API key in CMS.")
-        except Exception as e:
-            logging.error(f"No valid assistant id has been provided. error: {e}")
-            raise Exception(f"No valid assistant id has been provided. error: {e}")
-
     def retrieve_messages(self, thread_id):
         try:
+            self.load_client()
+
             return self.client.beta.threads.messages.list(
                 thread_id=thread_id
             )
         except AuthenticationError:
             logging.error("Invalid OPENAI_API_KEY provided")
-            raise AssistantAPIException ("Request could not be fulfilled. Please provide an valid OpenAI API key in CMS.")
+            raise AssistantAPIException(
+                "Request could not be fulfilled. Please provide an valid OpenAI API key in CMS.")
         except Exception as e:
             logging.error(f"No valid assistant id has been provided: {e}")
             raise Exception(f"No valid thread id has been provided. error: {e}")

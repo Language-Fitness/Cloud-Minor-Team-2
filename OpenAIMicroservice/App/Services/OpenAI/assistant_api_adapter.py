@@ -4,7 +4,7 @@ import logging
 import re
 from io import BytesIO
 from Utils.Exceptions.AssistantAPIException import AssistantAPIException
-from Services.OpenAI.OpenAIAssistantManager import OpenAIAssistantManager
+from Services.OpenAI.openai_assistant_manager import OpenAIAssistantManager
 
 class AssistantAPIAdapter:
     def __init__(self):
@@ -27,11 +27,11 @@ class AssistantAPIAdapter:
 
         except AssistantAPIException as e:
             logging.error(f"An error occurred in generate_multiple_choice_questions. error: {e}")
-            AssistantAPIException(str(e))
+            raise
 
         except Exception as e:
             logging.error(f"Unexpected error occurred in generate_multiple_choice_questions. error: {e}")
-            raise Exception(f"Unexpected error occurred in generate_multiple_choice_questions. error: {e}")
+            raise
 
     def read_multiple_choice_questions_from_file(self, file_data, filename):
         try:
@@ -55,11 +55,11 @@ class AssistantAPIAdapter:
 
         except AssistantAPIException as e:
             logging.error(f"An error occurred in read_multiple_choice_questions_from_file. error: {e}")
-            AssistantAPIException(str(e))
+            raise
 
         except Exception as e:
             logging.error(f"Unexpected error occurred in read_multiple_choice_questions_from_file. error: {e}")
-            raise Exception(f"Unexpected error occurred in read_multiple_choice_questions_from_file. error: {e}")
+            raise
 
     def generate_explanation(self, question_subject, question_text, given_answer, correct_answer):
         try:
@@ -78,11 +78,11 @@ class AssistantAPIAdapter:
 
         except AssistantAPIException as e:
             logging.error(f"An error occurred in generate_explanation. error: {e}")
-            AssistantAPIException(str(e))
+            raise
 
         except Exception as e:
             logging.error(f"Unexpected error occurred in generate_explanation. error: {e}")
-            raise Exception(f"Unexpected error occurred in generate_explanation. error: {e}")
+            raise
 
 
     def retrieve_response(self, token, endpoint_id_for_check, validation_function):
@@ -90,7 +90,6 @@ class AssistantAPIAdapter:
             thread_id, assistant_id, file_id = self.decode_and_check_token(token, endpoint_id_for_check)
             messages = self.assistant_manager.retrieve_messages(thread_id)
             last_message_data = self.get_last_message(messages)
-            # json_data = json_data.replace('```json', '').replace('```', '')
 
             json_data_dict = self.extract_json_from_message(last_message_data)
 
@@ -105,7 +104,7 @@ class AssistantAPIAdapter:
 
         except AssistantAPIException as e:
             logging.warning(f"API warning in retrieve_response: {e}")
-            raise AssistantAPIException(str(e))
+            raise
 
         except Exception as e:
             logging.error(f"Unexpected API error in retrieve_response: {e}")
@@ -295,42 +294,3 @@ class AssistantAPIAdapter:
         if not explanation['info'].strip() or not explanation['tips'].strip():
             logging.warning("Info or tips are empty or whitespace")
             raise AssistantAPIException("Info or tips are empty or whitespace")
-
-# def generate_open_answer_questions(self, subject, level, amount_questions):
-#     assistant_json = self.assistant_manager.load_assistant(
-#         "Services/OpenAI/Assistants/OpenAnswerQuestionsAssistant.json")
-#     assistant = self.assistant_manager.create_assistant(assistant_json)
-#
-#     request = f"onderwerp: {subject}, nederlands niveau: {level}, aantal vragen: {amount_questions}"
-#
-#     thread = self.assistant_manager.create_thread()
-#     self.assistant_manager.create_message(thread.id, request)
-#
-#     run = self.assistant_manager.run_thread(thread.id, assistant.id)
-#     token = self.encode_token(run.thread_id, run.assistant_id)
-#     return token
-
-
-# def retrieve_open_answer_questions(self, token):
-#     try:
-#         thread_id, assistant_id = self.decode_token(token)
-#         messages = self.assistant_manager.retrieve_messages(thread_id)
-#     except Exception as e:
-#         raise Exception("Please enter a valid token!")
-#
-#     try:
-#         json_data = self.get_last_message(messages)
-#         json_data = json_data.replace('```json', '').replace('```', '')
-#
-#         json_data_dict = json.loads(json_data)
-#         json_data_dict["status"] = "success"
-#
-#         self.assistant_manager.delete_assistant(assistant_id)
-#
-#         return json_data_dict
-#
-#     except json.JSONDecodeError:
-#         raise Exception("Response still pending, please wait.")
-#
-#     except Exception as e:
-#         raise Exception(str(e))
