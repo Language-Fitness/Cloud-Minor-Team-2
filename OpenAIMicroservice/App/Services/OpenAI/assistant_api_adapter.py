@@ -3,7 +3,7 @@ import json
 import logging
 import re
 from io import BytesIO
-from Utils.Exceptions.AssistantAPIException import AssistantAPIException
+from Utils.Exceptions.assistant_api_exception import AssistantAPIException
 from Services.OpenAI.openai_assistant_manager import OpenAIAssistantManager
 
 class AssistantAPIAdapter:

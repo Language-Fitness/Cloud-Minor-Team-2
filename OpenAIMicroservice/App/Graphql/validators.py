@@ -1,6 +1,6 @@
 import base64
 import re
-from Utils.Exceptions.ValidationException import ValidationException
+from Utils.Exceptions.validation_exception import ValidationException
 import magic
 
 

@@ -3,7 +3,7 @@ import logging
 import os
 from openai import OpenAI, NotFoundError, AuthenticationError
 from dotenv import load_dotenv
-from Utils.Exceptions.AssistantAPIException import AssistantAPIException
+from Utils.Exceptions.assistant_api_exception import AssistantAPIException
 
 
 class OpenAIAssistantManager:

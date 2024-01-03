@@ -3,7 +3,7 @@ import json
 import unittest
 from unittest.mock import patch, MagicMock
 from Services.OpenAI.assistant_api_adapter import AssistantAPIAdapter
-from Utils.Exceptions.AssistantAPIException import AssistantAPIException
+from Utils.Exceptions.assistant_api_exception import AssistantAPIException
 import logging
 
 
