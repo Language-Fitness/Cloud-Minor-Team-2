@@ -9,8 +9,8 @@ services:
     ports:
       - "8082:8082"
 
-  mongodb:
-    container_name: mongodb
+  mongodb_class:
+    container_name: mongodb_class
     image: mongo
     ports:
       - "27017:27017"

@@ -10,8 +10,8 @@ services:
       - "8083:8083"
       - "9090:9090"
 
-  mongodb:
-    container_name: mongodb
+  mongodb_saga:
+    container_name: mongodb_saga
     image: mongo
     ports:
       - "27019:27019"
