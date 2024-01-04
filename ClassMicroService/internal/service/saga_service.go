@@ -42,6 +42,8 @@ func (s *SagaService) FindSagaObjectChildren(ctx context.Context, req *pb.Object
 		Step:   0,
 	}
 
+	fmt.Println(filter)
+
 	classes, err := s.service.ListClasses(req.BearerToken, helper.ListClassFilterPointer(filter), helper.PaginatorPointer(paginate))
 	if err != nil {
 		return nil, err

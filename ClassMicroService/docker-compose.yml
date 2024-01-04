@@ -1,6 +1,6 @@
 services:
   api:
-    container_name: go-api
+    container_name: go-class-api
     restart: always
     build:
       context: .
@@ -8,12 +8,13 @@ services:
     image: graph-api
     ports:
       - "8082:8082"
+      - "9092:9092"
 
   mongodb_class:
     container_name: mongodb_class
     image: mongo
     ports:
-      - "27017:27017"
+      - "27018:27017"
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: example

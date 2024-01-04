@@ -14,7 +14,7 @@ services:
     container_name: mongodb_saga
     image: mongo
     ports:
-      - "27019:27019"
+      - "27019:27017"
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: example

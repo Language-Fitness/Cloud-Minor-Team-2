@@ -24,6 +24,8 @@ type FakeClass struct {
 
 func Init() {
 
+	fmt.Println("running init")
+
 	randomClasses := GenerateRandomClasses(10)
 
 	collection, _ := database.GetCollection()
@@ -31,6 +33,8 @@ func Init() {
 		ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
 
 		_, err := collection.InsertOne(ctx, class)
+		fmt.Println("yeah boi")
+
 		cancel()
 		if err != nil {
 			log.Fatal(err)

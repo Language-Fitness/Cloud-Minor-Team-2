@@ -20,7 +20,7 @@ import (
 type ISagaService interface {
 	InitSagaSteps(token string, filter *model.SagaFilter) (*model.SuccessMessage, error)
 	initializeSagaObject(token string, filter *model.SagaFilter) (*model.SagaObject, error)
-	findAllChildren(sagaObject *model.SagaObject) ([]model.SagaObject, error)
+	findAllChildren(token string, sagaObject *model.SagaObject) ([]model.SagaObject, error)
 	findBottomChildren(sagaObject *model.SagaObject) (*model.SagaObject, error)
 	softDeleteItems(items []model.SagaObject) error
 	areAllItemsDeleted(items []model.SagaObject) bool
@@ -55,7 +55,7 @@ func (s SagaService) InitSagaSteps(token string, filter *model.SagaFilter) (*mod
 	}
 
 	// Step 2: Find all possible children
-	children, err := s.findAllChildren(sagaObject)
+	children, err := s.findAllChildren(token, sagaObject)
 	if err != nil {
 		return nil, err
 	}
@@ -99,12 +99,12 @@ func (s SagaService) InitSagaSteps(token string, filter *model.SagaFilter) (*mod
 }
 
 func (s SagaService) initializeSagaObject(token string, filter *model.SagaFilter) (*model.SagaObject, error) {
-	client, conn, err := createGRPCClient(filter.ObjectType)
+	client, conn1, err := createGRPCClient(filter.ObjectType)
 	if err != nil {
 		fmt.Println(err)
 	}
 
-	defer conn.Close()
+	defer conn1.Close()
 
 	request := pb.ObjectRequest{
 		BearerToken:  token,
@@ -140,20 +140,27 @@ func (s SagaService) initializeSagaObject(token string, filter *model.SagaFilter
 	return object, nil
 }
 
-func (s SagaService) findAllChildren(sagaObject *model.SagaObject) ([]model.SagaObject, error) {
-	client, conn, err := createGRPCClient(sagaObject.ObjectType)
+func (s SagaService) findAllChildren(token string, sagaObject *model.SagaObject) ([]model.SagaObject, error) {
+	fmt.Println("test4")
+	//client, conn2, err := createGRPCClient(model.SagaObjectTypesModule)
+	client, conn2, err := createGRPCClient(model.SagaObjectTypesClass)
+	fmt.Println("test5")
+
 	if err != nil {
 		fmt.Println(err)
 	}
+	fmt.Println("test")
 
-	defer conn.Close()
+	defer conn2.Close()
 
 	request := pb.ObjectRequest{
-		BearerToken:  "eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJIaUpNcWZhTGFWQXBiME5JTEpweTlacmdtRzBERElIaWpVZklVWjM2NXJvIn0.eyJleHAiOjE3MDM5NDc5NzMsImlhdCI6MTcwMzk0NzY3MywianRpIjoiNjk1ZWNlNTktZDYwOS00MjExLWFiMjQtNjA2ODMwMTFkMTQ0IiwiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDo4ODg4L3JlYWxtcy9jbG91ZC1wcm9qZWN0IiwiYXVkIjpbInVzZXItbWFuYWdlbWVudC1jbGllbnQiLCJhY2NvdW50Il0sInN1YiI6IjZiMDNiYTVkLTVkMGUtNGRkOC05ZjdmLTkyOGU3NWVhOGVjYSIsInR5cCI6IkJlYXJlciIsImF6cCI6ImxvZ2luLWNsaWVudCIsInNlc3Npb25fc3RhdGUiOiIzYjYxNGNmNy00NmVjLTQ5NDEtOWU3Zi0wODkzZGRiODA3NmUiLCJhY3IiOiIxIiwicmVhbG1fYWNjZXNzIjp7InJvbGVzIjpbImRlZmF1bHQtcm9sZXMtY2xvdWQtcHJvamVjdCIsIm9mZmxpbmVfYWNjZXNzIiwidW1hX2F1dGhvcml6YXRpb24iXX0sInJlc291cmNlX2FjY2VzcyI6eyJ1c2VyLW1hbmFnZW1lbnQtY2xpZW50Ijp7InJvbGVzIjpbImZpbHRlcl9jbGFzc19kaWZmaWN1bHR5IiwiZ2V0X2NsYXNzZXNfYWxsIiwidXBkYXRlX3NjaG9vbCIsImZpbHRlcl9zY2hvb2xfbWFkZV9ieSIsImZpbHRlcl9zY2hvb2xfbmFtZSIsImZpbHRlcl9tb2R1bGVfY2F0ZWdvcnkiLCJmaWx0ZXJfY2xhc3NfbWFkZV9ieSIsImZpbHRlcl9tb2R1bGVfc29mdERlbGV0ZSIsImdldF9leGVyY2lzZXMiLCJnZXRfY2xhc3NlcyIsImRlbGV0ZV9tb2R1bGUiLCJkZWxldGVfZXhlcmNpc2UiLCJnZXRfc2Nob29scyIsInVwZGF0ZV9leGVyY2lzZSIsImdldF9leGVyY2lzZSIsImRlbGV0ZV9tb2R1bGVfYWxsIiwiY3JlYXRlX2V4ZXJjaXNlIiwiZ2V0X3NjaG9vbCIsImRlbGV0ZV9leGVyY2lzZV9hbGwiLCJmaWx0ZXJfc2Nob29sX2xvY2F0aW9uIiwidXBkYXRlX3NjaG9vbF9hbGwiLCJkZWxldGVfY2xhc3MiLCJmaWx0ZXJfbW9kdWxlX2RpZmZpY3VsdHkiLCJjcmVhdGVfbW9kdWxlIiwiZ2V0X21vZHVsZSIsImdldF9tb2R1bGVzIiwidXBkYXRlX2V4ZXJjaXNlX2FsbCIsImNyZWF0ZV9jbGFzcyIsImNyZWF0ZV9zY2hvb2wiLCJmaWx0ZXJfc2Nob29sX3NvZnREZWxldGUiLCJ1cGRhdGVfbW9kdWxlX2FsbCIsImdldF9tb2R1bGVzX2FsbCIsImZpbHRlcl9jbGFzc19tb2R1bGVfaWQiLCJmaWx0ZXJfbW9kdWxlX3NjaG9vbF9pZCIsImZpbHRlcl9tb2R1bGVfbWFkZV9ieSIsImZpbHRlcl9jbGFzc19uYW1lIiwidXBkYXRlX2NsYXNzX2FsbCIsImZpbHRlcl9tb2R1bGVfbmFtZSIsInVwZGF0ZV9tb2R1bGUiLCJnZXRfY2xhc3MiLCJkZWxldGVfc2Nob29sX2FsbCIsImZpbHRlcl9tb2R1bGVfcHJpdmF0ZSIsInVwZGF0ZV9jbGFzcyIsImdldF9zY2hvb2xzX2FsbCIsImZpbHRlcl9jbGFzc19zb2Z0RGVsZXRlIiwiZGVsZXRlX2NsYXNzX2FsbCJdfSwiYWNjb3VudCI6eyJyb2xlcyI6WyJtYW5hZ2UtYWNjb3VudCIsIm1hbmFnZS1hY2NvdW50LWxpbmtzIiwidmlldy1wcm9maWxlIl19fSwic2NvcGUiOiJlbWFpbCBwcm9maWxlIiwic2lkIjoiM2I2MTRjZjctNDZlYy00OTQxLTllN2YtMDg5M2RkYjgwNzZlIiwiZW1haWxfdmVyaWZpZWQiOmZhbHNlLCJuYW1lIjoiY2hhZCBhZG1pbiIsInByZWZlcnJlZF91c2VybmFtZSI6ImFkbWluQGFkbWluLmNvbSIsImdpdmVuX25hbWUiOiJjaGFkIiwiZmFtaWx5X25hbWUiOiJhZG1pbiIsImVtYWlsIjoiYWRtaW5AYWRtaW4uY29tIn0.ufqx_RD2A5abIdqEvf79lwl9bsQjZnIga54v82OdEKDpH47IF4yfnKIwl5f4sCpVeyaPl_ihPpYLtBwuD2ZLD-O-u6zRnFyVm3sXuAeN2CC3FOEWZtxr0gxECySaW7k3Oj7AWZimn_yxJfxyElRuNhlg4811gFJ1bZgGkl_3vJvg_61FEIBQB74vQA51jx27Y2-kSxdSMxXAkgWVNYjFtjgDyzeGZUHibqw8uLX4NYASprW4lGDVu-A3S_Vj3dJvJJON6Oe_8-IS-LH2Vw6olJNjEonxm9x5HJAWwUcn_Md4ShUB3u-k9jT1MAFkke1p4h5wuRnTa5mY3yjaF8LiRw",
-		ObjectId:     "0e520bea-a96b-47cc-96bc-83633e47c58e",
-		ObjectType:   pb.SagaObjectType_SCHOOL,
+		BearerToken:  token,
+		ObjectId:     sagaObject.ObjectID,
+		ObjectType:   pb.SagaObjectType_CLASS,
 		ObjectStatus: pb.SagaObjectStatus_EXIST,
 	}
+
+	fmt.Println("test2")
 
 	fmt.Println("Calling FindObject RPC...")
 	response, err := client.FindSagaObjectChildren(context.Background(), &request)
@@ -161,6 +168,8 @@ func (s SagaService) findAllChildren(sagaObject *model.SagaObject) ([]model.Saga
 		//log.Fatalf("failed to call FindObject RPC: %v", err)
 		log.Printf("failed to call FindObject RPC: %v", err)
 	}
+
+	fmt.Println("test3")
 
 	fmt.Println("\nResponse 1:", response.Objects[0].ObjectId)
 	fmt.Println("\nResponse 2:", response.Objects[0].ObjectStatus)
@@ -237,7 +246,10 @@ func createGRPCClient(sagaType model.SagaObjectTypes) (pb.GRPCSagaServiceClient,
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
 	}
 
+	fmt.Println(getHostByType(sagaType))
+
 	conn, err := grpc.DialContext(context.Background(), getHostByType(sagaType), opts...)
+	fmt.Println("oops")
 	if err != nil {
 		fmt.Printf("failed to dial gRPC server: %v\n", err)
 		log.Printf("failed to dial gRPC server: %v", err)

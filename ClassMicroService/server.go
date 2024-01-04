@@ -5,15 +5,17 @@ import (
 	"Class/internal/auth"
 	"Class/internal/service"
 	"Class/proto/pb"
+	"github.com/99designs/gqlgen/graphql/handler"
+	"github.com/99designs/gqlgen/graphql/playground"
+	"github.com/gorilla/handlers"
+	"github.com/gorilla/mux"
 	"github.com/joho/godotenv"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"google.golang.org/grpc"
 	"log"
 	"net"
 	"net/http"
 	"os"
-
-	"github.com/99designs/gqlgen/graphql/handler"
-	"github.com/99designs/gqlgen/graphql/playground"
 )
 
 const defaultPort = "8082"
@@ -28,17 +30,30 @@ func main() {
 		log.Fatal("Error loading .env file")
 	}
 
+	graphQLServer := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{Resolvers: graph.NewResolver()}))
+
 	tokenMiddleware := auth.Middleware
 
-	srv := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{Resolvers: graph.NewResolver()}))
+	r := mux.NewRouter()
 
-	http.Handle("/query", tokenMiddleware(srv))
-	http.Handle("/", playground.Handler("GraphQL playground", "/query"))
+	r.Handle("/query", tokenMiddleware(graphQLServer))
+	r.Handle("/", playground.Handler("GraphQL playground", "/query"))
+	r.Handle("/metrics", promhttp.Handler())
+	msHandler := handlers.LoggingHandler(os.Stdout, r)
+
+	//tokenMiddleware := auth.Middleware
+	//
+	////migrations.Init()
+	//
+	//srv := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{Resolvers: graph.NewResolver()}))
+	//
+	//http.Handle("/query", tokenMiddleware(srv))
+	//http.Handle("/", playground.Handler("GraphQL playground", "/query"))
 
 	go grpcSagaServer()
 
-	log.Printf("connect to http://localhost:%s/ for GraphQL playground", port)
-	log.Fatal(http.ListenAndServe(":"+port, nil))
+	log.Printf("SagaService is running on http://localhost:%s", port)
+	log.Fatal(http.ListenAndServe(":"+port, msHandler))
 }
 
 func grpcSagaServer() {
@@ -50,7 +65,6 @@ func grpcSagaServer() {
 	grpcServer := grpc.NewServer()
 	pb.RegisterGRPCSagaServiceServer(grpcServer, service.NewSagaService())
 
-	log.Printf("server listening at %v", lis.Addr())
 	if err := grpcServer.Serve(lis); err != nil {
 		log.Fatalf("Failed to serve: %v", err)
 	}
