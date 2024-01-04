@@ -2,9 +2,12 @@ package service
 
 import (
 	"errors"
+	"fmt"
 	"github.com/google/uuid"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo/options"
+	"io"
+	"net/http"
 	"school/graph/model"
 	"school/internal/auth"
 	"school/internal/database"
@@ -61,6 +64,14 @@ func (s *SchoolService) CreateSchool(token string, newSchool model.SchoolInput) 
 		return nil, errors.New(errorMessage)
 	}
 
+	if !helper.IsNil(newSchool.OpenaiKey) {
+		err := validateOpenAiKey(*newSchool.OpenaiKey)
+
+		if err != nil {
+			return nil, err
+		}
+	}
+
 	timestamp := time.Now().String()
 	softDeleted := false
 
@@ -99,6 +110,14 @@ func (s *SchoolService) UpdateSchool(token string, id string, updatedData model.
 		errorMessage := ValidationPrefix + strings.Join(validationErrors, ", ")
 		s.Validator.ClearErrors()
 		return nil, errors.New(errorMessage)
+	}
+
+	if existingSchool.OpenaiKey != updatedData.OpenaiKey {
+		err := validateOpenAiKey(*updatedData.OpenaiKey)
+
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	timestamp := time.Now().String()
@@ -256,4 +275,33 @@ func buildBsonFilter(policy auth.IPolicy, token string, filter *model.ListSchool
 			helper.DereferenceArrayIfNeeded(filter.Location.Input))
 	}
 	return bsonFilter
+}
+
+func validateOpenAiKey(apiKey string) error {
+	url := "https://api.openai.com/v1/engines"
+
+	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		return fmt.Errorf("error creating request: %v", err)
+	}
+
+	req.Header.Set("Authorization", "Bearer "+apiKey)
+
+	client := http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		return fmt.Errorf("error making request: %v", err)
+	}
+	defer resp.Body.Close()
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return fmt.Errorf("error reading response body: %v", err)
+	}
+
+	if resp.StatusCode == http.StatusOK {
+		return nil
+	} else {
+		return fmt.Errorf("API key validation failded. Status code %d, Response %s\n", resp.StatusCode, string(body))
+	}
 }

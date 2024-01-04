@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package proto;
+
+service SchoolService {
+  rpc GetKey (KeyRequest) returns (KeyResponse);
+}
+
+message KeyRequest {
+  string school_id = 1;
+}
+
+message KeyResponse {
+  string key = 1;
+  string error = 2;
+}
