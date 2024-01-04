@@ -92,7 +92,7 @@ func (p *Policy) GetModule(bearerToken string, id string) (*model.Module, error)
 
 	module, err := p.ModuleRepository.GetModuleByID(id)
 	if err != nil {
-		return nil, errors.New("invalid permissions for this action")
+		return nil, errors.New("no module found with this id")
 	}
 
 	if p.hasRole(roles, "get_module") {

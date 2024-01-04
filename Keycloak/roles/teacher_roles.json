@@ -49,5 +49,8 @@
   },
   {
     "name": "filter_exercise_question_type_id"
+  },
+  {
+    "name": "openai_generate_questions"
   }
 ]
