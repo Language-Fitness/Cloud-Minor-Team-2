@@ -53,7 +53,7 @@ func (p *ExercisePolicy) UpdateExercise(bearerToken string, id string) (*model.E
 
 	exercise, err := p.ExerciseRepository.GetExerciseByID(id)
 	if err != nil {
-		return nil, errors.New("invalid permissions for this action")
+		return nil, errors.New("exercise not found")
 	}
 
 	if p.hasRole(roles, "update_exercise") && exercise.MadeBy == uuid {
@@ -97,7 +97,7 @@ func (p *ExercisePolicy) GetExercise(bearerToken string, id string) (*model.Exer
 
 	exercise, err := p.ExerciseRepository.GetExerciseByID(id)
 	if err != nil {
-		return nil, errors.New("invalid permissions for this action")
+		return nil, errors.New("exercise not found")
 	}
 
 	if p.hasRole(roles, "get_exercise") {

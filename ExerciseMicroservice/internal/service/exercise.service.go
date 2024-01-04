@@ -131,7 +131,7 @@ func (e *ExerciseService) DeleteExercise(token string, id string) (*model.Exerci
 	}
 
 	if existingExercise.SoftDeleted {
-		return nil, errors.New("exercise could not be deleted")
+		return nil, errors.New("exercise is already deleted")
 	}
 
 	existingExercise.SoftDeleted = true
