@@ -7,12 +7,12 @@ app = FastAPI()
 
 # Define the /graphql endpoint with GraphiQL enabled for development
 app.add_websocket_route(
-    "/",
+    "/query",
     GraphQLApp(schema=graphene_schema, on_get=make_graphiql_handler())
 )
 
 app.add_route(
-    "/",
+    "/query",
     GraphQLApp(schema=graphene_schema, on_get=make_graphiql_handler())
 )
 

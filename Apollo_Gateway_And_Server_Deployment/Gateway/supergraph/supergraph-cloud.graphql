@@ -26,6 +26,7 @@ enum join__Graph {
     CLASSES @join__graph(name: "classes", url: "http://class-microservice-service:8082/query")
     SCHOOLS @join__graph(name: "schools", url: "http://school-microservice-service:8083/query")
     EXERCISES @join__graph(name: "exercises", url: "http://exercise-microservice-service:8084/query")
+    OPENAI @join__graph(name: "openai", url: "http://openai-microservice-service:4000/query")
 }
 
 scalar link__Import
@@ -199,6 +200,7 @@ type Query
 @join__type(graph: SCHOOLS)
 @join__type(graph: MODULES)
 @join__type(graph: EXERCISES)
+@join__type(graph: OPENAI)
 {
     getModule(id: ID!): Module @join__field(graph: MODULES)
     listModules(filter: ModuleFilter, paginate: Paginator): [ModuleInfo] @join__field(graph: MODULES)
@@ -208,6 +210,9 @@ type Query
     listSchools(filter: ListSchoolFilter, paginate: Paginator): [SchoolInfo] @join__field(graph: SCHOOLS)
     GetExercise(ExerciseId: ID!): Exercise @join__field(graph: EXERCISES)
     ListExercise(filter: ExerciseFilter!, paginator: Paginator!): [Exercise] @join__field(graph: EXERCISES)
+    retrieveMultipleChoiceQuestions(token: String!): ResponseMultipleChoiceQuestion @join__field(graph: OPENAI)
+    retrieveExplanation(token: String!): ResponseExplanation @join__field(graph: OPENAI)
+    retrieveMultipleChoiceQuestionsFromFile(token: String!): ResponseMultipleChoiceQuestion @join__field(graph: OPENAI)
 }
 
 type Mutation
@@ -215,6 +220,7 @@ type Mutation
 @join__type(graph: SCHOOLS)
 @join__type(graph: MODULES)
 @join__type(graph: EXERCISES)
+@join__type(graph: OPENAI)
 {
     createModule(input: ModuleInputCreate!): Module @join__field(graph: MODULES)
     updateModule(id: ID!, input: ModuleInputUpdate!): Module @join__field(graph: MODULES)
@@ -228,6 +234,21 @@ type Mutation
     CreateExercise(exercise: ExerciseInput!): Exercise @join__field(graph: EXERCISES)
     UpdateExercise(id: ID!, exercise: ExerciseInput!): Exercise @join__field(graph: EXERCISES)
     DeleteExercise(ExerciseID: ID!): Exercise @join__field(graph: EXERCISES)
+    generateExplanation(
+        correctAnswer: String!
+        givenAnswer: String!
+        questionSubject: SubjectEnum!
+        questionText: String!
+    ): GenerateExplanation @join__field(graph: OPENAI)
+    readMultipleChoiceQuestionsFromFile(
+        fileData: String!
+        filename: String!
+    ): ReadMultipleChoiceQuestionsFromFile @join__field(graph: OPENAI)
+    generateMultipleChoiceQuestions(
+        amountQuestions: Int!
+        questionLevel: LevelEnum!
+        questionSubject: SubjectEnum!
+    ): GenerateMultipleChoiceQuestions @join__field(graph: OPENAI)
 }
 
 # FILTERS
@@ -336,4 +357,87 @@ enum NameFilterTypes
     ne
     starts
     ends
+}
+
+## OpenAI Microservice
+type ResponseMultipleChoiceQuestion
+@join__type(graph: OPENAI)
+{
+    status: String!
+    message: String!
+    questions: [MultipleChoiceQuestion]
+}
+
+type MultipleChoiceQuestion
+@join__type(graph: OPENAI)
+{
+    questionType: String!
+    questionLevel: String!
+    questionSubject: String!
+    questionText: String!
+    answerOptions: [String]!
+    correctAnswer: String!
+}
+
+type ResponseExplanation
+@join__type(graph: OPENAI)
+{
+    status: String!
+    message: String!
+    explanation: Explanation
+}
+
+type Explanation
+@join__type(graph: OPENAI)
+{
+    info: String!
+    tips: String!
+}
+
+enum SubjectEnum
+@join__type(graph: OPENAI)
+{
+    grammatica
+    spelling
+    woordenschat
+    uitdrukkingen
+    interpunctie
+    werkwoordvervoegingen
+}
+
+type GenerateExplanation
+@join__type(graph: OPENAI)
+{
+    response: TokenResponse!
+}
+
+type TokenResponse
+@join__type(graph: OPENAI)
+{
+    status: String!
+    message: String!
+    token: String
+}
+
+type ReadMultipleChoiceQuestionsFromFile
+@join__type(graph: OPENAI)
+{
+    response: TokenResponse!
+}
+
+enum LevelEnum
+@join__type(graph: OPENAI)
+{
+    A1
+    A2
+    B1
+    B2
+    C1
+    C2
+}
+
+type GenerateMultipleChoiceQuestions
+@join__type(graph: OPENAI)
+{
+    response: TokenResponse!
 }
