@@ -30,6 +30,8 @@ func main() {
 
 	tokenMiddleware := auth.Middleware
 
+	//migrations.InitExercise()
+
 	srv := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{Resolvers: graph.NewResolver()}))
 
 	http.Handle("/query", tokenMiddleware(srv))
