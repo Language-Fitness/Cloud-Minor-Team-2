@@ -4,6 +4,7 @@ import (
 	"ExerciseMicroservice/graph"
 	"ExerciseMicroservice/internal/auth"
 	"github.com/joho/godotenv"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"log"
 	"net/http"
 	"os"
@@ -23,6 +24,9 @@ func main() {
 	if err := godotenv.Load(); err != nil {
 		log.Fatal("Error loading .env file")
 	}
+
+	// Prometheus Metrics
+	http.Handle("/metrics", promhttp.Handler())
 
 	tokenMiddleware := auth.Middleware
 
