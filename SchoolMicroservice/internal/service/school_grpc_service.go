@@ -20,8 +20,7 @@ func NewSchoolGRPCService() *SchoolGRPCService {
 func (s *SchoolGRPCService) GetKey(ctx context.Context, req *pb.KeyRequest) (*pb.KeyResponse, error) {
 	response := &pb.KeyResponse{}
 
-	//s.service.GetSchoolById(req.bearerToken, req.SchoolId)
-	school, err := s.service.GetSchoolById("", req.SchoolId)
+	school, err := s.service.GetSchoolById(req.BearerToken, req.SchoolId)
 	if err != nil {
 		response.Error = "school was not found"
 	}
