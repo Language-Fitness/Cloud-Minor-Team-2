@@ -15,7 +15,7 @@ services:
     environment:
       - DB_HOST_TEST=mongodb://root:example@mongodb_test:27017
       - DB_NAME_TEST=mongodb
-      - DB_COLLECTION_TEST=module
+      - DB_COLLECTION_TEST=exercise
 
   mongodb_test:
     container_name: mongodb_test
