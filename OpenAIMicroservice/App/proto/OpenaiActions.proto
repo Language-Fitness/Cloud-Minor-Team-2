@@ -17,3 +17,14 @@ message KeyResponse {
   string key = 1;
   string error = 2;
 }
+
+
+//generate the python code
+// python -m pip install grpcio
+// python -m pip install grpcio-tools
+
+//Might need to install protobuf (not sure website said it is included in grpcio-tools
+
+//python -m grpc_tools.protoc -I .\proto --python_out=.\proto\pb --pyi_out=.\proto\pb --grpc_python_out=.\proto\pb .\proto\OpenaiActions.proto
+
+//website: https://grpc.io/docs/languages/python/quickstart/
