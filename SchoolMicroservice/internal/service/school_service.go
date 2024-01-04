@@ -28,6 +28,7 @@ type ISchoolService interface {
 	DeleteSchool(token string, id string) error
 	GetSchoolById(token string, id string) (*model.School, error)
 	ListSchools(token string, filter *model.ListSchoolFilter, paginate *model.Paginator) ([]*model.SchoolInfo, error)
+	ValidateOpenAiKey(apiKey string) error
 }
 
 // SchoolService GOLANG STRUCT
@@ -65,7 +66,7 @@ func (s *SchoolService) CreateSchool(token string, newSchool model.SchoolInput) 
 	}
 
 	if !helper.IsNil(newSchool.OpenaiKey) {
-		err := validateOpenAiKey(*newSchool.OpenaiKey)
+		err := s.ValidateOpenAiKey(*newSchool.OpenaiKey)
 
 		if err != nil {
 			return nil, err
@@ -113,7 +114,7 @@ func (s *SchoolService) UpdateSchool(token string, id string, updatedData model.
 	}
 
 	if existingSchool.OpenaiKey != updatedData.OpenaiKey {
-		err := validateOpenAiKey(*updatedData.OpenaiKey)
+		err := s.ValidateOpenAiKey(*updatedData.OpenaiKey)
 
 		if err != nil {
 			return nil, err
@@ -277,7 +278,7 @@ func buildBsonFilter(policy auth.IPolicy, token string, filter *model.ListSchool
 	return bsonFilter
 }
 
-func validateOpenAiKey(apiKey string) error {
+func (s *SchoolService) ValidateOpenAiKey(apiKey string) error {
 	url := "https://api.openai.com/v1/engines"
 
 	req, err := http.NewRequest("GET", url, nil)
