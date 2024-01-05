@@ -1,0 +1,19 @@
+services:
+  api:
+    container_name: go-api
+    restart: always
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: graph-api
+    ports:
+      - "8085:8085"
+
+  mongodb_exercise:
+    container_name: mongodb_result
+    image: mongo
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example

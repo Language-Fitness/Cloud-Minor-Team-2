@@ -1,0 +1,27 @@
+version: '3'
+
+services:
+  go-api-test:
+    container_name: go-api-test
+    restart: always
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: graph-api-test
+    ports:
+      - "8085:8085"
+    depends_on:
+      - mongodb_test
+    environment:
+      - DB_HOST_TEST=mongodb://root:example@mongodb_test:27017
+      - DB_NAME_TEST=mongodb
+      - DB_COLLECTION_TEST=result
+
+  mongodb_test:
+    container_name: mongodb_test
+    image: mongo
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
