@@ -2,8 +2,7 @@
 """Client and server classes corresponding to protobuf-defined services."""
 import grpc
 
-import OpenaiActions_pb2 as OpenaiActions__pb2
-
+from . import OpenaiActions_pb2
 
 class SchoolServiceStub(object):
     """Missing associated documentation comment in .proto file."""
@@ -16,8 +15,8 @@ class SchoolServiceStub(object):
         """
         self.GetKey = channel.unary_unary(
                 '/proto.SchoolService/GetKey',
-                request_serializer=OpenaiActions__pb2.KeyRequest.SerializeToString,
-                response_deserializer=OpenaiActions__pb2.KeyResponse.FromString,
+                request_serializer=OpenaiActions_pb2.KeyRequest.SerializeToString,
+                response_deserializer=OpenaiActions_pb2.KeyResponse.FromString,
                 )
 
 

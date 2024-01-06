@@ -4,9 +4,8 @@ import os
 from openai import OpenAI, NotFoundError, AuthenticationError
 from dotenv import load_dotenv
 from utils.exceptions.assistant_api_exception import AssistantAPIException
-
 import grpc
-from App.proto.pb import OpenaiActions_pb2, OpenaiActions_pb2_grpc
+from proto.pb import OpenaiActions_pb2, OpenaiActions_pb2_grpc
 
 class OpenAIAssistantManager:
 
