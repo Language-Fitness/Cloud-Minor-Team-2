@@ -1,9 +1,9 @@
 from graphene import ObjectType, String, Field
 from .types import ResponseExplanation, ResponseMultipleChoiceQuestion
-from Services.OpenAI.assistant_api_adapter import AssistantAPIAdapter
-from Utils.Exceptions.assistant_api_exception import AssistantAPIException
-from Utils.Exceptions.validation_exception import ValidationException
-from Utils.Exceptions.security_exception import SecurityException
+from services.openai.assistant_api_adapter import AssistantAPIAdapter
+from utils.exceptions.assistant_api_exception import AssistantAPIException
+from utils.exceptions.validation_exception import ValidationException
+from utils.exceptions.security_exception import SecurityException
 from .security import Security
 from .validators import validate_base64
 
@@ -17,15 +17,15 @@ class Query(ObjectType):
 
         try:
             security = Security()
-            token = security.extract_token_from_header(info)
-            security.validate_token(token)
-            security.has_required_role(token, "moet nog")
+            bearer_token = security.extract_token_from_header(info)
+            security.validate_token(bearer_token)
+            security.has_required_role(bearer_token, "moet nog")
 
 
             # validate if token is in base64
             validate_base64(token)
 
-            adapter = AssistantAPIAdapter()
+            adapter = AssistantAPIAdapter(bearer_token)
             response = adapter.retrieve_generated_multiple_choice_questions_response(token)
 
             return ResponseMultipleChoiceQuestion(status="success", message="Question(s) retrieved successfully",
@@ -44,14 +44,14 @@ class Query(ObjectType):
 
         try:
             security = Security()
-            token = security.extract_token_from_header(info)
-            security.validate_token(token)
-            security.has_required_role(token, "moet nog")
+            bearer_token = security.extract_token_from_header(info)
+            security.validate_token(bearer_token)
+            security.has_required_role(bearer_token, "moet nog")
 
             # validate if token is in base64
             validate_base64(token)
 
-            adapter = AssistantAPIAdapter()
+            adapter = AssistantAPIAdapter(bearer_token)
             response = adapter.retrieve_multiple_choice_questions_from_file_response(token)
 
             return ResponseMultipleChoiceQuestion(status="success", message="Question(s) retrieved successfully",
@@ -73,14 +73,14 @@ class Query(ObjectType):
 
         try:
             security = Security()
-            token = security.extract_token_from_header(info)
-            security.validate_token(token)
-            security.has_required_role(token, "moet nog")
+            bearer_token = security.extract_token_from_header(info)
+            security.validate_token(bearer_token)
+            security.has_required_role(bearer_token, "moet nog")
 
             # validate if token is in base64
             validate_base64(token)
 
-            adapter = AssistantAPIAdapter()
+            adapter = AssistantAPIAdapter(bearer_token)
             response = adapter.retrieve_explanation_response(token)
 
             return ResponseExplanation(status="success", message="Explanation retrieved successfully",

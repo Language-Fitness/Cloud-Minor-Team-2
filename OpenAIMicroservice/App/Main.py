@@ -1,11 +1,11 @@
 from fastapi import FastAPI
 from starlette_graphene3 import GraphQLApp, make_graphiql_handler
-from Graphql.schema import schema as graphene_schema
+from graphql_api.schema import schema as graphene_schema
 import uvicorn
 
 app = FastAPI()
 
-# Define the /graphql endpoint with GraphiQL enabled for development
+# Define the /graphql_api endpoint with GraphiQL enabled for development
 app.add_websocket_route(
     "/query",
     GraphQLApp(schema=graphene_schema, on_get=make_graphiql_handler())

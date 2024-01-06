@@ -1,12 +1,9 @@
 import graphene
-from fastapi import Depends
-from starlette.requests import Request
-
-from Services.OpenAI.assistant_api_adapter import AssistantAPIAdapter
-from Utils.Exceptions.security_exception import SecurityException
+from services.openai.assistant_api_adapter import AssistantAPIAdapter
+from utils.exceptions.security_exception import SecurityException
 from .types import SubjectEnum, LevelEnum, TokenResponse
-from Utils.Exceptions.validation_exception import ValidationException
-from Utils.Exceptions.assistant_api_exception import AssistantAPIException
+from utils.exceptions.validation_exception import ValidationException
+from utils.exceptions.assistant_api_exception import AssistantAPIException
 from .validators import validate_minimum_int, validate_string, validate_file
 from .security import Security
 
@@ -23,14 +20,14 @@ class GenerateMultipleChoiceQuestions(graphene.Mutation):
 
         try:
             security = Security()
-            token = security.extract_token_from_header(info)
-            security.validate_token(token)
-            security.has_required_role(token, "moet nog")
+            bearer_token = security.extract_token_from_header(info)
+            security.validate_token(bearer_token)
+            security.has_required_role(bearer_token, "moet nog")
 
             # validate amount questions
             validate_minimum_int("amount_questions", amount_questions)
 
-            adapter = AssistantAPIAdapter()
+            adapter = AssistantAPIAdapter(bearer_token)
 
             token = adapter.generate_multiple_choice_questions(question_subject, question_level, amount_questions)
 
@@ -60,14 +57,14 @@ class ReadMultipleChoiceQuestionsFromFile(graphene.Mutation):
 
         try:
             security = Security()
-            token = security.extract_token_from_header(info)
-            security.validate_token(token)
-            security.has_required_role(token, "moet nog")
+            bearer_token = security.extract_token_from_header(info)
+            security.validate_token(bearer_token)
+            security.has_required_role(bearer_token, "moet nog")
 
             # validate file
             validate_file(file_data)
 
-            adapter = AssistantAPIAdapter()
+            adapter = AssistantAPIAdapter(bearer_token)
             token = adapter.read_multiple_choice_questions_from_file(file_data, filename)
             return ReadMultipleChoiceQuestionsFromFile(
                 TokenResponse(status="success", message="Reading questions from the file started!", token=token))
@@ -96,16 +93,16 @@ class GenerateExplanation(graphene.Mutation):
     def mutate(self, info, question_subject, question_text, given_answer, correct_answer):
         try:
             security = Security()
-            token = security.extract_token_from_header(info)
-            security.validate_token(token)
-            security.has_required_role(token, "moet nog")
+            bearer_token = security.extract_token_from_header(info)
+            security.validate_token(bearer_token)
+            security.has_required_role(bearer_token, "moet nog")
 
             # validate given strings
             validate_string("question_text", question_text)
             validate_string("given_answer", given_answer)
             validate_string("correct_answer", correct_answer)
 
-            adapter = AssistantAPIAdapter()
+            adapter = AssistantAPIAdapter(bearer_token)
             token = adapter.generate_explanation(question_subject, question_text, given_answer, correct_answer)
 
             return GenerateExplanation(

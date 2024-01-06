@@ -4,7 +4,8 @@ import logging
 import re
 from io import BytesIO
 from utils.exceptions.assistant_api_exception import AssistantAPIException
-from Services.openai.openai_assistant_manager import OpenAIAssistantManager
+from services.openai.openai_assistant_manager import OpenAIAssistantManager
+
 
 class AssistantAPIAdapter:
     def __init__(self, bearer_token):
@@ -84,7 +85,6 @@ class AssistantAPIAdapter:
             logging.error(f"Unexpected error occurred in generate_explanation. error: {e}")
             raise
 
-
     def retrieve_response(self, token, endpoint_id_for_check, validation_function):
         try:
             thread_id, assistant_id, file_id = self.decode_and_check_token(token, endpoint_id_for_check)
@@ -140,7 +140,6 @@ class AssistantAPIAdapter:
         except Exception as e:
             logging.error(f"Error in extract_json_from_message. error:{e}")
             raise Exception(f"Error in extract_json_from_message. error:{e}")
-
 
     def encode_token(self, thread_id, assistant_id, endpoint_id, file_id):
         try:

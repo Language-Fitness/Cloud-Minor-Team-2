@@ -1,5 +1,5 @@
-from Services.Keycloak.token_provider import TokenProvider
-from Utils.Exceptions.security_exception import SecurityException
+from services.keycloak.token_provider import TokenProvider
+from utils.exceptions.security_exception import SecurityException
 
 
 class Security:
