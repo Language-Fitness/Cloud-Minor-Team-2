@@ -15,7 +15,6 @@ type IResultRepository interface {
 	//Todo only return items that are not soft deleted
 	CreateResult(newResult *model.Result) (*model.Result, error)
 	UpdateResult(id string, updatedResult model.Result) (*model.Result, error)
-	DeleteResultByID(id string) error
 	GetResultByID(id string) (*model.Result, error)
 	ListResults(bsonFilter bson.D, paginateOptions *options.FindOptions) ([]*model.Result, error)
 }
@@ -34,35 +33,6 @@ func NewResultRepository(collection *mongo.Collection) IResultRepository {
 		results:    []*model.Result{},
 		collection: collection,
 	}
-}
-
-func (r *ResultRepository) ListResults(bsonFilter bson.D, paginateOptions *options.FindOptions) ([]*model.Result, error) {
-	ctx, cancel := context.WithTimeout(context.TODO(), time.Second*10) // 10-second timeout
-	defer cancel()
-
-	var results []*model.Result
-
-	cursor, err := r.collection.Find(ctx, bsonFilter, paginateOptions)
-	if err != nil {
-		return nil, err // Return any MongoDB-related errors.
-	}
-
-	defer func(cursor *mongo.Cursor, ctx context.Context) {
-		err := cursor.Close(ctx)
-		if err != nil {
-			return
-		}
-	}(cursor, ctx)
-
-	for cursor.Next(ctx) {
-		var result model.Result
-		if err := cursor.Decode(&result); err != nil {
-			return nil, err
-		}
-		results = append(results, &result)
-	}
-
-	return results, nil
 }
 
 func (r *ResultRepository) CreateResult(newResult *model.Result) (*model.Result, error) {
@@ -110,25 +80,6 @@ func (r *ResultRepository) UpdateResult(id string, updatedResult model.Result) (
 	return &result, nil
 }
 
-func (r *ResultRepository) DeleteResultByID(id string) error {
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10) // 10-second timeout
-	defer cancel()
-
-	_, err := r.GetResultByID(id)
-	if err != nil {
-		return err // Return the error if it exists in MongoDB.
-	}
-
-	filter := bson.M{"id": id}
-
-	_, err = r.collection.DeleteOne(ctx, filter)
-	if err != nil {
-		return err // Return any MongoDB-related errors.
-	}
-
-	return nil
-}
-
 func (r *ResultRepository) GetResultByID(id string) (*model.Result, error) {
 	ctx, cancel := context.WithTimeout(context.TODO(), time.Second*10) // 10-second timeout
 	defer cancel()
@@ -142,4 +93,33 @@ func (r *ResultRepository) GetResultByID(id string) (*model.Result, error) {
 	}
 
 	return &result, nil
+}
+
+func (r *ResultRepository) ListResults(bsonFilter bson.D, paginateOptions *options.FindOptions) ([]*model.Result, error) {
+	ctx, cancel := context.WithTimeout(context.TODO(), time.Second*10) // 10-second timeout
+	defer cancel()
+
+	var results []*model.Result
+
+	cursor, err := r.collection.Find(ctx, bsonFilter, paginateOptions)
+	if err != nil {
+		return nil, err // Return any MongoDB-related errors.
+	}
+
+	defer func(cursor *mongo.Cursor, ctx context.Context) {
+		err := cursor.Close(ctx)
+		if err != nil {
+			return
+		}
+	}(cursor, ctx)
+
+	for cursor.Next(ctx) {
+		var result model.Result
+		if err := cursor.Decode(&result); err != nil {
+			return nil, err
+		}
+		results = append(results, &result)
+	}
+
+	return results, nil
 }
