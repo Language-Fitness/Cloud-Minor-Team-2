@@ -1,3 +1,4 @@
+import asyncio
 import json
 import logging
 import os
@@ -17,15 +18,26 @@ class OpenAIAssistantManager:
         load_dotenv()
         api_key = os.getenv("OPENAI_API_KEY")
 
-        self.get_school_from_bearer(self.bearer_token)
+        # response = self.get_school_from_bearer(self.bearer_token)
+        # if (response.error != ""):
+        #     print(response.error)
+        # else:
+        #     api_key = response.key
 
         if not api_key:
             raise AuthenticationError
 
         self.client = OpenAI(api_key=api_key)
     
-    async def get_school_from_bearer(self, bearer):
-        async with grpc.aio.insecure_channel("host.internal.docker:9050") as channel:
+    def get_school_from_bearer(self, bearer):
+        channel = grpc.insecure_channel("localhost:9050")
+        stub = OpenaiActions_pb2_grpc.SchoolServiceStub(channel)
+        response = stub.GetKey(OpenaiActions_pb2.KeyRequest(bearerToken=bearer))
+        channel.close()
+        return response
+
+    async def async_call(bearer):
+        async with grpc.insecure_channel("localhost:9050") as channel:
             stub = OpenaiActions_pb2_grpc.SchoolServiceStub(channel)
             response = await stub.GetKey(OpenaiActions_pb2.KeyRequest(bearerToken=bearer))
         print("Greeter client received: " + response.key)
