@@ -16,3 +16,5 @@ message KeyResponse {
   string key = 1;
   string error = 2;
 }
+
+//protoc --proto_path=.\proto --go_out=.\proto --go-grpc_out=.\proto .\proto\SchoolActions.proto
