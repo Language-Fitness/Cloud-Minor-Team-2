@@ -4,12 +4,12 @@ import requests
 import json
 import base64
 
+
 class TokenProvider:
     def __init__(self):
         self.endpoint = os.getenv("KEYCLOAK_HOST")
         self.client_id = os.getenv("KEYCLOAK_CLIENT_ID")
         self.client_secret = os.getenv("KEYCLOAK_CLIENT_SECRET")
-
 
     def introspect_token(self, bearer_token):
         auth_header = self.generate_basic_auth_header()
@@ -34,6 +34,7 @@ class TokenProvider:
         active = introspection_response.get("active", False)
         return active, None
 
+    @staticmethod
     def decode_token(self, token):
         parts = token.split(".")
         if len(parts) != 3:
@@ -55,4 +56,3 @@ class TokenProvider:
         auth_string = f"{self.client_id}:{self.client_secret}"
         auth_header = base64.b64encode(auth_string.encode()).decode()
         return f"Basic {auth_header}"
-
