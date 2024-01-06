@@ -246,5 +246,5 @@ func (r *ResultService) ValidateResult(result *model.InputResult) {
 	r.Validator.Validate(result.ClassID, []string{"IsUUID"}, "ClassID")
 	r.Validator.Validate(result.ModuleID, []string{"IsUUID"}, "ModuleID")
 	r.Validator.Validate(result.Input, []string{"IsString"}, "Input")
-	r.Validator.Validate(result.Result, []string{"IsString"}, "Result")
+	r.Validator.Validate(result.Result, []string{"IsBoolean"}, "Result")
 }
