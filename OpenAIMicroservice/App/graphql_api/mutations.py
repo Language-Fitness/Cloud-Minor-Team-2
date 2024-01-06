@@ -22,7 +22,7 @@ class GenerateMultipleChoiceQuestions(graphene.Mutation):
             security = Security()
             bearer_token = security.extract_token_from_header(info)
             security.validate_token(bearer_token)
-            security.has_required_role(bearer_token, "moet nog")
+            security.has_required_role(bearer_token, "openai_generate_questions")
 
             # validate amount questions
             validate_minimum_int("amount_questions", amount_questions)
@@ -59,7 +59,7 @@ class ReadMultipleChoiceQuestionsFromFile(graphene.Mutation):
             security = Security()
             bearer_token = security.extract_token_from_header(info)
             security.validate_token(bearer_token)
-            security.has_required_role(bearer_token, "moet nog")
+            security.has_required_role(bearer_token, "openai_generate_questions_from_file")
 
             # validate file
             validate_file(file_data)
@@ -95,7 +95,7 @@ class GenerateExplanation(graphene.Mutation):
             security = Security()
             bearer_token = security.extract_token_from_header(info)
             security.validate_token(bearer_token)
-            security.has_required_role(bearer_token, "moet nog")
+            security.has_required_role(bearer_token, "openai_generate_explanation")
 
             # validate given strings
             validate_string("question_text", question_text)

@@ -1,0 +1,6 @@
+OPENAI_API_KEY=
+
+KEYCLOAK_REALM=cloud-project
+KEYCLOAK_CLIENT_ID=openai-client
+KEYCLOAK_CLIENT_SECRET=
+KEYCLOAK_HOST=http://localhost:8888/realms/cloud-project/protocol/openid-connect/token/introspect

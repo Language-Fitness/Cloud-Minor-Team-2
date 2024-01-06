@@ -54,6 +54,9 @@
     "name": "openai_generate_questions"
   },
   {
+    "name": "openai_generate_questions_from_file"
+  },
+  {
     "name": "list_results_all"
   },
   {

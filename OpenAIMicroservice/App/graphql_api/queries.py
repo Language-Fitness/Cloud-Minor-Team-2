@@ -19,7 +19,7 @@ class Query(ObjectType):
             security = Security()
             bearer_token = security.extract_token_from_header(info)
             security.validate_token(bearer_token)
-            security.has_required_role(bearer_token, "moet nog")
+            security.has_required_role(bearer_token, "openai_generate_questions")
 
 
             # validate if token is in base64
@@ -46,7 +46,7 @@ class Query(ObjectType):
             security = Security()
             bearer_token = security.extract_token_from_header(info)
             security.validate_token(bearer_token)
-            security.has_required_role(bearer_token, "moet nog")
+            security.has_required_role(bearer_token, "openai_generate_questions_from_file")
 
             # validate if token is in base64
             validate_base64(token)
@@ -75,7 +75,7 @@ class Query(ObjectType):
             security = Security()
             bearer_token = security.extract_token_from_header(info)
             security.validate_token(bearer_token)
-            security.has_required_role(bearer_token, "moet nog")
+            security.has_required_role(bearer_token, "openai_generate_explanation")
 
             # validate if token is in base64
             validate_base64(token)
