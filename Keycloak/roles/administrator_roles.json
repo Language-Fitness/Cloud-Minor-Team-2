@@ -88,5 +88,11 @@
   },
   {
     "name": "filter_exercise_made_by"
+  },
+  {
+    "name": "update_result_all"
+  },
+  {
+    "name": "delete_result_all"
   }
 ]

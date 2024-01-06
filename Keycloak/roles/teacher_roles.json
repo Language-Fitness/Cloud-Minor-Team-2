@@ -52,5 +52,11 @@
   },
   {
     "name": "openai_generate_questions"
+  },
+  {
+    "name": "list_results_all"
+  },
+  {
+    "name": "get_result_all"
   }
 ]

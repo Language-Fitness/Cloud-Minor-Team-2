@@ -173,20 +173,21 @@ func (r *ResultService) GetResultById(token string, id string) (*model.Result, e
 }
 
 func (r *ResultService) ListResults(token string, filter *model.ResultFilter, paginate *model.Paginator) ([]*model.Result, error) {
-	_, err := r.ResultPolicy.ListResult(token)
+	id, teacher, err := r.ResultPolicy.ListResult(token)
 	if err != nil {
 		return nil, err
 	}
 
 	validateListResultFilter(r.Validator, filter, paginate)
 	validationErrors := r.Validator.GetErrors()
+
 	if len(validationErrors) > 0 {
 		errorMessage := ValidationPrefix + strings.Join(validationErrors, ", ")
 		r.Validator.ClearErrors()
 		return nil, errors.New(errorMessage)
 	}
 
-	bsonFilter, errs := buildBsonFilterForListResult(r.ResultPolicy, token, filter)
+	bsonFilter, errs := buildBsonFilterForListResult(r.ResultPolicy, token, filter, teacher, id)
 	if len(errs) > 0 {
 		return nil, helper.AggregateErrors(errs)
 	}
@@ -213,7 +214,7 @@ func validateListResultFilter(validator validation.IValidator, filter *model.Res
 	validator.Validate(paginate.Step, []string{"IsInt", "Size:>=0"}, "Paginate Step")
 }
 
-func buildBsonFilterForListResult(policy auth.IResultPolicy, token string, filter *model.ResultFilter) (bson.D, []error) {
+func buildBsonFilterForListResult(policy auth.IResultPolicy, token string, filter *model.ResultFilter, teacher bool, uuid string) (bson.D, []error) {
 	bsonFilter := bson.D{}
 	var errs []error
 
@@ -232,8 +233,12 @@ func buildBsonFilterForListResult(policy auth.IResultPolicy, token string, filte
 	if b == false {
 		bsonFilter = append(bsonFilter, bson.E{Key: "softdeleted", Value: false})
 	}
+	if !teacher {
+		bsonFilter = append(bsonFilter, bson.E{Key: "userid", Value: uuid})
+	} else {
+		appendCondition("user_id", filter.UserID, "userid")
+	}
 	appendCondition("exercise_id", filter.ExerciseID, "exerciseid")
-	appendCondition("user_id", filter.UserID, "userid")
 	appendCondition("class_id", filter.ClassID, "classid")
 	appendCondition("module_id", filter.ModuleID, "moduleid")
 

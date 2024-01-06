@@ -31,5 +31,32 @@
   },
   {
     "name": "openai_generate_explanation"
+  },
+  {
+    "name": "create_result"
+  },
+  {
+    "name": "update_result"
+  },
+  {
+    "name": "delete_result"
+  },
+  {
+    "name": "get_result"
+  },
+  {
+    "name": "list_results"
+  },
+  {
+    "name": "filter_result_class_id"
+  },
+  {
+    "name": "filter_result_exercise_id"
+  },
+  {
+    "name": "filter_result_user_id"
+  },
+  {
+    "name": "filter_result_module_id"
   }
 ]
