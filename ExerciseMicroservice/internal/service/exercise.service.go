@@ -49,7 +49,7 @@ func NewExerciseService() IExerciseService {
 }
 
 func (e *ExerciseService) CreateExercise(token string, newExercise model.ExerciseInput) (*model.Exercise, error) {
-	sub, err := e.Policy.CreateExercise(token)
+	id, err := e.Policy.CreateExercise(token)
 	if err != nil {
 		return nil, err
 	}
@@ -76,7 +76,7 @@ func (e *ExerciseService) CreateExercise(token string, newExercise model.Exercis
 		Difficulty:       newExercise.Difficulty,
 		CreatedAt:        timestamp,
 		SoftDeleted:      false,
-		MadeBy:           sub,
+		MadeBy:           id,
 	}
 
 	result, err := e.Repo.CreateExercise(exerciseToInsert)
@@ -88,17 +88,18 @@ func (e *ExerciseService) CreateExercise(token string, newExercise model.Exercis
 }
 
 func (e *ExerciseService) UpdateExercise(token string, id string, updateData model.ExerciseInput) (*model.Exercise, error) {
-	existingExercise, err := e.Policy.UpdateExercise(token, id)
-	if err != nil {
-		return nil, err
-	}
-
 	validateUpdatedExercise(e.Validator, id, updateData)
 	validationErrors := e.Validator.GetErrors()
 	if len(validationErrors) > 0 {
 		errorMessage := ValidationPrefix + strings.Join(validationErrors, ", ")
 		e.Validator.ClearErrors()
 		return nil, errors.New(errorMessage)
+	}
+
+	//validate first because policy does not validate, and does a database request
+	existingExercise, err := e.Policy.UpdateExercise(token, id)
+	if err != nil {
+		return nil, err
 	}
 
 	timestamp := time.Now().String()
@@ -125,6 +126,15 @@ func (e *ExerciseService) UpdateExercise(token string, id string, updateData mod
 }
 
 func (e *ExerciseService) DeleteExercise(token string, id string) (*model.Exercise, error) {
+	e.Validator.Validate(id, []string{"IsUUID"}, "ID")
+
+	valErrors := e.Validator.GetErrors()
+	if len(valErrors) > 0 {
+		errorMessage := ValidationPrefix + strings.Join(valErrors, ", ")
+		e.Validator.ClearErrors()
+		return nil, errors.New(errorMessage)
+	}
+	//validate first because policy does not validate, and does a database request
 	_, existingExercise, err := e.Policy.DeleteExercise(token, id)
 	if err != nil {
 		return nil, err
@@ -203,8 +213,8 @@ func validateListExerciseFilter(validator validation.IValidator, filter *model.E
 func validateUpdatedExercise(validator validation.IValidator, id string, updatedData model.ExerciseInput) {
 	validator.Validate(id, []string{"IsUUID"}, "ID")
 	validator.Validate(updatedData.ClassID, []string{"IsString"}, "ClassID")
-	validator.Validate(updatedData.Name, []string{"IsString", "Length:<25"}, "Name")
-	validator.Validate(updatedData.Question, []string{"IsString", "Length:<50"}, "Question")
+	validator.Validate(updatedData.Name, []string{"IsString", "Length:<50"}, "Name")
+	validator.Validate(updatedData.Question, []string{"IsString", "Length:<100"}, "Question")
 	validator.Validate(updatedData.Answers, []string{"IsString"}, "Answers")
 	validator.Validate(updatedData.PosCorrectAnswer, []string{"IsInt"}, "PosCorrectAnswer")
 	validator.Validate(updatedData.QuestionTypeID, []string{"IsString"}, "QuestionTypeID")
@@ -214,8 +224,8 @@ func validateUpdatedExercise(validator validation.IValidator, id string, updated
 // todo look if they need to be Dereferenced
 func validateNewExercise(validator validation.IValidator, newExercise model.ExerciseInput) {
 	validator.Validate(newExercise.ClassID, []string{"IsString"}, "ClassID")
-	validator.Validate(newExercise.Name, []string{"IsString", "Length:<25"}, "Name")
-	validator.Validate(newExercise.Question, []string{"IsString", "Length:<50"}, "Question")
+	validator.Validate(newExercise.Name, []string{"IsString", "Length:<50"}, "Name")
+	validator.Validate(newExercise.Question, []string{"IsString", "Length:<100"}, "Question")
 	validator.Validate(newExercise.Answers, []string{"IsString"}, "Answers")
 	validator.Validate(newExercise.PosCorrectAnswer, []string{"IsInt"}, "PosCorrectAnswer")
 	validator.Validate(newExercise.QuestionTypeID, []string{"IsString"}, "QuestionTypeID")
