@@ -3,13 +3,14 @@ import logging
 import os
 from openai import OpenAI, NotFoundError, AuthenticationError
 from dotenv import load_dotenv
-from Utils.Exceptions.assistant_api_exception import AssistantAPIException
+from utils.exceptions.assistant_api_exception import AssistantAPIException
 
 
 class OpenAIAssistantManager:
 
-    def __init__(self):
+    def __init__(self, bearer_token):
         self.client = None
+        self.bearer_token = bearer_token
 
     def load_client(self):
         load_dotenv()
@@ -33,7 +34,7 @@ class OpenAIAssistantManager:
         except AuthenticationError:
             logging.error("Invalid OPENAI_API_KEY provided")
             raise AssistantAPIException(
-                "Request could not be fulfilled. Please provide an valid OpenAI API key in CMS.")
+                "Request could not be fulfilled. Please provide an valid openai API key in CMS.")
         except Exception as e:
             logging.error(f"Message could not be created. check fields json fields in assistant json. error: {e}")
             raise Exception(f"Message could not be created. check fields json fields in assistant json. error: {e}")
@@ -46,7 +47,7 @@ class OpenAIAssistantManager:
         except AuthenticationError:
             logging.error("Invalid OPENAI_API_KEY provided")
             raise AssistantAPIException(
-                "Request could not be fulfilled. Please provide an valid OpenAI API key in CMS.")
+                "Request could not be fulfilled. Please provide an valid openai API key in CMS.")
         except NotFoundError:
             logging.info(f"Assistant: {assistant_id} already deleted or does not exist")
         except Exception as e:
@@ -61,7 +62,7 @@ class OpenAIAssistantManager:
         except AuthenticationError:
             logging.error("Invalid OPENAI_API_KEY provided")
             raise AssistantAPIException(
-                "Request could not be fulfilled. Please provide an valid OpenAI API key in CMS.")
+                "Request could not be fulfilled. Please provide an valid openai API key in CMS.")
         except Exception as e:
             logging.error(f"An unexpected error occurred while creating thread. error: {e}")
             raise Exception(f"An unexpected error occurred while creating thread. error: {e}")
@@ -77,7 +78,7 @@ class OpenAIAssistantManager:
         except AuthenticationError:
             logging.error("Invalid OPENAI_API_KEY provided")
             raise AssistantAPIException(
-                "Request could not be fulfilled. Please provide an valid OpenAI API key in CMS.")
+                "Request could not be fulfilled. Please provide an valid openai API key in CMS.")
         except Exception as e:
             logging.error(
                 f"Message could not be created. thread_id: ({thread_id}), message: ({message}) and file_id: ({file_id}). error: {e}")
@@ -96,7 +97,7 @@ class OpenAIAssistantManager:
         except AuthenticationError:
             logging.error("Invalid OPENAI_API_KEY provided")
             raise AssistantAPIException(
-                "Request could not be fulfilled. Please provide an valid OpenAI API key in CMS.")
+                "Request could not be fulfilled. Please provide an valid openai API key in CMS.")
         except Exception as e:
             logging.error(f"Message could not be created. check thread_id and message. error: {e}")
             raise Exception(f"Message could not be created. check thread_id and message. error: {e}")
@@ -112,7 +113,7 @@ class OpenAIAssistantManager:
         except AuthenticationError:
             logging.error("Invalid OPENAI_API_KEY provided")
             raise AssistantAPIException(
-                "Request could not be fulfilled. Please provide an valid OpenAI API key in CMS.")
+                "Request could not be fulfilled. Please provide an valid openai API key in CMS.")
         except Exception as e:
             logging.error(f"An unexpected error occurred while creating the file. error: {e}")
             raise Exception(f"An unexpected error occurred while creating the file. error: {e}")
@@ -123,7 +124,7 @@ class OpenAIAssistantManager:
         except AuthenticationError:
             logging.error("Invalid OPENAI_API_KEY provided")
             raise AssistantAPIException(
-                "Request could not be fulfilled. Please provide an valid OpenAI API key in CMS.")
+                "Request could not be fulfilled. Please provide an valid openai API key in CMS.")
         except NotFoundError as e:
             logging.info(f"File: {file_id} already deleted or does not exist. error: {e}")
         except Exception as e:
@@ -139,7 +140,7 @@ class OpenAIAssistantManager:
         except AuthenticationError:
             logging.error("Invalid OPENAI_API_KEY provided")
             raise AssistantAPIException(
-                "Request could not be fulfilled. Please provide an valid OpenAI API key in CMS.")
+                "Request could not be fulfilled. Please provide an valid openai API key in CMS.")
         except Exception as e:
             raise Exception(f"Thread could not be run. check thread_id and assistant_id. error: {e}")
 
@@ -153,7 +154,7 @@ class OpenAIAssistantManager:
         except AuthenticationError:
             logging.error("Invalid OPENAI_API_KEY provided")
             raise AssistantAPIException(
-                "Request could not be fulfilled. Please provide an valid OpenAI API key in CMS.")
+                "Request could not be fulfilled. Please provide an valid openai API key in CMS.")
         except Exception as e:
             logging.error(f"No valid assistant id has been provided: {e}")
             raise Exception(f"No valid thread id has been provided. error: {e}")

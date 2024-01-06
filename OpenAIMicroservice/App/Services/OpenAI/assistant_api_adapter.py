@@ -3,17 +3,17 @@ import json
 import logging
 import re
 from io import BytesIO
-from Utils.Exceptions.assistant_api_exception import AssistantAPIException
-from Services.OpenAI.openai_assistant_manager import OpenAIAssistantManager
+from utils.exceptions.assistant_api_exception import AssistantAPIException
+from Services.openai.openai_assistant_manager import OpenAIAssistantManager
 
 class AssistantAPIAdapter:
-    def __init__(self):
-        self.assistant_manager = OpenAIAssistantManager()
+    def __init__(self, bearer_token):
+        self.assistant_manager = OpenAIAssistantManager(bearer_token)
 
     def generate_multiple_choice_questions(self, question_subject, question_level, amount_questions):
         try:
             assistant_json = self.assistant_manager.load_assistant(
-                "Services/OpenAI/Assistants/MultipleChoiceQuestionAssistant.json")
+                "services/openai/assistants/MultipleChoiceQuestionAssistant.json")
             assistant = self.assistant_manager.create_assistant(assistant_json)
 
             request = f"onderwerp: {question_subject}, nederlands niveau: {question_level}, aantal vragen: {amount_questions}"
@@ -41,7 +41,7 @@ class AssistantAPIAdapter:
             file = self.assistant_manager.create_file(filename, binary_object)
 
             assistant_json = self.assistant_manager.load_assistant(
-                "Services/OpenAI/Assistants/FileToMultipleChoiceQuestionAssistant.json")
+                "services/openai/assistants/FileToMultipleChoiceQuestionAssistant.json")
             assistant = self.assistant_manager.create_assistant(assistant_json)
 
             request = f"bestandsnaam: {filename}, Geef de multiple choice vragen uit het bestand"
@@ -64,7 +64,7 @@ class AssistantAPIAdapter:
     def generate_explanation(self, question_subject, question_text, given_answer, correct_answer):
         try:
             assistant_json = self.assistant_manager.load_assistant(
-                "Services/OpenAI/Assistants/ExplanationAssistant.json")
+                "services/openai/assistants/ExplanationAssistant.json")
             assistant = self.assistant_manager.create_assistant(assistant_json)
 
             request = f"onderwerp van de vraag: {question_subject}, de vraag zelf : {question_text}, gegeven antwoord: {given_answer}, het correcte antwoord: {correct_answer}"
