@@ -1,7 +1,7 @@
 package validation
 
 import (
-	"Module/internal/helper"
+	"ResultMicroservice/internal/helper"
 	"fmt"
 	"strings"
 )
@@ -55,8 +55,6 @@ func (v *Validator) Validate(input interface{}, arr []string, name string) {
 	if helper.ContainsString(arr, "IsNull") == true && helper.IsNil(input) {
 		return
 	}
-
-	fmt.Println("error here")
 
 	for _, value := range arr {
 		functionName := value
