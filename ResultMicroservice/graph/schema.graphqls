@@ -9,7 +9,7 @@ input ResultFilter {
     classId: ID
     moduleId: ID
     input: String
-    result: String
+    result: Boolean
 }
 
 input Paginator {
@@ -24,7 +24,7 @@ type Result {
     class_id: ID!
     module_id: ID!
     input: String!
-    result: String!
+    result: Boolean!
     created_at: String!
     updated_at: String!
     soft_deleted: Boolean!
@@ -36,7 +36,7 @@ input InputResult {
     class_id: ID!
     module_id: ID!
     input: String!
-    result: String!
+    result: Boolean!
 }
 
 type Query {

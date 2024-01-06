@@ -8,7 +8,7 @@ type InputResult struct {
 	ClassID    string `json:"class_id"`
 	ModuleID   string `json:"module_id"`
 	Input      string `json:"input"`
-	Result     string `json:"result"`
+	Result     bool   `json:"result"`
 }
 
 type Paginator struct {
@@ -23,7 +23,7 @@ type Result struct {
 	ClassID     string `json:"class_id"`
 	ModuleID    string `json:"module_id"`
 	Input       string `json:"input"`
-	Result      string `json:"result"`
+	Result      bool   `json:"result"`
 	CreatedAt   string `json:"created_at"`
 	UpdatedAt   string `json:"updated_at"`
 	SoftDeleted bool   `json:"soft_deleted"`
@@ -36,5 +36,5 @@ type ResultFilter struct {
 	ClassID    *string `json:"classId,omitempty"`
 	ModuleID   *string `json:"moduleId,omitempty"`
 	Input      *string `json:"input,omitempty"`
-	Result     *string `json:"result,omitempty"`
+	Result     *bool   `json:"result,omitempty"`
 }
