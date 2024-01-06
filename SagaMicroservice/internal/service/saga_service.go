@@ -109,7 +109,7 @@ func (s SagaService) initializeSagaObject(token string, filter *model.SagaFilter
 	request := pb.ObjectRequest{
 		BearerToken:  token,
 		ObjectId:     filter.ObjectID,
-		ObjectType:   pb.SagaObjectType_SCHOOL,
+		ObjectType:   convertToPBObjectType(filter.ObjectType),
 		ObjectStatus: pb.SagaObjectStatus_EXIST,
 	}
 
@@ -126,9 +126,9 @@ func (s SagaService) initializeSagaObject(token string, filter *model.SagaFilter
 	sagaObject := model.SagaObject{
 		ID:           uuid.New().String(),
 		ObjectID:     response.ObjectId,
-		ObjectType:   model.SagaObjectTypes(response.ObjectType),
+		ObjectType:   convertToModelObjectType(response.ObjectType),
 		CreatedAt:    time.Now().Format("HH:MM:SS"),
-		ObjectStatus: model.SagaObjectStatus(response.ObjectStatus),
+		ObjectStatus: convertToModelObjectStatus(response.ObjectStatus),
 		ActionDoneBy: "1", //@TODO get this from the bearer token sub
 	}
 
@@ -137,13 +137,17 @@ func (s SagaService) initializeSagaObject(token string, filter *model.SagaFilter
 		return nil, err
 	}
 
+	fmt.Println(object)
+
 	return object, nil
 }
 
 func (s SagaService) findAllChildren(token string, sagaObject *model.SagaObject) ([]model.SagaObject, error) {
 	fmt.Println("test4")
 	//client, conn2, err := createGRPCClient(model.SagaObjectTypesModule)
-	client, conn2, err := createGRPCClient(model.SagaObjectTypesClass)
+	fmt.Println(sagaObject.ObjectType)
+	fmt.Println(getChildTypeByType(sagaObject.ObjectType))
+	client, conn2, err := createGRPCClient(getChildTypeByType(sagaObject.ObjectType))
 	fmt.Println("test5")
 
 	if err != nil {
@@ -237,6 +241,60 @@ func getHostByType(sagaType model.SagaObjectTypes) string {
 		return os.Getenv("EXERCISE_MS_GRPC_HOST")
 	default:
 		return os.Getenv("MODULE_MS_GRPC_HOST")
+	}
+}
+
+func getChildTypeByType(sagaType model.SagaObjectTypes) model.SagaObjectTypes {
+	switch sagaType {
+	case model.SagaObjectTypesSchool:
+		return model.SagaObjectTypesModule
+	case model.SagaObjectTypesModule:
+		return model.SagaObjectTypesClass
+	case model.SagaObjectTypesClass:
+		return model.SagaObjectTypesExercise
+	case model.SagaObjectTypesExercise:
+		return model.SagaObjectTypesResult
+	default:
+		return model.SagaObjectTypesResult
+	}
+}
+
+func convertToPBObjectType(objectType model.SagaObjectTypes) pb.SagaObjectType {
+	switch objectType {
+	case model.SagaObjectTypesSchool:
+		return pb.SagaObjectType_SCHOOL
+	case model.SagaObjectTypesModule:
+		return pb.SagaObjectType_MODULE
+	case model.SagaObjectTypesClass:
+		return pb.SagaObjectType_CLASS
+	case model.SagaObjectTypesExercise:
+		return pb.SagaObjectType_EXERCISE
+	default:
+		return pb.SagaObjectType_RESULT
+	}
+}
+
+func convertToModelObjectType(objectType pb.SagaObjectType) model.SagaObjectTypes {
+	switch objectType {
+	case pb.SagaObjectType_SCHOOL:
+		return model.SagaObjectTypesSchool
+	case pb.SagaObjectType_MODULE:
+		return model.SagaObjectTypesModule
+	case pb.SagaObjectType_CLASS:
+		return model.SagaObjectTypesClass
+	case pb.SagaObjectType_EXERCISE:
+		return model.SagaObjectTypesExercise
+	default:
+		return model.SagaObjectTypesResult
+	}
+}
+
+func convertToModelObjectStatus(objectType pb.SagaObjectStatus) model.SagaObjectStatus {
+	switch objectType {
+	case pb.SagaObjectStatus_DELETED:
+		return model.SagaObjectStatusDeleted
+	default:
+		return model.SagaObjectStatusExist
 	}
 }
 
