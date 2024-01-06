@@ -1,9 +1,0 @@
-graphene==3.3
-starlette-graphene3==0.6.0
-python-magic==0.4.27
-fastapi==0.104.1
-openai==1.2.4
-python-dotenv==1.0.0
-uvicorn==0.24.0.post1
-websockets==12.0
-requests==2.31.0
