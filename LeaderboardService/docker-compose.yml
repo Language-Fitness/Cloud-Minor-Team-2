@@ -1,0 +1,16 @@
+version: '3'
+
+services:
+  leaderboard:
+    build:
+      context: .
+    ports:
+      - "4000:4000"
+  redis:
+    image: redis:latest
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+volumes:
+  redis-data:
