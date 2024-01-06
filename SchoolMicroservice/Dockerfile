@@ -16,6 +16,7 @@ RUN go mod download
 COPY / .
 
 EXPOSE 8083
+EXPOSE 9050
 
 RUN go build -o main .
 

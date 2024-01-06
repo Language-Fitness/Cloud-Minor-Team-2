@@ -9,8 +9,7 @@ service SchoolService {
 }
 
 message KeyRequest {
-  string school_id = 1;
-  string bearerToken = 2;
+  string bearerToken = 1;
 }
 
 message KeyResponse {
