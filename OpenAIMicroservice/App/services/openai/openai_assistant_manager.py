@@ -5,6 +5,8 @@ from openai import OpenAI, NotFoundError, AuthenticationError
 from dotenv import load_dotenv
 from utils.exceptions.assistant_api_exception import AssistantAPIException
 
+import grpc
+from App.proto.pb import OpenaiActions_pb2, OpenaiActions_pb2_grpc
 
 class OpenAIAssistantManager:
 
@@ -16,10 +18,18 @@ class OpenAIAssistantManager:
         load_dotenv()
         api_key = os.getenv("OPENAI_API_KEY")
 
+        self.get_school_from_bearer(self.bearer_token)
+
         if not api_key:
             raise AuthenticationError
 
         self.client = OpenAI(api_key=api_key)
+    
+    async def get_school_from_bearer(self, bearer):
+        async with grpc.aio.insecure_channel("host.internal.docker:9050") as channel:
+            stub = OpenaiActions_pb2_grpc.SchoolServiceStub(channel)
+            response = await stub.GetKey(OpenaiActions_pb2.KeyRequest(bearerToken=bearer))
+        print("Greeter client received: " + response.key)
 
     def create_assistant(self, assistant_json_object):
         try:
