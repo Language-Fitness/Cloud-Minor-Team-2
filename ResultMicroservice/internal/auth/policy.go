@@ -14,7 +14,7 @@ type IResultPolicy interface {
 	UpdateResult(bearerToken string, id string) (*model.Result, error)
 	DeleteResult(bearerToken string, id string) (*model.Result, error)
 	GetResultByID(bearerToken string, id string) (*model.Result, error)
-	ListResult(bearerToken string) (bool, error)
+	ListResult(bearerToken string) (string, bool, error)
 	HasPermissions(bearerToken string, role string) bool
 }
 
@@ -90,7 +90,7 @@ func (p *ResultPolicy) DeleteResult(bearerToken string, id string) (*model.Resul
 }
 
 func (p *ResultPolicy) GetResultByID(bearerToken string, id string) (*model.Result, error) {
-	_, roles, err2 := p.getSubAndRoles(bearerToken)
+	uuid, roles, err2 := p.getSubAndRoles(bearerToken)
 	if err2 != nil {
 		return nil, err2
 	}
@@ -100,28 +100,32 @@ func (p *ResultPolicy) GetResultByID(bearerToken string, id string) (*model.Resu
 		return nil, errors.New("result not found")
 	}
 
-	if !p.hasRole(roles, "get_result") {
-		return nil, errors.New("invalid permissions for this action")
+	if p.hasRole(roles, "get_result") && result.UserID == uuid {
+		return result, nil
 	}
 
-	return result, nil
+	if p.hasRole(roles, "get_result_all") {
+		return result, nil
+	}
+
+	return nil, errors.New("invalid permissions for this action")
 }
 
-func (p *ResultPolicy) ListResult(bearerToken string) (bool, error) {
-	_, roles, err := p.getSubAndRoles(bearerToken)
+func (p *ResultPolicy) ListResult(bearerToken string) (string, bool, error) {
+	uuid, roles, err := p.getSubAndRoles(bearerToken)
 	if err != nil {
-		return false, err
+		return "", false, err
 	}
 
-	if p.hasRole(roles, "get_exercises_all") {
-		return true, nil
+	if p.hasRole(roles, "list_results_all") {
+		return uuid, true, nil
 	}
 
-	if p.hasRole(roles, "get_exercises") {
-		return false, nil
+	if p.hasRole(roles, "list_results") {
+		return uuid, false, nil
 	}
 
-	return false, errors.New("invalid permissions for this action")
+	return uuid, false, errors.New("invalid permissions for this action")
 }
 
 func (p *ResultPolicy) HasPermissions(bearerToken string, role string) bool {
