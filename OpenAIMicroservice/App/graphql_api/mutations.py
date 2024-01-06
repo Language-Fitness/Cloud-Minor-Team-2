@@ -21,12 +21,11 @@ class GenerateMultipleChoiceQuestions(graphene.Mutation):
         try:
             security = Security()
             bearer_token = security.extract_token_from_header(info)
-            security.validate_token(bearer_token)
-            security.has_required_role(bearer_token, "openai_generate_questions")
+            # security.validate_token(bearer_token)
+            # security.has_required_role(bearer_token, "openai_generate_questions")
 
             # validate amount questions
             validate_minimum_int("amount_questions", amount_questions)
-
             adapter = AssistantAPIAdapter(bearer_token)
 
             token = adapter.generate_multiple_choice_questions(question_subject, question_level, amount_questions)

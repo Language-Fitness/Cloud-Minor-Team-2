@@ -18,8 +18,8 @@ class Query(ObjectType):
         try:
             security = Security()
             bearer_token = security.extract_token_from_header(info)
-            security.validate_token(bearer_token)
-            security.has_required_role(bearer_token, "openai_generate_questions")
+            # security.validate_token(bearer_token)
+            # security.has_required_role(bearer_token, "openai_generate_questions")
 
 
             # validate if token is in base64
@@ -36,7 +36,7 @@ class Query(ObjectType):
             return ResponseMultipleChoiceQuestion(status="error", message=str(e))
         except AssistantAPIException as e:
             return ResponseMultipleChoiceQuestion(status="error", message=str(e))
-        except Exception as e:
+        except Exception:
             return ResponseMultipleChoiceQuestion(status="error",
                                                   message="An unexpected error occurred. Please try again later.")
 
