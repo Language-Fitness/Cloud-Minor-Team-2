@@ -156,6 +156,15 @@ func (e *ExerciseService) DeleteExercise(token string, id string) (*model.Exerci
 }
 
 func (e *ExerciseService) GetExerciseById(token string, id string) (*model.Exercise, error) {
+	e.Validator.Validate(id, []string{"IsUUID"}, "ID")
+	
+	validationErrors := e.Validator.GetErrors()
+	if len(validationErrors) > 0 {
+		errorMessage := ValidationPrefix + strings.Join(validationErrors, ", ")
+		e.Validator.ClearErrors()
+		return nil, errors.New(errorMessage)
+	}
+
 	existingExercise, err := e.Policy.GetExercise(token, id)
 	if err != nil {
 		return nil, err
