@@ -8,4 +8,4 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 EXPOSE 4000
 
-CMD ["python", "./Main.py"]
+CMD ["python", "./main.py"]

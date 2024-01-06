@@ -4,16 +4,19 @@ import requests
 import json
 import base64
 
+from dotenv import load_dotenv
+
 
 class TokenProvider:
     def __init__(self):
+        load_dotenv()
         self.endpoint = os.getenv("KEYCLOAK_HOST")
         self.client_id = os.getenv("KEYCLOAK_CLIENT_ID")
         self.client_secret = os.getenv("KEYCLOAK_CLIENT_SECRET")
 
     def introspect_token(self, bearer_token):
         auth_header = self.generate_basic_auth_header()
-
+        print(self.endpoint)
         req_body = f"token_type_hint=requesting_party_token&token={bearer_token}"
         headers = {
             "Authorization": auth_header,
