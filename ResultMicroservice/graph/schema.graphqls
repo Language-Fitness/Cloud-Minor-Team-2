@@ -40,14 +40,14 @@ input InputResult {
 }
 
 type Query {
-    ListResults: [Result]
+    ListResults(filter: ResultFilter!, paginator: Paginator!): [Result]
     GetResultsByID(id: ID!): Result
 }
 
 type Mutation {
     CreateResult(input: InputResult!): Result
     UpdateResult(id: ID!, input: InputResult!): Result
-    DeleteResult(id: ID!): ID
+    DeleteResult(id: ID!): Result
 }
 
 #go mod init example

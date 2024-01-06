@@ -8,7 +8,6 @@ import (
 	"ResultMicroservice/graph/model"
 	"ResultMicroservice/internal/auth"
 	"context"
-	"fmt"
 )
 
 // CreateResult is the resolver for the CreateResult field.
@@ -36,21 +35,27 @@ func (r *mutationResolver) UpdateResult(ctx context.Context, id string, input mo
 }
 
 // DeleteResult is the resolver for the DeleteResult field.
-// Deleting one of your own results is allowed, and does not need SAGA.
-func (r *mutationResolver) DeleteResult(ctx context.Context, id string) (*string, error) {
+func (r *mutationResolver) DeleteResult(ctx context.Context, id string) (*model.Result, error) {
 	token := auth.TokenFromContext(ctx)
 
-	err2 := r.Service.DeleteResult(token, id)
+	result, err2 := r.Service.DeleteResult(token, id)
 	if err2 != nil {
 		return nil, err2
 	}
 
-	return &id, nil
+	return result, nil
 }
 
 // ListResults is the resolver for the ListResults field.
-func (r *queryResolver) ListResults(ctx context.Context) ([]*model.Result, error) {
-	panic(fmt.Errorf("not implemented: ListResults - ListResults"))
+func (r *queryResolver) ListResults(ctx context.Context, filter model.ResultFilter, paginator model.Paginator) ([]*model.Result, error) {
+	token := auth.TokenFromContext(ctx)
+
+	results, err := r.Service.ListResults(token, &filter, &paginator)
+	if err != nil {
+		return nil, err
+	}
+
+	return results, nil
 }
 
 // GetResultsByID is the resolver for the GetResultsByID field.

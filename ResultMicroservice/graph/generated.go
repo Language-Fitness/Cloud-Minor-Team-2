@@ -55,7 +55,7 @@ type ComplexityRoot struct {
 
 	Query struct {
 		GetResultsByID func(childComplexity int, id string) int
-		ListResults    func(childComplexity int) int
+		ListResults    func(childComplexity int, filter model.ResultFilter, paginator model.Paginator) int
 	}
 
 	Result struct {
@@ -75,10 +75,10 @@ type ComplexityRoot struct {
 type MutationResolver interface {
 	CreateResult(ctx context.Context, input model.InputResult) (*model.Result, error)
 	UpdateResult(ctx context.Context, id string, input model.InputResult) (*model.Result, error)
-	DeleteResult(ctx context.Context, id string) (*string, error)
+	DeleteResult(ctx context.Context, id string) (*model.Result, error)
 }
 type QueryResolver interface {
-	ListResults(ctx context.Context) ([]*model.Result, error)
+	ListResults(ctx context.Context, filter model.ResultFilter, paginator model.Paginator) ([]*model.Result, error)
 	GetResultsByID(ctx context.Context, id string) (*model.Result, error)
 }
 
@@ -154,7 +154,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			break
 		}
 
-		return e.complexity.Query.ListResults(childComplexity), true
+		args, err := ec.field_Query_ListResults_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.ListResults(childComplexity, args["filter"].(model.ResultFilter), args["paginator"].(model.Paginator)), true
 
 	case "Result.class_id":
 		if e.complexity.Result.ClassID == nil {
@@ -422,6 +427,30 @@ func (ec *executionContext) field_Query_GetResultsByID_args(ctx context.Context,
 	return args, nil
 }
 
+func (ec *executionContext) field_Query_ListResults_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 model.ResultFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg0, err = ec.unmarshalNResultFilter2ResultMicroserviceᚋgraphᚋmodelᚐResultFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	var arg1 model.Paginator
+	if tmp, ok := rawArgs["paginator"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("paginator"))
+		arg1, err = ec.unmarshalNPaginator2ResultMicroserviceᚋgraphᚋmodelᚐPaginator(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["paginator"] = arg1
+	return args, nil
+}
+
 func (ec *executionContext) field_Query___type_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -646,9 +675,9 @@ func (ec *executionContext) _Mutation_DeleteResult(ctx context.Context, field gr
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(*string)
+	res := resTmp.(*model.Result)
 	fc.Result = res
-	return ec.marshalOID2ᚖstring(ctx, field.Selections, res)
+	return ec.marshalOResult2ᚖResultMicroserviceᚋgraphᚋmodelᚐResult(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Mutation_DeleteResult(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -658,7 +687,29 @@ func (ec *executionContext) fieldContext_Mutation_DeleteResult(ctx context.Conte
 		IsMethod:   true,
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type ID does not have child fields")
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Result_id(ctx, field)
+			case "exercise_id":
+				return ec.fieldContext_Result_exercise_id(ctx, field)
+			case "user_id":
+				return ec.fieldContext_Result_user_id(ctx, field)
+			case "class_id":
+				return ec.fieldContext_Result_class_id(ctx, field)
+			case "module_id":
+				return ec.fieldContext_Result_module_id(ctx, field)
+			case "input":
+				return ec.fieldContext_Result_input(ctx, field)
+			case "result":
+				return ec.fieldContext_Result_result(ctx, field)
+			case "created_at":
+				return ec.fieldContext_Result_created_at(ctx, field)
+			case "updated_at":
+				return ec.fieldContext_Result_updated_at(ctx, field)
+			case "soft_deleted":
+				return ec.fieldContext_Result_soft_deleted(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Result", field.Name)
 		},
 	}
 	defer func() {
@@ -689,7 +740,7 @@ func (ec *executionContext) _Query_ListResults(ctx context.Context, field graphq
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().ListResults(rctx)
+		return ec.resolvers.Query().ListResults(rctx, fc.Args["filter"].(model.ResultFilter), fc.Args["paginator"].(model.Paginator))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -734,6 +785,17 @@ func (ec *executionContext) fieldContext_Query_ListResults(ctx context.Context, 
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Result", field.Name)
 		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_ListResults_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
 	}
 	return fc, nil
 }
@@ -3957,6 +4019,16 @@ func (ec *executionContext) marshalNInt2int(ctx context.Context, sel ast.Selecti
 		}
 	}
 	return res
+}
+
+func (ec *executionContext) unmarshalNPaginator2ResultMicroserviceᚋgraphᚋmodelᚐPaginator(ctx context.Context, v interface{}) (model.Paginator, error) {
+	res, err := ec.unmarshalInputPaginator(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNResultFilter2ResultMicroserviceᚋgraphᚋmodelᚐResultFilter(ctx context.Context, v interface{}) (model.ResultFilter, error) {
+	res, err := ec.unmarshalInputResultFilter(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) unmarshalNString2string(ctx context.Context, v interface{}) (string, error) {
