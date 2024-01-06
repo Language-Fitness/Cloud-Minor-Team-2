@@ -30,12 +30,13 @@ func main() {
 
 	tokenMiddleware := auth.Middleware
 
+	//migrations.Init()
 	srv := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{Resolvers: graph.NewResolver()}))
 
 	http.Handle("/query", tokenMiddleware(srv))
 	http.Handle("/", playground.Handler("GraphQL playground", "/query"))
 
-	//go grpcSchoolServer()
+	go grpcSchoolServer()
 
 	log.Printf("connect to http://localhost:%s/ for GraphQL playground", port)
 	log.Fatal(http.ListenAndServe(":"+port, nil))

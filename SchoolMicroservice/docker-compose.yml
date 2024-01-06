@@ -8,6 +8,7 @@ services:
     image: graph-api
     ports:
       - "8083:8083"
+      - "9050:9050"
 
   mongodb:
     container_name: mongodb
