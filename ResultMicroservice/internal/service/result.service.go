@@ -4,12 +4,14 @@ import (
 	"ResultMicroservice/graph/model"
 	"ResultMicroservice/internal/auth"
 	"ResultMicroservice/internal/database"
+	"ResultMicroservice/internal/helper"
 	"ResultMicroservice/internal/repository"
 	"ResultMicroservice/internal/validation"
 	"errors"
 	"github.com/google/uuid"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo/options"
+	"reflect"
 	"strings"
 	"time"
 )
@@ -21,7 +23,7 @@ const ValidationPrefix = "Validation errors: "
 type IResultService interface {
 	CreateResult(token string, newResult model.InputResult) (*model.Result, error)
 	UpdateResult(token string, id string, updateData model.InputResult) (*model.Result, error)
-	DeleteResult(token string, id string) error
+	DeleteResult(token string, id string) (*model.Result, error)
 	GetResultById(token string, id string) (*model.Result, error)
 	ListResults(token string, filter *model.ResultFilter, paginate *model.Paginator) ([]*model.Result, error)
 }
@@ -47,13 +49,12 @@ func NewResultService() IResultService {
 }
 
 func (r *ResultService) CreateResult(token string, newResult model.InputResult) (*model.Result, error) {
-	err := r.ResultPolicy.CreateResult(token)
+	id, err := r.ResultPolicy.CreateResult(token)
 	if err != nil {
 		return nil, err
 	}
 
 	r.ValidateResult(&newResult)
-
 	validationErrors := r.Validator.GetErrors()
 	if len(validationErrors) > 0 {
 		errorMessage := ValidationPrefix + strings.Join(validationErrors, ", ")
@@ -66,7 +67,7 @@ func (r *ResultService) CreateResult(token string, newResult model.InputResult) 
 	resultToInsert := &model.Result{
 		ID:          uuid.New().String(),
 		ExerciseID:  newResult.ExerciseID,
-		UserID:      newResult.UserID,
+		UserID:      id,
 		ClassID:     newResult.ClassID,
 		ModuleID:    newResult.ModuleID,
 		Input:       newResult.Input,
@@ -122,35 +123,7 @@ func (r *ResultService) UpdateResult(token string, id string, updateData model.I
 	return updatedResult, nil
 }
 
-func (r *ResultService) DeleteResult(token string, id string) error {
-	err := r.ResultPolicy.DeleteResult(token, id)
-	if err != nil {
-		return err
-	}
-
-	r.Validator.Validate(id, []string{"IsUUID"}, "ID")
-
-	validationErrors := r.Validator.GetErrors()
-	if len(validationErrors) > 0 {
-		errorMessage := ValidationPrefix + strings.Join(validationErrors, ", ")
-		r.Validator.ClearErrors()
-		return errors.New(errorMessage)
-	}
-
-	err2 := r.Repo.DeleteResultByID(id)
-	if err2 != nil {
-		return err2
-	}
-
-	return nil
-}
-
-func (r *ResultService) GetResultById(token string, id string) (*model.Result, error) {
-	err := r.ResultPolicy.GetResultByID(token, id)
-	if err != nil {
-		return nil, err
-	}
-
+func (r *ResultService) DeleteResult(token string, id string) (*model.Result, error) {
 	r.Validator.Validate(id, []string{"IsUUID"}, "ID")
 
 	validationErrors := r.Validator.GetErrors()
@@ -160,16 +133,47 @@ func (r *ResultService) GetResultById(token string, id string) (*model.Result, e
 		return nil, errors.New(errorMessage)
 	}
 
-	result, err := r.Repo.GetResultByID(id)
+	//validate first because policy does not validate, and does a database request
+	existingResult, err := r.ResultPolicy.DeleteResult(token, id)
 	if err != nil {
 		return nil, err
 	}
 
-	return result, nil
+	if existingResult.SoftDeleted {
+		return nil, errors.New("result already soft deleted")
+	}
+
+	existingResult.SoftDeleted = true
+	existingResult.UpdatedAt = time.Now().String()
+
+	updatedResult, err := r.Repo.UpdateResult(id, *existingResult)
+	if err != nil {
+		return nil, err
+	}
+
+	return updatedResult, nil
+}
+
+func (r *ResultService) GetResultById(token string, id string) (*model.Result, error) {
+	r.Validator.Validate(id, []string{"IsUUID"}, "ID")
+
+	validationErrors := r.Validator.GetErrors()
+	if len(validationErrors) > 0 {
+		errorMessage := ValidationPrefix + strings.Join(validationErrors, ", ")
+		r.Validator.ClearErrors()
+		return nil, errors.New(errorMessage)
+	}
+
+	ExistingResult, err := r.ResultPolicy.GetResultByID(token, id)
+	if err != nil {
+		return nil, err
+	}
+
+	return ExistingResult, nil
 }
 
 func (r *ResultService) ListResults(token string, filter *model.ResultFilter, paginate *model.Paginator) ([]*model.Result, error) {
-	err := r.ResultPolicy.ListResult(token)
+	_, err := r.ResultPolicy.ListResult(token)
 	if err != nil {
 		return nil, err
 	}
@@ -182,7 +186,10 @@ func (r *ResultService) ListResults(token string, filter *model.ResultFilter, pa
 		return nil, errors.New(errorMessage)
 	}
 
-	bsonFilter := buildBsonFilterForListResult(r.ResultPolicy, token, filter)
+	bsonFilter, errs := buildBsonFilterForListResult(r.ResultPolicy, token, filter)
+	if len(errs) > 0 {
+		return nil, helper.AggregateErrors(errs)
+	}
 
 	paginateOptions := options.Find().
 		SetSkip(int64(paginate.Step)).
@@ -206,22 +213,31 @@ func validateListResultFilter(validator validation.IValidator, filter *model.Res
 	validator.Validate(paginate.Step, []string{"IsInt", "Size:>=0"}, "Paginate Step")
 }
 
-func buildBsonFilterForListResult(policy auth.IResultPolicy, token string, filter *model.ResultFilter) bson.D {
+func buildBsonFilterForListResult(policy auth.IResultPolicy, token string, filter *model.ResultFilter) (bson.D, []error) {
 	bsonFilter := bson.D{}
+	var errs []error
 
-	appendCondition := func(key string, value interface{}) {
-		if value != nil && policy.HasPermissions(token, "filter_result_"+key) {
-			bsonFilter = append(bsonFilter, bson.E{Key: key, Value: value})
+	appendCondition := func(key string, value interface{}, dbKey string) bool {
+		if value != nil && !reflect.ValueOf(value).IsZero() && policy.HasPermissions(token, "filter_result_"+key) {
+			bsonFilter = append(bsonFilter, bson.E{Key: dbKey, Value: value})
+			return true
+		} else if value != nil && !reflect.ValueOf(value).IsZero() && !policy.HasPermissions(token, "filter_result_"+key) {
+			errs = append(errs, errors.New("invalid permissions for filter_result_"+key+" action, "))
+			return false
 		}
+		return false
 	}
 
-	appendCondition("softdeleted", filter.SoftDelete)
-	appendCondition("exerciseid", filter.ExerciseID)
-	appendCondition("userid", filter.UserID)
-	appendCondition("classid", filter.ClassID)
-	appendCondition("moduleid", filter.ModuleID)
+	b := appendCondition("softdeleted", filter.SoftDelete, "softdeleted")
+	if b == false {
+		bsonFilter = append(bsonFilter, bson.E{Key: "softdeleted", Value: false})
+	}
+	appendCondition("exercise_id", filter.ExerciseID, "exerciseid")
+	appendCondition("user_id", filter.UserID, "userid")
+	appendCondition("class_id", filter.ClassID, "classid")
+	appendCondition("module_id", filter.ModuleID, "moduleid")
 
-	return bsonFilter
+	return bsonFilter, errs
 }
 
 func (r *ResultService) ValidateResult(result *model.InputResult) {

@@ -33,9 +33,9 @@ func NewExercisePolicy(collection *mongo.Collection) IExercisePolicy {
 }
 
 func (p *ExercisePolicy) CreateExercise(bearerToken string) (string, error) {
-	uuid, roles, err2 := p.getSubAndRoles(bearerToken)
-	if err2 != nil {
-		return "", err2
+	uuid, roles, err := p.getSubAndRoles(bearerToken)
+	if err != nil {
+		return "", err
 	}
 
 	if !p.hasRole(roles, "create_exercise") {
@@ -46,13 +46,13 @@ func (p *ExercisePolicy) CreateExercise(bearerToken string) (string, error) {
 }
 
 func (p *ExercisePolicy) UpdateExercise(bearerToken string, id string) (*model.Exercise, error) {
-	uuid, roles, err2 := p.getSubAndRoles(bearerToken)
-	if err2 != nil {
-		return nil, err2
+	uuid, roles, err := p.getSubAndRoles(bearerToken)
+	if err != nil {
+		return nil, err
 	}
 
-	exercise, err := p.ExerciseRepository.GetExerciseByID(id)
-	if err != nil {
+	exercise, err2 := p.ExerciseRepository.GetExerciseByID(id)
+	if err2 != nil {
 		return nil, errors.New("exercise not found")
 	}
 

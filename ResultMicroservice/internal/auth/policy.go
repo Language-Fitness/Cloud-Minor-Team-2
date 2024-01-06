@@ -7,12 +7,14 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
+const InvalidTokenMessage = "invalid token"
+
 type IResultPolicy interface {
-	CreateResult(bearerToken string) error
+	CreateResult(bearerToken string) (string, error)
 	UpdateResult(bearerToken string, id string) (*model.Result, error)
-	DeleteResult(bearerToken string, id string) error
-	GetResultByID(bearerToken string, id string) error
-	ListResult(bearerToken string) error //TODO: implement
+	DeleteResult(bearerToken string, id string) (*model.Result, error)
+	GetResultByID(bearerToken string, id string) (*model.Result, error)
+	ListResult(bearerToken string) (bool, error)
 	HasPermissions(bearerToken string, role string) bool
 }
 
@@ -30,22 +32,17 @@ func NewResultPolicy(collection *mongo.Collection) IResultPolicy {
 	}
 }
 
-func (p *ResultPolicy) ListResult(bearerToken string) error {
-	//TODO implement me
-	panic("implement me")
-}
-
-func (p *ResultPolicy) CreateResult(bearerToken string) error {
-	_, roles, err2 := p.getSubAndRoles(bearerToken)
-	if err2 != nil {
-		return err2
+func (p *ResultPolicy) CreateResult(bearerToken string) (string, error) {
+	uuid, roles, err := p.getSubAndRoles(bearerToken)
+	if err != nil {
+		return "", err
 	}
 
 	if !p.hasRole(roles, "create_result") {
-		return errors.New("invalid permissions for this action")
+		return "", errors.New("invalid permissions for this action")
 	}
 
-	return nil
+	return uuid, nil
 }
 
 func (p *ResultPolicy) UpdateResult(bearerToken string, id string) (*model.Result, error) {
@@ -56,7 +53,7 @@ func (p *ResultPolicy) UpdateResult(bearerToken string, id string) (*model.Resul
 
 	result, err := p.ResultRepository.GetResultByID(id)
 	if err != nil {
-		return nil, errors.New("invalid permissions for this action")
+		return nil, errors.New("result not found")
 	}
 
 	if p.hasRole(roles, "update_result") && result.UserID == uuid {
@@ -70,39 +67,61 @@ func (p *ResultPolicy) UpdateResult(bearerToken string, id string) (*model.Resul
 	return nil, errors.New("invalid permissions for this action")
 }
 
-func (p *ResultPolicy) DeleteResult(bearerToken string, id string) error {
+func (p *ResultPolicy) DeleteResult(bearerToken string, id string) (*model.Result, error) {
 	uuid, roles, err2 := p.getSubAndRoles(bearerToken)
 	if err2 != nil {
-		return err2
+		return nil, err2
 	}
 
 	result, err := p.ResultRepository.GetResultByID(id)
 	if err != nil {
-		return errors.New("invalid permissions for this action")
+		return nil, errors.New("result not found")
 	}
 
 	if p.hasRole(roles, "delete_result") && result.UserID == uuid {
-		return nil
+		return result, nil
 	}
 
 	if p.hasRole(roles, "delete_result_all") {
-		return nil
+		return result, nil
 	}
 
-	return errors.New("invalid permissions for this action")
+	return nil, errors.New("invalid permissions for this action")
 }
 
-func (p *ResultPolicy) GetResultByID(bearerToken string, id string) error {
+func (p *ResultPolicy) GetResultByID(bearerToken string, id string) (*model.Result, error) {
 	_, roles, err2 := p.getSubAndRoles(bearerToken)
 	if err2 != nil {
-		return err2
+		return nil, err2
 	}
 
-	if !p.hasRole(roles, "get_result_by_id") {
-		return errors.New("invalid permissions for this action")
+	result, err := p.ResultRepository.GetResultByID(id)
+	if err != nil {
+		return nil, errors.New("result not found")
 	}
 
-	return nil
+	if !p.hasRole(roles, "get_result") {
+		return nil, errors.New("invalid permissions for this action")
+	}
+
+	return result, nil
+}
+
+func (p *ResultPolicy) ListResult(bearerToken string) (bool, error) {
+	_, roles, err := p.getSubAndRoles(bearerToken)
+	if err != nil {
+		return false, err
+	}
+
+	if p.hasRole(roles, "get_exercises_all") {
+		return true, nil
+	}
+
+	if p.hasRole(roles, "get_exercises") {
+		return false, nil
+	}
+
+	return false, errors.New("invalid permissions for this action")
 }
 
 func (p *ResultPolicy) HasPermissions(bearerToken string, role string) bool {
@@ -114,7 +133,7 @@ func (p *ResultPolicy) HasPermissions(bearerToken string, role string) bool {
 func (p *ResultPolicy) getSubAndRoles(bearerToken string) (string, []interface{}, error) {
 	token, err := p.Token.IntrospectToken(bearerToken)
 	if err != nil || token == false {
-		return "", nil, errors.New("invalid token")
+		return "", nil, errors.New("invalid token introspect")
 	}
 
 	decodeToken, err := p.Token.DecodeToken(bearerToken)
@@ -126,17 +145,17 @@ func (p *ResultPolicy) getSubAndRoles(bearerToken string) (string, []interface{}
 
 	resourceAccess, ok := decodeToken["resource_access"].(map[string]interface{})
 	if !ok {
-		return "", nil, errors.New("invalid token")
+		return "", nil, errors.New(InvalidTokenMessage)
 	}
 
 	userManagementClient, ok := resourceAccess["user-management-client"].(map[string]interface{})
 	if !ok {
-		return "", nil, errors.New("invalid token")
+		return "", nil, errors.New(InvalidTokenMessage)
 	}
 
 	roles, ok := userManagementClient["roles"].([]interface{})
 	if !ok {
-		return "", nil, errors.New("invalid token")
+		return "", nil, errors.New(InvalidTokenMessage)
 	}
 	return sub, roles, nil
 }

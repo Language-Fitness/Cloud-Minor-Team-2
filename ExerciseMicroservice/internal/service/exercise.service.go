@@ -8,7 +8,6 @@ import (
 	"ExerciseMicroservice/internal/repository"
 	"ExerciseMicroservice/internal/validation"
 	"errors"
-	"fmt"
 	"github.com/google/uuid"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -157,7 +156,7 @@ func (e *ExerciseService) DeleteExercise(token string, id string) (*model.Exerci
 
 func (e *ExerciseService) GetExerciseById(token string, id string) (*model.Exercise, error) {
 	e.Validator.Validate(id, []string{"IsUUID"}, "ID")
-	
+
 	validationErrors := e.Validator.GetErrors()
 	if len(validationErrors) > 0 {
 		errorMessage := ValidationPrefix + strings.Join(validationErrors, ", ")
@@ -179,8 +178,6 @@ func (e *ExerciseService) ListExercises(token string, filter *model.ExerciseFilt
 		return nil, err
 	}
 
-	fmt.Println("filter: ", filter)
-
 	validateListExerciseFilter(e.Validator, filter, paginate)
 	validationErrors := e.Validator.GetErrors()
 	if len(validationErrors) > 0 {
@@ -197,8 +194,6 @@ func (e *ExerciseService) ListExercises(token string, filter *model.ExerciseFilt
 	paginateOptions := options.Find().
 		SetSkip(int64(paginate.Step)).
 		SetLimit(int64(paginate.Amount))
-
-	fmt.Println("bsonFilter: ", bsonFilter)
 
 	exercises, err2 := e.Repo.ListExercises(bsonFilter, paginateOptions)
 	if err2 != nil {
