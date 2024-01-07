@@ -11,20 +11,25 @@ from proto.pb import OpenaiActions_pb2, OpenaiActions_pb2_grpc
 class OpenAIAssistantManager:
 
     def __init__(self, bearer_token):
-        self.client = None
+        # self.client = None
         self.bearer_token = bearer_token
         self.openai_key = self.get_school_from_bearer(self.bearer_token)
+        self.client = OpenAI(api_key=self.openai_key)
 
-    def load_client(self):
-        load_dotenv()
-        api_key = os.getenv("OPENAI_API_KEY")
-        # api_key = self.openai_key
 
-        if not api_key:
-            raise AuthenticationError
 
-        self.client = OpenAI(api_key=api_key)
-    
+    # def load_client(self):
+        # load_dotenv()
+        # api_key = os.getenv("OPENAI_API_KEY")
+        # api_key = self.get_school_from_bearer(self.bearer_token)
+
+        # if not api_key:
+            # raise AuthenticationError
+        # print(self.openai_key)
+        # self.client = OpenAI(api_key=self.openai_key)
+
+
+
     # !!!! DEZE IS SYNC !!!!
     def get_school_from_bearer(self, bearer):
         channel = grpc.insecure_channel("localhost:9050")
@@ -33,16 +38,20 @@ class OpenAIAssistantManager:
         channel.close()
         return response
 
+
+
     # !!!! DEZE IS ASYNC !!!!
-    async def async_call(bearer):
-        async with grpc.insecure_channel("localhost:9050") as channel:
+    async def async_call(self, bearer):
+        async with grpc.aio.insecure_channel("localhost:9050") as channel:
             stub = OpenaiActions_pb2_grpc.SchoolServiceStub(channel)
             response = await stub.GetKey(OpenaiActions_pb2.KeyRequest(bearerToken=bearer))
         print("Greeter client received: " + response.key)
 
+
+
     def create_assistant(self, assistant_json_object):
         try:
-            self.load_client()
+            # self.load_client()
 
             return self.client.beta.assistants.create(
                 instructions=assistant_json_object['instructions'],
@@ -60,7 +69,7 @@ class OpenAIAssistantManager:
 
     def delete_assistant(self, assistant_id):
         try:
-            self.load_client()
+            # self.load_client()
 
             self.client.beta.assistants.delete(assistant_id)
         except AuthenticationError:
@@ -75,7 +84,7 @@ class OpenAIAssistantManager:
 
     def create_thread(self):
         try:
-            self.load_client()
+            # self.load_client()
 
             return self.client.beta.threads.create()
         except AuthenticationError:
@@ -106,7 +115,7 @@ class OpenAIAssistantManager:
 
     def create_message(self, thread_id, message):
         try:
-            self.load_client()
+            # self.load_client()
 
             return self.client.beta.threads.messages.create(
                 thread_id=thread_id,
@@ -123,7 +132,7 @@ class OpenAIAssistantManager:
 
     def create_file(self, filename, file_like_object):
         try:
-            self.load_client()
+            # self.load_client()
 
             return self.client.files.create(
                 file=(filename, file_like_object),
@@ -165,7 +174,7 @@ class OpenAIAssistantManager:
 
     def retrieve_messages(self, thread_id):
         try:
-            self.load_client()
+            # self.load_client()
 
             return self.client.beta.threads.messages.list(
                 thread_id=thread_id
