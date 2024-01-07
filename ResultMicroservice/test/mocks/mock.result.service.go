@@ -9,27 +9,27 @@ type MockResultService struct {
 	mock.Mock
 }
 
-func (m *MockResultService) CreateResult(bearerToken string, newResult model.InputResult) (*model.Result, error) {
-	args := m.Called(bearerToken, newResult)
+func (m *MockResultService) CreateResult(token string, newResult model.InputResult) (*model.Result, error) {
+	args := m.Called(token, newResult)
 	return args.Get(0).(*model.Result), args.Error(1)
 }
 
-func (m *MockResultService) UpdateResult(bearerToken string, id string, updateData model.InputResult) (*model.Result, error) {
-	args := m.Called(bearerToken, id, updateData)
+func (m *MockResultService) UpdateResult(token string, id string, updateData model.InputResult) (*model.Result, error) {
+	args := m.Called(token, id, updateData)
 	return args.Get(0).(*model.Result), args.Error(1)
 }
 
-func (m *MockResultService) DeleteResult(bearerToken string, id string) error {
-	args := m.Called(bearerToken, id)
-	return args.Error(0)
-}
-
-func (m *MockResultService) GetResultById(bearerToken string, id string) (*model.Result, error) {
-	args := m.Called(bearerToken, id)
+func (m *MockResultService) DeleteResult(token string, id string) (*model.Result, error) {
+	args := m.Called(token, id)
 	return args.Get(0).(*model.Result), args.Error(1)
 }
 
-func (m *MockResultService) ListResults(bearerToken string) ([]*model.Result, error) {
-	args := m.Called(bearerToken)
+func (m *MockResultService) GetResultById(token string, id string) (*model.Result, error) {
+	args := m.Called(token, id)
+	return args.Get(0).(*model.Result), args.Error(1)
+}
+
+func (m *MockResultService) ListResults(token string, filter *model.ResultFilter, paginate *model.Paginator) ([]*model.Result, error) {
+	args := m.Called(token, filter, paginate)
 	return args.Get(0).([]*model.Result), args.Error(1)
 }

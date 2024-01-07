@@ -3,7 +3,9 @@ package mocks
 import (
 	"ResultMicroservice/graph/model"
 	"github.com/stretchr/testify/mock"
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 type MockResultRepository struct {
@@ -22,52 +24,12 @@ func (m *MockResultRepository) UpdateResult(id string, updatedResult model.Resul
 	return args.Get(0).(*model.Result), args.Error(1)
 }
 
-func (m *MockResultRepository) DeleteResultByID(id string) error {
-	args := m.Called(id)
-	return args.Error(0)
-}
-
 func (m *MockResultRepository) GetResultByID(id string) (*model.Result, error) {
 	args := m.Called(id)
 	return args.Get(0).(*model.Result), args.Error(1)
 }
 
-func (m *MockResultRepository) DeleteResultByClassAndUserID(classID string, userID string) error {
-	args := m.Called(classID, userID)
-	return args.Error(0)
-}
-
-func (m *MockResultRepository) SoftDeleteByUser(userID string) error {
-	args := m.Called(userID)
-	return args.Error(0)
-}
-
-func (m *MockResultRepository) SoftDeleteByClass(classID string) error {
-	args := m.Called(classID)
-	return args.Error(0)
-}
-
-func (m *MockResultRepository) SoftDeleteByModule(moduleID string) error {
-	args := m.Called(moduleID)
-	return args.Error(0)
-}
-
-func (m *MockResultRepository) DeleteByUser(userID string) error {
-	args := m.Called(userID)
-	return args.Error(0)
-}
-
-func (m *MockResultRepository) DeleteByClass(classID string) error {
-	args := m.Called(classID)
-	return args.Error(0)
-}
-
-func (m *MockResultRepository) DeleteByModule(moduleID string) error {
-	args := m.Called(moduleID)
-	return args.Error(0)
-}
-
-func (m *MockResultRepository) ListResults() ([]*model.Result, error) {
-	args := m.Called()
+func (m *MockResultRepository) ListResults(bsonFilter bson.D, paginateOptions *options.FindOptions) ([]*model.Result, error) {
+	args := m.Called(bsonFilter, paginateOptions)
 	return args.Get(0).([]*model.Result), args.Error(1)
 }
