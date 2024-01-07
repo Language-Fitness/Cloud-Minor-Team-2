@@ -1,4 +1,3 @@
-import asyncio
 import json
 import logging
 import os
@@ -11,48 +10,27 @@ from proto.pb import OpenaiActions_pb2, OpenaiActions_pb2_grpc
 class OpenAIAssistantManager:
 
     def __init__(self, bearer_token):
-        # self.client = None
-        self.bearer_token = bearer_token
-        self.openai_key = self.get_school_from_bearer(self.bearer_token)
+        load_dotenv()
+        self.openai_key = os.getenv("OPENAI_API_KEY")
+
+        if not self.openai_key:
+            res = self.get_key_with_bearer(bearer_token)
+            self.openai_key = res.key
+        
+        if not self.openai_key:
+            raise AuthenticationError
+
         self.client = OpenAI(api_key=self.openai_key)
 
-
-
-    # def load_client(self):
-        # load_dotenv()
-        # api_key = os.getenv("OPENAI_API_KEY")
-        # api_key = self.get_school_from_bearer(self.bearer_token)
-
-        # if not api_key:
-            # raise AuthenticationError
-        # print(self.openai_key)
-        # self.client = OpenAI(api_key=self.openai_key)
-
-
-
-    # !!!! DEZE IS SYNC !!!!
-    def get_school_from_bearer(self, bearer):
+    def get_key_with_bearer(self, bearer):
         channel = grpc.insecure_channel("localhost:9050")
         stub = OpenaiActions_pb2_grpc.SchoolServiceStub(channel)
         response = stub.GetKey(OpenaiActions_pb2.KeyRequest(bearerToken=bearer))
         channel.close()
         return response
 
-
-
-    # !!!! DEZE IS ASYNC !!!!
-    async def async_call(self, bearer):
-        async with grpc.aio.insecure_channel("localhost:9050") as channel:
-            stub = OpenaiActions_pb2_grpc.SchoolServiceStub(channel)
-            response = await stub.GetKey(OpenaiActions_pb2.KeyRequest(bearerToken=bearer))
-        print("Greeter client received: " + response.key)
-
-
-
     def create_assistant(self, assistant_json_object):
         try:
-            # self.load_client()
-
             return self.client.beta.assistants.create(
                 instructions=assistant_json_object['instructions'],
                 name=assistant_json_object['name'],
@@ -69,8 +47,6 @@ class OpenAIAssistantManager:
 
     def delete_assistant(self, assistant_id):
         try:
-            # self.load_client()
-
             self.client.beta.assistants.delete(assistant_id)
         except AuthenticationError:
             logging.error("Invalid OPENAI_API_KEY provided")
@@ -84,8 +60,6 @@ class OpenAIAssistantManager:
 
     def create_thread(self):
         try:
-            # self.load_client()
-
             return self.client.beta.threads.create()
         except AuthenticationError:
             logging.error("Invalid OPENAI_API_KEY provided")
@@ -115,8 +89,6 @@ class OpenAIAssistantManager:
 
     def create_message(self, thread_id, message):
         try:
-            # self.load_client()
-
             return self.client.beta.threads.messages.create(
                 thread_id=thread_id,
                 role="user",
@@ -132,8 +104,6 @@ class OpenAIAssistantManager:
 
     def create_file(self, filename, file_like_object):
         try:
-            # self.load_client()
-
             return self.client.files.create(
                 file=(filename, file_like_object),
                 purpose="assistants"
@@ -174,8 +144,6 @@ class OpenAIAssistantManager:
 
     def retrieve_messages(self, thread_id):
         try:
-            # self.load_client()
-
             return self.client.beta.threads.messages.list(
                 thread_id=thread_id
             )
