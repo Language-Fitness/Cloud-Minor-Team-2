@@ -13,16 +13,12 @@ class OpenAIAssistantManager:
     def __init__(self, bearer_token):
         self.client = None
         self.bearer_token = bearer_token
+        self.openai_key = self.get_school_from_bearer(self.bearer_token)
 
     def load_client(self):
         load_dotenv()
         api_key = os.getenv("OPENAI_API_KEY")
-
-        # response = self.get_school_from_bearer(self.bearer_token)
-        # if (response.error != ""):
-        #     print(response.error)
-        # else:
-        #     api_key = response.key
+        # api_key = self.openai_key
 
         if not api_key:
             raise AuthenticationError

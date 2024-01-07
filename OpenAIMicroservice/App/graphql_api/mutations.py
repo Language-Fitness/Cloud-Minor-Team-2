@@ -7,7 +7,6 @@ from utils.exceptions.assistant_api_exception import AssistantAPIException
 from .validators import validate_minimum_int, validate_string, validate_file
 from .security import Security
 
-
 class GenerateMultipleChoiceQuestions(graphene.Mutation):
     class Arguments:
         question_subject = SubjectEnum(required=True)
@@ -17,7 +16,6 @@ class GenerateMultipleChoiceQuestions(graphene.Mutation):
     response = graphene.Field(TokenResponse)
 
     def mutate(self, info, question_subject, question_level, amount_questions):
-
         try:
             security = Security()
             bearer_token = security.extract_token_from_header(info)
@@ -43,7 +41,6 @@ class GenerateMultipleChoiceQuestions(graphene.Mutation):
             print(str(e))
             return GenerateMultipleChoiceQuestions(TokenResponse(status="error",
                                                                  message="An unexpected error occurred while generating questions. Please try again later."))
-
 
 class ReadMultipleChoiceQuestionsFromFile(graphene.Mutation):
     class Arguments:
