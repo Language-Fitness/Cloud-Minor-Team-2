@@ -2,6 +2,7 @@ package database
 
 import (
 	"context"
+	"fmt"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"os"
@@ -15,11 +16,15 @@ var (
 
 // GetDBClient returns a singleton MongoDB client instance.
 func GetDBClient() (*mongo.Client, error) {
+	fmt.Println("ewaeaw")
+	fmt.Println(getDatabaseConnectionString())
+
 	clientOnce.Do(func() {
 		// Initialize the MongoDB client here.
 		clientOptions := options.Client().ApplyURI(getDatabaseConnectionString())
 		c, err := mongo.Connect(context.Background(), clientOptions)
 		if err != nil {
+			fmt.Println("here")
 			panic(err)
 		}
 		client = c

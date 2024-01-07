@@ -16,22 +16,21 @@ var moduleID = "09d6be4b-da77-4be0-9094-445e1a5e639a"
 
 type FakeAnswer struct {
 	Value   string `faker:"sentence"`
-	Correct bool   `faker:"bool"`
+	Correct bool
 }
 
 type FakeExercise struct {
-	ID               string `faker:"uuid_hyphenated"`
-	ClassID          string `faker:"uuid_hyphenated"`
-	ModuleID         string `faker:"uuid_hyphenated"`
-	Name             string `faker:"word"`
-	Question         string `faker:"sentence"`
-	Answers          []*FakeAnswer
-	PosCorrectAnswer int                 `faker:"int"`
-	Difficulty       model.LanguageLevel `faker:"oneof:A1,A2,B1,B2,C1,C2"`
-	CreatedAt        *string
-	UpdatedAt        *string
-	SoftDeleted      bool
-	MadeBy           string `faker:"uuid_hyphenated"`
+	ID          string `faker:"uuid_hyphenated"`
+	ClassID     string `faker:"uuid_hyphenated"`
+	ModuleID    string `faker:"uuid_hyphenated"`
+	Name        string `faker:"word"`
+	Question    string `faker:"sentence"`
+	Answers     []*FakeAnswer
+	Difficulty  model.LanguageLevel `faker:"oneof:A1,A2,B1,B2,C1,C2"`
+	CreatedAt   *string
+	UpdatedAt   *string
+	SoftDeleted bool
+	MadeBy      string `faker:"uuid_hyphenated"`
 }
 
 func InitExercise() {
