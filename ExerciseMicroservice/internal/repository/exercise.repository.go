@@ -15,13 +15,13 @@ type IExerciseRepository interface {
 	CreateExercise(newExercise *model.Exercise) (*model.Exercise, error)
 	UpdateExercise(id string, updatedExercise model.Exercise) (*model.Exercise, error)
 	GetExerciseByID(id string) (*model.Exercise, error)
-	ListExercises(bsonFilter bson.D, paginateOptions *options.FindOptions) ([]*model.Exercise, error)
+	ListExercises(bsonFilter bson.D, paginateOptions *options.FindOptions) ([]*model.ExerciseInfo, error)
 }
 
 // ExerciseRepository GOLANG STRUCT
 // Contains a model.Exercise list and a mongo.Collection.
 type ExerciseRepository struct {
-	exercises  []*model.Exercise
+	exercises  []*model.ExerciseInfo
 	collection *mongo.Collection
 }
 
@@ -29,7 +29,7 @@ type ExerciseRepository struct {
 // Returns an ExerciseRepository implementing IExerciseRepository.
 func NewExerciseRepository(collection *mongo.Collection) IExerciseRepository {
 	return &ExerciseRepository{
-		exercises:  []*model.Exercise{},
+		exercises:  []*model.ExerciseInfo{},
 		collection: collection,
 	}
 }
@@ -89,11 +89,11 @@ func (r *ExerciseRepository) GetExerciseByID(id string) (*model.Exercise, error)
 	return &result, nil
 }
 
-func (r *ExerciseRepository) ListExercises(bsonFilter bson.D, paginateOptions *options.FindOptions) ([]*model.Exercise, error) {
+func (r *ExerciseRepository) ListExercises(bsonFilter bson.D, paginateOptions *options.FindOptions) ([]*model.ExerciseInfo, error) {
 	ctx, cancel := context.WithTimeout(context.TODO(), time.Second*10) // 10-second timeout
 	defer cancel()
 
-	var exercises []*model.Exercise
+	var exercises []*model.ExerciseInfo
 
 	cursor, err := r.collection.Find(ctx, bsonFilter, paginateOptions)
 	if err != nil {
@@ -105,7 +105,7 @@ func (r *ExerciseRepository) ListExercises(bsonFilter bson.D, paginateOptions *o
 
 	// Decode results
 	for cursor.Next(ctx) {
-		var exercise model.Exercise
+		var exercise model.ExerciseInfo
 		if err := cursor.Decode(&exercise); err != nil {
 			return nil, err
 		}

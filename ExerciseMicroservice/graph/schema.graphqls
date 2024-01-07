@@ -31,8 +31,7 @@ type Exercise {
   module_id: ID!
   name: String!
   question: String!
-  answers: String!
-  pos_correct_answer: Int!
+  answers: [Answer]!
   difficulty: LanguageLevel!
   created_at: String!
   updated_at: String!
@@ -40,25 +39,45 @@ type Exercise {
   made_by: ID!
 }
 
+type ExerciseInfo {
+  id: ID!
+  class_Id: ID!
+  module_id: ID!
+  name: String!
+  question: String!
+  answers: [Answer]!
+  difficulty: LanguageLevel!
+  made_by: ID!
+}
+
+type Answer {
+  value: String!
+  correct: Boolean!
+}
+
+input AnswerInput {
+  value: String!
+  correct: Boolean!
+}
+
 input ExerciseInput {
   class_Id: ID!
   module_id: ID!
   name: String!
   question: String!
-  answers: String!
-  pos_correct_answer: Int!
+  answers: [AnswerInput]!
   difficulty: LanguageLevel!
 }
 
 type Query {
   GetExercise(ExerciseId: ID!): Exercise
-  ListExercise(filter: ExerciseFilter!, paginator: Paginator!): [Exercise]
+  ListExercise(filter: ExerciseFilter!, paginator: Paginator!): [ExerciseInfo]
 }
 
 type Mutation {
   CreateExercise(exercise: ExerciseInput!): Exercise
   UpdateExercise(id: ID!, exercise: ExerciseInput!): Exercise
-  DeleteExercise(ExerciseID: ID!): Exercise
+  DeleteExercise(ExerciseID: ID!): ID
 }
 
 

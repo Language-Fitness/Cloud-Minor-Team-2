@@ -7,6 +7,7 @@ package graph
 import (
 	"ExerciseMicroservice/graph/model"
 	"ExerciseMicroservice/internal/auth"
+	"ExerciseMicroservice/internal/helper"
 	"context"
 )
 
@@ -35,15 +36,15 @@ func (r *mutationResolver) UpdateExercise(ctx context.Context, id string, exerci
 }
 
 // DeleteExercise is the resolver for the DeleteExercise field.
-func (r *mutationResolver) DeleteExercise(ctx context.Context, exerciseID string) (*model.Exercise, error) {
+func (r *mutationResolver) DeleteExercise(ctx context.Context, exerciseID string) (*string, error) {
 	token := auth.TokenFromContext(ctx)
 
-	result, err := r.Service.DeleteExercise(token, exerciseID)
+	err := r.Service.DeleteExercise(token, exerciseID)
 	if err != nil {
 		return nil, err
 	}
 
-	return result, nil
+	return helper.StringPointer(exerciseID), nil
 }
 
 // GetExercise is the resolver for the GetExercise field.
@@ -59,7 +60,7 @@ func (r *queryResolver) GetExercise(ctx context.Context, exerciseID string) (*mo
 }
 
 // ListExercise is the resolver for the ListExercise field.
-func (r *queryResolver) ListExercise(ctx context.Context, filter model.ExerciseFilter, paginator model.Paginator) ([]*model.Exercise, error) {
+func (r *queryResolver) ListExercise(ctx context.Context, filter model.ExerciseFilter, paginator model.Paginator) ([]*model.ExerciseInfo, error) {
 	token := auth.TokenFromContext(ctx)
 
 	exercises, err := r.Service.ListExercises(token, &filter, &paginator)

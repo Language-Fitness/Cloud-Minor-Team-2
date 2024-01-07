@@ -6,7 +6,6 @@ import (
 	"context"
 	"fmt"
 	"github.com/bxcodec/faker/v3"
-	"github.com/google/uuid"
 	"log"
 	"math/rand"
 	"time"
@@ -14,7 +13,6 @@ import (
 
 var classID = "962c8541-e4be-4c06-9875-d4184b367dca"
 var moduleID = "09d6be4b-da77-4be0-9094-445e1a5e639a"
-var userID = "0e520bea-a96b-47cc-96bc-83633e47c58e"
 
 type FakeExercise struct {
 	ID               string              `faker:"uuid_hyphenated"`
@@ -24,7 +22,6 @@ type FakeExercise struct {
 	Question         string              `faker:"sentence"`
 	Answers          string              `faker:"sentence"`
 	PosCorrectAnswer int                 `faker:"int"`
-	QuestionTypeID   string              `faker:"word"`
 	Difficulty       model.LanguageLevel `faker:"oneof:A1,A2,B1,B2,C1,C2"`
 	CreatedAt        *string
 	UpdatedAt        *string
@@ -58,7 +55,6 @@ func GenerateRandomExercises(n int) []FakeExercise {
 			return nil
 		}
 
-		exercise.ID = uuid.New().String()
 		exercise.ClassID = classID
 		exercise.ModuleID = moduleID
 		exercise.SoftDeleted = false

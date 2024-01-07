@@ -8,19 +8,28 @@ import (
 	"strconv"
 )
 
+type Answer struct {
+	Value   string `json:"value"`
+	Correct bool   `json:"correct"`
+}
+
+type AnswerInput struct {
+	Value   string `json:"value"`
+	Correct bool   `json:"correct"`
+}
+
 type Exercise struct {
-	ID               string        `json:"id"`
-	ClassID          string        `json:"class_Id"`
-	ModuleID         string        `json:"module_id"`
-	Name             string        `json:"name"`
-	Question         string        `json:"question"`
-	Answers          string        `json:"answers"`
-	PosCorrectAnswer int           `json:"pos_correct_answer"`
-	Difficulty       LanguageLevel `json:"difficulty"`
-	CreatedAt        string        `json:"created_at"`
-	UpdatedAt        string        `json:"updated_at"`
-	SoftDeleted      bool          `json:"soft_deleted"`
-	MadeBy           string        `json:"made_by"`
+	ID          string        `json:"id"`
+	ClassID     string        `json:"class_Id"`
+	ModuleID    string        `json:"module_id"`
+	Name        string        `json:"name"`
+	Question    string        `json:"question"`
+	Answers     []*Answer     `json:"answers"`
+	Difficulty  LanguageLevel `json:"difficulty"`
+	CreatedAt   string        `json:"created_at"`
+	UpdatedAt   string        `json:"updated_at"`
+	SoftDeleted bool          `json:"soft_deleted"`
+	MadeBy      string        `json:"made_by"`
 }
 
 type ExerciseFilter struct {
@@ -32,14 +41,24 @@ type ExerciseFilter struct {
 	MadeBy     *string        `json:"made_by,omitempty"`
 }
 
+type ExerciseInfo struct {
+	ID         string        `json:"id"`
+	ClassID    string        `json:"class_Id"`
+	ModuleID   string        `json:"module_id"`
+	Name       string        `json:"name"`
+	Question   string        `json:"question"`
+	Answers    []*Answer     `json:"answers"`
+	Difficulty LanguageLevel `json:"difficulty"`
+	MadeBy     string        `json:"made_by"`
+}
+
 type ExerciseInput struct {
-	ClassID          string        `json:"class_Id"`
-	ModuleID         string        `json:"module_id"`
-	Name             string        `json:"name"`
-	Question         string        `json:"question"`
-	Answers          string        `json:"answers"`
-	PosCorrectAnswer int           `json:"pos_correct_answer"`
-	Difficulty       LanguageLevel `json:"difficulty"`
+	ClassID    string         `json:"class_Id"`
+	ModuleID   string         `json:"module_id"`
+	Name       string         `json:"name"`
+	Question   string         `json:"question"`
+	Answers    []*AnswerInput `json:"answers"`
+	Difficulty LanguageLevel  `json:"difficulty"`
 }
 
 type Paginator struct {

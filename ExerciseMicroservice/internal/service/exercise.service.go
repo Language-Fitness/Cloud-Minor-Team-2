@@ -23,9 +23,9 @@ const ValidationPrefix = "Validation errors: "
 type IExerciseService interface {
 	CreateExercise(token string, newExercise model.ExerciseInput) (*model.Exercise, error)
 	UpdateExercise(token string, id string, updateData model.ExerciseInput) (*model.Exercise, error)
-	DeleteExercise(token string, id string) (*model.Exercise, error)
+	DeleteExercise(token string, id string) error
 	GetExerciseById(token string, id string) (*model.Exercise, error)
-	ListExercises(token string, filter *model.ExerciseFilter, paginate *model.Paginator) ([]*model.Exercise, error)
+	ListExercises(token string, filter *model.ExerciseFilter, paginate *model.Paginator) ([]*model.ExerciseInfo, error)
 }
 
 // ExerciseService GOLANG STRUCT
@@ -61,20 +61,30 @@ func (e *ExerciseService) CreateExercise(token string, newExercise model.Exercis
 		return nil, errors.New(errorMessage)
 	}
 
+	var answerArray []*model.Answer
+
+	for _, input := range newExercise.Answers {
+		object := &model.Answer{
+			Value:   input.Value,
+			Correct: input.Correct,
+		}
+
+		answerArray = append(answerArray, object)
+	}
+
 	timestamp := time.Now().String()
 
 	exerciseToInsert := &model.Exercise{
-		ID:               uuid.New().String(),
-		ClassID:          newExercise.ClassID,
-		ModuleID:         newExercise.ModuleID,
-		Name:             newExercise.Name,
-		Question:         newExercise.Question,
-		Answers:          newExercise.Answers,
-		PosCorrectAnswer: newExercise.PosCorrectAnswer,
-		Difficulty:       newExercise.Difficulty,
-		CreatedAt:        timestamp,
-		SoftDeleted:      false,
-		MadeBy:           id,
+		ID:          uuid.New().String(),
+		ClassID:     newExercise.ClassID,
+		ModuleID:    newExercise.ModuleID,
+		Name:        newExercise.Name,
+		Question:    newExercise.Question,
+		Answers:     answerArray,
+		Difficulty:  newExercise.Difficulty,
+		CreatedAt:   timestamp,
+		SoftDeleted: false,
+		MadeBy:      id,
 	}
 
 	result, err := e.Repo.CreateExercise(exerciseToInsert)
@@ -100,18 +110,28 @@ func (e *ExerciseService) UpdateExercise(token string, id string, updateData mod
 		return nil, err
 	}
 
+	var answerArray []*model.Answer
+
+	for _, input := range updateData.Answers {
+		object := &model.Answer{
+			Value:   input.Value,
+			Correct: input.Correct,
+		}
+
+		answerArray = append(answerArray, object)
+	}
+
 	timestamp := time.Now().String()
 	newExercise := model.Exercise{
-		ID:               existingExercise.ID,
-		ClassID:          updateData.ClassID,
-		Name:             updateData.Name,
-		Question:         updateData.Question,
-		Answers:          updateData.Answers,
-		PosCorrectAnswer: updateData.PosCorrectAnswer,
-		Difficulty:       updateData.Difficulty,
-		CreatedAt:        existingExercise.CreatedAt,
-		UpdatedAt:        timestamp,
-		SoftDeleted:      existingExercise.SoftDeleted,
+		ID:          existingExercise.ID,
+		ClassID:     updateData.ClassID,
+		Name:        updateData.Name,
+		Question:    updateData.Question,
+		Answers:     answerArray,
+		Difficulty:  updateData.Difficulty,
+		CreatedAt:   existingExercise.CreatedAt,
+		UpdatedAt:   timestamp,
+		SoftDeleted: existingExercise.SoftDeleted,
 	}
 
 	result, err := e.Repo.UpdateExercise(id, newExercise)
@@ -122,34 +142,34 @@ func (e *ExerciseService) UpdateExercise(token string, id string, updateData mod
 	return result, nil
 }
 
-func (e *ExerciseService) DeleteExercise(token string, id string) (*model.Exercise, error) {
+func (e *ExerciseService) DeleteExercise(token string, id string) error {
 	e.Validator.Validate(id, []string{"IsUUID"}, "ID")
 
 	valErrors := e.Validator.GetErrors()
 	if len(valErrors) > 0 {
 		errorMessage := ValidationPrefix + strings.Join(valErrors, ", ")
 		e.Validator.ClearErrors()
-		return nil, errors.New(errorMessage)
+		return errors.New(errorMessage)
 	}
 	//validate first because policy does not validate, and does a database request
 	_, existingExercise, err := e.Policy.DeleteExercise(token, id)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	if existingExercise.SoftDeleted {
-		return nil, errors.New("exercise is already deleted")
+		return errors.New("exercise is already deleted")
 	}
 
 	existingExercise.SoftDeleted = true
 	existingExercise.UpdatedAt = time.Now().String()
 
-	result, err := e.Repo.UpdateExercise(id, *existingExercise)
+	_, err = e.Repo.UpdateExercise(id, *existingExercise)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	return result, nil
+	return nil
 }
 
 func (e *ExerciseService) GetExerciseById(token string, id string) (*model.Exercise, error) {
@@ -170,7 +190,7 @@ func (e *ExerciseService) GetExerciseById(token string, id string) (*model.Exerc
 	return existingExercise, nil
 }
 
-func (e *ExerciseService) ListExercises(token string, filter *model.ExerciseFilter, paginate *model.Paginator) ([]*model.Exercise, error) {
+func (e *ExerciseService) ListExercises(token string, filter *model.ExerciseFilter, paginate *model.Paginator) ([]*model.ExerciseInfo, error) {
 	_, err := e.Policy.ListExercises(token)
 	if err != nil {
 		return nil, err
@@ -217,7 +237,6 @@ func validateUpdatedExercise(validator validation.IValidator, id string, updated
 	validator.Validate(updatedData.Name, []string{"IsString", "Length:<50"}, "Name")
 	validator.Validate(updatedData.Question, []string{"IsString", "Length:<100"}, "Question")
 	validator.Validate(updatedData.Answers, []string{"IsString"}, "Answers")
-	validator.Validate(updatedData.PosCorrectAnswer, []string{"IsInt"}, "PosCorrectAnswer")
 	validator.Validate(updatedData.ModuleID, []string{"IsString"}, "ModuleID")
 }
 
@@ -227,7 +246,6 @@ func validateNewExercise(validator validation.IValidator, newExercise model.Exer
 	validator.Validate(newExercise.Name, []string{"IsString", "Length:<50"}, "Name")
 	validator.Validate(newExercise.Question, []string{"IsString", "Length:<100"}, "Question")
 	validator.Validate(newExercise.Answers, []string{"IsString"}, "Answers")
-	validator.Validate(newExercise.PosCorrectAnswer, []string{"IsInt"}, "PosCorrectAnswer")
 	validator.Validate(newExercise.ModuleID, []string{"IsString"}, "ModuleID")
 }
 
