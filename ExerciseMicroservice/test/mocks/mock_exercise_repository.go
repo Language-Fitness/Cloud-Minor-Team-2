@@ -10,7 +10,7 @@ import (
 
 type MockExerciseRepository struct {
 	mock.Mock
-	exercises  []*model.Exercise
+	exercises  []*model.ExerciseInfo
 	collection *mongo.Collection
 }
 
@@ -29,7 +29,7 @@ func (m *MockExerciseRepository) GetExerciseByID(id string) (*model.Exercise, er
 	return args.Get(0).(*model.Exercise), args.Error(1)
 }
 
-func (m *MockExerciseRepository) ListExercises(bsonFilter bson.D, paginateOptions *options.FindOptions) ([]*model.Exercise, error) {
+func (m *MockExerciseRepository) ListExercises(bsonFilter bson.D, paginateOptions *options.FindOptions) ([]*model.ExerciseInfo, error) {
 	args := m.Called(bsonFilter, paginateOptions)
-	return args.Get(0).([]*model.Exercise), args.Error(1)
+	return args.Get(0).([]*model.ExerciseInfo), args.Error(1)
 }

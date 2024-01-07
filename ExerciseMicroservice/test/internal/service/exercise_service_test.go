@@ -110,13 +110,10 @@ func TestExerciseService_DeleteExercise(t *testing.T) {
 		Return(&mocks.MockDeletedExercise, nil)
 
 	// Call the method being tested
-	result, err := exerciseService.DeleteExercise(userToken, mocks.ExerciseID)
+	err := exerciseService.DeleteExercise(userToken, mocks.ExerciseID)
 
 	// Assertions
 	assert.Nil(t, err)
-	assert.NotNil(t, result)
-	assert.Equal(t, mocks.MockDeletedExercise.ID, result.ID)
-	assert.True(t, result.SoftDeleted)
 
 	// Verify that the expected methods were called
 	mockPolicy.AssertExpectations(t)
@@ -176,7 +173,7 @@ func TestExerciseService_ListExercises(t *testing.T) {
 
 	// Mock Repo expectations
 	mockRepo.On("ListExercises", mock.AnythingOfType("primitive.D"), mock.AnythingOfType("*options.FindOptions")).
-		Return([]*model.Exercise{&mocks.MockExercise}, nil)
+		Return([]*model.ExerciseInfo{&mocks.MockExerciseInfo}, nil)
 
 	// Call the method being tested
 	result, err := exerciseService.ListExercises(userToken, &model.ExerciseFilter{}, &model.Paginator{})

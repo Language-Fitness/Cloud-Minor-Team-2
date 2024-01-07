@@ -19,9 +19,9 @@ func (m *MockExerciseService) UpdateExercise(token string, id string, updateData
 	return args.Get(0).(*model.Exercise), args.Error(1)
 }
 
-func (m *MockExerciseService) DeleteExercise(token string, id string) (*model.Exercise, error) {
+func (m *MockExerciseService) DeleteExercise(token string, id string) error {
 	args := m.Called(token, id)
-	return args.Get(0).(*model.Exercise), args.Error(1)
+	return args.Error(0)
 }
 
 func (m *MockExerciseService) GetExerciseById(token string, id string) (*model.Exercise, error) {
@@ -29,7 +29,7 @@ func (m *MockExerciseService) GetExerciseById(token string, id string) (*model.E
 	return args.Get(0).(*model.Exercise), args.Error(1)
 }
 
-func (m *MockExerciseService) ListExercises(token string, filter *model.ExerciseFilter, paginate *model.Paginator) ([]*model.Exercise, error) {
+func (m *MockExerciseService) ListExercises(token string, filter *model.ExerciseFilter, paginate *model.Paginator) ([]*model.ExerciseInfo, error) {
 	args := m.Called(token, filter, paginate)
-	return args.Get(0).([]*model.Exercise), args.Error(1)
+	return args.Get(0).([]*model.ExerciseInfo), args.Error(1)
 }

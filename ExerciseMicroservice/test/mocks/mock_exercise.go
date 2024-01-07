@@ -16,51 +16,64 @@ var ExerciseID2 = "3a3bd756-6353-4e29-8aba-5b3531bdb9f0"
 var ClassID = "5a7bd776-6373-4e29-8aba-5b7571bdb7f5"
 var ModuleID = "2a7bd276-2373-4e22-2aba-2b7521bdb2f6"
 
+var MockAnswerInput = model.AnswerInput{
+	Value:   "Option A",
+	Correct: false,
+}
+
 var MockExerciseInput = model.ExerciseInput{
-	ClassID:          ClassID,
-	ModuleID:         ModuleID,
-	Name:             ExerciseName,
-	Question:         ExerciseQuestion,
-	Answers:          ExerciseAnswers,
-	PosCorrectAnswer: ExercisePosCorrectAnswer,
-	Difficulty:       ExerciseDifficulty,
+	ClassID:    ClassID,
+	ModuleID:   ModuleID,
+	Name:       ExerciseName,
+	Question:   ExerciseQuestion,
+	Answers:    []*model.AnswerInput{&MockAnswerInput},
+	Difficulty: ExerciseDifficulty,
 }
 
 var MockExercise = model.Exercise{
-	ID:               ExerciseID,
-	ClassID:          ClassID,
-	ModuleID:         ModuleID,
-	Name:             ExerciseName,
-	Question:         ExerciseQuestion,
-	Answers:          ExerciseAnswers,
-	PosCorrectAnswer: ExercisePosCorrectAnswer,
-	Difficulty:       ExerciseDifficulty,
-	CreatedAt:        ExerciseCreatedAt,
-	UpdatedAt:        ExerciseUpdatedAt,
-	SoftDeleted:      ExerciseSoftDeleted,
-	MadeBy:           ExerciseMadeBy,
+	ID:          ExerciseID,
+	ClassID:     ClassID,
+	ModuleID:    ModuleID,
+	Name:        ExerciseName,
+	Question:    ExerciseQuestion,
+	Answers:     []*model.Answer{{Value: "Option A", Correct: false}},
+	Difficulty:  ExerciseDifficulty,
+	CreatedAt:   ExerciseCreatedAt,
+	UpdatedAt:   ExerciseUpdatedAt,
+	SoftDeleted: false,
+	MadeBy:      ExerciseMadeBy,
 }
 
 var MockExerciseFilter = model.ExerciseFilter{
 	Name:       &ExerciseName,
-	SoftDelete: &ExerciseSoftDeleted,
-	Difficulty: &ExerciseDifficulty,
+	SoftDelete: &MockExercise.SoftDeleted,
+	Difficulty: &MockExercise.Difficulty,
 	ClassID:    &MockExercise.ClassID,
 	ModuleID:   &MockExercise.ModuleID,
-	MadeBy:     &ExerciseMadeBy,
+	MadeBy:     &MockExercise.MadeBy,
 }
 
 var MockDeletedExercise = model.Exercise{
-	ID:               ExerciseID,
-	ClassID:          ClassID,
-	ModuleID:         ModuleID,
-	Name:             ExerciseName,
-	Question:         ExerciseQuestion,
-	Answers:          ExerciseAnswers,
-	PosCorrectAnswer: ExercisePosCorrectAnswer,
-	Difficulty:       ExerciseDifficulty,
-	CreatedAt:        ExerciseCreatedAt,
-	UpdatedAt:        ExerciseUpdatedAt,
-	SoftDeleted:      true,
-	MadeBy:           ExerciseMadeBy,
+	ID:          ExerciseID,
+	ClassID:     ClassID,
+	ModuleID:    ModuleID,
+	Name:        ExerciseName,
+	Question:    ExerciseQuestion,
+	Answers:     []*model.Answer{{Value: "Option A", Correct: false}},
+	Difficulty:  ExerciseDifficulty,
+	CreatedAt:   ExerciseCreatedAt,
+	UpdatedAt:   ExerciseUpdatedAt,
+	SoftDeleted: true,
+	MadeBy:      ExerciseMadeBy,
+}
+
+var MockExerciseInfo = model.ExerciseInfo{
+	ID:         ExerciseID,
+	ClassID:    ClassID,
+	ModuleID:   ModuleID,
+	Name:       ExerciseName,
+	Question:   ExerciseQuestion,
+	Answers:    []*model.Answer{{Value: "Option A", Correct: false}},
+	Difficulty: ExerciseDifficulty,
+	MadeBy:     ExerciseMadeBy,
 }
