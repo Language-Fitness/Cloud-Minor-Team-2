@@ -23,7 +23,7 @@ class OpenAIAssistantManager:
         self.client = OpenAI(api_key=self.openai_key)
 
     def get_key_with_bearer(self, bearer):
-        channel = grpc.insecure_channel("localhost:9050")
+        channel = grpc.insecure_channel("school-microservice-service:9050")
         stub = OpenaiActions_pb2_grpc.SchoolServiceStub(channel)
         response = stub.GetKey(OpenaiActions_pb2.KeyRequest(bearerToken=bearer))
         channel.close()

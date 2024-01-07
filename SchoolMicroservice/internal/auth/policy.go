@@ -101,6 +101,10 @@ func (p *Policy) GetSchool(bearerToken string, id string) (*model.School, error)
 		return school, nil
 	}
 
+	if p.hasRole(roles, "openai_get_school") {
+		return school, nil
+	}
+
 	return nil, errors.New(InvalidActionsMessage)
 }
 
