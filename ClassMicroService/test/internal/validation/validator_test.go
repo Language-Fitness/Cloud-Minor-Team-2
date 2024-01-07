@@ -18,12 +18,12 @@ func TestValidator_Validate(t *testing.T) {
 		arr   []string
 	}{
 		{
-			name:  "Test IsInt",
+			name:  "test IsInt",
 			input: "42",
 			arr:   []string{"IsInt"},
 		},
 		{
-			name:  "Test IsString",
+			name:  "test IsString",
 			input: "Hello, World!",
 			arr:   []string{"IsString", "Length:<5"},
 		},
@@ -37,7 +37,7 @@ func TestValidator_Validate(t *testing.T) {
 			v := validation.NewValidator()
 
 			// Call the Validate function
-			v.Validate(tc.input, tc.arr, "Test")
+			v.Validate(tc.input, tc.arr, "test")
 
 			// Add assertions here to check if the validation was successful
 

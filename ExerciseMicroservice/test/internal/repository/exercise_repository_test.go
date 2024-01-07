@@ -29,7 +29,7 @@ func TestCreateExercise(t *testing.T) {
 
 	newExercise := &model.Exercise{
 		ID:         "123",
-		Name:       "Test Exercise",
+		Name:       "test Exercise",
 		Difficulty: model.LanguageLevelA2,
 		CreatedAt:  time.Now().String(),
 	}
@@ -73,7 +73,7 @@ func TestUpdateExercise(t *testing.T) {
 
 	existingExercise := &model.Exercise{
 		ID:         "123",
-		Name:       "Test Exercise",
+		Name:       "test Exercise",
 		Difficulty: model.LanguageLevelB1,
 		CreatedAt:  time.Now().String(),
 	}
@@ -85,7 +85,7 @@ func TestUpdateExercise(t *testing.T) {
 
 	updatedExerciseInput := model.Exercise{
 		ID:         "123",
-		Name:       "Updated Test Exercise",
+		Name:       "Updated test Exercise",
 		Difficulty: model.LanguageLevelA2,
 		CreatedAt:  time.Now().String(),
 	}
@@ -129,7 +129,7 @@ func TestGetExerciseByID(t *testing.T) {
 
 	existingExercise := &model.Exercise{
 		ID:         "123",
-		Name:       "Test Exercise",
+		Name:       "test Exercise",
 		Difficulty: model.LanguageLevelA2,
 		CreatedAt:  time.Now().String(),
 	}

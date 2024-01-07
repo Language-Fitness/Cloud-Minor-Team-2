@@ -37,7 +37,7 @@ func TestCreateSchool(t *testing.T) {
 
 	newSchool := &model.School{
 		ID:              "123",
-		Name:            "Test School",
+		Name:            "test School",
 		Location:        location,
 		CreatedAt:       &timestamp,
 		SoftDeleted:     &softDeleted,
@@ -88,7 +88,7 @@ func TestUpdateSchool(t *testing.T) {
 	// Define your test data for an existing school.
 	existingSchool := &model.School{
 		ID:   "123",
-		Name: "Test School",
+		Name: "test School",
 		// Initialize other fields as needed for the existing School.
 	}
 
@@ -101,7 +101,7 @@ func TestUpdateSchool(t *testing.T) {
 	// Define the updates you want to apply to the school.
 	updatedSchoolInput := model.School{
 		ID:   "123",
-		Name: "Updated Test School",
+		Name: "Updated test School",
 		// Define other fields you want to update.
 	}
 
@@ -150,7 +150,7 @@ func TestSoftDeleteSchool(t *testing.T) {
 	isNotSoftDelete := false
 	existingSchool := &model.School{
 		ID:          "123",
-		Name:        "Test School",
+		Name:        "test School",
 		SoftDeleted: &isNotSoftDelete,
 		// Initialize other fields as needed for the existing School.
 	}
@@ -164,7 +164,7 @@ func TestSoftDeleteSchool(t *testing.T) {
 	// Define the updates you want to apply to the school.
 	updatedSchoolInput := model.School{
 		ID:          "123",
-		Name:        "Updated Test School",
+		Name:        "Updated test School",
 		SoftDeleted: &isNotSoftDelete,
 		// Define other fields you want to update.
 	}
@@ -213,7 +213,7 @@ func TestGetSchoolByID(t *testing.T) {
 	// Define your test data for an existing school.
 	existingSchool := &model.School{
 		ID:   "123",
-		Name: "Test School",
+		Name: "test School",
 		// Initialize other fields as needed for the existing school.
 	}
 

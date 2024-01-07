@@ -29,15 +29,15 @@ func TestCreateClass(t *testing.T) {
 	repo := repository.NewClassRepository(collection)
 
 	// Define your test data based on the Class struct.
-	description := "Test description."
+	description := "test description."
 	difficulty := "B2"
 	timestamp := time.Now().String()
 	softDeleted := false
 
 	newClass := &model.Class{
 		ID:          "123",
-		ModuleID:    "Test module-id",
-		Name:        "Test Class",
+		ModuleID:    "test module-id",
+		Name:        "test Class",
 		Description: description,
 		Difficulty:  model.LanguageLevel(difficulty),
 		CreatedAt:   &timestamp,
@@ -87,7 +87,7 @@ func TestUpdateClass(t *testing.T) {
 	existingClass := &model.Class{
 		ID:       "123",
 		ModuleID: "module-id",
-		Name:     "Test Class",
+		Name:     "test Class",
 		// Initialize other fields as needed for the existing class.
 	}
 
@@ -101,7 +101,7 @@ func TestUpdateClass(t *testing.T) {
 	updatedClassInput := model.Class{
 		ID:       "123",
 		ModuleID: "module-id",
-		Name:     "Updated Test Class",
+		Name:     "Updated test Class",
 		// Define other fields you want to update.
 	}
 
@@ -151,7 +151,7 @@ func TestSoftDeleteClass(t *testing.T) {
 	existingClass := &model.Class{
 		ID:          "123",
 		ModuleID:    "module-id",
-		Name:        "Test Class",
+		Name:        "test Class",
 		SoftDeleted: &isNotSoftDelete,
 		// Initialize other fields as needed for the existing class.
 	}
@@ -167,7 +167,7 @@ func TestSoftDeleteClass(t *testing.T) {
 	updatedClassInput := model.Class{
 		ID:          "123",
 		ModuleID:    "module-id",
-		Name:        "Test Class",
+		Name:        "test Class",
 		SoftDeleted: &isSoftDelete,
 		// Define other fields you want to update.
 	}
@@ -215,7 +215,7 @@ func TestGetClassByID(t *testing.T) {
 	// Define your test data for an existing class.
 	existingClass := &model.Class{
 		ID:   "123",
-		Name: "Test Class",
+		Name: "test Class",
 		// Initialize other fields as needed for the existing class.
 	}
 

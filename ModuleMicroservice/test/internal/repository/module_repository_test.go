@@ -29,9 +29,9 @@ func TestCreateModule(t *testing.T) {
 	repo := repository.NewModuleRepository(collection)
 
 	// Define your test data based on the Module struct.
-	desc := "Test description"
+	desc := "test description"
 	category := "Grammatica"
-	user := "Test user"
+	user := "test user"
 	key := "test-key"
 	createdAt := "2023-10-27"
 	difficulty := "A1"
@@ -39,7 +39,7 @@ func TestCreateModule(t *testing.T) {
 
 	newModule := &model.Module{
 		ID:          "123",
-		Name:        "Test Module",
+		Name:        "test Module",
 		SchoolID:    "e5ba872c-cb9a-4cac-9a89-d7a2f3f1e4f1",
 		Description: desc,
 		Difficulty:  model.LanguageLevel(difficulty),
@@ -94,7 +94,7 @@ func TestUpdateModule(t *testing.T) {
 	// Define your test data for an existing module.
 	existingModule := &model.Module{
 		ID:   "123",
-		Name: "Test Module",
+		Name: "test Module",
 		// Initialize other fields as needed for the existing module.
 	}
 
@@ -107,7 +107,7 @@ func TestUpdateModule(t *testing.T) {
 	// Define the updates you want to apply to the module.
 	updatedModuleInput := model.Module{
 		ID:   "123",
-		Name: "Updated Test Module",
+		Name: "Updated test Module",
 		// Define other fields you want to update.
 	}
 
@@ -156,7 +156,7 @@ func TestSoftDeleteModule(t *testing.T) {
 	isNotSoftDelete := false
 	existingModule := &model.Module{
 		ID:          "123",
-		Name:        "Test Module",
+		Name:        "test Module",
 		SoftDeleted: &isNotSoftDelete,
 		// Initialize other fields as needed for the existing module.
 	}
@@ -170,7 +170,7 @@ func TestSoftDeleteModule(t *testing.T) {
 	// Define the updates you want to apply to the module.
 	updatedModuleInput := model.Module{
 		ID:          "123",
-		Name:        "Updated Test Module",
+		Name:        "Updated test Module",
 		SoftDeleted: &isNotSoftDelete,
 		// Define other fields you want to update.
 	}
@@ -219,7 +219,7 @@ func TestGetModuleByID(t *testing.T) {
 	// Define your test data for an existing module.
 	existingModule := &model.Module{
 		ID:   "123",
-		Name: "Test Module",
+		Name: "test Module",
 		// Initialize other fields as needed for the existing module.
 	}
 
