@@ -6,7 +6,6 @@ input ExerciseFilter {
   name: String
   softDelete: Boolean
   difficulty: LanguageLevel
-  question_type_id: ID
   class_Id: ID
   module_id: ID
   made_by: ID
@@ -34,7 +33,6 @@ type Exercise {
   question: String!
   answers: String!
   pos_correct_answer: Int!
-  question_type_id: ID!
   difficulty: LanguageLevel!
   created_at: String!
   updated_at: String!
@@ -49,7 +47,6 @@ input ExerciseInput {
   question: String!
   answers: String!
   pos_correct_answer: Int!
-  question_type_id: ID!
   difficulty: LanguageLevel!
 }
 

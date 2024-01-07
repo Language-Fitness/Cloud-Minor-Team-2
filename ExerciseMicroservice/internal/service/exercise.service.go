@@ -71,7 +71,6 @@ func (e *ExerciseService) CreateExercise(token string, newExercise model.Exercis
 		Question:         newExercise.Question,
 		Answers:          newExercise.Answers,
 		PosCorrectAnswer: newExercise.PosCorrectAnswer,
-		QuestionTypeID:   newExercise.QuestionTypeID,
 		Difficulty:       newExercise.Difficulty,
 		CreatedAt:        timestamp,
 		SoftDeleted:      false,
@@ -109,7 +108,6 @@ func (e *ExerciseService) UpdateExercise(token string, id string, updateData mod
 		Question:         updateData.Question,
 		Answers:          updateData.Answers,
 		PosCorrectAnswer: updateData.PosCorrectAnswer,
-		QuestionTypeID:   updateData.QuestionTypeID,
 		Difficulty:       updateData.Difficulty,
 		CreatedAt:        existingExercise.CreatedAt,
 		UpdatedAt:        timestamp,
@@ -206,7 +204,6 @@ func (e *ExerciseService) ListExercises(token string, filter *model.ExerciseFilt
 func validateListExerciseFilter(validator validation.IValidator, filter *model.ExerciseFilter, paginate *model.Paginator) {
 	validator.Validate(filter.SoftDelete, []string{"IsNull", "IsBoolean"}, "Filter SoftDelete")
 	validator.Validate(filter.Name, []string{"IsNull", "IsString"}, "Filter Name")
-	validator.Validate(filter.QuestionTypeID, []string{"IsNull", "IsString"}, "Filter QuestionTypeID")
 	validator.Validate(filter.ClassID, []string{"IsNull", "IsString"}, "Filter ClassID")
 	validator.Validate(filter.ModuleID, []string{"IsNull", "IsString"}, "Filter ModuleID")
 	validator.Validate(filter.MadeBy, []string{"IsNull", "IsString"}, "Filter MadeBy")
@@ -221,7 +218,6 @@ func validateUpdatedExercise(validator validation.IValidator, id string, updated
 	validator.Validate(updatedData.Question, []string{"IsString", "Length:<100"}, "Question")
 	validator.Validate(updatedData.Answers, []string{"IsString"}, "Answers")
 	validator.Validate(updatedData.PosCorrectAnswer, []string{"IsInt"}, "PosCorrectAnswer")
-	validator.Validate(updatedData.QuestionTypeID, []string{"IsString"}, "QuestionTypeID")
 	validator.Validate(updatedData.ModuleID, []string{"IsString"}, "ModuleID")
 }
 
@@ -232,7 +228,6 @@ func validateNewExercise(validator validation.IValidator, newExercise model.Exer
 	validator.Validate(newExercise.Question, []string{"IsString", "Length:<100"}, "Question")
 	validator.Validate(newExercise.Answers, []string{"IsString"}, "Answers")
 	validator.Validate(newExercise.PosCorrectAnswer, []string{"IsInt"}, "PosCorrectAnswer")
-	validator.Validate(newExercise.QuestionTypeID, []string{"IsString"}, "QuestionTypeID")
 	validator.Validate(newExercise.ModuleID, []string{"IsString"}, "ModuleID")
 }
 
@@ -259,7 +254,6 @@ func buildBsonFilterForListExercise(policy auth.IExercisePolicy, token string, f
 	}
 	appendCondition("name", filter.Name, "name")
 	appendCondition("difficulty", filter.Difficulty, "difficulty")
-	appendCondition("question_type_id", filter.QuestionTypeID, "questiontypeid")
 	appendCondition("class_id", filter.ClassID, "classid")
 	appendCondition("module_id", filter.ModuleID, "moduleid")
 	appendCondition("made_by", filter.MadeBy, "madeby")

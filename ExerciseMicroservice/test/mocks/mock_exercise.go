@@ -6,7 +6,6 @@ var ExerciseName = "Sample Exercise"
 var ExerciseQuestion = "This is a sample question."
 var ExerciseAnswers = "Option A, Option B, Option C"
 var ExercisePosCorrectAnswer = 1
-var ExerciseQuestionTypeID = "question-type-id"
 var ExerciseDifficulty = model.LanguageLevelB1
 var ExerciseCreatedAt = "2024-01-03T12:00:00Z"
 var ExerciseUpdatedAt = "2024-01-03T13:30:00Z"
@@ -24,7 +23,6 @@ var MockExerciseInput = model.ExerciseInput{
 	Question:         ExerciseQuestion,
 	Answers:          ExerciseAnswers,
 	PosCorrectAnswer: ExercisePosCorrectAnswer,
-	QuestionTypeID:   ExerciseQuestionTypeID,
 	Difficulty:       ExerciseDifficulty,
 }
 
@@ -36,7 +34,6 @@ var MockExercise = model.Exercise{
 	Question:         ExerciseQuestion,
 	Answers:          ExerciseAnswers,
 	PosCorrectAnswer: ExercisePosCorrectAnswer,
-	QuestionTypeID:   ExerciseQuestionTypeID,
 	Difficulty:       ExerciseDifficulty,
 	CreatedAt:        ExerciseCreatedAt,
 	UpdatedAt:        ExerciseUpdatedAt,
@@ -45,13 +42,12 @@ var MockExercise = model.Exercise{
 }
 
 var MockExerciseFilter = model.ExerciseFilter{
-	Name:           &ExerciseName,
-	SoftDelete:     &ExerciseSoftDeleted,
-	Difficulty:     &ExerciseDifficulty,
-	QuestionTypeID: &ExerciseQuestionTypeID,
-	ClassID:        &MockExercise.ClassID,
-	ModuleID:       &MockExercise.ModuleID,
-	MadeBy:         &ExerciseMadeBy,
+	Name:       &ExerciseName,
+	SoftDelete: &ExerciseSoftDeleted,
+	Difficulty: &ExerciseDifficulty,
+	ClassID:    &MockExercise.ClassID,
+	ModuleID:   &MockExercise.ModuleID,
+	MadeBy:     &ExerciseMadeBy,
 }
 
 var MockDeletedExercise = model.Exercise{
@@ -62,7 +58,6 @@ var MockDeletedExercise = model.Exercise{
 	Question:         ExerciseQuestion,
 	Answers:          ExerciseAnswers,
 	PosCorrectAnswer: ExercisePosCorrectAnswer,
-	QuestionTypeID:   ExerciseQuestionTypeID,
 	Difficulty:       ExerciseDifficulty,
 	CreatedAt:        ExerciseCreatedAt,
 	UpdatedAt:        ExerciseUpdatedAt,

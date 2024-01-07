@@ -16,7 +16,6 @@ type Exercise struct {
 	Question         string        `json:"question"`
 	Answers          string        `json:"answers"`
 	PosCorrectAnswer int           `json:"pos_correct_answer"`
-	QuestionTypeID   string        `json:"question_type_id"`
 	Difficulty       LanguageLevel `json:"difficulty"`
 	CreatedAt        string        `json:"created_at"`
 	UpdatedAt        string        `json:"updated_at"`
@@ -25,13 +24,12 @@ type Exercise struct {
 }
 
 type ExerciseFilter struct {
-	Name           *string        `json:"name,omitempty"`
-	SoftDelete     *bool          `json:"softDelete,omitempty"`
-	Difficulty     *LanguageLevel `json:"difficulty,omitempty"`
-	QuestionTypeID *string        `json:"question_type_id,omitempty"`
-	ClassID        *string        `json:"class_Id,omitempty"`
-	ModuleID       *string        `json:"module_id,omitempty"`
-	MadeBy         *string        `json:"made_by,omitempty"`
+	Name       *string        `json:"name,omitempty"`
+	SoftDelete *bool          `json:"softDelete,omitempty"`
+	Difficulty *LanguageLevel `json:"difficulty,omitempty"`
+	ClassID    *string        `json:"class_Id,omitempty"`
+	ModuleID   *string        `json:"module_id,omitempty"`
+	MadeBy     *string        `json:"made_by,omitempty"`
 }
 
 type ExerciseInput struct {
@@ -41,7 +39,6 @@ type ExerciseInput struct {
 	Question         string        `json:"question"`
 	Answers          string        `json:"answers"`
 	PosCorrectAnswer int           `json:"pos_correct_answer"`
-	QuestionTypeID   string        `json:"question_type_id"`
 	Difficulty       LanguageLevel `json:"difficulty"`
 }
 

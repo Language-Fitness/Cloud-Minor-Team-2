@@ -98,6 +98,9 @@ func TestExerciseService_DeleteExercise(t *testing.T) {
 		Policy:    mockPolicy,
 	}
 
+	// Mock Validator expectations
+	mockValidator.On("GetErrors").Return([]string{})
+
 	// Mock Policy expectations
 	mockPolicy.On("DeleteExercise", mock.AnythingOfType("string"), mock.AnythingOfType("string")).
 		Return(true, &model.Exercise{}, nil)
@@ -132,6 +135,9 @@ func TestExerciseService_GetExerciseById(t *testing.T) {
 		Repo:      mockRepo,
 		Policy:    mockPolicy,
 	}
+
+	// Mock Validator expectations
+	mockValidator.On("GetErrors").Return([]string{})
 
 	// Mock Policy expectations
 	mockPolicy.On("GetExercise", mock.AnythingOfType("string"), mock.AnythingOfType("string")).

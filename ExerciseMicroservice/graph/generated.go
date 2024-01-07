@@ -58,7 +58,6 @@ type ComplexityRoot struct {
 		Name             func(childComplexity int) int
 		PosCorrectAnswer func(childComplexity int) int
 		Question         func(childComplexity int) int
-		QuestionTypeID   func(childComplexity int) int
 		SoftDeleted      func(childComplexity int) int
 		UpdatedAt        func(childComplexity int) int
 	}
@@ -173,13 +172,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Exercise.Question(childComplexity), true
-
-	case "Exercise.question_type_id":
-		if e.complexity.Exercise.QuestionTypeID == nil {
-			break
-		}
-
-		return e.complexity.Exercise.QuestionTypeID(childComplexity), true
 
 	case "Exercise.soft_deleted":
 		if e.complexity.Exercise.SoftDeleted == nil {
@@ -836,50 +828,6 @@ func (ec *executionContext) fieldContext_Exercise_pos_correct_answer(ctx context
 	return fc, nil
 }
 
-func (ec *executionContext) _Exercise_question_type_id(ctx context.Context, field graphql.CollectedField, obj *model.Exercise) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Exercise_question_type_id(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.QuestionTypeID, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	fc.Result = res
-	return ec.marshalNID2string(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Exercise_question_type_id(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Exercise",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type ID does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
 func (ec *executionContext) _Exercise_difficulty(ctx context.Context, field graphql.CollectedField, obj *model.Exercise) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Exercise_difficulty(ctx, field)
 	if err != nil {
@@ -1150,8 +1098,6 @@ func (ec *executionContext) fieldContext_Mutation_CreateExercise(ctx context.Con
 				return ec.fieldContext_Exercise_answers(ctx, field)
 			case "pos_correct_answer":
 				return ec.fieldContext_Exercise_pos_correct_answer(ctx, field)
-			case "question_type_id":
-				return ec.fieldContext_Exercise_question_type_id(ctx, field)
 			case "difficulty":
 				return ec.fieldContext_Exercise_difficulty(ctx, field)
 			case "created_at":
@@ -1230,8 +1176,6 @@ func (ec *executionContext) fieldContext_Mutation_UpdateExercise(ctx context.Con
 				return ec.fieldContext_Exercise_answers(ctx, field)
 			case "pos_correct_answer":
 				return ec.fieldContext_Exercise_pos_correct_answer(ctx, field)
-			case "question_type_id":
-				return ec.fieldContext_Exercise_question_type_id(ctx, field)
 			case "difficulty":
 				return ec.fieldContext_Exercise_difficulty(ctx, field)
 			case "created_at":
@@ -1310,8 +1254,6 @@ func (ec *executionContext) fieldContext_Mutation_DeleteExercise(ctx context.Con
 				return ec.fieldContext_Exercise_answers(ctx, field)
 			case "pos_correct_answer":
 				return ec.fieldContext_Exercise_pos_correct_answer(ctx, field)
-			case "question_type_id":
-				return ec.fieldContext_Exercise_question_type_id(ctx, field)
 			case "difficulty":
 				return ec.fieldContext_Exercise_difficulty(ctx, field)
 			case "created_at":
@@ -1390,8 +1332,6 @@ func (ec *executionContext) fieldContext_Query_GetExercise(ctx context.Context, 
 				return ec.fieldContext_Exercise_answers(ctx, field)
 			case "pos_correct_answer":
 				return ec.fieldContext_Exercise_pos_correct_answer(ctx, field)
-			case "question_type_id":
-				return ec.fieldContext_Exercise_question_type_id(ctx, field)
 			case "difficulty":
 				return ec.fieldContext_Exercise_difficulty(ctx, field)
 			case "created_at":
@@ -1470,8 +1410,6 @@ func (ec *executionContext) fieldContext_Query_ListExercise(ctx context.Context,
 				return ec.fieldContext_Exercise_answers(ctx, field)
 			case "pos_correct_answer":
 				return ec.fieldContext_Exercise_pos_correct_answer(ctx, field)
-			case "question_type_id":
-				return ec.fieldContext_Exercise_question_type_id(ctx, field)
 			case "difficulty":
 				return ec.fieldContext_Exercise_difficulty(ctx, field)
 			case "created_at":
@@ -3409,7 +3347,7 @@ func (ec *executionContext) unmarshalInputExerciseFilter(ctx context.Context, ob
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"name", "softDelete", "difficulty", "question_type_id", "class_Id", "module_id", "made_by"}
+	fieldsInOrder := [...]string{"name", "softDelete", "difficulty", "class_Id", "module_id", "made_by"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -3443,15 +3381,6 @@ func (ec *executionContext) unmarshalInputExerciseFilter(ctx context.Context, ob
 				return it, err
 			}
 			it.Difficulty = data
-		case "question_type_id":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("question_type_id"))
-			data, err := ec.unmarshalOID2ᚖstring(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.QuestionTypeID = data
 		case "class_Id":
 			var err error
 
@@ -3492,7 +3421,7 @@ func (ec *executionContext) unmarshalInputExerciseInput(ctx context.Context, obj
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"class_Id", "module_id", "name", "question", "answers", "pos_correct_answer", "question_type_id", "difficulty"}
+	fieldsInOrder := [...]string{"class_Id", "module_id", "name", "question", "answers", "pos_correct_answer", "difficulty"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -3553,15 +3482,6 @@ func (ec *executionContext) unmarshalInputExerciseInput(ctx context.Context, obj
 				return it, err
 			}
 			it.PosCorrectAnswer = data
-		case "question_type_id":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("question_type_id"))
-			data, err := ec.unmarshalNID2string(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.QuestionTypeID = data
 		case "difficulty":
 			var err error
 
@@ -3666,11 +3586,6 @@ func (ec *executionContext) _Exercise(ctx context.Context, sel ast.SelectionSet,
 			}
 		case "pos_correct_answer":
 			out.Values[i] = ec._Exercise_pos_correct_answer(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
-		case "question_type_id":
-			out.Values[i] = ec._Exercise_question_type_id(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
