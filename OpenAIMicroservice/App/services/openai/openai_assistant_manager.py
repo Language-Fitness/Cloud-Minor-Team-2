@@ -25,6 +25,7 @@ class OpenAIAssistantManager:
 
         self.client = OpenAI(api_key=api_key)
     
+    # !!!! DEZE IS SYNC !!!!
     def get_school_from_bearer(self, bearer):
         channel = grpc.insecure_channel("localhost:9050")
         stub = OpenaiActions_pb2_grpc.SchoolServiceStub(channel)
@@ -32,6 +33,7 @@ class OpenAIAssistantManager:
         channel.close()
         return response
 
+    # !!!! DEZE IS ASYNC !!!!
     async def async_call(bearer):
         async with grpc.insecure_channel("localhost:9050") as channel:
             stub = OpenaiActions_pb2_grpc.SchoolServiceStub(channel)
