@@ -10,7 +10,7 @@ import (
 func TestRules_IsInt(t *testing.T) {
 	validator := validation.NewRules()
 
-	// test cases
+	// Test cases
 	testCases := []struct {
 		input    string
 		expected bool
@@ -34,7 +34,7 @@ func TestRules_IsInt(t *testing.T) {
 func TestRules_IsString(t *testing.T) {
 	validator := validation.NewRules()
 
-	// test cases
+	// Test cases
 	testCases := []struct {
 		input    interface{}
 		expected bool
@@ -65,7 +65,7 @@ func toString(v interface{}) string {
 func TestRules_IsUUID(t *testing.T) {
 	validator := validation.NewRules()
 
-	// test cases
+	// Test cases
 	testCases := []struct {
 		input    string
 		expected bool
@@ -89,7 +89,7 @@ func TestRules_IsUUID(t *testing.T) {
 func TestRules_IsBoolean(t *testing.T) {
 	validator := validation.NewRules()
 
-	// test cases
+	// Test cases
 	testCases := []struct {
 		input    interface{}
 		expected bool
@@ -113,7 +113,7 @@ func TestRules_IsBoolean(t *testing.T) {
 func TestRules_IsDatetime(t *testing.T) {
 	validator := validation.NewRules()
 
-	// test cases
+	// Test cases
 	testCases := []struct {
 		input    string
 		expected bool
@@ -136,7 +136,7 @@ func TestRules_IsDatetime(t *testing.T) {
 func TestRules_IsArray(t *testing.T) {
 	validator := validation.NewRules()
 
-	// test cases
+	// Test cases
 	testCases := []struct {
 		input    interface{}
 		expected bool
@@ -160,7 +160,7 @@ func TestRules_IsArray(t *testing.T) {
 func TestRules_ArrayType(t *testing.T) {
 	validator := validation.NewRules()
 
-	// test cases
+	// Test cases
 	testCases := []struct {
 		input        interface{}
 		expectedType string

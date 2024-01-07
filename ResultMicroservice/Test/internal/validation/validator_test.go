@@ -1,7 +1,7 @@
 package validation
 
 import (
-	"ExerciseMicroservice/internal/validation"
+	"ResultMicroservice/internal/validation"
 	"fmt"
 	_ "fmt"
 	_ "reflect"
@@ -37,7 +37,7 @@ func TestValidator_Validate(t *testing.T) {
 			v := validation.NewValidator()
 
 			// Call the Validate function
-			v.Validate(tc.input, tc.arr, "Test")
+			v.Validate(tc.input, tc.arr)
 
 			// Add assertions here to check if the validation was successful
 

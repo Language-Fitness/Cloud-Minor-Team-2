@@ -18,12 +18,12 @@ func TestValidator_Validate(t *testing.T) {
 		arr   []string
 	}{
 		{
-			name:  "test IsInt",
+			name:  "Test IsInt",
 			input: "42",
 			arr:   []string{"IsInt"},
 		},
 		{
-			name:  "test IsString",
+			name:  "Test IsString",
 			input: "Hello, World!",
 			arr:   []string{"IsString", "Length:<5"},
 		},
