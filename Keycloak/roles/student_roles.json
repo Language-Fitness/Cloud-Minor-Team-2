@@ -58,5 +58,8 @@
   },
   {
     "name": "filter_result_module_id"
+  },
+  {
+    "name": "openai_get_school"
   }
 ]

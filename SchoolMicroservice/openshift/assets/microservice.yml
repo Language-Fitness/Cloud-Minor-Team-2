@@ -17,6 +17,7 @@ spec:
           image: microservice_image
           ports:
             - containerPort: 8083
+            - containerPort: 9050
           readinessProbe:
             timeoutSeconds: 3
             initialDelaySeconds: 5
@@ -43,6 +44,10 @@ spec:
     - name: http
       port: 8083
       targetPort: 8083
+    - name: tcp
+      port: 9050
+      targetPort: 9050
+      protocol: TCP
   selector:
     app: school-microservice
 ---
