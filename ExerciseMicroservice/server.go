@@ -3,7 +3,6 @@ package main
 import (
 	"ExerciseMicroservice/graph"
 	"ExerciseMicroservice/internal/auth"
-	"ExerciseMicroservice/internal/database/migrations"
 	"github.com/joho/godotenv"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"log"
@@ -31,7 +30,7 @@ func main() {
 
 	tokenMiddleware := auth.Middleware
 
-	migrations.InitExercise()
+	//migrations.InitExercise()
 
 	srv := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{Resolvers: graph.NewResolver()}))
 

@@ -1,5 +1,6 @@
-#DB_HOST=mongodb://root:example@mongodb:27017
-DB_HOST=mongodb://root:password@exercise-mongodb-service:27017
+DB_HOST=mongodb://root:example@mongodb_exercise:27017
+#DB_HOST=mongodb://root:password@exercise-mongodb-service:27017
+
 DB_NAME=mongodb
 DB_COLLECTION=exercise
 
