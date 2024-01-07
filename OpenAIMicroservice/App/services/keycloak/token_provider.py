@@ -38,7 +38,7 @@ class TokenProvider:
         return active, None
 
     @staticmethod
-    def decode_token(self, token):
+    def decode_token(token):
         parts = token.split(".")
         if len(parts) != 3:
             return None, ValueError("Invalid token format")
