@@ -14,13 +14,18 @@ import (
 var classID = "962c8541-e4be-4c06-9875-d4184b367dca"
 var moduleID = "09d6be4b-da77-4be0-9094-445e1a5e639a"
 
+type FakeAnswer struct {
+	Value   string `faker:"sentence"`
+	Correct bool   `faker:"bool"`
+}
+
 type FakeExercise struct {
-	ID               string              `faker:"uuid_hyphenated"`
-	ClassID          string              `faker:"uuid_hyphenated"`
-	ModuleID         string              `faker:"uuid_hyphenated"`
-	Name             string              `faker:"word"`
-	Question         string              `faker:"sentence"`
-	Answers          string              `faker:"sentence"`
+	ID               string `faker:"uuid_hyphenated"`
+	ClassID          string `faker:"uuid_hyphenated"`
+	ModuleID         string `faker:"uuid_hyphenated"`
+	Name             string `faker:"word"`
+	Question         string `faker:"sentence"`
+	Answers          []*FakeAnswer
 	PosCorrectAnswer int                 `faker:"int"`
 	Difficulty       model.LanguageLevel `faker:"oneof:A1,A2,B1,B2,C1,C2"`
 	CreatedAt        *string
