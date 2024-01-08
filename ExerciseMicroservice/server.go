@@ -3,9 +3,14 @@ package main
 import (
 	"ExerciseMicroservice/graph"
 	"ExerciseMicroservice/internal/auth"
+	"ExerciseMicroservice/internal/database"
+	service "ExerciseMicroservice/internal/rpc"
+	"ExerciseMicroservice/proto/pb"
 	"github.com/joho/godotenv"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
+	"google.golang.org/grpc"
 	"log"
+	"net"
 	"net/http"
 	"os"
 
@@ -37,6 +42,24 @@ func main() {
 	http.Handle("/query", tokenMiddleware(srv))
 	http.Handle("/", playground.Handler("GraphQL playground", "/query"))
 
+	go grpcSagaServer()
+
 	log.Printf("connect to http://localhost:%s/ for GraphQL playground", port)
 	log.Fatal(http.ListenAndServe(":"+port, nil))
+}
+
+func grpcSagaServer() {
+	lis, err := net.Listen("tcp", ":9094")
+	if err != nil {
+		log.Fatalf("Failed to listen: %v", err)
+	}
+
+	grpcServer := grpc.NewServer()
+	collection, _ := database.GetCollection()
+	pb.RegisterGRPCSagaServiceServer(grpcServer, service.NewSagaService(collection))
+
+	log.Printf("server listening at %v", lis.Addr())
+	if err := grpcServer.Serve(lis); err != nil {
+		log.Fatalf("Failed to serve: %v", err)
+	}
 }
