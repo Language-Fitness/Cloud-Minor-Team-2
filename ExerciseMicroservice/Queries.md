@@ -8,8 +8,10 @@
        module_id
        name
        question
-       answers
-       pos_correct_answer
+       answers {
+         value
+         correct
+       }
        difficulty
        created_at
        updated_at
@@ -19,27 +21,33 @@
    }
    ```
 
-2. **List Exercises with Filters and Pagination:**
+2. **List Exercises with Filtering and Pagination:**
    ```graphql
    query {
-     ListExercise(filter: { 
-     name: "yourExerciseName", 
-     difficulty: B1, class_Id: "yourClassId" }, 
-     paginator: { 
-        amount: 10, 
-        Step: 1 }) 
-   {
+     ListExercise(
+       filter: {
+         name: "yourExerciseName"
+         softDelete: true
+         difficulty: A1
+         class_Id: "yourClassId"
+         module_id: "yourModuleId"
+         made_by: "yourMadeById"
+       }
+       paginator: {
+         amount: 10
+         Step: 1
+       }
+     ) {
        id
        class_Id
        module_id
        name
        question
-       answers
-       pos_correct_answer
+       answers {
+         value
+         correct
+       }
        difficulty
-       created_at
-       updated_at
-       soft_deleted
        made_by
      }
    }
@@ -51,23 +59,25 @@
      CreateExercise(exercise: {
        class_Id: "yourClassId"
        module_id: "yourModuleId"
-       name: "NewExercise"
+       name: "New Exercise"
        question: "What is the question?"
-       answers: "Option A,Option B,Option C"
-       pos_correct_answer: 2
-       difficulty: B2
+       answers: [
+         { value: "Option 1", correct: true },
+         { value: "Option 2", correct: false },
+         { value: "Option 3", correct: false }
+       ]
+       difficulty: A2
      }) {
        id
        class_Id
        module_id
        name
        question
-       answers
-       pos_correct_answer
+       answers {
+         value
+         correct
+       }
        difficulty
-       created_at
-       updated_at
-       soft_deleted
        made_by
      }
    }
@@ -77,25 +87,27 @@
    ```graphql
    mutation {
      UpdateExercise(id: "yourExerciseId", exercise: {
-       class_Id: "updatedClassId"
-       module_id: "updatedModuleId"
-       name: "UpdatedExercise"
+       class_Id: "yourUpdatedClassId"
+       module_id: "yourUpdatedModuleId"
+       name: "Updated Exercise"
        question: "What is the updated question?"
-       answers: "Option A,Option B,Option C,Option D"
-       pos_correct_answer: 3
-       difficulty: C1
+       answers: [
+         { value: "Updated Option 1", correct: true },
+         { value: "Updated Option 2", correct: false },
+         { value: "Updated Option 3", correct: false }
+       ]
+       difficulty: B1
      }) {
        id
        class_Id
        module_id
        name
        question
-       answers
-       pos_correct_answer
+       answers {
+         value
+         correct
+       }
        difficulty
-       created_at
-       updated_at
-       soft_deleted
        made_by
      }
    }
@@ -104,19 +116,6 @@
 5. **Delete Exercise:**
    ```graphql
    mutation {
-     DeleteExercise(ExerciseID: "yourExerciseId") {
-       id
-       class_Id
-       module_id
-       name
-       question
-       answers
-       pos_correct_answer
-       difficulty
-       created_at
-       updated_at
-       soft_deleted
-       made_by
-     }
+     DeleteExercise(ExerciseID: "yourExerciseId")
    }
    ```

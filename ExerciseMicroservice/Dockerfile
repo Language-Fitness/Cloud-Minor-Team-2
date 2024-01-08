@@ -5,7 +5,7 @@ RUN apk update && apk upgrade && \
 
 WORKDIR /app
 
-COPY .env.ex .env
+COPY .env .env
 
 RUN export $(cat .env | grep -v ^# | xargs)
 
