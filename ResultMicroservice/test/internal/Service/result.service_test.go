@@ -1,238 +1,201 @@
 package service
 
-//
-//import (
-//	"ResultMicroservice/graph/model"
-//	Service "ResultMicroservice/internal/service"
-//	"ResultMicroservice/test/mocks"
-//	"errors"
-//	"github.com/stretchr/testify/assert"
-//	"github.com/stretchr/testify/mock"
-//	"testing"
-//)
-//
-//var adminToken = "eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJnWWlqam1Zd3Z5a2t3WUNlZUtpVzV3amxVM215dmVoNTRZSHlVZFc5MUFzIn0.eyJleHAiOjE3MDExMDgyMzEsImlhdCI6MTcwMTEwNzkzMSwianRpIjoiNzYxYTQwZjktNTMzMS00Mzc4LWI5OTktZjhjNWM3MGRkYWEzIiwiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDo4ODg4L3JlYWxtcy9jbG91ZC1wcm9qZWN0IiwiYXVkIjpbInVzZXItbWFuYWdlbWVudC1jbGllbnQiLCJhY2NvdW50Il0sInN1YiI6IjQwN2VjMjNkLWM2ZjQtNDhkYi05YjFlLWZhN2Q3MDBmMjg2NiIsInR5cCI6IkJlYXJlciIsImF6cCI6ImxvZ2luLWNsaWVudCIsInNlc3Npb25fc3RhdGUiOiIwMWZhNjNkZi0wNDJmLTRmNTMtYmYzZi03NDNkYjFjMmY0MjYiLCJhY3IiOiIxIiwicmVhbG1fYWNjZXNzIjp7InJvbGVzIjpbImRlZmF1bHQtcm9sZXMtY2xvdWQtcHJvamVjdCIsIm9mZmxpbmVfYWNjZXNzIiwidW1hX2F1dGhvcml6YXRpb24iXX0sInJlc291cmNlX2FjY2VzcyI6eyJ1c2VyLW1hbmFnZW1lbnQtY2xpZW50Ijp7InJvbGVzIjpbInVwZGF0ZV9zY2hvb2wiLCJnZXRfY2xhc3NlcyIsImdldF9leGVyY2lzZXMiLCJkZWxldGVfbW9kdWxlIiwiZ2V0X3NjaG9vbHMiLCJkZWxldGVfZXhlcmNpc2UiLCJ1cGRhdGVfZXhlcmNpc2UiLCJnZXRfZXhlcmNpc2UiLCJkZWxldGVfbW9kdWxlX2FsbCIsImNyZWF0ZV9leGVyY2lzZSIsImdldF9zY2hvb2wiLCJkZWxldGVfZXhlcmNpc2VfYWxsIiwidXBkYXRlX3NjaG9vbF9hbGwiLCJkZWxldGVfY2xhc3MiLCJjcmVhdGVfbW9kdWxlIiwiZ2V0X21vZHVsZSIsInVwZGF0ZV9leGVyY2lzZV9hbGwiLCJnZXRfbW9kdWxlcyIsImNyZWF0ZV9jbGFzcyIsImNyZWF0ZV9zY2hvb2wiLCJ1cGRhdGVfbW9kdWxlX2FsbCIsImRlbGV0ZV9zY2hvb2wiLCJ1cGRhdGVfY2xhc3NfYWxsIiwidXBkYXRlX21vZHVsZSIsImdldF9jbGFzcyIsImRlbGV0ZV9zY2hvb2xfYWxsIiwidXBkYXRlX2NsYXNzIiwiZGVsZXRlX2NsYXNzX2FsbCJdfSwiYWNjb3VudCI6eyJyb2xlcyI6WyJtYW5hZ2UtYWNjb3VudCIsIm1hbmFnZS1hY2NvdW50LWxpbmtzIiwidmlldy1wcm9maWxlIl19fSwic2NvcGUiOiJlbWFpbCBwcm9maWxlIiwic2lkIjoiMDFmYTYzZGYtMDQyZi00ZjUzLWJmM2YtNzQzZGIxYzJmNDI2IiwiZW1haWxfdmVyaWZpZWQiOmZhbHNlLCJuYW1lIjoiY2hhZCBhZG1pbiIsInByZWZlcnJlZF91c2VybmFtZSI6ImFkbWluQGFkbWluLmNvbSIsImdpdmVuX25hbWUiOiJjaGFkIiwiZmFtaWx5X25hbWUiOiJhZG1pbiIsImVtYWlsIjoiYWRtaW5AYWRtaW4uY29tIn0.F4WBE9C3Ct17v5broRGPO92YR-lt9CzLprCnrOe4jWIMcMYyjHSBoLC-oQ7GHSoe1MjXe02CWRP98IZqQ5TPhF7nCliYs5qhn2vZRtlLa-QsjrTF2kZ1F_uEdXVekhVSKIRRFwoH8y2KxkaR3SSQ4bXOtJe8UJQs1AvzHPPeVDmRgfQcCZDNwdQTGI9Sb-8-C_dLXmU6W2ORJN1GmKikn9in4IS2kZ6KEiW6qNqOOllNlSQMZdtLQXf8BlymGf6s8z9j1itpg4iVljKeV8X76A8EHy-xQ98ESB188OVOxFHYReT82xOp5pusRjvMf3K71t20jPcOtUj-GiTZpEy9pQ"
-//
-//func TestResultService_CreateResult(t *testing.T) {
-//	mockRepo := new(mocks.MockResultRepository)
-//	mockValidator := new(mocks.MockValidator)
-//	mockPolicy := new(mocks.MockResultPolicy)
-//	service := &Service.ResultService{Validator: mockValidator, Repo: mockRepo, ResultPolicy: mockPolicy}
-//
-//	mockPolicy.On("CreateResult", mock.AnythingOfType("string")).Return(nil)
-//
-//	mockValidator.On("GetErrors").Return([]string{})
-//
-//	mockRepo.On("CreateResult", mock.AnythingOfType("*model.Result")).Return(&mocks.MockResult, nil)
-//
-//	result, err := service.CreateResult(adminToken, mocks.MockInputResult)
-//
-//	assert.Nil(t, err)
-//	assert.NotNil(t, result)
-//	assert.Equal(t, "sample_result_id", result.ID)
-//
-//	mockValidator.AssertExpectations(t)
-//	mockRepo.AssertExpectations(t)
-//	mockPolicy.AssertExpectations(t)
-//}
-//
-//func TestResultService_CreateResult_CatchValidationErrors(t *testing.T) {
-//	mockRepo := new(mocks.MockResultRepository)
-//	mockValidator := new(mocks.MockValidator)
-//	mockPolicy := new(mocks.MockResultPolicy)
-//	service := &Service.ResultService{Validator: mockValidator, Repo: mockRepo, ResultPolicy: mockPolicy}
-//
-//	mockPolicy.On("CreateResult", mock.AnythingOfType("string")).Return(nil)
-//
-//	mockValidator.On("GetErrors").Return([]string{"validation_error"})
-//
-//	result, err := service.CreateResult(adminToken, mocks.MockInputResult)
-//
-//	assert.NotNil(t, err)
-//	assert.Nil(t, result)
-//	assert.Equal(t, "Validation errors: validation_error", err.Error())
-//
-//	mockValidator.AssertExpectations(t)
-//	mockPolicy.AssertExpectations(t)
-//}
-//
-//func TestResultService_CreateResult_CatchInsertError(t *testing.T) {
-//	mockRepo := new(mocks.MockResultRepository)
-//	mockValidator := new(mocks.MockValidator)
-//	mockPolicy := new(mocks.MockResultPolicy)
-//	service := &Service.ResultService{Validator: mockValidator, Repo: mockRepo, ResultPolicy: mockPolicy}
-//
-//	mockPolicy.On("CreateResult", mock.AnythingOfType("string")).Return(nil)
-//
-//	mockValidator.On("GetErrors").Return([]string{})
-//
-//	mockRepo.On("CreateResult", mock.AnythingOfType("*model.Result")).Return(&model.Result{}, errors.New("insertion_error"))
-//
-//	result, err := service.CreateResult(adminToken, mocks.MockInputResult)
-//
-//	assert.Nil(t, result)
-//	assert.NotNil(t, err)
-//	assert.Equal(t, "insertion_error", err.Error())
-//
-//	mockValidator.AssertExpectations(t)
-//	mockPolicy.AssertExpectations(t)
-//}
-//
-//func TestResultService_UpdateResult(t *testing.T) {
-//	mockRepo := new(mocks.MockResultRepository)
-//	mockValidator := new(mocks.MockValidator)
-//	mockPolicy := new(mocks.MockResultPolicy)
-//	service := &Service.ResultService{Validator: mockValidator, Repo: mockRepo, ResultPolicy: mockPolicy}
-//
-//	mockPolicy.On("UpdateResult", mock.AnythingOfType("string"), mock.AnythingOfType("string")).
-//		Return(&mocks.MockResult, nil)
-//
-//	mockValidator.On("GetErrors").Return([]string{})
-//
-//	mockRepo.On("UpdateResult", "sample_result_id", mock.AnythingOfType("model.Result")).Return(&mocks.MockResult, nil)
-//
-//	result, err := service.UpdateResult(adminToken, "sample_result_id", mocks.MockInputResult)
-//
-//	assert.Nil(t, err)
-//	assert.NotNil(t, result)
-//	assert.Equal(t, "sample_result_id", result.ID)
-//
-//	mockValidator.AssertExpectations(t)
-//	mockRepo.AssertExpectations(t)
-//	mockPolicy.AssertExpectations(t)
-//}
-//
-//func TestResultService_UpdateResult_CatchValidationErrors(t *testing.T) {
-//	mockRepo := new(mocks.MockResultRepository)
-//	mockValidator := new(mocks.MockValidator)
-//	mockPolicy := new(mocks.MockResultPolicy)
-//	service := &Service.ResultService{Validator: mockValidator, Repo: mockRepo, ResultPolicy: mockPolicy}
-//
-//	mockPolicy.On("UpdateResult", mock.AnythingOfType("string"), mock.AnythingOfType("string")).
-//		Return(&mocks.MockResult, nil)
-//
-//	mockValidator.On("GetErrors").Return([]string{"validation_error"})
-//
-//	result, err := service.UpdateResult(adminToken, "sample_result_id", mocks.MockInputResult)
-//
-//	assert.NotNil(t, err)
-//	assert.Nil(t, result)
-//	assert.Equal(t, "Validation errors: validation_error", err.Error())
-//
-//	mockValidator.AssertExpectations(t)
-//	mockPolicy.AssertExpectations(t)
-//}
-//
-//func TestResultService_UpdateResult_CatchUpdateError(t *testing.T) {
-//	mockRepo := new(mocks.MockResultRepository)
-//	mockValidator := new(mocks.MockValidator)
-//	mockPolicy := new(mocks.MockResultPolicy)
-//	service := &Service.ResultService{Validator: mockValidator, Repo: mockRepo, ResultPolicy: mockPolicy}
-//
-//	mockPolicy.On("UpdateResult", mock.AnythingOfType("string"), mock.AnythingOfType("string")).
-//		Return(&mocks.MockResult, nil)
-//
-//	mockValidator.On("GetErrors").Return([]string{})
-//
-//	mockRepo.On("UpdateResult", "sample_result_id", mock.AnythingOfType("model.Result")).
-//		Return(&model.Result{}, errors.New("update_error"))
-//
-//	result, err := service.UpdateResult(adminToken, "sample_result_id", mocks.MockInputResult)
-//
-//	assert.Nil(t, result)
-//	assert.NotNil(t, err)
-//	assert.Equal(t, "update_error", err.Error())
-//
-//	mockValidator.AssertExpectations(t)
-//	mockPolicy.AssertExpectations(t)
-//}
-//
-//func TestResultService_DeleteResult(t *testing.T) {
-//	// Create mocks
-//	mockRepo := new(mocks.MockResultRepository)
-//	mockValidator := new(mocks.MockValidator)
-//	mockPolicy := new(mocks.MockResultPolicy)
-//
-//	service := &Service.ResultService{
-//		Validator:    mockValidator,
-//		Repo:         mockRepo,
-//		ResultPolicy: mockPolicy,
-//	}
-//
-//	mockPolicy.On("DeleteResult", mock.AnythingOfType("string"), mock.AnythingOfType("string")).Return(nil).Once()
-//
-//	mockValidator.On("GetErrors").Return([]string{})
-//
-//	mockRepo.On("DeleteResultByID", "sample_result_id").Return(nil).Once()
-//
-//	err := service.DeleteResult(adminToken, "sample_result_id")
-//
-//	assert.Nil(t, err)
-//
-//	mockValidator.AssertExpectations(t)
-//	mockRepo.AssertExpectations(t)
-//	mockPolicy.AssertExpectations(t)
-//}
-//
-//func TestResultService_DeleteResult_CatchPolicyError(t *testing.T) {
-//	mockRepo := new(mocks.MockResultRepository)
-//	mockValidator := new(mocks.MockValidator)
-//	mockPolicy := new(mocks.MockResultPolicy)
-//	service := &Service.ResultService{Validator: mockValidator, Repo: mockRepo, ResultPolicy: mockPolicy}
-//
-//	mockPolicy.On("DeleteResult", mock.AnythingOfType("string"), mock.AnythingOfType("string")).Return(errors.New("policy_error"))
-//
-//	err := service.DeleteResult(adminToken, "sample_result_id")
-//
-//	assert.NotNil(t, err)
-//	assert.Equal(t, "policy_error", err.Error())
-//
-//	mockRepo.AssertExpectations(t)
-//	mockPolicy.AssertExpectations(t)
-//}
-//
-//func TestResultService_DeleteResult_CatchDeleteError(t *testing.T) {
-//	mockRepo := new(mocks.MockResultRepository)
-//	mockValidator := new(mocks.MockValidator)
-//	mockPolicy := new(mocks.MockResultPolicy)
-//	service := &Service.ResultService{Validator: mockValidator, Repo: mockRepo, ResultPolicy: mockPolicy}
-//
-//	mockPolicy.On("DeleteResult", mock.AnythingOfType("string"), mock.AnythingOfType("string")).Return(nil)
-//
-//	mockValidator.On("GetErrors").Return([]string{})
-//
-//	mockRepo.On("DeleteResultByID", "sample_result_id").Return(errors.New("delete_error"))
-//
-//	err := service.DeleteResult(adminToken, "sample_result_id")
-//
-//	assert.NotNil(t, err)
-//	assert.Equal(t, "delete_error", err.Error())
-//
-//	mockValidator.AssertExpectations(t)
-//	mockRepo.AssertExpectations(t)
-//	mockPolicy.AssertExpectations(t)
-//}
-//
-//func TestResultService_GetResultById(t *testing.T) {
-//	mockRepo := new(mocks.MockResultRepository)
-//	mockValidator := new(mocks.MockValidator)
-//	mockPolicy := new(mocks.MockResultPolicy)
-//	service := &Service.ResultService{Validator: mockValidator, Repo: mockRepo, ResultPolicy: mockPolicy}
-//
-//	mockPolicy.On("GetResultByID", mock.AnythingOfType("string"), mock.AnythingOfType("string")).Return(nil)
-//
-//	mockValidator.On("GetErrors").Return([]string{})
-//
-//	mockRepo.On("GetResultByID", mock.AnythingOfType("string")).Return(&mocks.MockResult, nil)
-//
-//	result, err := service.GetResultById(adminToken, "sample_result_id")
-//
-//	assert.Nil(t, err)
-//	assert.NotNil(t, result)
-//	assert.Equal(t, "sample_result_id", result.ID)
-//
-//	mockValidator.AssertExpectations(t)
-//	mockRepo.AssertExpectations(t)
-//	mockPolicy.AssertExpectations(t)
-//}
-//
+import (
+	"ResultMicroservice/graph/model"
+	"ResultMicroservice/internal/service"
+	"ResultMicroservice/test/mocks"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
+	"testing"
+)
+
+var userToken = "user_token"
+
+func TestResultService_CreateResult(t *testing.T) {
+	mockValidator := new(mocks.MockValidator)
+	mockRepo := new(mocks.MockResultRepository)
+	mockPolicy := new(mocks.MockResultPolicy)
+
+	resultService := service.ResultService{
+		Validator:    mockValidator,
+		Repo:         mockRepo,
+		ResultPolicy: mockPolicy,
+	}
+
+	mockPolicy.On("CreateResult", mock.AnythingOfType("string")).Return("", nil)
+
+	mockValidator.On("GetErrors").Return([]string{})
+
+	mockRepo.On("CreateResult", mock.AnythingOfType("*model.Result")).Return(&model.Result{ID: "some_result_id"}, nil)
+
+	newResult := model.InputResult{
+		ExerciseID: "some_exercise_id",
+		ClassID:    "some_class_id",
+		ModuleID:   "some_module_id",
+		Input:      "some_input",
+		Result:     true,
+	}
+
+	result, err := resultService.CreateResult(userToken, newResult)
+
+	assert.Nil(t, err)
+	assert.NotNil(t, result)
+	assert.Equal(t, "some_result_id", result.ID)
+
+	mockPolicy.AssertExpectations(t)
+	mockValidator.AssertExpectations(t)
+	mockRepo.AssertExpectations(t)
+}
+
+func TestResultService_UpdateResult(t *testing.T) {
+	mockValidator := new(mocks.MockValidator)
+	mockRepo := new(mocks.MockResultRepository)
+	mockPolicy := new(mocks.MockResultPolicy)
+
+	resultService := service.ResultService{
+		Validator:    mockValidator,
+		Repo:         mockRepo,
+		ResultPolicy: mockPolicy,
+	}
+
+	mockPolicy.On("UpdateResult", mock.AnythingOfType("string"), mock.AnythingOfType("string")).
+		Return(&model.Result{}, nil)
+
+	mockValidator.On("GetErrors").Return([]string{})
+
+	mockRepo.On("UpdateResult", mock.AnythingOfType("string"), mock.AnythingOfType("model.Result")).
+		Return(&model.Result{ID: "some_result_id"}, nil)
+
+	updateData := model.InputResult{
+		ExerciseID: "some_updated_exercise_id",
+		ClassID:    "some_updated_class_id",
+		ModuleID:   "some_updated_module_id",
+		Input:      "some_updated_input",
+		Result:     false,
+	}
+
+	result, err := resultService.UpdateResult(userToken, "some_result_id", updateData)
+
+	assert.Nil(t, err)
+	assert.NotNil(t, result)
+	assert.Equal(t, "some_result_id", result.ID)
+
+	mockPolicy.AssertExpectations(t)
+	mockValidator.AssertExpectations(t)
+	mockRepo.AssertExpectations(t)
+}
+
+func TestResultService_DeleteResult(t *testing.T) {
+	mockValidator := new(mocks.MockValidator)
+	mockRepo := new(mocks.MockResultRepository)
+	mockPolicy := new(mocks.MockResultPolicy)
+
+	resultService := service.ResultService{
+		Validator:    mockValidator,
+		Repo:         mockRepo,
+		ResultPolicy: mockPolicy,
+	}
+
+	mockValidator.On("GetErrors").Return([]string{}).Return([]string{})
+
+	mockPolicy.On("DeleteResult", mock.AnythingOfType("string"), mock.AnythingOfType("string")).
+		Return(&model.Result{}, nil)
+
+	mockRepo.On("UpdateResult", mock.AnythingOfType("string"), mock.AnythingOfType("model.Result")).
+		Return(&mocks.MockResult, nil)
+
+	err := resultService.DeleteResult(userToken, "some_result_id")
+
+	assert.Nil(t, err)
+
+	mockPolicy.AssertExpectations(t)
+	mockRepo.AssertExpectations(t)
+	mockValidator.AssertExpectations(t)
+}
+
+func TestResultService_UnDeleteResult(t *testing.T) {
+	mockValidator := new(mocks.MockValidator)
+	mockRepo := new(mocks.MockResultRepository)
+	mockPolicy := new(mocks.MockResultPolicy)
+
+	resultService := service.ResultService{
+		Validator:    mockValidator,
+		Repo:         mockRepo,
+		ResultPolicy: mockPolicy,
+	}
+
+	mockValidator.On("GetErrors").Return([]string{})
+
+	mockPolicy.On("DeleteResult", mock.AnythingOfType("string"), mock.AnythingOfType("string")).
+		Return(&mocks.MockDeletedResult, nil)
+
+	mockRepo.On("UpdateResult", mock.AnythingOfType("string"), mock.AnythingOfType("model.Result")).
+		Return(&model.Result{ID: "some_result_id"}, nil)
+
+	err := resultService.UnDeleteResult(userToken, "some_result_id")
+
+	assert.Nil(t, err)
+
+	mockPolicy.AssertExpectations(t)
+	mockRepo.AssertExpectations(t)
+	mockValidator.AssertExpectations(t)
+}
+
+func TestResultService_GetResultById(t *testing.T) {
+	mockValidator := new(mocks.MockValidator)
+	mockRepo := new(mocks.MockResultRepository)
+	mockPolicy := new(mocks.MockResultPolicy)
+
+	resultService := service.ResultService{
+		Validator:    mockValidator,
+		Repo:         mockRepo,
+		ResultPolicy: mockPolicy,
+	}
+
+	mockValidator.On("GetErrors").Return([]string{})
+
+	mockPolicy.On("GetResultByID", mock.AnythingOfType("string"), mock.AnythingOfType("string")).
+		Return(&model.Result{ID: "some_result_id"}, nil)
+
+	result, err := resultService.GetResultById(userToken, "some_result_id")
+
+	assert.Nil(t, err)
+	assert.NotNil(t, result)
+	assert.Equal(t, "some_result_id", result.ID)
+
+	mockPolicy.AssertExpectations(t)
+}
+
+func TestResultService_ListResults(t *testing.T) {
+	mockValidator := new(mocks.MockValidator)
+	mockRepo := new(mocks.MockResultRepository)
+	mockPolicy := new(mocks.MockResultPolicy)
+
+	resultService := service.ResultService{
+		Validator:    mockValidator,
+		Repo:         mockRepo,
+		ResultPolicy: mockPolicy,
+	}
+
+	mockPolicy.On("ListResult", mock.AnythingOfType("string")).
+		Return("some-id", true, nil)
+
+	mockValidator.On("GetErrors").Return([]string{}).Return([]string{})
+
+	mockRepo.On("ListResults", mock.AnythingOfType("primitive.D"), mock.AnythingOfType("*options.FindOptions")).
+		Return([]*model.ResultInfo{&model.ResultInfo{ID: "some_result_id"}}, nil)
+
+	filter := &model.ResultFilter{}
+	paginate := &model.Paginator{}
+
+	results, err := resultService.ListResults(userToken, filter, paginate)
+
+	assert.Nil(t, err)
+	assert.NotNil(t, results)
+	assert.Equal(t, 1, len(results))
+	assert.Equal(t, "some_result_id", results[0].ID)
+
+	mockPolicy.AssertExpectations(t)
+	mockRepo.AssertExpectations(t)
+	mockValidator.AssertExpectations(t)
+}

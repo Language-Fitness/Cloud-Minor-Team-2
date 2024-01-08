@@ -29,7 +29,7 @@ func (m *MockResultRepository) GetResultByID(id string) (*model.Result, error) {
 	return args.Get(0).(*model.Result), args.Error(1)
 }
 
-func (m *MockResultRepository) ListResults(bsonFilter bson.D, paginateOptions *options.FindOptions) ([]*model.Result, error) {
+func (m *MockResultRepository) ListResults(bsonFilter bson.D, paginateOptions *options.FindOptions) ([]*model.ResultInfo, error) {
 	args := m.Called(bsonFilter, paginateOptions)
-	return args.Get(0).([]*model.Result), args.Error(1)
+	return args.Get(0).([]*model.ResultInfo), args.Error(1)
 }

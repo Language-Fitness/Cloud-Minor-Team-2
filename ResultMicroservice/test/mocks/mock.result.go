@@ -43,3 +43,26 @@ var MockResultFilter = model.ResultFilter{
 	Input:      &ResultInput,
 	Result:     &ResultResult,
 }
+
+var MockResultInfo = model.ResultInfo{
+	ID:         "1a2b3c4d-5e6f-7g8h-9i0j-1k2l3m4n5o6p",
+	ExerciseID: ResultExerciseID,
+	UserID:     ResultUserID,
+	ClassID:    ClassID,
+	ModuleID:   ModuleID,
+	Input:      ResultInput,
+	Result:     ResultResult,
+}
+
+var MockDeletedResult = model.Result{
+	ID:          "1a2b3c4d-5e6f-7g8h-9i0j-1k2l3m4n5o6p",
+	ExerciseID:  ResultExerciseID,
+	UserID:      ResultUserID,
+	ClassID:     ClassID,
+	ModuleID:    ModuleID,
+	Input:       ResultInput,
+	Result:      ResultResult,
+	CreatedAt:   ResultCreatedAt,
+	UpdatedAt:   ResultUpdatedAt,
+	SoftDeleted: true,
+}
