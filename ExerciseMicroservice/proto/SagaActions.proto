@@ -1,0 +1,46 @@
+syntax = "proto3";
+
+package proto;
+
+option go_package= "/pb";
+// Enum for SagaObjectTypes
+enum SagaObjectType {
+  SCHOOL = 0;
+  CLASS = 1;
+  EXERCISE = 2;
+  RESULT = 3;
+  MODULE = 4;
+}
+
+// Enum for SagaObjectStatus
+enum SagaObjectStatus {
+  EXIST = 0;
+  DELETED = 1;
+}
+
+// Define gRPC User Service
+service gRPCSagaService {
+  // RPC method to get user information
+  rpc FindSagaObject (ObjectRequest) returns (SagaObject);
+  rpc FindSagaObjectChildren (ObjectRequest) returns (ObjectResponse);
+  rpc DeleteObject (ObjectRequest) returns (ObjectResponse);
+  rpc UnDeleteObject (ObjectRequest) returns (ObjectResponse);
+}
+
+// Request message for getting a user
+message ObjectRequest {
+  string object_id = 1;
+  string bearer_token = 2;
+  SagaObjectType object_type = 3;
+  SagaObjectStatus object_status = 4;
+}
+
+message ObjectResponse {
+  repeated SagaObject objects = 1;
+}
+
+message SagaObject {
+  string object_id = 1;
+  SagaObjectType object_type = 2;
+  SagaObjectStatus object_status = 3;
+}
