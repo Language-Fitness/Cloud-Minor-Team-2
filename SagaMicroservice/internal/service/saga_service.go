@@ -4,7 +4,9 @@ import (
 	"context"
 	"fmt"
 	"github.com/google/uuid"
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 	"log"
@@ -22,8 +24,7 @@ type ISagaService interface {
 	InitSagaSteps(token string, filter *model.SagaFilter) (*model.SuccessMessage, error)
 	initializeSagaObject(token string, filter *model.SagaFilter) (*model.SagaObject, error)
 	findAllChildren(token string, sagaObject *model.SagaObject) error
-	findBottomChildren(sagaObject *model.SagaObject) (*model.SagaObject, error)
-	softDeleteItems(items []model.SagaObject) error
+	softDeleteChildren(token string, object *model.SagaObject) error
 	areAllItemsDeleted(items []model.SagaObject) bool
 	undeleteItems(items []model.SagaObject) error
 }
@@ -62,17 +63,11 @@ func (s SagaService) InitSagaSteps(token string, filter *model.SagaFilter) (*mod
 		return nil, err2
 	}
 
-	// Step 4: Loop through everything starting with the bottom children
-	sagaObject, err = s.findBottomChildren(sagaObject)
-	if err != nil {
+	// Step 5: Start soft deleting items and change object_status to Deleted if success
+	if err := s.softDeleteChildren(token, sagaObject); err != nil {
+		// Handle rollback logic or return an error
 		return nil, err
 	}
-
-	//// Step 5: Start soft deleting items and change object_status to Deleted if success
-	//if err := s.softDeleteItems(sagaObject); err != nil {
-	//	// Handle rollback logic or return an error
-	//	return nil, err
-	//}
 	//
 	//// Step 6: Loop through items to check if all object_status are Deleted
 	//if !s.areAllItemsDeleted(sagaObject) {
@@ -209,15 +204,68 @@ func (s SagaService) findAllChildren(token string, sagaObject *model.SagaObject)
 	return nil
 }
 
-func (s SagaService) findBottomChildren(sagaObject *model.SagaObject) (*model.SagaObject, error) {
-	// Step 4 logic here
-	// Example: return a slice of BottomChildType
-	return sagaObject, nil
-}
+func (s SagaService) softDeleteChildren(token string, sagaObject *model.SagaObject) error {
+	if sagaObject.ObjectType == model.SagaObjectTypesResult {
+		return nil
+	}
 
-func (s SagaService) softDeleteItems(items []model.SagaObject) error {
-	// Step 5 logic here
-	// Example: soft delete items and update object_status
+	filterQuery := bson.D{{Key: "parent_id", Value: sagaObject.ID}}
+	optionsQuery := options.Find().
+		SetSkip(int64(0)).
+		SetLimit(int64(100))
+
+	objects, err := s.Repo.ListSagaObjects(filterQuery, optionsQuery)
+	if err != nil {
+		return err
+	}
+
+	for _, child := range objects {
+
+		func(child *model.SagaObject) {
+			client, conn3, err := createGRPCClient(child.ObjectType)
+			if err != nil {
+				fmt.Println(err)
+			}
+
+			defer conn3.Close()
+
+			request := pb.ObjectRequest{
+				BearerToken:  token,
+				ObjectId:     sagaObject.ObjectID,
+				ObjectType:   convertToPBObjectType(sagaObject.ObjectType),
+				ObjectStatus: pb.SagaObjectStatus_EXIST,
+			}
+
+			fmt.Println("Calling FindObject RPC...")
+			response, err := client.DeleteObject(context.Background(), &request)
+			if err != nil {
+				//log.Fatalf("failed to call FindObject RPC: %v", err)
+				log.Printf("failed to call FindObject RPC: %v", err)
+			}
+
+			updatedSagaObject := model.SagaObject{
+				ID:           child.ID,
+				ObjectID:     child.ObjectID,
+				ObjectType:   child.ObjectType,
+				CreatedAt:    child.CreatedAt,
+				UpdatedAt:    helper.StringPointer(time.Now().Format("HH:MM:SS")),
+				ObjectStatus: convertToModelObjectStatus(response.ObjectStatus),
+				ParentID:     helper.StringPointer(sagaObject.ObjectID),
+				ActionDoneBy: child.ActionDoneBy,
+			}
+
+			updateSagaObject, err := s.Repo.UpdateSagaObject(child.ID, updatedSagaObject)
+			if err != nil {
+				return
+			}
+
+			err2 := s.softDeleteChildren(token, updateSagaObject)
+			if err2 != nil {
+				return
+			}
+		}(child)
+	}
+
 	return nil
 }
 

@@ -32,8 +32,8 @@ type GRPCSagaServiceClient interface {
 	// RPC method to get user information
 	FindSagaObject(ctx context.Context, in *ObjectRequest, opts ...grpc.CallOption) (*SagaObject, error)
 	FindSagaObjectChildren(ctx context.Context, in *ObjectRequest, opts ...grpc.CallOption) (*ObjectResponse, error)
-	DeleteObject(ctx context.Context, in *ObjectRequest, opts ...grpc.CallOption) (*ObjectResponse, error)
-	UnDeleteObject(ctx context.Context, in *ObjectRequest, opts ...grpc.CallOption) (*ObjectResponse, error)
+	DeleteObject(ctx context.Context, in *ObjectRequest, opts ...grpc.CallOption) (*ObjectRequest, error)
+	UnDeleteObject(ctx context.Context, in *ObjectRequest, opts ...grpc.CallOption) (*ObjectRequest, error)
 }
 
 type gRPCSagaServiceClient struct {
@@ -62,8 +62,8 @@ func (c *gRPCSagaServiceClient) FindSagaObjectChildren(ctx context.Context, in *
 	return out, nil
 }
 
-func (c *gRPCSagaServiceClient) DeleteObject(ctx context.Context, in *ObjectRequest, opts ...grpc.CallOption) (*ObjectResponse, error) {
-	out := new(ObjectResponse)
+func (c *gRPCSagaServiceClient) DeleteObject(ctx context.Context, in *ObjectRequest, opts ...grpc.CallOption) (*ObjectRequest, error) {
+	out := new(ObjectRequest)
 	err := c.cc.Invoke(ctx, GRPCSagaService_DeleteObject_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -71,8 +71,8 @@ func (c *gRPCSagaServiceClient) DeleteObject(ctx context.Context, in *ObjectRequ
 	return out, nil
 }
 
-func (c *gRPCSagaServiceClient) UnDeleteObject(ctx context.Context, in *ObjectRequest, opts ...grpc.CallOption) (*ObjectResponse, error) {
-	out := new(ObjectResponse)
+func (c *gRPCSagaServiceClient) UnDeleteObject(ctx context.Context, in *ObjectRequest, opts ...grpc.CallOption) (*ObjectRequest, error) {
+	out := new(ObjectRequest)
 	err := c.cc.Invoke(ctx, GRPCSagaService_UnDeleteObject_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -87,8 +87,8 @@ type GRPCSagaServiceServer interface {
 	// RPC method to get user information
 	FindSagaObject(context.Context, *ObjectRequest) (*SagaObject, error)
 	FindSagaObjectChildren(context.Context, *ObjectRequest) (*ObjectResponse, error)
-	DeleteObject(context.Context, *ObjectRequest) (*ObjectResponse, error)
-	UnDeleteObject(context.Context, *ObjectRequest) (*ObjectResponse, error)
+	DeleteObject(context.Context, *ObjectRequest) (*ObjectRequest, error)
+	UnDeleteObject(context.Context, *ObjectRequest) (*ObjectRequest, error)
 	mustEmbedUnimplementedGRPCSagaServiceServer()
 }
 
@@ -102,10 +102,10 @@ func (UnimplementedGRPCSagaServiceServer) FindSagaObject(context.Context, *Objec
 func (UnimplementedGRPCSagaServiceServer) FindSagaObjectChildren(context.Context, *ObjectRequest) (*ObjectResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method FindSagaObjectChildren not implemented")
 }
-func (UnimplementedGRPCSagaServiceServer) DeleteObject(context.Context, *ObjectRequest) (*ObjectResponse, error) {
+func (UnimplementedGRPCSagaServiceServer) DeleteObject(context.Context, *ObjectRequest) (*ObjectRequest, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteObject not implemented")
 }
-func (UnimplementedGRPCSagaServiceServer) UnDeleteObject(context.Context, *ObjectRequest) (*ObjectResponse, error) {
+func (UnimplementedGRPCSagaServiceServer) UnDeleteObject(context.Context, *ObjectRequest) (*ObjectRequest, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UnDeleteObject not implemented")
 }
 func (UnimplementedGRPCSagaServiceServer) mustEmbedUnimplementedGRPCSagaServiceServer() {}

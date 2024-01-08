@@ -23,8 +23,8 @@ service gRPCSagaService {
   // RPC method to get user information
   rpc FindSagaObject (ObjectRequest) returns (SagaObject);
   rpc FindSagaObjectChildren (ObjectRequest) returns (ObjectResponse);
-  rpc DeleteObject (ObjectRequest) returns (ObjectResponse);
-  rpc UnDeleteObject (ObjectRequest) returns (ObjectResponse);
+  rpc DeleteObject (ObjectRequest) returns (ObjectRequest);
+  rpc UnDeleteObject (ObjectRequest) returns (ObjectRequest);
 }
 
 // Request message for getting a user
