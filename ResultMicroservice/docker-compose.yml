@@ -8,6 +8,7 @@ services:
     image: graph-api
     ports:
       - "8085:8085"
+      - "9095:9095"
 
   mongodb_exercise:
     container_name: mongodb_result

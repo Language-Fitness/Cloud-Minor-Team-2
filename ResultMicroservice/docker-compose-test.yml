@@ -10,6 +10,7 @@ services:
     image: graph-api-test
     ports:
       - "8085:8085"
+      - "9095:9095"
     depends_on:
       - mongodb_test
     environment:

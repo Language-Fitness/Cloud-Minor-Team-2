@@ -1,10 +1,10 @@
 package service
 
 import (
-	"ExerciseMicroservice/graph/model"
-	"ExerciseMicroservice/internal/helper"
-	"ExerciseMicroservice/internal/service"
-	"ExerciseMicroservice/proto/pb"
+	"ResultMicroservice/graph/model"
+	"ResultMicroservice/internal/helper"
+	"ResultMicroservice/internal/service"
+	"ResultMicroservice/proto/pb"
 	"context"
 	"fmt"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -12,25 +12,25 @@ import (
 
 type SagaService struct {
 	pb.UnimplementedGRPCSagaServiceServer
-	service service.IExerciseService
+	service service.IResultService
 }
 
 func NewSagaService(collection *mongo.Collection) *SagaService {
 	return &SagaService{
-		service: service.NewExerciseService(),
+		service: service.NewResultService(),
 	}
 }
 
 // FindSagaObject implements the FindSagaObject RPC method
 func (s *SagaService) FindSagaObject(ctx context.Context, req *pb.ObjectRequest) (*pb.SagaObject, error) {
-	result, err := s.service.GetExerciseById(req.BearerToken, req.ObjectId)
+	result, err := s.service.GetResultById(req.BearerToken, req.ObjectId)
 	if err != nil {
 		return nil, err
 	}
 
 	response := &pb.SagaObject{
 		ObjectId:     result.ID,
-		ObjectType:   pb.SagaObjectType_EXERCISE,
+		ObjectType:   pb.SagaObjectType_RESULT,
 		ObjectStatus: pb.SagaObjectStatus_EXIST,
 	}
 
@@ -40,8 +40,8 @@ func (s *SagaService) FindSagaObject(ctx context.Context, req *pb.ObjectRequest)
 // FindSagaObjectChildren implements the FindSagaObjectChildren RPC method
 func (s *SagaService) FindSagaObjectChildren(ctx context.Context, req *pb.ObjectRequest) (*pb.ObjectResponse, error) {
 
-	filter := model.ExerciseFilter{
-		ClassID: helper.StringPointer(req.ObjectId),
+	filter := model.ResultFilter{
+		ExerciseID: helper.StringPointer(req.ObjectId),
 	}
 
 	paginate := model.Paginator{
@@ -49,25 +49,25 @@ func (s *SagaService) FindSagaObjectChildren(ctx context.Context, req *pb.Object
 		Step:   0,
 	}
 
-	exercises, err := s.service.ListExercises(req.BearerToken, &filter, &paginate)
+	results, err := s.service.ListResults(req.BearerToken, &filter, &paginate)
 	if err != nil {
 		return nil, err
 	}
 
 	fmt.Println("test exercises:")
-	fmt.Println(exercises)
+	fmt.Println(results)
 
-	for i := range exercises {
-		fmt.Println(*exercises[i])
+	for i := range results {
+		fmt.Println(*results[i])
 	}
 
 	response := &pb.ObjectResponse{
-		Objects: make([]*pb.SagaObject, len(exercises)),
+		Objects: make([]*pb.SagaObject, len(results)),
 	}
 
-	for i := range exercises {
+	for i := range results {
 		object := &pb.SagaObject{
-			ObjectId:     fmt.Sprintf(exercises[i].ID),
+			ObjectId:     fmt.Sprintf(results[i].ID),
 			ObjectType:   pb.SagaObjectType_EXERCISE,
 			ObjectStatus: pb.SagaObjectStatus_EXIST,
 		}
@@ -80,7 +80,7 @@ func (s *SagaService) FindSagaObjectChildren(ctx context.Context, req *pb.Object
 
 // DeleteObject implements the DeleteObject RPC method
 func (s *SagaService) DeleteObject(ctx context.Context, req *pb.ObjectRequest) (*pb.ObjectResponse, error) {
-	err := s.service.DeleteExercise(req.BearerToken, req.ObjectId)
+	err := s.service.DeleteResult(req.BearerToken, req.ObjectId)
 	if err != nil {
 		return nil, err
 	}
@@ -99,7 +99,7 @@ func (s *SagaService) DeleteObject(ctx context.Context, req *pb.ObjectRequest) (
 
 // UnDeleteObject implements the UnDeleteObject RPC method
 func (s *SagaService) UnDeleteObject(ctx context.Context, req *pb.ObjectRequest) (*pb.ObjectResponse, error) {
-	err := s.service.UnDeleteExercise(req.BearerToken, req.ObjectId)
+	err := s.service.UnDeleteResult(req.BearerToken, req.ObjectId)
 	if err != nil {
 		return nil, err
 	}
