@@ -99,6 +99,7 @@ func (r *ExerciseRepository) ListExercises(bsonFilter bson.D, paginateOptions *o
 	if err != nil {
 		return nil, err
 	}
+
 	defer func(cursor *mongo.Cursor, ctx context.Context) {
 		cursor.Close(ctx)
 	}(cursor, ctx)

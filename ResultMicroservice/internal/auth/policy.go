@@ -56,11 +56,11 @@ func (p *ResultPolicy) UpdateResult(bearerToken string, id string) (*model.Resul
 		return nil, errors.New("result not found")
 	}
 
-	if p.hasRole(roles, "update_result") && result.UserID == uuid {
+	if p.hasRole(roles, "update_result_all") {
 		return result, nil
 	}
 
-	if p.hasRole(roles, "update_result_all") {
+	if p.hasRole(roles, "update_result") && result.UserID == uuid {
 		return result, nil
 	}
 

@@ -261,7 +261,7 @@ func buildBsonFilterForListResult(policy auth.IResultPolicy, token string, filte
 		return false
 	}
 
-	b := appendCondition("softdeleted", filter.SoftDelete, "softdeleted")
+	b := appendCondition("softDelete", filter.SoftDelete, "softdeleted")
 	if b == false {
 		bsonFilter = append(bsonFilter, bson.E{Key: "softdeleted", Value: false})
 	}

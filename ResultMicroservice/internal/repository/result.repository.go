@@ -107,10 +107,7 @@ func (r *ResultRepository) ListResults(bsonFilter bson.D, paginateOptions *optio
 	}
 
 	defer func(cursor *mongo.Cursor, ctx context.Context) {
-		err := cursor.Close(ctx)
-		if err != nil {
-			return
-		}
+		cursor.Close(ctx)
 	}(cursor, ctx)
 
 	for cursor.Next(ctx) {

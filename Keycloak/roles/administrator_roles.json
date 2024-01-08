@@ -94,5 +94,8 @@
   },
   {
     "name": "delete_result_all"
+  },
+  {
+    "name": "filter_result_softDelete"
   }
 ]

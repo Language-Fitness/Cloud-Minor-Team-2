@@ -2,6 +2,9 @@ package main
 
 import (
 	"ResultMicroservice/graph"
+	"ResultMicroservice/internal/auth"
+	"github.com/joho/godotenv"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"log"
 	"net/http"
 	"os"
@@ -10,52 +13,28 @@ import (
 	"github.com/99designs/gqlgen/graphql/playground"
 )
 
-const defaultPort = "8080"
+const defaultPort = "8085"
 
 func main() {
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = defaultPort
 	}
-	//todo fix this
-	srv := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{}}))
 
+	if err := godotenv.Load(); err != nil {
+		log.Fatal("Error loading .env file")
+	}
+
+	// Prometheus Metrics
+	http.Handle("/metrics", promhttp.Handler())
+
+	tokenMiddleware := auth.Middleware
+
+	srv := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{Resolvers: graph.NewResolver()}))
+
+	http.Handle("/query", tokenMiddleware(srv))
 	http.Handle("/", playground.Handler("GraphQL playground", "/query"))
-	http.Handle("/query", srv)
 
 	log.Printf("connect to http://localhost:%s/ for GraphQL playground", port)
-
-	grpcServer()
-
 	log.Fatal(http.ListenAndServe(":"+port, nil))
-}
-
-func grpcServer() {
-	// Replace with the actual path to your server certificate
-	//creds, err := credentials.NewServerTLSFromFile("path/to/your/server.crt", "path/to/your/server.key")
-	//if err != nil {
-	//	log.Fatalf("Failed to load TLS keys: %v", err)
-	//}
-	//
-	//// Create a new gRPC server with the TLS credentials
-	//server := grpc.NewServer(grpc.Creds(creds))
-
-	// Create a new gRPC server without TLS
-	//server := grpc.NewServer()
-	//
-	//// Register the server with the generated protobuf code
-	//result_pb.RegisterGrpcResultServer(server, &rpc.ResultServer{})
-	//
-	//// Create a listener on a specific port
-	//lis, err := net.Listen("tcp", ":50051")
-	//if err != nil {
-	//	log.Fatalf("Failed to listen: %v", err)
-	//}
-	//
-	//fmt.Println("grpc Result Server is listening on port 50051...")
-	//
-	//// Serve the gRPC server
-	//if err := server.Serve(lis); err != nil {
-	//	log.Fatalf("Failed to serve: %v", err)
-	//}
 }
