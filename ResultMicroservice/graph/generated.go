@@ -85,7 +85,7 @@ type ComplexityRoot struct {
 type MutationResolver interface {
 	CreateResult(ctx context.Context, input model.InputResult) (*model.Result, error)
 	UpdateResult(ctx context.Context, id string, input model.InputResult) (*model.Result, error)
-	DeleteResult(ctx context.Context, id string) (*model.Result, error)
+	DeleteResult(ctx context.Context, id string) (*string, error)
 }
 type QueryResolver interface {
 	ListResults(ctx context.Context, filter model.ResultFilter, paginator model.Paginator) ([]*model.ResultInfo, error)
@@ -734,9 +734,9 @@ func (ec *executionContext) _Mutation_DeleteResult(ctx context.Context, field gr
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(*model.Result)
+	res := resTmp.(*string)
 	fc.Result = res
-	return ec.marshalOResult2ᚖResultMicroserviceᚋgraphᚋmodelᚐResult(ctx, field.Selections, res)
+	return ec.marshalOID2ᚖstring(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Mutation_DeleteResult(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -746,29 +746,7 @@ func (ec *executionContext) fieldContext_Mutation_DeleteResult(ctx context.Conte
 		IsMethod:   true,
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "id":
-				return ec.fieldContext_Result_id(ctx, field)
-			case "exercise_id":
-				return ec.fieldContext_Result_exercise_id(ctx, field)
-			case "user_id":
-				return ec.fieldContext_Result_user_id(ctx, field)
-			case "class_id":
-				return ec.fieldContext_Result_class_id(ctx, field)
-			case "module_id":
-				return ec.fieldContext_Result_module_id(ctx, field)
-			case "input":
-				return ec.fieldContext_Result_input(ctx, field)
-			case "result":
-				return ec.fieldContext_Result_result(ctx, field)
-			case "created_at":
-				return ec.fieldContext_Result_created_at(ctx, field)
-			case "updated_at":
-				return ec.fieldContext_Result_updated_at(ctx, field)
-			case "soft_deleted":
-				return ec.fieldContext_Result_soft_deleted(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type Result", field.Name)
+			return nil, errors.New("field of type ID does not have child fields")
 		},
 	}
 	defer func() {
@@ -3592,8 +3570,6 @@ func (ec *executionContext) unmarshalInputInputResult(ctx context.Context, obj i
 		}
 		switch k {
 		case "exercise_id":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("exercise_id"))
 			data, err := ec.unmarshalNID2string(ctx, v)
 			if err != nil {
@@ -3601,8 +3577,6 @@ func (ec *executionContext) unmarshalInputInputResult(ctx context.Context, obj i
 			}
 			it.ExerciseID = data
 		case "user_id":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("user_id"))
 			data, err := ec.unmarshalNID2string(ctx, v)
 			if err != nil {
@@ -3610,8 +3584,6 @@ func (ec *executionContext) unmarshalInputInputResult(ctx context.Context, obj i
 			}
 			it.UserID = data
 		case "class_id":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("class_id"))
 			data, err := ec.unmarshalNID2string(ctx, v)
 			if err != nil {
@@ -3619,8 +3591,6 @@ func (ec *executionContext) unmarshalInputInputResult(ctx context.Context, obj i
 			}
 			it.ClassID = data
 		case "module_id":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("module_id"))
 			data, err := ec.unmarshalNID2string(ctx, v)
 			if err != nil {
@@ -3628,8 +3598,6 @@ func (ec *executionContext) unmarshalInputInputResult(ctx context.Context, obj i
 			}
 			it.ModuleID = data
 		case "input":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
 			data, err := ec.unmarshalNString2string(ctx, v)
 			if err != nil {
@@ -3637,8 +3605,6 @@ func (ec *executionContext) unmarshalInputInputResult(ctx context.Context, obj i
 			}
 			it.Input = data
 		case "result":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("result"))
 			data, err := ec.unmarshalNBoolean2bool(ctx, v)
 			if err != nil {
@@ -3666,8 +3632,6 @@ func (ec *executionContext) unmarshalInputPaginator(ctx context.Context, obj int
 		}
 		switch k {
 		case "amount":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("amount"))
 			data, err := ec.unmarshalNInt2int(ctx, v)
 			if err != nil {
@@ -3675,8 +3639,6 @@ func (ec *executionContext) unmarshalInputPaginator(ctx context.Context, obj int
 			}
 			it.Amount = data
 		case "step":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("step"))
 			data, err := ec.unmarshalNInt2int(ctx, v)
 			if err != nil {
@@ -3704,8 +3666,6 @@ func (ec *executionContext) unmarshalInputResultFilter(ctx context.Context, obj 
 		}
 		switch k {
 		case "softDelete":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("softDelete"))
 			data, err := ec.unmarshalOBoolean2ᚖbool(ctx, v)
 			if err != nil {
@@ -3713,8 +3673,6 @@ func (ec *executionContext) unmarshalInputResultFilter(ctx context.Context, obj 
 			}
 			it.SoftDelete = data
 		case "exerciseId":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("exerciseId"))
 			data, err := ec.unmarshalOID2ᚖstring(ctx, v)
 			if err != nil {
@@ -3722,8 +3680,6 @@ func (ec *executionContext) unmarshalInputResultFilter(ctx context.Context, obj 
 			}
 			it.ExerciseID = data
 		case "userId":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("userId"))
 			data, err := ec.unmarshalOID2ᚖstring(ctx, v)
 			if err != nil {
@@ -3731,8 +3687,6 @@ func (ec *executionContext) unmarshalInputResultFilter(ctx context.Context, obj 
 			}
 			it.UserID = data
 		case "classId":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("classId"))
 			data, err := ec.unmarshalOID2ᚖstring(ctx, v)
 			if err != nil {
@@ -3740,8 +3694,6 @@ func (ec *executionContext) unmarshalInputResultFilter(ctx context.Context, obj 
 			}
 			it.ClassID = data
 		case "moduleId":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("moduleId"))
 			data, err := ec.unmarshalOID2ᚖstring(ctx, v)
 			if err != nil {
@@ -3749,8 +3701,6 @@ func (ec *executionContext) unmarshalInputResultFilter(ctx context.Context, obj 
 			}
 			it.ModuleID = data
 		case "input":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
 			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
@@ -3758,8 +3708,6 @@ func (ec *executionContext) unmarshalInputResultFilter(ctx context.Context, obj 
 			}
 			it.Input = data
 		case "result":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("result"))
 			data, err := ec.unmarshalOBoolean2ᚖbool(ctx, v)
 			if err != nil {

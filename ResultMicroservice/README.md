@@ -1,106 +1,104 @@
-## Queries
 
-### Get Result by Exercise ID
-```graphql
-query {
-  GetResultByExercise(exercise_id: "your-exercise-id") {
-    id
-    exercise_id
-    user_id
-    class_id
-    module_id
-    input
-    result
-    created_at
-    updated_at
-    soft_deleted
-  }
-}
-```
+1. **List Results Query:**
+   ```graphql
+   {
+     ListResults(
+       filter: {
+         softDelete: true
+         exerciseId: "yourExerciseId"
+         userId: "yourUserId"
+         classId: "yourClassId"
+         moduleId: "yourModuleId"
+         input: "yourInput"
+         result: true
+       }
+       paginator: {
+         amount: 10
+         step: 1
+       }
+     ) {
+       id
+       exercise_id
+       user_id
+       class_id
+       module_id
+       input
+       result
+     }
+   }
+   ```
 
-### Get Results by Class ID
-```graphql
-query {
-  GetResultsByClass(class_id: "your-class-id") {
-    id
-    exercise_id
-    user_id
-    class_id
-    module_id
-    input
-    result
-    created_at
-    updated_at
-    soft_deleted
-  }
-}
-```
+2. **Get Result by ID Query:**
+   ```graphql
+   {
+     GetResultsByID(id: "yourResultId") {
+       id
+       exercise_id
+       user_id
+       class_id
+       module_id
+       input
+       result
+       created_at
+       updated_at
+       soft_deleted
+     }
+   }
+   ```
 
-## Mutations:
-### Create Result
-```graphql
-mutation {
-  CreateResult(input: {
-    exercise_id: "your-exercise-id"
-    user_id: "your-user-id"
-    class_id: "your-class-id"
-    module_id: "your-module-id"
-    input: "your-input"
-    result: "your-result"
-  }) {
-    id
-    exercise_id
-    user_id
-    class_id
-    module_id
-    input
-    result
-    created_at
-    updated_at
-    soft_deleted
-  }
-}
-```
+3. **Create Result Mutation:**
+   ```graphql
+   mutation {
+     CreateResult(input: {
+       exercise_id: "yourExerciseId"
+       user_id: "yourUserId"
+       class_id: "yourClassId"
+       module_id: "yourModuleId"
+       input: "yourInput"
+       result: true
+     }) {
+       id
+       exercise_id
+       user_id
+       class_id
+       module_id
+       input
+       result
+       created_at
+       updated_at
+       soft_deleted
+     }
+   }
+   ```
 
-## Update Result
-```graphql
-mutation {
-  UpdateResult(id: "result-id-to-update", input: {
-    exercise_id: "updated-exercise-id"
-    user_id: "updated-user-id"
-    class_id: "updated-class-id"
-    module_id: "updated-module-id"
-    input: "updated-input"
-    result: "updated-result"
-  }) {
-    id
-    exercise_id
-    user_id
-    class_id
-    module_id
-    input
-    result
-    created_at
-    updated_at
-    soft_deleted
-  }
-}
-```
+4. **Update Result Mutation:**
+   ```graphql
+   mutation {
+     UpdateResult(id: "yourResultId", input: {
+       exercise_id: "yourUpdatedExerciseId"
+       user_id: "yourUpdatedUserId"
+       class_id: "yourUpdatedClassId"
+       module_id: "yourUpdatedModuleId"
+       input: "yourUpdatedInput"
+       result: false
+     }) {
+       id
+       exercise_id
+       user_id
+       class_id
+       module_id
+       input
+       result
+       created_at
+       updated_at
+       soft_deleted
+     }
+   }
+   ```
 
-## Delete Result
-```graphql
-mutation {
-  DeleteResult(id: "result-id-to-delete") {
-    id
-    exercise_id
-    user_id
-    class_id
-    module_id
-    input
-    result
-    created_at
-    updated_at
-    soft_deleted
-  }
-}
-```
+5. **Delete Result Mutation:**
+   ```graphql
+   mutation {
+     DeleteResult(id: "yourResultId")
+   }
+   ```

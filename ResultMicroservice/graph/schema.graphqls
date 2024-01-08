@@ -57,7 +57,7 @@ type Query {
 type Mutation {
     CreateResult(input: InputResult!): Result
     UpdateResult(id: ID!, input: InputResult!): Result
-    DeleteResult(id: ID!): Result
+    DeleteResult(id: ID!): ID
 }
 
 #go mod init example

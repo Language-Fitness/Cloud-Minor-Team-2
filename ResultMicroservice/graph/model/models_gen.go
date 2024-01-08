@@ -11,9 +11,15 @@ type InputResult struct {
 	Result     bool   `json:"result"`
 }
 
+type Mutation struct {
+}
+
 type Paginator struct {
 	Amount int `json:"amount"`
 	Step   int `json:"step"`
+}
+
+type Query struct {
 }
 
 type Result struct {
