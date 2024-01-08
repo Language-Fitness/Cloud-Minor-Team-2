@@ -16,7 +16,7 @@ type IResultRepository interface {
 	CreateResult(newResult *model.Result) (*model.Result, error)
 	UpdateResult(id string, updatedResult model.Result) (*model.Result, error)
 	GetResultByID(id string) (*model.Result, error)
-	ListResults(bsonFilter bson.D, paginateOptions *options.FindOptions) ([]*model.Result, error)
+	ListResults(bsonFilter bson.D, paginateOptions *options.FindOptions) ([]*model.ResultInfo, error)
 }
 
 // ResultRepository GOLANG STRUCT
@@ -95,11 +95,11 @@ func (r *ResultRepository) GetResultByID(id string) (*model.Result, error) {
 	return &result, nil
 }
 
-func (r *ResultRepository) ListResults(bsonFilter bson.D, paginateOptions *options.FindOptions) ([]*model.Result, error) {
+func (r *ResultRepository) ListResults(bsonFilter bson.D, paginateOptions *options.FindOptions) ([]*model.ResultInfo, error) {
 	ctx, cancel := context.WithTimeout(context.TODO(), time.Second*10) // 10-second timeout
 	defer cancel()
 
-	var results []*model.Result
+	var results []*model.ResultInfo
 
 	cursor, err := r.collection.Find(ctx, bsonFilter, paginateOptions)
 	if err != nil {
@@ -114,7 +114,7 @@ func (r *ResultRepository) ListResults(bsonFilter bson.D, paginateOptions *optio
 	}(cursor, ctx)
 
 	for cursor.Next(ctx) {
-		var result model.Result
+		var result model.ResultInfo
 		if err := cursor.Decode(&result); err != nil {
 			return nil, err
 		}

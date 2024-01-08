@@ -38,3 +38,13 @@ type ResultFilter struct {
 	Input      *string `json:"input,omitempty"`
 	Result     *bool   `json:"result,omitempty"`
 }
+
+type ResultInfo struct {
+	ID         string `json:"id"`
+	ExerciseID string `json:"exercise_id"`
+	UserID     string `json:"user_id"`
+	ClassID    string `json:"class_id"`
+	ModuleID   string `json:"module_id"`
+	Input      string `json:"input"`
+	Result     bool   `json:"result"`
+}

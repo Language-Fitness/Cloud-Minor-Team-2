@@ -47,7 +47,7 @@ func (r *mutationResolver) DeleteResult(ctx context.Context, id string) (*model.
 }
 
 // ListResults is the resolver for the ListResults field.
-func (r *queryResolver) ListResults(ctx context.Context, filter model.ResultFilter, paginator model.Paginator) ([]*model.Result, error) {
+func (r *queryResolver) ListResults(ctx context.Context, filter model.ResultFilter, paginator model.Paginator) ([]*model.ResultInfo, error) {
 	token := auth.TokenFromContext(ctx)
 
 	results, err := r.Service.ListResults(token, &filter, &paginator)

@@ -25,7 +25,7 @@ type IResultService interface {
 	UpdateResult(token string, id string, updateData model.InputResult) (*model.Result, error)
 	DeleteResult(token string, id string) (*model.Result, error)
 	GetResultById(token string, id string) (*model.Result, error)
-	ListResults(token string, filter *model.ResultFilter, paginate *model.Paginator) ([]*model.Result, error)
+	ListResults(token string, filter *model.ResultFilter, paginate *model.Paginator) ([]*model.ResultInfo, error)
 }
 
 // ResultService GOLANG STRUCT
@@ -172,7 +172,7 @@ func (r *ResultService) GetResultById(token string, id string) (*model.Result, e
 	return ExistingResult, nil
 }
 
-func (r *ResultService) ListResults(token string, filter *model.ResultFilter, paginate *model.Paginator) ([]*model.Result, error) {
+func (r *ResultService) ListResults(token string, filter *model.ResultFilter, paginate *model.Paginator) ([]*model.ResultInfo, error) {
 	id, teacher, err := r.ResultPolicy.ListResult(token)
 	if err != nil {
 		return nil, err

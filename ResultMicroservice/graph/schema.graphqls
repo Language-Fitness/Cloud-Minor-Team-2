@@ -30,6 +30,16 @@ type Result {
     soft_deleted: Boolean!
 }
 
+type resultInfo {
+    id: ID!
+    exercise_id: ID!
+    user_id: ID!
+    class_id: ID!
+    module_id: ID!
+    input: String!
+    result: Boolean!
+}
+
 input InputResult {
     exercise_id: ID!
     user_id: ID!
@@ -40,7 +50,7 @@ input InputResult {
 }
 
 type Query {
-    ListResults(filter: ResultFilter!, paginator: Paginator!): [Result]
+    ListResults(filter: ResultFilter!, paginator: Paginator!): [resultInfo]
     GetResultsByID(id: ID!): Result
 }
 
