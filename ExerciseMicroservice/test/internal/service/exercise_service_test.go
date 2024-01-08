@@ -120,6 +120,41 @@ func TestExerciseService_DeleteExercise(t *testing.T) {
 	mockRepo.AssertExpectations(t)
 }
 
+func TestExerciseService_UnDeleteExercise(t *testing.T) {
+	// Setup mock objects
+	mockValidator := new(mocks.MockValidator)
+	mockRepo := new(mocks.MockExerciseRepository)
+	mockPolicy := new(mocks.MockExercisePolicy)
+
+	// Create an instance of ExerciseService with mock dependencies
+	exerciseService := service.ExerciseService{
+		Validator: mockValidator,
+		Repo:      mockRepo,
+		Policy:    mockPolicy,
+	}
+
+	// Mock Validator expectations
+	mockValidator.On("GetErrors").Return([]string{})
+
+	// Mock Policy expectations
+	mockPolicy.On("DeleteExercise", mock.AnythingOfType("string"), mock.AnythingOfType("string")).
+		Return(true, &mocks.MockDeletedExercise, nil)
+
+	// Mock Repo expectations
+	mockRepo.On("UpdateExercise", mock.AnythingOfType("string"), mock.AnythingOfType("model.Exercise")).
+		Return(&mocks.MockExercise, nil)
+
+	// Call the method being tested
+	err := exerciseService.UnDeleteExercise(userToken, mocks.ExerciseID)
+
+	// Assertions
+	assert.Nil(t, err)
+
+	// Verify that the expected methods were called
+	mockPolicy.AssertExpectations(t)
+	mockRepo.AssertExpectations(t)
+}
+
 func TestExerciseService_GetExerciseById(t *testing.T) {
 	// Setup mock objects
 	mockValidator := new(mocks.MockValidator)

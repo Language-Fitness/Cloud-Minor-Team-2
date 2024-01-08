@@ -24,6 +24,11 @@ func (m *MockExerciseService) DeleteExercise(token string, id string) error {
 	return args.Error(0)
 }
 
+func (m *MockExerciseService) UnDeleteExercise(token string, id string) error {
+	args := m.Called(token, id)
+	return args.Error(0)
+}
+
 func (m *MockExerciseService) GetExerciseById(token string, id string) (*model.Exercise, error) {
 	args := m.Called(token, id)
 	return args.Get(0).(*model.Exercise), args.Error(1)
