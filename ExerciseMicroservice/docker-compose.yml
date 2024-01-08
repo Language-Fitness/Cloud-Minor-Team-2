@@ -8,13 +8,13 @@ services:
     image: graph-api
     ports:
       - "8084:8084"
-      - "9094:9094"
+      - "9093:9093"
 
   mongodb_exercise:
     container_name: mongodb_exercise
     image: mongo
     ports:
-      - "27017:27017"
+      - "27020:27017"
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: example

@@ -11,6 +11,7 @@ import (
 	"os"
 	"saga/graph/model"
 	"saga/internal/auth"
+	"saga/internal/helper"
 	"saga/internal/repository"
 	"saga/internal/validation"
 	"saga/proto/pb"
@@ -47,8 +48,7 @@ func NewSagaService(collection *mongo.Collection) ISagaService {
 
 func (s SagaService) InitSagaSteps(token string, filter *model.SagaFilter) (*model.SuccessMessage, error) {
 	// Step 1: check if saga object exist and if it does then create it
-	token = "eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJIaUpNcWZhTGFWQXBiME5JTEpweTlacmdtRzBERElIaWpVZklVWjM2NXJvIn0.eyJleHAiOjE3MDM5NDc5NzMsImlhdCI6MTcwMzk0NzY3MywianRpIjoiNjk1ZWNlNTktZDYwOS00MjExLWFiMjQtNjA2ODMwMTFkMTQ0IiwiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDo4ODg4L3JlYWxtcy9jbG91ZC1wcm9qZWN0IiwiYXVkIjpbInVzZXItbWFuYWdlbWVudC1jbGllbnQiLCJhY2NvdW50Il0sInN1YiI6IjZiMDNiYTVkLTVkMGUtNGRkOC05ZjdmLTkyOGU3NWVhOGVjYSIsInR5cCI6IkJlYXJlciIsImF6cCI6ImxvZ2luLWNsaWVudCIsInNlc3Npb25fc3RhdGUiOiIzYjYxNGNmNy00NmVjLTQ5NDEtOWU3Zi0wODkzZGRiODA3NmUiLCJhY3IiOiIxIiwicmVhbG1fYWNjZXNzIjp7InJvbGVzIjpbImRlZmF1bHQtcm9sZXMtY2xvdWQtcHJvamVjdCIsIm9mZmxpbmVfYWNjZXNzIiwidW1hX2F1dGhvcml6YXRpb24iXX0sInJlc291cmNlX2FjY2VzcyI6eyJ1c2VyLW1hbmFnZW1lbnQtY2xpZW50Ijp7InJvbGVzIjpbImZpbHRlcl9jbGFzc19kaWZmaWN1bHR5IiwiZ2V0X2NsYXNzZXNfYWxsIiwidXBkYXRlX3NjaG9vbCIsImZpbHRlcl9zY2hvb2xfbWFkZV9ieSIsImZpbHRlcl9zY2hvb2xfbmFtZSIsImZpbHRlcl9tb2R1bGVfY2F0ZWdvcnkiLCJmaWx0ZXJfY2xhc3NfbWFkZV9ieSIsImZpbHRlcl9tb2R1bGVfc29mdERlbGV0ZSIsImdldF9leGVyY2lzZXMiLCJnZXRfY2xhc3NlcyIsImRlbGV0ZV9tb2R1bGUiLCJkZWxldGVfZXhlcmNpc2UiLCJnZXRfc2Nob29scyIsInVwZGF0ZV9leGVyY2lzZSIsImdldF9leGVyY2lzZSIsImRlbGV0ZV9tb2R1bGVfYWxsIiwiY3JlYXRlX2V4ZXJjaXNlIiwiZ2V0X3NjaG9vbCIsImRlbGV0ZV9leGVyY2lzZV9hbGwiLCJmaWx0ZXJfc2Nob29sX2xvY2F0aW9uIiwidXBkYXRlX3NjaG9vbF9hbGwiLCJkZWxldGVfY2xhc3MiLCJmaWx0ZXJfbW9kdWxlX2RpZmZpY3VsdHkiLCJjcmVhdGVfbW9kdWxlIiwiZ2V0X21vZHVsZSIsImdldF9tb2R1bGVzIiwidXBkYXRlX2V4ZXJjaXNlX2FsbCIsImNyZWF0ZV9jbGFzcyIsImNyZWF0ZV9zY2hvb2wiLCJmaWx0ZXJfc2Nob29sX3NvZnREZWxldGUiLCJ1cGRhdGVfbW9kdWxlX2FsbCIsImdldF9tb2R1bGVzX2FsbCIsImZpbHRlcl9jbGFzc19tb2R1bGVfaWQiLCJmaWx0ZXJfbW9kdWxlX3NjaG9vbF9pZCIsImZpbHRlcl9tb2R1bGVfbWFkZV9ieSIsImZpbHRlcl9jbGFzc19uYW1lIiwidXBkYXRlX2NsYXNzX2FsbCIsImZpbHRlcl9tb2R1bGVfbmFtZSIsInVwZGF0ZV9tb2R1bGUiLCJnZXRfY2xhc3MiLCJkZWxldGVfc2Nob29sX2FsbCIsImZpbHRlcl9tb2R1bGVfcHJpdmF0ZSIsInVwZGF0ZV9jbGFzcyIsImdldF9zY2hvb2xzX2FsbCIsImZpbHRlcl9jbGFzc19zb2Z0RGVsZXRlIiwiZGVsZXRlX2NsYXNzX2FsbCJdfSwiYWNjb3VudCI6eyJyb2xlcyI6WyJtYW5hZ2UtYWNjb3VudCIsIm1hbmFnZS1hY2NvdW50LWxpbmtzIiwidmlldy1wcm9maWxlIl19fSwic2NvcGUiOiJlbWFpbCBwcm9maWxlIiwic2lkIjoiM2I2MTRjZjctNDZlYy00OTQxLTllN2YtMDg5M2RkYjgwNzZlIiwiZW1haWxfdmVyaWZpZWQiOmZhbHNlLCJuYW1lIjoiY2hhZCBhZG1pbiIsInByZWZlcnJlZF91c2VybmFtZSI6ImFkbWluQGFkbWluLmNvbSIsImdpdmVuX25hbWUiOiJjaGFkIiwiZmFtaWx5X25hbWUiOiJhZG1pbiIsImVtYWlsIjoiYWRtaW5AYWRtaW4uY29tIn0.ufqx_RD2A5abIdqEvf79lwl9bsQjZnIga54v82OdEKDpH47IF4yfnKIwl5f4sCpVeyaPl_ihPpYLtBwuD2ZLD-O-u6zRnFyVm3sXuAeN2CC3FOEWZtxr0gxECySaW7k3Oj7AWZimn_yxJfxyElRuNhlg4811gFJ1bZgGkl_3vJvg_61FEIBQB74vQA51jx27Y2-kSxdSMxXAkgWVNYjFtjgDyzeGZUHibqw8uLX4NYASprW4lGDVu-A3S_Vj3dJvJJON6Oe_8-IS-LH2Vw6olJNjEonxm9x5HJAWwUcn_Md4ShUB3u-k9jT1MAFkke1p4h5wuRnTa5mY3yjaF8LiRw"
-
+	token = "eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICI5ck1vbGRRY0pVSFM1alhGNXBLb1M5cVZGMC0yLWZnS0ZreVhRMnZiX0JvIn0.eyJleHAiOjE3MDQ3MjUwODQsImlhdCI6MTcwNDcyNDc4NCwianRpIjoiMWYzMTc2YzQtMWVmYi00MTdjLWE3ZTctNjI0MzMyYjcxNDc1IiwiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDo4ODg4L3JlYWxtcy9jbG91ZC1wcm9qZWN0IiwiYXVkIjpbInVzZXItbWFuYWdlbWVudC1jbGllbnQiLCJhY2NvdW50Il0sInN1YiI6IjJiOTY2ZTQ2LTg3NDgtNDZhYy1hODNkLTU4MjlmOGI5ZTk0ZiIsInR5cCI6IkJlYXJlciIsImF6cCI6ImxvZ2luLWNsaWVudCIsInNlc3Npb25fc3RhdGUiOiIwM2Y5YzMxZS0zYTcwLTQ5ZGEtYjVmMS1hMGE5MWVkZGE0NmYiLCJhY3IiOiIxIiwicmVhbG1fYWNjZXNzIjp7InJvbGVzIjpbImRlZmF1bHQtcm9sZXMtY2xvdWQtcHJvamVjdCIsIm9mZmxpbmVfYWNjZXNzIiwidW1hX2F1dGhvcml6YXRpb24iXX0sInJlc291cmNlX2FjY2VzcyI6eyJ1c2VyLW1hbmFnZW1lbnQtY2xpZW50Ijp7InJvbGVzIjpbImZpbHRlcl9yZXN1bHRfc29mdERlbGV0ZSIsImZpbHRlcl9jbGFzc19kaWZmaWN1bHR5IiwiZmlsdGVyX2V4ZXJjaXNlX2RpZmZpY3VsdHkiLCJmaWx0ZXJfc2Nob29sX25hbWUiLCJ1cGRhdGVfcmVzdWx0IiwiZmlsdGVyX2V4ZXJjaXNlX21vZHVsZV9pZCIsImZpbHRlcl9tb2R1bGVfY2F0ZWdvcnkiLCJkZWxldGVfbW9kdWxlX2FsbCIsImNyZWF0ZV9leGVyY2lzZSIsImdldF9zY2hvb2wiLCJmaWx0ZXJfc2Nob29sX2xvY2F0aW9uIiwiZmlsdGVyX21vZHVsZV9kaWZmaWN1bHR5IiwiZmlsdGVyX3Jlc3VsdF9tb2R1bGVfaWQiLCJvcGVuYWlfZ2VuZXJhdGVfcXVlc3Rpb25zIiwiZ2V0X21vZHVsZSIsImdldF9tb2R1bGVzIiwiZGVsZXRlX3Jlc3VsdF9hbGwiLCJmaWx0ZXJfc2Nob29sX3NvZnREZWxldGUiLCJ1cGRhdGVfbW9kdWxlX2FsbCIsImNyZWF0ZV9yZXN1bHQiLCJmaWx0ZXJfY2xhc3NfbW9kdWxlX2lkIiwiZ2V0X3Jlc3VsdF9hbGwiLCJmaWx0ZXJfbW9kdWxlX21hZGVfYnkiLCJsaXN0X3Jlc3VsdHNfYWxsIiwiZmlsdGVyX2V4ZXJjaXNlX3F1ZXN0aW9uX3R5cGVfaWQiLCJ1cGRhdGVfY2xhc3NfYWxsIiwiZ2V0X2NsYXNzIiwiZ2V0X3NjaG9vbHNfYWxsIiwiZmlsdGVyX3Jlc3VsdF9leGVyY2lzZV9pZCIsImZpbHRlcl9jbGFzc19zb2Z0RGVsZXRlIiwidXBkYXRlX3Jlc3VsdF9hbGwiLCJvcGVuYWlfZ2VuZXJhdGVfcXVlc3Rpb25zX2Zyb21fZmlsZSIsImdldF9jbGFzc2VzX2FsbCIsInVwZGF0ZV9zY2hvb2wiLCJmaWx0ZXJfc2Nob29sX21hZGVfYnkiLCJnZXRfZXhlcmNpc2VzX2FsbCIsImZpbHRlcl9jbGFzc19tYWRlX2J5IiwiZmlsdGVyX21vZHVsZV9zb2Z0RGVsZXRlIiwib3BlbmFpX2dlbmVyYXRlX2V4cGxhbmF0aW9uIiwiZ2V0X2NsYXNzZXMiLCJnZXRfZXhlcmNpc2VzIiwiZGVsZXRlX21vZHVsZSIsImRlbGV0ZV9leGVyY2lzZSIsImdldF9zY2hvb2xzIiwiZ2V0X2V4ZXJjaXNlIiwidXBkYXRlX2V4ZXJjaXNlIiwiZmlsdGVyX3Jlc3VsdF91c2VyX2lkIiwiZmlsdGVyX2V4ZXJjaXNlX25hbWUiLCJmaWx0ZXJfZXhlcmNpc2Vfc29mdERlbGV0ZSIsImRlbGV0ZV9leGVyY2lzZV9hbGwiLCJmaWx0ZXJfcmVzdWx0X2NsYXNzX2lkIiwidXBkYXRlX3NjaG9vbF9hbGwiLCJkZWxldGVfY2xhc3MiLCJkZWxldGVfcmVzdWx0IiwiY3JlYXRlX21vZHVsZSIsInVwZGF0ZV9leGVyY2lzZV9hbGwiLCJjcmVhdGVfY2xhc3MiLCJjcmVhdGVfc2Nob29sIiwiZ2V0X21vZHVsZXNfYWxsIiwiZmlsdGVyX2V4ZXJjaXNlX2NsYXNzX2lkIiwiZmlsdGVyX21vZHVsZV9zY2hvb2xfaWQiLCJsaXN0X3Jlc3VsdHMiLCJmaWx0ZXJfY2xhc3NfbmFtZSIsImdldF9yZXN1bHQiLCJvcGVuYWlfZ2V0X3NjaG9vbCIsImZpbHRlcl9tb2R1bGVfbmFtZSIsImZpbHRlcl9tb2R1bGVfbWFkZV9ieV9uYW1lIiwidXBkYXRlX21vZHVsZSIsImZpbHRlcl9leGVyY2lzZV9tYWRlX2J5IiwiZGVsZXRlX3NjaG9vbF9hbGwiLCJ1cGRhdGVfY2xhc3MiLCJmaWx0ZXJfbW9kdWxlX3ByaXZhdGUiLCJkZWxldGVfY2xhc3NfYWxsIl19LCJhY2NvdW50Ijp7InJvbGVzIjpbIm1hbmFnZS1hY2NvdW50IiwibWFuYWdlLWFjY291bnQtbGlua3MiLCJ2aWV3LXByb2ZpbGUiXX19LCJzY29wZSI6InByb2ZpbGUgZW1haWwiLCJzaWQiOiIwM2Y5YzMxZS0zYTcwLTQ5ZGEtYjVmMS1hMGE5MWVkZGE0NmYiLCJlbWFpbF92ZXJpZmllZCI6ZmFsc2UsIm5hbWUiOiJjaGFkIGFkbWluIiwicHJlZmVycmVkX3VzZXJuYW1lIjoiYWRtaW5AYWRtaW4uY29tIiwiZ2l2ZW5fbmFtZSI6ImNoYWQiLCJmYW1pbHlfbmFtZSI6ImFkbWluIiwiZW1haWwiOiJhZG1pbkBhZG1pbi5jb20ifQ.a8FEZpvU8E367vxB9z7BtD4fObTef8YNh10KvViuHl6qyp_hbEvGi2BzBl6X438UbMM73JjJ4ngL515CaKIlcVOf39Fkm_RZMsug4l9guACYPQGQaohVCGDeXQVOe0rdaC6O4ir5lPUPycTJOXf6q1JQfpfaVFhDuTAWyTG4fqO1ibuCLEabAtToCo6Y3opfgjSkvQfFniLHpUQQ-yphIS39N5MIZwIYxtIRmi6bQpL4K79ftkjm46mjwzvRs2H_Ri4kL9gaq-gyKbokR7DCOwbxZP0uCjnYS4mZOBSmNtrMSuGH1MBW8afRruCSx8WjBJsVAcmxJNBHPnMt8Ud9ug"
 	sagaObject, err := s.initializeSagaObject(token, filter)
 	if err != nil {
 		return nil, err
@@ -143,28 +143,31 @@ func (s SagaService) initializeSagaObject(token string, filter *model.SagaFilter
 }
 
 func (s SagaService) findAllChildren(token string, sagaObject *model.SagaObject) ([]model.SagaObject, error) {
-	fmt.Println("test4")
-	//client, conn2, err := createGRPCClient(model.SagaObjectTypesModule)
-	fmt.Println(sagaObject.ObjectType)
+	fmt.Println("find all children:")
+	fmt.Println(sagaObject)
+
+	if sagaObject.ObjectType == model.SagaObjectTypesExercise {
+		return nil, nil
+	}
+
 	fmt.Println(getChildTypeByType(sagaObject.ObjectType))
 	client, conn2, err := createGRPCClient(getChildTypeByType(sagaObject.ObjectType))
-	fmt.Println("test5")
+	fmt.Println("create client")
 
 	if err != nil {
 		fmt.Println(err)
 	}
-	fmt.Println("test")
+	fmt.Println("create client after error")
 
 	defer conn2.Close()
 
+	fmt.Println(convertToPBObjectType(sagaObject.ObjectType))
 	request := pb.ObjectRequest{
 		BearerToken:  token,
 		ObjectId:     sagaObject.ObjectID,
-		ObjectType:   pb.SagaObjectType_CLASS,
+		ObjectType:   convertToPBObjectType(sagaObject.ObjectType),
 		ObjectStatus: pb.SagaObjectStatus_EXIST,
 	}
-
-	fmt.Println("test2")
 
 	fmt.Println("Calling FindObject RPC...")
 	response, err := client.FindSagaObjectChildren(context.Background(), &request)
@@ -173,11 +176,39 @@ func (s SagaService) findAllChildren(token string, sagaObject *model.SagaObject)
 		log.Printf("failed to call FindObject RPC: %v", err)
 	}
 
-	fmt.Println("test3")
+	fmt.Println("after response")
+	if len(response.Objects) != 0 {
+		fmt.Println("\nResponse 1:", response.Objects[0].ObjectId)
+		fmt.Println("\nResponse 2:", response.Objects[0].ObjectStatus)
+		fmt.Println("\nResponse 3:", response.Objects[0].ObjectType)
+	}
+	for _, child := range response.Objects {
+		fmt.Println("childs:")
+		fmt.Println(child)
 
-	fmt.Println("\nResponse 1:", response.Objects[0].ObjectId)
-	fmt.Println("\nResponse 2:", response.Objects[0].ObjectStatus)
-	fmt.Println("\nResponse 3:", response.Objects[0].ObjectType)
+		sagaObject := model.SagaObject{
+			ID:           uuid.New().String(),
+			ObjectID:     child.ObjectId,
+			ObjectType:   convertToModelObjectType(child.ObjectType),
+			CreatedAt:    time.Now().Format("HH:MM:SS"),
+			ObjectStatus: convertToModelObjectStatus(child.ObjectStatus),
+			ParentID:     helper.StringPointer(sagaObject.ObjectID),
+			ActionDoneBy: "1", //@TODO get this from the bearer token sub
+		}
+
+		object, err := s.Repo.CreateSagaObject(&sagaObject)
+		if err != nil {
+			return nil, err
+		}
+
+		fmt.Println("for loop recursion")
+		ewa, err2 := s.findAllChildren(token, object)
+		fmt.Println(ewa)
+		fmt.Println(err2)
+		if err2 != nil {
+			return nil, err2
+		}
+	}
 
 	// Step 2 logic here
 	// Example: return a slice of ChildType

@@ -62,7 +62,7 @@ func (s *SagaService) FindSagaObjectChildren(ctx context.Context, req *pb.Object
 	for i := range classes {
 		object := &pb.SagaObject{
 			ObjectId:     fmt.Sprintf(classes[i].ID),
-			ObjectType:   pb.SagaObjectType_MODULE,
+			ObjectType:   pb.SagaObjectType_CLASS,
 			ObjectStatus: pb.SagaObjectStatus_EXIST,
 		}
 

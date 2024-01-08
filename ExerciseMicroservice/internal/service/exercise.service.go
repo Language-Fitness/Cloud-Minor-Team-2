@@ -8,6 +8,7 @@ import (
 	"ExerciseMicroservice/internal/repository"
 	"ExerciseMicroservice/internal/validation"
 	"errors"
+	"fmt"
 	"github.com/google/uuid"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -222,10 +223,10 @@ func (e *ExerciseService) GetExerciseById(token string, id string) (*model.Exerc
 }
 
 func (e *ExerciseService) ListExercises(token string, filter *model.ExerciseFilter, paginate *model.Paginator) ([]*model.ExerciseInfo, error) {
-	_, err := e.Policy.ListExercises(token)
-	if err != nil {
-		return nil, err
-	}
+	//_, err := e.Policy.ListExercises(token)
+	//if err != nil {
+	//	return nil, err
+	//}
 
 	validateListExerciseFilter(e.Validator, filter, paginate)
 	validationErrors := e.Validator.GetErrors()
@@ -284,6 +285,8 @@ func buildBsonFilterForListExercise(policy auth.IExercisePolicy, token string, f
 	bsonFilter := bson.D{}
 	//list of errors
 	var errs []error
+
+	fmt.Println(token)
 
 	appendCondition := func(key string, value interface{}, dbKey string) bool {
 

@@ -16,7 +16,7 @@ const keycloakServer        = 'http://localhost:8888';
 const masterRealm           = 'master';
 const projectRealm          = 'cloud-project';
 const adminClientId         = 'admin-cli';
-const adminClientSecret     = 'ppsIsOpfYs2stbwkTOqH5kFVdh2zklI4';
+const adminClientSecret     = 'KwJpmg3AXCbrGnPeCD2TvBm9scaUI0e3';
 const adminTokenEndpoint    = `${keycloakServer}/realms/${masterRealm}/protocol/openid-connect/token`;
 const clientTokenEndpoint   = `${keycloakServer}/realms/${projectRealm}/protocol/openid-connect/token`;
 
