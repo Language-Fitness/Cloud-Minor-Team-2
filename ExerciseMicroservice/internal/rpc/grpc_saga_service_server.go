@@ -41,7 +41,7 @@ func (s *SagaService) FindSagaObject(ctx context.Context, req *pb.ObjectRequest)
 func (s *SagaService) FindSagaObjectChildren(ctx context.Context, req *pb.ObjectRequest) (*pb.ObjectResponse, error) {
 
 	filter := model.ExerciseFilter{
-		MadeBy: helper.StringPointer(req.ObjectId),
+		ClassID: helper.StringPointer(req.ObjectId),
 	}
 
 	paginate := model.Paginator{
