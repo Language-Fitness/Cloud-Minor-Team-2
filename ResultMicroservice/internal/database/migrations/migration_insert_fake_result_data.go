@@ -15,7 +15,7 @@ var resultModuleID = "09d6be4b-da77-4be0-9094-445e1a5e639a"
 
 type FakeResult struct {
 	ID          string `faker:"uuid_hyphenated"`
-	ExerciseID  string `faker:"uuid_hyphenated"`
+	ExerciseID  string
 	UserID      string `faker:"uuid_hyphenated"`
 	ClassID     string `faker:"uuid_hyphenated"`
 	ModuleID    string `faker:"uuid_hyphenated"`
@@ -52,6 +52,7 @@ func GenerateRandomResults(n int) []FakeResult {
 			return nil
 		}
 
+		result.ExerciseID = "95f964a0-9749-4064-9162-cdd1b7b5d776"
 		result.ClassID = resultClassID
 		result.ModuleID = resultModuleID
 		result.SoftDeleted = false
@@ -68,7 +69,7 @@ func GenerateRandomResults(n int) []FakeResult {
 		return nil
 	}
 
-	fakeResultWithIdSet.ID = "95f964a0-9749-4064-9162-cdd1b7b5d777" // use this id for result
+	fakeResultWithIdSet.ExerciseID = "95f964a0-9749-4064-9162-cdd1b7b5d776"
 	fakeResultWithIdSet.ClassID = resultClassID
 	fakeResultWithIdSet.ModuleID = resultModuleID
 	fakeResultWithIdSet.SoftDeleted = false

@@ -21,7 +21,7 @@ import (
 type ISagaService interface {
 	InitSagaSteps(token string, filter *model.SagaFilter) (*model.SuccessMessage, error)
 	initializeSagaObject(token string, filter *model.SagaFilter) (*model.SagaObject, error)
-	findAllChildren(token string, sagaObject *model.SagaObject) ([]model.SagaObject, error)
+	findAllChildren(token string, sagaObject *model.SagaObject) error
 	findBottomChildren(sagaObject *model.SagaObject) (*model.SagaObject, error)
 	softDeleteItems(items []model.SagaObject) error
 	areAllItemsDeleted(items []model.SagaObject) bool
@@ -49,21 +49,17 @@ func NewSagaService(collection *mongo.Collection) ISagaService {
 func (s SagaService) InitSagaSteps(token string, filter *model.SagaFilter) (*model.SuccessMessage, error) {
 	// Step 1: check if saga object exist and if it does then create it
 	token = "eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICI5ck1vbGRRY0pVSFM1alhGNXBLb1M5cVZGMC0yLWZnS0ZreVhRMnZiX0JvIn0.eyJleHAiOjE3MDQ3MjUwODQsImlhdCI6MTcwNDcyNDc4NCwianRpIjoiMWYzMTc2YzQtMWVmYi00MTdjLWE3ZTctNjI0MzMyYjcxNDc1IiwiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDo4ODg4L3JlYWxtcy9jbG91ZC1wcm9qZWN0IiwiYXVkIjpbInVzZXItbWFuYWdlbWVudC1jbGllbnQiLCJhY2NvdW50Il0sInN1YiI6IjJiOTY2ZTQ2LTg3NDgtNDZhYy1hODNkLTU4MjlmOGI5ZTk0ZiIsInR5cCI6IkJlYXJlciIsImF6cCI6ImxvZ2luLWNsaWVudCIsInNlc3Npb25fc3RhdGUiOiIwM2Y5YzMxZS0zYTcwLTQ5ZGEtYjVmMS1hMGE5MWVkZGE0NmYiLCJhY3IiOiIxIiwicmVhbG1fYWNjZXNzIjp7InJvbGVzIjpbImRlZmF1bHQtcm9sZXMtY2xvdWQtcHJvamVjdCIsIm9mZmxpbmVfYWNjZXNzIiwidW1hX2F1dGhvcml6YXRpb24iXX0sInJlc291cmNlX2FjY2VzcyI6eyJ1c2VyLW1hbmFnZW1lbnQtY2xpZW50Ijp7InJvbGVzIjpbImZpbHRlcl9yZXN1bHRfc29mdERlbGV0ZSIsImZpbHRlcl9jbGFzc19kaWZmaWN1bHR5IiwiZmlsdGVyX2V4ZXJjaXNlX2RpZmZpY3VsdHkiLCJmaWx0ZXJfc2Nob29sX25hbWUiLCJ1cGRhdGVfcmVzdWx0IiwiZmlsdGVyX2V4ZXJjaXNlX21vZHVsZV9pZCIsImZpbHRlcl9tb2R1bGVfY2F0ZWdvcnkiLCJkZWxldGVfbW9kdWxlX2FsbCIsImNyZWF0ZV9leGVyY2lzZSIsImdldF9zY2hvb2wiLCJmaWx0ZXJfc2Nob29sX2xvY2F0aW9uIiwiZmlsdGVyX21vZHVsZV9kaWZmaWN1bHR5IiwiZmlsdGVyX3Jlc3VsdF9tb2R1bGVfaWQiLCJvcGVuYWlfZ2VuZXJhdGVfcXVlc3Rpb25zIiwiZ2V0X21vZHVsZSIsImdldF9tb2R1bGVzIiwiZGVsZXRlX3Jlc3VsdF9hbGwiLCJmaWx0ZXJfc2Nob29sX3NvZnREZWxldGUiLCJ1cGRhdGVfbW9kdWxlX2FsbCIsImNyZWF0ZV9yZXN1bHQiLCJmaWx0ZXJfY2xhc3NfbW9kdWxlX2lkIiwiZ2V0X3Jlc3VsdF9hbGwiLCJmaWx0ZXJfbW9kdWxlX21hZGVfYnkiLCJsaXN0X3Jlc3VsdHNfYWxsIiwiZmlsdGVyX2V4ZXJjaXNlX3F1ZXN0aW9uX3R5cGVfaWQiLCJ1cGRhdGVfY2xhc3NfYWxsIiwiZ2V0X2NsYXNzIiwiZ2V0X3NjaG9vbHNfYWxsIiwiZmlsdGVyX3Jlc3VsdF9leGVyY2lzZV9pZCIsImZpbHRlcl9jbGFzc19zb2Z0RGVsZXRlIiwidXBkYXRlX3Jlc3VsdF9hbGwiLCJvcGVuYWlfZ2VuZXJhdGVfcXVlc3Rpb25zX2Zyb21fZmlsZSIsImdldF9jbGFzc2VzX2FsbCIsInVwZGF0ZV9zY2hvb2wiLCJmaWx0ZXJfc2Nob29sX21hZGVfYnkiLCJnZXRfZXhlcmNpc2VzX2FsbCIsImZpbHRlcl9jbGFzc19tYWRlX2J5IiwiZmlsdGVyX21vZHVsZV9zb2Z0RGVsZXRlIiwib3BlbmFpX2dlbmVyYXRlX2V4cGxhbmF0aW9uIiwiZ2V0X2NsYXNzZXMiLCJnZXRfZXhlcmNpc2VzIiwiZGVsZXRlX21vZHVsZSIsImRlbGV0ZV9leGVyY2lzZSIsImdldF9zY2hvb2xzIiwiZ2V0X2V4ZXJjaXNlIiwidXBkYXRlX2V4ZXJjaXNlIiwiZmlsdGVyX3Jlc3VsdF91c2VyX2lkIiwiZmlsdGVyX2V4ZXJjaXNlX25hbWUiLCJmaWx0ZXJfZXhlcmNpc2Vfc29mdERlbGV0ZSIsImRlbGV0ZV9leGVyY2lzZV9hbGwiLCJmaWx0ZXJfcmVzdWx0X2NsYXNzX2lkIiwidXBkYXRlX3NjaG9vbF9hbGwiLCJkZWxldGVfY2xhc3MiLCJkZWxldGVfcmVzdWx0IiwiY3JlYXRlX21vZHVsZSIsInVwZGF0ZV9leGVyY2lzZV9hbGwiLCJjcmVhdGVfY2xhc3MiLCJjcmVhdGVfc2Nob29sIiwiZ2V0X21vZHVsZXNfYWxsIiwiZmlsdGVyX2V4ZXJjaXNlX2NsYXNzX2lkIiwiZmlsdGVyX21vZHVsZV9zY2hvb2xfaWQiLCJsaXN0X3Jlc3VsdHMiLCJmaWx0ZXJfY2xhc3NfbmFtZSIsImdldF9yZXN1bHQiLCJvcGVuYWlfZ2V0X3NjaG9vbCIsImZpbHRlcl9tb2R1bGVfbmFtZSIsImZpbHRlcl9tb2R1bGVfbWFkZV9ieV9uYW1lIiwidXBkYXRlX21vZHVsZSIsImZpbHRlcl9leGVyY2lzZV9tYWRlX2J5IiwiZGVsZXRlX3NjaG9vbF9hbGwiLCJ1cGRhdGVfY2xhc3MiLCJmaWx0ZXJfbW9kdWxlX3ByaXZhdGUiLCJkZWxldGVfY2xhc3NfYWxsIl19LCJhY2NvdW50Ijp7InJvbGVzIjpbIm1hbmFnZS1hY2NvdW50IiwibWFuYWdlLWFjY291bnQtbGlua3MiLCJ2aWV3LXByb2ZpbGUiXX19LCJzY29wZSI6InByb2ZpbGUgZW1haWwiLCJzaWQiOiIwM2Y5YzMxZS0zYTcwLTQ5ZGEtYjVmMS1hMGE5MWVkZGE0NmYiLCJlbWFpbF92ZXJpZmllZCI6ZmFsc2UsIm5hbWUiOiJjaGFkIGFkbWluIiwicHJlZmVycmVkX3VzZXJuYW1lIjoiYWRtaW5AYWRtaW4uY29tIiwiZ2l2ZW5fbmFtZSI6ImNoYWQiLCJmYW1pbHlfbmFtZSI6ImFkbWluIiwiZW1haWwiOiJhZG1pbkBhZG1pbi5jb20ifQ.a8FEZpvU8E367vxB9z7BtD4fObTef8YNh10KvViuHl6qyp_hbEvGi2BzBl6X438UbMM73JjJ4ngL515CaKIlcVOf39Fkm_RZMsug4l9guACYPQGQaohVCGDeXQVOe0rdaC6O4ir5lPUPycTJOXf6q1JQfpfaVFhDuTAWyTG4fqO1ibuCLEabAtToCo6Y3opfgjSkvQfFniLHpUQQ-yphIS39N5MIZwIYxtIRmi6bQpL4K79ftkjm46mjwzvRs2H_Ri4kL9gaq-gyKbokR7DCOwbxZP0uCjnYS4mZOBSmNtrMSuGH1MBW8afRruCSx8WjBJsVAcmxJNBHPnMt8Ud9ug"
+
+	//@TODO CHECK IF THERE IS ALREADY AN OBJECT IN THE DB WITH THIS TYPE!!! BEFORE WE CONTINUE
 	sagaObject, err := s.initializeSagaObject(token, filter)
 	if err != nil {
 		return nil, err
 	}
 
 	// Step 2: Find all possible children
-	children, err := s.findAllChildren(token, sagaObject)
-	if err != nil {
-		return nil, err
-	}
-
-	// Step 3: Loop through children and find those, if any
-	for _, child := range children {
-		// Your logic for finding children
-		fmt.Println(child)
+	err2 := s.findAllChildren(token, sagaObject)
+	if err2 != nil {
+		return nil, err2
 	}
 
 	// Step 4: Loop through everything starting with the bottom children
@@ -142,14 +138,15 @@ func (s SagaService) initializeSagaObject(token string, filter *model.SagaFilter
 	return object, nil
 }
 
-func (s SagaService) findAllChildren(token string, sagaObject *model.SagaObject) ([]model.SagaObject, error) {
+func (s SagaService) findAllChildren(token string, sagaObject *model.SagaObject) error {
 	fmt.Println("find all children:")
 	fmt.Println(sagaObject)
 
-	if sagaObject.ObjectType == model.SagaObjectTypesExercise {
-		return nil, nil
+	if sagaObject.ObjectType == model.SagaObjectTypesResult {
+		return nil
 	}
 
+	fmt.Println("get child by type:")
 	fmt.Println(getChildTypeByType(sagaObject.ObjectType))
 	client, conn2, err := createGRPCClient(getChildTypeByType(sagaObject.ObjectType))
 	fmt.Println("create client")
@@ -198,40 +195,18 @@ func (s SagaService) findAllChildren(token string, sagaObject *model.SagaObject)
 
 		object, err := s.Repo.CreateSagaObject(&sagaObject)
 		if err != nil {
-			return nil, err
+			return err
 		}
 
 		fmt.Println("for loop recursion")
-		ewa, err2 := s.findAllChildren(token, object)
-		fmt.Println(ewa)
+		err2 := s.findAllChildren(token, object)
 		fmt.Println(err2)
 		if err2 != nil {
-			return nil, err2
+			return err2
 		}
 	}
 
-	// Step 2 logic here
-	// Example: return a slice of ChildType
-
-	// Get main object and ID
-	// Send GRPC request to search children
-	// So if School   	    -> search User
-	// So if type User 	    -> search for Module
-	// So if type User 	    -> search for Results
-	// So if type Module    -> search for Classes
-	// So if type Classes   -> search for Exercises
-	// So if type Exercises -> search for Results
-
-	// Then push the results in saga object from GRPC request
-	// Save SagaObject in DB
-	// Return SagaObject
-
-	// Note this function can be reused to find children of the children
-	// for example if we first get all classes belonging to module
-	// We should be able to recall this function from a for loop to get all the
-	// children of the classes with exercises
-
-	return nil, nil
+	return nil
 }
 
 func (s SagaService) findBottomChildren(sagaObject *model.SagaObject) (*model.SagaObject, error) {
@@ -269,7 +244,7 @@ func getHostByType(sagaType model.SagaObjectTypes) string {
 	case model.SagaObjectTypesSchool:
 		return os.Getenv("SCHOOL_MS_GRPC_HOST")
 	case model.SagaObjectTypesResult:
-		return os.Getenv("EXERCISE_MS_GRPC_HOST")
+		return os.Getenv("RESULT_MS_GRPC_HOST")
 	default:
 		return os.Getenv("MODULE_MS_GRPC_HOST")
 	}
