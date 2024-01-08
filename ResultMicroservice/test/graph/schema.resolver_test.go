@@ -119,17 +119,16 @@ func TestDeleteResult(t *testing.T) {
 	resolver := graph.Resolver{Service: mockService}
 
 	// Set up expectations on the mock service
-	mockService.On("DeleteResult", mock.Anything, "resultID").Return(&mocks.MockResult, nil).Once()
+	mockService.On("DeleteResult", mock.Anything, "resultID").Return(nil).Once()
 
 	// Create a context with a mock token
 	ctx := context.WithValue(context.Background(), "myCustomTokenKey", "mock_token")
 
 	// Call the resolver function
-	result, err := resolver.Mutation().DeleteResult(ctx, "resultID")
+	_, err := resolver.Mutation().DeleteResult(ctx, "resultID")
 
 	// Assert that the result and error match expectations
 	assert.NoError(t, err)
-	assert.Equal(t, &mocks.MockResult, result)
 
 	// Verify that the expectations on the mock service were met
 	mockService.AssertExpectations(t)
@@ -144,16 +143,15 @@ func TestDeleteResult_Error(t *testing.T) {
 
 	// Set up expectations on the mock service for an error case
 	expectedError := errors.New("some error")
-	mockService.On("DeleteResult", mock.Anything, "resultID").Return((*model.Result)(nil), expectedError).Once()
+	mockService.On("DeleteResult", mock.Anything, "resultID").Return(expectedError).Once()
 
 	// Create a context with a mock token
 	ctx := context.WithValue(context.Background(), "myCustomTokenKey", "mock_token")
 
 	// Call the resolver function
-	result, err := resolver.Mutation().DeleteResult(ctx, "resultID")
+	_, err := resolver.Mutation().DeleteResult(ctx, "resultID")
 
 	// Assert that the result is nil and the error is not nil
-	assert.Nil(t, result)
 	assert.NotNil(t, err)
 	assert.EqualError(t, err, expectedError.Error())
 
@@ -169,7 +167,7 @@ func TestListResults(t *testing.T) {
 	resolver := graph.Resolver{Service: mockService}
 
 	// Set up expectations on the mock service
-	mockService.On("ListResults", mock.Anything, mock.Anything, mock.Anything).Return([]*model.Result{&mocks.MockResult}, nil).Once()
+	mockService.On("ListResults", mock.Anything, mock.Anything, mock.Anything).Return([]*model.ResultInfo{&mocks.MockResultInfo}, nil).Once()
 
 	// Create a context with a mock token
 	ctx := context.WithValue(context.Background(), "myCustomTokenKey", "mock_token")
@@ -179,7 +177,7 @@ func TestListResults(t *testing.T) {
 
 	// Assert that the result and error match expectations
 	assert.NoError(t, err)
-	assert.Equal(t, []*model.Result{&mocks.MockResult}, results)
+	assert.Equal(t, []*model.ResultInfo{&mocks.MockResultInfo}, results)
 
 	// Verify that the expectations on the mock service were met
 	mockService.AssertExpectations(t)
@@ -194,7 +192,7 @@ func TestListResults_Error(t *testing.T) {
 
 	// Set up expectations on the mock service for an error case
 	expectedError := errors.New("some error")
-	mockService.On("ListResults", mock.Anything, mock.Anything, mock.Anything).Return([]*model.Result{(*model.Result)(nil)}, expectedError).Once()
+	mockService.On("ListResults", mock.Anything, mock.Anything, mock.Anything).Return([]*model.ResultInfo{(*model.ResultInfo)(nil)}, expectedError).Once()
 
 	// Create a context with a mock token
 	ctx := context.WithValue(context.Background(), "myCustomTokenKey", "mock_token")
