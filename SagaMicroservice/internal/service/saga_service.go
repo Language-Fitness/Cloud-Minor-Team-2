@@ -25,8 +25,8 @@ type ISagaService interface {
 	initializeSagaObject(token string, filter *model.SagaFilter) (*model.SagaObject, error)
 	findAllChildren(token string, sagaObject *model.SagaObject) error
 	softDeleteChildren(token string, object *model.SagaObject) error
-	areAllItemsDeleted(items []model.SagaObject) bool
-	undeleteItems(items []model.SagaObject) error
+	areAllItemsDeleted(token string, sagaObject *model.SagaObject) bool
+	undeleteItems(token string, sagaObject *model.SagaObject) error
 }
 
 // SagaService GOLANG STRUCT
@@ -47,6 +47,7 @@ func NewSagaService(collection *mongo.Collection) ISagaService {
 	}
 }
 
+//goland:noinspection SpellCheckingInspection,SpellCheckingInspection,SpellCheckingInspection,SpellCheckingInspection,SpellCheckingInspection,SpellCheckingInspection,SpellCheckingInspection,SpellCheckingInspection,SpellCheckingInspection,SpellCheckingInspection,SpellCheckingInspection,SpellCheckingInspection,SpellCheckingInspection,SpellCheckingInspection,SpellCheckingInspection,SpellCheckingInspection,SpellCheckingInspection,SpellCheckingInspection,SpellCheckingInspection,SpellCheckingInspection,SpellCheckingInspection,SpellCheckingInspection,SpellCheckingInspection,SpellCheckingInspection,SpellCheckingInspection,SpellCheckingInspection,SpellCheckingInspection,SpellCheckingInspection,SpellCheckingInspection,SpellCheckingInspection,SpellCheckingInspection,SpellCheckingInspection,SpellCheckingInspection,SpellCheckingInspection,SpellCheckingInspection,SpellCheckingInspection,SpellCheckingInspection,SpellCheckingInspection,SpellCheckingInspection,SpellCheckingInspection,SpellCheckingInspection,SpellCheckingInspection,SpellCheckingInspection,SpellCheckingInspection,SpellCheckingInspection,SpellCheckingInspection,SpellCheckingInspection,SpellCheckingInspection,SpellCheckingInspection,SpellCheckingInspection,SpellCheckingInspection,SpellCheckingInspection,SpellCheckingInspection,SpellCheckingInspection,SpellCheckingInspection,SpellCheckingInspection,SpellCheckingInspection
 func (s SagaService) InitSagaSteps(token string, filter *model.SagaFilter) (*model.SuccessMessage, error) {
 	// Step 1: check if saga object exist and if it does then create it
 	token = "eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICI5ck1vbGRRY0pVSFM1alhGNXBLb1M5cVZGMC0yLWZnS0ZreVhRMnZiX0JvIn0.eyJleHAiOjE3MDQ3MjUwODQsImlhdCI6MTcwNDcyNDc4NCwianRpIjoiMWYzMTc2YzQtMWVmYi00MTdjLWE3ZTctNjI0MzMyYjcxNDc1IiwiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDo4ODg4L3JlYWxtcy9jbG91ZC1wcm9qZWN0IiwiYXVkIjpbInVzZXItbWFuYWdlbWVudC1jbGllbnQiLCJhY2NvdW50Il0sInN1YiI6IjJiOTY2ZTQ2LTg3NDgtNDZhYy1hODNkLTU4MjlmOGI5ZTk0ZiIsInR5cCI6IkJlYXJlciIsImF6cCI6ImxvZ2luLWNsaWVudCIsInNlc3Npb25fc3RhdGUiOiIwM2Y5YzMxZS0zYTcwLTQ5ZGEtYjVmMS1hMGE5MWVkZGE0NmYiLCJhY3IiOiIxIiwicmVhbG1fYWNjZXNzIjp7InJvbGVzIjpbImRlZmF1bHQtcm9sZXMtY2xvdWQtcHJvamVjdCIsIm9mZmxpbmVfYWNjZXNzIiwidW1hX2F1dGhvcml6YXRpb24iXX0sInJlc291cmNlX2FjY2VzcyI6eyJ1c2VyLW1hbmFnZW1lbnQtY2xpZW50Ijp7InJvbGVzIjpbImZpbHRlcl9yZXN1bHRfc29mdERlbGV0ZSIsImZpbHRlcl9jbGFzc19kaWZmaWN1bHR5IiwiZmlsdGVyX2V4ZXJjaXNlX2RpZmZpY3VsdHkiLCJmaWx0ZXJfc2Nob29sX25hbWUiLCJ1cGRhdGVfcmVzdWx0IiwiZmlsdGVyX2V4ZXJjaXNlX21vZHVsZV9pZCIsImZpbHRlcl9tb2R1bGVfY2F0ZWdvcnkiLCJkZWxldGVfbW9kdWxlX2FsbCIsImNyZWF0ZV9leGVyY2lzZSIsImdldF9zY2hvb2wiLCJmaWx0ZXJfc2Nob29sX2xvY2F0aW9uIiwiZmlsdGVyX21vZHVsZV9kaWZmaWN1bHR5IiwiZmlsdGVyX3Jlc3VsdF9tb2R1bGVfaWQiLCJvcGVuYWlfZ2VuZXJhdGVfcXVlc3Rpb25zIiwiZ2V0X21vZHVsZSIsImdldF9tb2R1bGVzIiwiZGVsZXRlX3Jlc3VsdF9hbGwiLCJmaWx0ZXJfc2Nob29sX3NvZnREZWxldGUiLCJ1cGRhdGVfbW9kdWxlX2FsbCIsImNyZWF0ZV9yZXN1bHQiLCJmaWx0ZXJfY2xhc3NfbW9kdWxlX2lkIiwiZ2V0X3Jlc3VsdF9hbGwiLCJmaWx0ZXJfbW9kdWxlX21hZGVfYnkiLCJsaXN0X3Jlc3VsdHNfYWxsIiwiZmlsdGVyX2V4ZXJjaXNlX3F1ZXN0aW9uX3R5cGVfaWQiLCJ1cGRhdGVfY2xhc3NfYWxsIiwiZ2V0X2NsYXNzIiwiZ2V0X3NjaG9vbHNfYWxsIiwiZmlsdGVyX3Jlc3VsdF9leGVyY2lzZV9pZCIsImZpbHRlcl9jbGFzc19zb2Z0RGVsZXRlIiwidXBkYXRlX3Jlc3VsdF9hbGwiLCJvcGVuYWlfZ2VuZXJhdGVfcXVlc3Rpb25zX2Zyb21fZmlsZSIsImdldF9jbGFzc2VzX2FsbCIsInVwZGF0ZV9zY2hvb2wiLCJmaWx0ZXJfc2Nob29sX21hZGVfYnkiLCJnZXRfZXhlcmNpc2VzX2FsbCIsImZpbHRlcl9jbGFzc19tYWRlX2J5IiwiZmlsdGVyX21vZHVsZV9zb2Z0RGVsZXRlIiwib3BlbmFpX2dlbmVyYXRlX2V4cGxhbmF0aW9uIiwiZ2V0X2NsYXNzZXMiLCJnZXRfZXhlcmNpc2VzIiwiZGVsZXRlX21vZHVsZSIsImRlbGV0ZV9leGVyY2lzZSIsImdldF9zY2hvb2xzIiwiZ2V0X2V4ZXJjaXNlIiwidXBkYXRlX2V4ZXJjaXNlIiwiZmlsdGVyX3Jlc3VsdF91c2VyX2lkIiwiZmlsdGVyX2V4ZXJjaXNlX25hbWUiLCJmaWx0ZXJfZXhlcmNpc2Vfc29mdERlbGV0ZSIsImRlbGV0ZV9leGVyY2lzZV9hbGwiLCJmaWx0ZXJfcmVzdWx0X2NsYXNzX2lkIiwidXBkYXRlX3NjaG9vbF9hbGwiLCJkZWxldGVfY2xhc3MiLCJkZWxldGVfcmVzdWx0IiwiY3JlYXRlX21vZHVsZSIsInVwZGF0ZV9leGVyY2lzZV9hbGwiLCJjcmVhdGVfY2xhc3MiLCJjcmVhdGVfc2Nob29sIiwiZ2V0X21vZHVsZXNfYWxsIiwiZmlsdGVyX2V4ZXJjaXNlX2NsYXNzX2lkIiwiZmlsdGVyX21vZHVsZV9zY2hvb2xfaWQiLCJsaXN0X3Jlc3VsdHMiLCJmaWx0ZXJfY2xhc3NfbmFtZSIsImdldF9yZXN1bHQiLCJvcGVuYWlfZ2V0X3NjaG9vbCIsImZpbHRlcl9tb2R1bGVfbmFtZSIsImZpbHRlcl9tb2R1bGVfbWFkZV9ieV9uYW1lIiwidXBkYXRlX21vZHVsZSIsImZpbHRlcl9leGVyY2lzZV9tYWRlX2J5IiwiZGVsZXRlX3NjaG9vbF9hbGwiLCJ1cGRhdGVfY2xhc3MiLCJmaWx0ZXJfbW9kdWxlX3ByaXZhdGUiLCJkZWxldGVfY2xhc3NfYWxsIl19LCJhY2NvdW50Ijp7InJvbGVzIjpbIm1hbmFnZS1hY2NvdW50IiwibWFuYWdlLWFjY291bnQtbGlua3MiLCJ2aWV3LXByb2ZpbGUiXX19LCJzY29wZSI6InByb2ZpbGUgZW1haWwiLCJzaWQiOiIwM2Y5YzMxZS0zYTcwLTQ5ZGEtYjVmMS1hMGE5MWVkZGE0NmYiLCJlbWFpbF92ZXJpZmllZCI6ZmFsc2UsIm5hbWUiOiJjaGFkIGFkbWluIiwicHJlZmVycmVkX3VzZXJuYW1lIjoiYWRtaW5AYWRtaW4uY29tIiwiZ2l2ZW5fbmFtZSI6ImNoYWQiLCJmYW1pbHlfbmFtZSI6ImFkbWluIiwiZW1haWwiOiJhZG1pbkBhZG1pbi5jb20ifQ.a8FEZpvU8E367vxB9z7BtD4fObTef8YNh10KvViuHl6qyp_hbEvGi2BzBl6X438UbMM73JjJ4ngL515CaKIlcVOf39Fkm_RZMsug4l9guACYPQGQaohVCGDeXQVOe0rdaC6O4ir5lPUPycTJOXf6q1JQfpfaVFhDuTAWyTG4fqO1ibuCLEabAtToCo6Y3opfgjSkvQfFniLHpUQQ-yphIS39N5MIZwIYxtIRmi6bQpL4K79ftkjm46mjwzvRs2H_Ri4kL9gaq-gyKbokR7DCOwbxZP0uCjnYS4mZOBSmNtrMSuGH1MBW8afRruCSx8WjBJsVAcmxJNBHPnMt8Ud9ug"
@@ -64,19 +65,43 @@ func (s SagaService) InitSagaSteps(token string, filter *model.SagaFilter) (*mod
 	}
 
 	// Step 5: Start soft deleting items and change object_status to Deleted if success
+	client, conn4, err := createGRPCClient(sagaObject.ObjectType)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	defer conn4.Close()
+
+	request := pb.ObjectRequest{
+		BearerToken:  token,
+		ObjectId:     sagaObject.ObjectID,
+		ObjectType:   convertToPBObjectType(sagaObject.ObjectType),
+		ObjectStatus: pb.SagaObjectStatus_EXIST,
+	}
+
+	response, err := client.DeleteObject(context.Background(), &request)
+	if err != nil {
+		log.Printf("failed to call FindObject RPC: %v", err)
+	}
+
+	sagaObject, err = s.updateSagaObject(sagaObject, response, sagaObject, err)
+	if err != nil {
+		return nil, err
+	}
+
 	if err := s.softDeleteChildren(token, sagaObject); err != nil {
 		// Handle rollback logic or return an error
 		return nil, err
 	}
 	//
 	//// Step 6: Loop through items to check if all object_status are Deleted
-	//if !s.areAllItemsDeleted(sagaObject) {
-	//	// Step 7: If not everything is deleted, reloop steps 4 and 5 but undelete every item
-	//	if err := s.undeleteItems(sagaObject); err != nil {
-	//		// Handle rollback logic or return an error
-	//		return nil, err
-	//	}
-	//}
+	if !s.areAllItemsDeleted(token, sagaObject) {
+		// Step 7: If not everything is deleted, reloop steps 4 and 5 but undelete every item
+		if err := s.undeleteItems(token, sagaObject); err != nil {
+			// Handle rollback logic or return an error
+			return nil, err
+		}
+	}
 
 	successMessage := &model.SuccessMessage{
 		ID:         "1",
@@ -134,22 +159,14 @@ func (s SagaService) initializeSagaObject(token string, filter *model.SagaFilter
 }
 
 func (s SagaService) findAllChildren(token string, sagaObject *model.SagaObject) error {
-	fmt.Println("find all children:")
-	fmt.Println(sagaObject)
-
 	if sagaObject.ObjectType == model.SagaObjectTypesResult {
 		return nil
 	}
 
-	fmt.Println("get child by type:")
-	fmt.Println(getChildTypeByType(sagaObject.ObjectType))
 	client, conn2, err := createGRPCClient(getChildTypeByType(sagaObject.ObjectType))
-	fmt.Println("create client")
-
 	if err != nil {
 		fmt.Println(err)
 	}
-	fmt.Println("create client after error")
 
 	defer conn2.Close()
 
@@ -161,23 +178,12 @@ func (s SagaService) findAllChildren(token string, sagaObject *model.SagaObject)
 		ObjectStatus: pb.SagaObjectStatus_EXIST,
 	}
 
-	fmt.Println("Calling FindObject RPC...")
 	response, err := client.FindSagaObjectChildren(context.Background(), &request)
 	if err != nil {
-		//log.Fatalf("failed to call FindObject RPC: %v", err)
 		log.Printf("failed to call FindObject RPC: %v", err)
 	}
 
-	fmt.Println("after response")
-	if len(response.Objects) != 0 {
-		fmt.Println("\nResponse 1:", response.Objects[0].ObjectId)
-		fmt.Println("\nResponse 2:", response.Objects[0].ObjectStatus)
-		fmt.Println("\nResponse 3:", response.Objects[0].ObjectType)
-	}
 	for _, child := range response.Objects {
-		fmt.Println("childs:")
-		fmt.Println(child)
-
 		sagaObject := model.SagaObject{
 			ID:           uuid.New().String(),
 			ObjectID:     child.ObjectId,
@@ -193,9 +199,7 @@ func (s SagaService) findAllChildren(token string, sagaObject *model.SagaObject)
 			return err
 		}
 
-		fmt.Println("for loop recursion")
 		err2 := s.findAllChildren(token, object)
-		fmt.Println(err2)
 		if err2 != nil {
 			return err2
 		}
@@ -221,7 +225,7 @@ func (s SagaService) softDeleteChildren(token string, sagaObject *model.SagaObje
 
 	for _, child := range objects {
 
-		func(child *model.SagaObject) {
+		err := func(child *model.SagaObject) error {
 			client, conn3, err := createGRPCClient(child.ObjectType)
 			if err != nil {
 				fmt.Println(err)
@@ -243,41 +247,128 @@ func (s SagaService) softDeleteChildren(token string, sagaObject *model.SagaObje
 				log.Printf("failed to call FindObject RPC: %v", err)
 			}
 
-			updatedSagaObject := model.SagaObject{
-				ID:           child.ID,
-				ObjectID:     child.ObjectID,
-				ObjectType:   child.ObjectType,
-				CreatedAt:    child.CreatedAt,
-				UpdatedAt:    helper.StringPointer(time.Now().Format("HH:MM:SS")),
-				ObjectStatus: convertToModelObjectStatus(response.ObjectStatus),
-				ParentID:     helper.StringPointer(sagaObject.ObjectID),
-				ActionDoneBy: child.ActionDoneBy,
-			}
-
-			updateSagaObject, err := s.Repo.UpdateSagaObject(child.ID, updatedSagaObject)
-			if err != nil {
-				return
+			updateSagaObject, err3 := s.updateSagaObject(child, response, sagaObject, err)
+			if err3 != nil {
+				return err3
 			}
 
 			err2 := s.softDeleteChildren(token, updateSagaObject)
 			if err2 != nil {
-				return
+				return err2
 			}
+			return nil
 		}(child)
+		if err != nil {
+			return err
+		}
 	}
 
 	return nil
 }
 
-func (s SagaService) areAllItemsDeleted(items []model.SagaObject) bool {
-	// Step 6 logic here
-	// Example: check if all items have object_status set to Deleted
+func (s SagaService) areAllItemsDeleted(token string, sagaObject *model.SagaObject) bool {
+	if sagaObject.ObjectType == model.SagaObjectTypesResult {
+		return false
+	}
+
+	filterQuery := bson.D{{Key: "parent_id", Value: sagaObject.ID}}
+	optionsQuery := options.Find().
+		SetSkip(int64(0)).
+		SetLimit(int64(100))
+
+	objects, err := s.Repo.ListSagaObjects(filterQuery, optionsQuery)
+	if err != nil {
+		return false
+	}
+
+	for _, child := range objects {
+
+		boolRes := func(child *model.SagaObject) bool {
+			client, conn3, err := createGRPCClient(child.ObjectType)
+			if err != nil {
+				fmt.Println(err)
+			}
+
+			defer conn3.Close()
+
+			request := pb.ObjectRequest{
+				BearerToken:  token,
+				ObjectId:     sagaObject.ObjectID,
+				ObjectType:   convertToPBObjectType(sagaObject.ObjectType),
+				ObjectStatus: pb.SagaObjectStatus_EXIST,
+			}
+
+			fmt.Println("Calling FindObject RPC...")
+			response, err := client.FindSagaObject(context.Background(), &request)
+			if err != nil {
+				log.Printf("failed to call FindObject RPC: %v", err)
+			}
+
+			if convertToModelObjectStatus(response.ObjectStatus) != child.ObjectStatus {
+				return false
+			}
+
+			res := s.areAllItemsDeleted(token, child)
+			return res
+		}(child)
+		return boolRes
+	}
+
 	return true
 }
 
-func (s SagaService) undeleteItems(items []model.SagaObject) error {
-	// Step 8 logic here
-	// Example: undelete items and update object_status
+func (s SagaService) undeleteItems(token string, sagaObject *model.SagaObject) error {
+	if sagaObject.ObjectType == model.SagaObjectTypesResult {
+		return nil
+	}
+
+	filterQuery := bson.D{{Key: "parent_id", Value: sagaObject.ID}}
+	optionsQuery := options.Find().
+		SetSkip(int64(0)).
+		SetLimit(int64(100))
+
+	objects, err := s.Repo.ListSagaObjects(filterQuery, optionsQuery)
+	if err != nil {
+		return err
+	}
+
+	for _, child := range objects {
+
+		boolRes := func(child *model.SagaObject) error {
+			client, conn3, err := createGRPCClient(child.ObjectType)
+			if err != nil {
+				fmt.Println(err)
+				return err
+			}
+
+			defer conn3.Close()
+
+			request := pb.ObjectRequest{
+				BearerToken:  token,
+				ObjectId:     sagaObject.ObjectID,
+				ObjectType:   convertToPBObjectType(sagaObject.ObjectType),
+				ObjectStatus: pb.SagaObjectStatus_EXIST,
+			}
+
+			fmt.Println("Calling FindObject RPC...")
+			_, err = client.UnDeleteObject(context.Background(), &request)
+			if err != nil {
+				log.Printf("failed to call FindObject RPC: %v", err)
+				return err
+			}
+
+			res := s.undeleteItems(token, child)
+
+			if res != nil {
+				log.Printf("failed to call FindObject RPC: %v", err)
+				return res
+			}
+
+			return nil
+		}(child)
+		return boolRes
+	}
+
 	return nil
 }
 
@@ -341,6 +432,25 @@ func convertToModelObjectType(objectType pb.SagaObjectType) model.SagaObjectType
 	default:
 		return model.SagaObjectTypesResult
 	}
+}
+
+func (s SagaService) updateSagaObject(child *model.SagaObject, response *pb.ObjectRequest, sagaObject *model.SagaObject, err error) (*model.SagaObject, error) {
+	updatedSagaObject := model.SagaObject{
+		ID:           child.ID,
+		ObjectID:     child.ObjectID,
+		ObjectType:   child.ObjectType,
+		CreatedAt:    child.CreatedAt,
+		UpdatedAt:    helper.StringPointer(time.Now().Format("HH:MM:SS")),
+		ObjectStatus: convertToModelObjectStatus(response.ObjectStatus),
+		ParentID:     helper.StringPointer(sagaObject.ObjectID),
+		ActionDoneBy: child.ActionDoneBy,
+	}
+
+	updateSagaObject, err := s.Repo.UpdateSagaObject(child.ID, updatedSagaObject)
+	if err != nil {
+		return nil, err
+	}
+	return updateSagaObject, nil
 }
 
 func convertToModelObjectStatus(objectType pb.SagaObjectStatus) model.SagaObjectStatus {
