@@ -1,0 +1,15 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: result-mongodb-service
+  annotations:
+    description: Exposes and load balances the application pods
+  labels:
+    app: result-mongodb
+spec:
+  ports:
+    - name: tcp
+      port: 27017
+      targetPort: 27017
+  selector:
+    app: result-mongodb
