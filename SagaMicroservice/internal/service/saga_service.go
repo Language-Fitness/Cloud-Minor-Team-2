@@ -213,12 +213,7 @@ func (s SagaService) softDeleteChildren(token string, sagaObject *model.SagaObje
 		return nil
 	}
 
-	filterQuery := bson.D{{Key: "parent_id", Value: sagaObject.ID}}
-	optionsQuery := options.Find().
-		SetSkip(int64(0)).
-		SetLimit(int64(100))
-
-	objects, err := s.Repo.ListSagaObjects(filterQuery, optionsQuery)
+	objects, err := s.Repo.ListSagaObjects(s.createQuery(sagaObject))
 	if err != nil {
 		return err
 	}
@@ -271,12 +266,7 @@ func (s SagaService) areAllItemsDeleted(token string, sagaObject *model.SagaObje
 		return false
 	}
 
-	filterQuery := bson.D{{Key: "parent_id", Value: sagaObject.ID}}
-	optionsQuery := options.Find().
-		SetSkip(int64(0)).
-		SetLimit(int64(100))
-
-	objects, err := s.Repo.ListSagaObjects(filterQuery, optionsQuery)
+	objects, err := s.Repo.ListSagaObjects(s.createQuery(sagaObject))
 	if err != nil {
 		return false
 	}
@@ -322,12 +312,7 @@ func (s SagaService) undeleteItems(token string, sagaObject *model.SagaObject) e
 		return nil
 	}
 
-	filterQuery := bson.D{{Key: "parent_id", Value: sagaObject.ID}}
-	optionsQuery := options.Find().
-		SetSkip(int64(0)).
-		SetLimit(int64(100))
-
-	objects, err := s.Repo.ListSagaObjects(filterQuery, optionsQuery)
+	objects, err := s.Repo.ListSagaObjects(s.createQuery(sagaObject))
 	if err != nil {
 		return err
 	}
@@ -370,6 +355,14 @@ func (s SagaService) undeleteItems(token string, sagaObject *model.SagaObject) e
 	}
 
 	return nil
+}
+
+func (s SagaService) createQuery(sagaObject *model.SagaObject) (bson.D, *options.FindOptions) {
+	filterQuery := bson.D{{Key: "parent_id", Value: sagaObject.ID}}
+	optionsQuery := options.Find().
+		SetSkip(int64(0)).
+		SetLimit(int64(100))
+	return filterQuery, optionsQuery
 }
 
 func getHostByType(sagaType model.SagaObjectTypes) string {
