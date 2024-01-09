@@ -1,0 +1,60 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: result-microservice
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: result-microservice
+  template:
+    metadata:
+      labels:
+        app: result-microservice
+    spec:
+      containers:
+        - name: result-microservice
+          image: microservice_image
+          ports:
+            - containerPort: 8085
+          readinessProbe:
+            timeoutSeconds: 3
+            initialDelaySeconds: 5
+            httpGet:
+              path: "/health/ready"
+              port: 8085
+          livenessProbe:
+            timeoutSeconds: 3
+            initialDelaySeconds: 30
+            httpGet:
+              path: "/health/live"
+              port: 8085
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: result-microservice-service
+  annotations:
+    description: Exposes and load balances the application pods
+  labels:
+    app: result-microservice
+spec:
+  ports:
+    - name: http
+      port: 8085
+      targetPort: 8085
+  selector:
+    app: result-microservice
+---
+kind: Route
+apiVersion: route.openshift.io/v1
+metadata:
+  name: result-microservice-route
+  labels:
+    app: result-microservice
+spec:
+  port:
+    targetPort: 8085
+  to:
+    kind: Service
+    name: result-microservice-service
