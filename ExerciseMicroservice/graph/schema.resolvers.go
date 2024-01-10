@@ -7,7 +7,6 @@ package graph
 import (
 	"ExerciseMicroservice/graph/model"
 	"ExerciseMicroservice/internal/auth"
-	"ExerciseMicroservice/internal/helper"
 	"context"
 )
 
@@ -33,18 +32,6 @@ func (r *mutationResolver) UpdateExercise(ctx context.Context, id string, exerci
 	}
 
 	return updatedExercise, nil
-}
-
-// DeleteExercise is the resolver for the DeleteExercise field.
-func (r *mutationResolver) DeleteExercise(ctx context.Context, exerciseID string) (*string, error) {
-	token := auth.TokenFromContext(ctx)
-
-	err := r.Service.DeleteExercise(token, exerciseID)
-	if err != nil {
-		return nil, err
-	}
-
-	return helper.StringPointer(exerciseID), nil
 }
 
 // GetExercise is the resolver for the GetExercise field.

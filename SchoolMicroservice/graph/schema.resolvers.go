@@ -34,18 +34,6 @@ func (r *mutationResolver) UpdateSchool(ctx context.Context, id string, input mo
 	return school, nil
 }
 
-// DeleteSchool is the resolver for the deleteSchool field.
-func (r *mutationResolver) DeleteSchool(ctx context.Context, id string) (*string, error) {
-	token := auth.TokenFromContext(ctx)
-
-	err := r.Service.DeleteSchool(token, id)
-	if err != nil {
-		return nil, err
-	}
-
-	return &id, nil
-}
-
 // GetSchool is the resolver for the getSchool field.
 func (r *queryResolver) GetSchool(ctx context.Context, id string) (*model.School, error) {
 	token := auth.TokenFromContext(ctx)

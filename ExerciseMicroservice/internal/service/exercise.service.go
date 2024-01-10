@@ -24,8 +24,7 @@ const ValidationPrefix = "Validation errors: "
 type IExerciseService interface {
 	CreateExercise(token string, newExercise model.ExerciseInput) (*model.Exercise, error)
 	UpdateExercise(token string, id string, updateData model.ExerciseInput) (*model.Exercise, error)
-	DeleteExercise(token string, id string) error
-	UnDeleteExercise(token string, id string) error
+	DeleteExercise(token string, id string, deleteFlag bool) error
 	GetExerciseById(token string, id string) (*model.Exercise, error)
 	ListExercises(token string, filter *model.ExerciseFilter, paginate *model.Paginator) ([]*model.ExerciseInfo, error)
 }
@@ -154,7 +153,7 @@ func (e *ExerciseService) UpdateExercise(token string, id string, updateData mod
 	return result, nil
 }
 
-func (e *ExerciseService) DeleteExercise(token string, id string) error {
+func (e *ExerciseService) DeleteExercise(token string, id string, deleteFlag bool) error {
 	e.Validator.Validate(id, []string{"IsUUID"}, "ID")
 
 	valErrors := e.Validator.GetErrors()
@@ -169,41 +168,7 @@ func (e *ExerciseService) DeleteExercise(token string, id string) error {
 		return err
 	}
 
-	if existingExercise.SoftDeleted {
-		return errors.New("exercise is already deleted")
-	}
-
-	existingExercise.SoftDeleted = true
-	existingExercise.UpdatedAt = time.Now().String()
-
-	_, err = e.Repo.UpdateExercise(id, *existingExercise)
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (e *ExerciseService) UnDeleteExercise(token string, id string) error {
-	e.Validator.Validate(id, []string{"IsUUID"}, "ID")
-
-	valErrors := e.Validator.GetErrors()
-	if len(valErrors) > 0 {
-		errorMessage := ValidationPrefix + strings.Join(valErrors, ", ")
-		e.Validator.ClearErrors()
-		return errors.New(errorMessage)
-	}
-	//validate first because policy does not validate, and does a database request
-	_, existingExercise, err := e.Policy.DeleteExercise(token, id)
-	if err != nil {
-		return err
-	}
-
-	if !existingExercise.SoftDeleted {
-		return errors.New("exercise is not soft deleted")
-	}
-
-	existingExercise.SoftDeleted = false
+	existingExercise.SoftDeleted = deleteFlag
 	existingExercise.UpdatedAt = time.Now().String()
 
 	_, err = e.Repo.UpdateExercise(id, *existingExercise)

@@ -290,19 +290,14 @@ type Mutation
 {
     createModule(input: ModuleInputCreate!): Module @join__field(graph: MODULES)
     updateModule(id: ID!, input: ModuleInputUpdate!): Module @join__field(graph: MODULES)
-    deleteModule(id: ID!, filter: ModuleFilter): ID @join__field(graph: MODULES)
     createClass(input: ClassInput!): Class @join__field(graph: CLASSES)
     updateClass(id: ID!, input: ClassInput!): Class @join__field(graph: CLASSES)
-    deleteClass(id: ID!): ID @join__field(graph: CLASSES)
     createSchool(input: SchoolInput!): School @join__field(graph: SCHOOLS)
     updateSchool(id: ID!, input: SchoolInput!): School @join__field(graph: SCHOOLS)
-    deleteSchool(id: ID!): ID @join__field(graph: SCHOOLS)
     CreateExercise(exercise: ExerciseInput!): Exercise @join__field(graph: EXERCISES)
     UpdateExercise(id: ID!, exercise: ExerciseInput!): Exercise @join__field(graph: EXERCISES)
-    DeleteExercise(ExerciseID: ID!): ID @join__field(graph: EXERCISES)
     CreateResult(input: InputResult!): Result @join__field(graph: RESULTS)
     UpdateResult(id: ID!, input: InputResult!): Result @join__field(graph: RESULTS)
-    DeleteResult(id: ID!): ID @join__field(graph: RESULTS)
     generateExplanation(
         correctAnswer: String!
         givenAnswer: String!

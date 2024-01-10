@@ -25,7 +25,7 @@ import (
 type IModuleService interface {
 	CreateModule(token string, newModule model.ModuleInputCreate) (*model.Module, error)
 	UpdateModule(token string, id string, updateData model.ModuleInputUpdate) (*model.Module, error)
-	DeleteModule(token string, id string, filter *model.ModuleFilter) error
+	DeleteModule(token string, id string, deleteFlag bool) error
 	GetModuleById(token string, id string) (*model.Module, error)
 	ListModules(token string, filter *model.ModuleFilter, paginate *model.Paginator) ([]*model.ModuleInfo, error)
 }
@@ -156,14 +156,14 @@ func (m *ModuleService) UpdateModule(token string, id string, updateData model.M
 	return result, nil
 }
 
-func (m *ModuleService) DeleteModule(token string, id string, filter *model.ModuleFilter) error {
+func (m *ModuleService) DeleteModule(token string, id string, deleteFlag bool) error {
 	existingModule, err := m.Policy.DeleteModule(token, id)
 	if err != nil {
 		return err
 	}
 
 	if !*existingModule.SoftDeleted {
-		softDelete := true
+		softDelete := deleteFlag
 		existingModule.SoftDeleted = &softDelete
 
 		err := m.Repo.DeleteModuleByID(id, *existingModule)

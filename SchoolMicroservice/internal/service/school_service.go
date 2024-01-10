@@ -25,7 +25,7 @@ const ValidationPrefix = "Validation errors: "
 type ISchoolService interface {
 	CreateSchool(token string, School model.SchoolInput) (*model.School, error)
 	UpdateSchool(token string, id string, updatedData model.SchoolInput) (*model.School, error)
-	DeleteSchool(token string, id string) error
+	DeleteSchool(token string, id string, deleteFlag bool) error
 	GetSchoolById(token string, id string) (*model.School, error)
 	ListSchools(token string, filter *model.ListSchoolFilter, paginate *model.Paginator) ([]*model.SchoolInfo, error)
 	ValidateOpenAiKey(apiKey string) error
@@ -147,14 +147,14 @@ func (s *SchoolService) UpdateSchool(token string, id string, updatedData model.
 	return result, nil
 }
 
-func (s *SchoolService) DeleteSchool(token string, id string) error {
+func (s *SchoolService) DeleteSchool(token string, id string, deleteFlag bool) error {
 	existingSchool, err := s.Policy.DeleteSchool(token, id)
 	if err != nil {
 		return err
 	}
 
 	if !*existingSchool.SoftDeleted {
-		softDelete := true
+		softDelete := deleteFlag
 		existingSchool.SoftDeleted = &softDelete
 
 		err := s.Repo.DeleteSchool(id, *existingSchool)

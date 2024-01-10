@@ -70,7 +70,6 @@ type ComplexityRoot struct {
 
 	Mutation struct {
 		CreateClass func(childComplexity int, input model.ClassInput) int
-		DeleteClass func(childComplexity int, id string) int
 		UpdateClass func(childComplexity int, id string, input model.ClassInput) int
 	}
 
@@ -83,7 +82,6 @@ type ComplexityRoot struct {
 type MutationResolver interface {
 	CreateClass(ctx context.Context, input model.ClassInput) (*model.Class, error)
 	UpdateClass(ctx context.Context, id string, input model.ClassInput) (*model.Class, error)
-	DeleteClass(ctx context.Context, id string) (*string, error)
 }
 type QueryResolver interface {
 	GetClass(ctx context.Context, id string) (*model.Class, error)
@@ -225,18 +223,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.CreateClass(childComplexity, args["input"].(model.ClassInput)), true
-
-	case "Mutation.deleteClass":
-		if e.complexity.Mutation.DeleteClass == nil {
-			break
-		}
-
-		args, err := ec.field_Mutation_deleteClass_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Mutation.DeleteClass(childComplexity, args["id"].(string)), true
 
 	case "Mutation.updateClass":
 		if e.complexity.Mutation.UpdateClass == nil {
@@ -414,21 +400,6 @@ func (ec *executionContext) field_Mutation_createClass_args(ctx context.Context,
 		}
 	}
 	args["input"] = arg0
-	return args, nil
-}
-
-func (ec *executionContext) field_Mutation_deleteClass_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 string
-	if tmp, ok := rawArgs["id"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
-		arg0, err = ec.unmarshalNID2string(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["id"] = arg0
 	return args, nil
 }
 
@@ -1337,58 +1308,6 @@ func (ec *executionContext) fieldContext_Mutation_updateClass(ctx context.Contex
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_updateClass_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
-		ec.Error(ctx, err)
-		return fc, err
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Mutation_deleteClass(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Mutation_deleteClass(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().DeleteClass(rctx, fc.Args["id"].(string))
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*string)
-	fc.Result = res
-	return ec.marshalOID2ᚖstring(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Mutation_deleteClass(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Mutation",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type ID does not have child fields")
-		},
-	}
-	defer func() {
-		if r := recover(); r != nil {
-			err = ec.Recover(ctx, r)
-			ec.Error(ctx, err)
-		}
-	}()
-	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Mutation_deleteClass_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -3800,10 +3719,6 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 		case "updateClass":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_updateClass(ctx, field)
-			})
-		case "deleteClass":
-			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Mutation_deleteClass(ctx, field)
 			})
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))

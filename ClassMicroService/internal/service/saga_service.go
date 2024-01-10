@@ -73,33 +73,33 @@ func (s *SagaService) FindSagaObjectChildren(ctx context.Context, req *pb.Object
 }
 
 // DeleteObject implements the DeleteObject RPC method
-func (s *SagaService) DeleteObject(ctx context.Context, req *pb.ObjectRequest) (*pb.ObjectResponse, error) {
-	// Implement your logic to delete the object based on the request
-	// For demonstration purposes, let's just return a sample response
-	response := &pb.ObjectResponse{
-		Objects: []*pb.SagaObject{
-			{
-				ObjectId:     "sample_object_id",
-				ObjectType:   pb.SagaObjectType_SCHOOL,
-				ObjectStatus: pb.SagaObjectStatus_DELETED,
-			},
-		},
+func (s *SagaService) DeleteObject(ctx context.Context, req *pb.ObjectRequest) (*pb.SagaObject, error) {
+	err := s.service.DeleteClass(req.BearerToken, req.ObjectId, true)
+	if err != nil {
+		return nil, err
 	}
-	return response, nil
+
+	response := pb.SagaObject{
+		ObjectId:     req.ObjectId,
+		ObjectType:   pb.SagaObjectType_CLASS,
+		ObjectStatus: pb.SagaObjectStatus_DELETED,
+	}
+
+	return &response, nil
 }
 
 // UnDeleteObject implements the UnDeleteObject RPC method
-func (s *SagaService) UnDeleteObject(ctx context.Context, req *pb.ObjectRequest) (*pb.ObjectResponse, error) {
-	// Implement your logic to undelete the object based on the request
-	// For demonstration purposes, let's just return a sample response
-	response := &pb.ObjectResponse{
-		Objects: []*pb.SagaObject{
-			{
-				ObjectId:     "sample_object_id",
-				ObjectType:   pb.SagaObjectType_SCHOOL,
-				ObjectStatus: pb.SagaObjectStatus_EXIST,
-			},
-		},
+func (s *SagaService) UnDeleteObject(ctx context.Context, req *pb.ObjectRequest) (*pb.SagaObject, error) {
+	err := s.service.DeleteClass(req.BearerToken, req.ObjectId, false)
+	if err != nil {
+		return nil, err
 	}
-	return response, nil
+
+	response := pb.SagaObject{
+		ObjectId:     req.ObjectId,
+		ObjectType:   pb.SagaObjectType_CLASS,
+		ObjectStatus: pb.SagaObjectStatus_EXIST,
+	}
+
+	return &response, nil
 }

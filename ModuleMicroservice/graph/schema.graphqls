@@ -38,7 +38,6 @@ type Query {
 type Mutation {
   createModule(input: ModuleInputCreate!): Module
   updateModule(id: ID!, input: ModuleInputUpdate!): Module
-  deleteModule(id: ID!, filter: ModuleFilter): ID
 }
 
 input ModuleInputCreate {

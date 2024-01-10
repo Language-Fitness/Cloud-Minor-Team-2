@@ -7,8 +7,8 @@ import (
 	"context"
 	"embed"
 	"errors"
-	"school/graph/model"
 	"fmt"
+	"school/graph/model"
 	"strconv"
 	"sync"
 	"sync/atomic"
@@ -49,7 +49,6 @@ type DirectiveRoot struct {
 type ComplexityRoot struct {
 	Mutation struct {
 		CreateSchool func(childComplexity int, input model.SchoolInput) int
-		DeleteSchool func(childComplexity int, id string) int
 		UpdateSchool func(childComplexity int, id string, input model.SchoolInput) int
 	}
 
@@ -83,7 +82,6 @@ type ComplexityRoot struct {
 type MutationResolver interface {
 	CreateSchool(ctx context.Context, input model.SchoolInput) (*model.School, error)
 	UpdateSchool(ctx context.Context, id string, input model.SchoolInput) (*model.School, error)
-	DeleteSchool(ctx context.Context, id string) (*string, error)
 }
 type QueryResolver interface {
 	GetSchool(ctx context.Context, id string) (*model.School, error)
@@ -120,18 +118,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.CreateSchool(childComplexity, args["input"].(model.SchoolInput)), true
-
-	case "Mutation.deleteSchool":
-		if e.complexity.Mutation.DeleteSchool == nil {
-			break
-		}
-
-		args, err := ec.field_Mutation_deleteSchool_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Mutation.DeleteSchool(childComplexity, args["id"].(string)), true
 
 	case "Mutation.updateSchool":
 		if e.complexity.Mutation.UpdateSchool == nil {
@@ -409,27 +395,12 @@ func (ec *executionContext) field_Mutation_createSchool_args(ctx context.Context
 	var arg0 model.SchoolInput
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg0, err = ec.unmarshalNSchoolInput2exampleᚋgraphᚋmodelᚐSchoolInput(ctx, tmp)
+		arg0, err = ec.unmarshalNSchoolInput2schoolᚋgraphᚋmodelᚐSchoolInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
 	args["input"] = arg0
-	return args, nil
-}
-
-func (ec *executionContext) field_Mutation_deleteSchool_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 string
-	if tmp, ok := rawArgs["id"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
-		arg0, err = ec.unmarshalNID2string(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["id"] = arg0
 	return args, nil
 }
 
@@ -448,7 +419,7 @@ func (ec *executionContext) field_Mutation_updateSchool_args(ctx context.Context
 	var arg1 model.SchoolInput
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg1, err = ec.unmarshalNSchoolInput2exampleᚋgraphᚋmodelᚐSchoolInput(ctx, tmp)
+		arg1, err = ec.unmarshalNSchoolInput2schoolᚋgraphᚋmodelᚐSchoolInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -493,7 +464,7 @@ func (ec *executionContext) field_Query_listSchools_args(ctx context.Context, ra
 	var arg0 *model.ListSchoolFilter
 	if tmp, ok := rawArgs["filter"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
-		arg0, err = ec.unmarshalOListSchoolFilter2ᚖexampleᚋgraphᚋmodelᚐListSchoolFilter(ctx, tmp)
+		arg0, err = ec.unmarshalOListSchoolFilter2ᚖschoolᚋgraphᚋmodelᚐListSchoolFilter(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -502,7 +473,7 @@ func (ec *executionContext) field_Query_listSchools_args(ctx context.Context, ra
 	var arg1 *model.Paginator
 	if tmp, ok := rawArgs["paginate"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("paginate"))
-		arg1, err = ec.unmarshalOPaginator2ᚖexampleᚋgraphᚋmodelᚐPaginator(ctx, tmp)
+		arg1, err = ec.unmarshalOPaginator2ᚖschoolᚋgraphᚋmodelᚐPaginator(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -574,7 +545,7 @@ func (ec *executionContext) _Mutation_createSchool(ctx context.Context, field gr
 	}
 	res := resTmp.(*model.School)
 	fc.Result = res
-	return ec.marshalOSchool2ᚖexampleᚋgraphᚋmodelᚐSchool(ctx, field.Selections, res)
+	return ec.marshalOSchool2ᚖschoolᚋgraphᚋmodelᚐSchool(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Mutation_createSchool(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -648,7 +619,7 @@ func (ec *executionContext) _Mutation_updateSchool(ctx context.Context, field gr
 	}
 	res := resTmp.(*model.School)
 	fc.Result = res
-	return ec.marshalOSchool2ᚖexampleᚋgraphᚋmodelᚐSchool(ctx, field.Selections, res)
+	return ec.marshalOSchool2ᚖschoolᚋgraphᚋmodelᚐSchool(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Mutation_updateSchool(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -697,58 +668,6 @@ func (ec *executionContext) fieldContext_Mutation_updateSchool(ctx context.Conte
 	return fc, nil
 }
 
-func (ec *executionContext) _Mutation_deleteSchool(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Mutation_deleteSchool(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().DeleteSchool(rctx, fc.Args["id"].(string))
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*string)
-	fc.Result = res
-	return ec.marshalOID2ᚖstring(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Mutation_deleteSchool(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Mutation",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type ID does not have child fields")
-		},
-	}
-	defer func() {
-		if r := recover(); r != nil {
-			err = ec.Recover(ctx, r)
-			ec.Error(ctx, err)
-		}
-	}()
-	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Mutation_deleteSchool_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
-		ec.Error(ctx, err)
-		return fc, err
-	}
-	return fc, nil
-}
-
 func (ec *executionContext) _Query_getSchool(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Query_getSchool(ctx, field)
 	if err != nil {
@@ -774,7 +693,7 @@ func (ec *executionContext) _Query_getSchool(ctx context.Context, field graphql.
 	}
 	res := resTmp.(*model.School)
 	fc.Result = res
-	return ec.marshalOSchool2ᚖexampleᚋgraphᚋmodelᚐSchool(ctx, field.Selections, res)
+	return ec.marshalOSchool2ᚖschoolᚋgraphᚋmodelᚐSchool(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Query_getSchool(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -848,7 +767,7 @@ func (ec *executionContext) _Query_listSchools(ctx context.Context, field graphq
 	}
 	res := resTmp.([]*model.SchoolInfo)
 	fc.Result = res
-	return ec.marshalOSchoolInfo2ᚕᚖexampleᚋgraphᚋmodelᚐSchoolInfo(ctx, field.Selections, res)
+	return ec.marshalOSchoolInfo2ᚕᚖschoolᚋgraphᚋmodelᚐSchoolInfo(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Query_listSchools(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -3464,7 +3383,7 @@ func (ec *executionContext) unmarshalInputListSchoolFilter(ctx context.Context, 
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
-			data, err := ec.unmarshalONameFilter2ᚖexampleᚋgraphᚋmodelᚐNameFilter(ctx, v)
+			data, err := ec.unmarshalONameFilter2ᚖschoolᚋgraphᚋmodelᚐNameFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -3473,7 +3392,7 @@ func (ec *executionContext) unmarshalInputListSchoolFilter(ctx context.Context, 
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("location"))
-			data, err := ec.unmarshalOLocationFilter2ᚖexampleᚋgraphᚋmodelᚐLocationFilter(ctx, v)
+			data, err := ec.unmarshalOLocationFilter2ᚖschoolᚋgraphᚋmodelᚐLocationFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -3529,7 +3448,7 @@ func (ec *executionContext) unmarshalInputLocationFilter(ctx context.Context, ob
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("type"))
-			data, err := ec.unmarshalNNameFilterTypes2exampleᚋgraphᚋmodelᚐNameFilterTypes(ctx, v)
+			data, err := ec.unmarshalNNameFilterTypes2schoolᚋgraphᚋmodelᚐNameFilterTypes(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -3567,7 +3486,7 @@ func (ec *executionContext) unmarshalInputNameFilter(ctx context.Context, obj in
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("type"))
-			data, err := ec.unmarshalNNameFilterTypes2exampleᚋgraphᚋmodelᚐNameFilterTypes(ctx, v)
+			data, err := ec.unmarshalNNameFilterTypes2schoolᚋgraphᚋmodelᚐNameFilterTypes(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -3706,10 +3625,6 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 		case "updateSchool":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_updateSchool(ctx, field)
-			})
-		case "deleteSchool":
-			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Mutation_deleteSchool(ctx, field)
 			})
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
@@ -4324,17 +4239,17 @@ func (ec *executionContext) marshalNInt2int(ctx context.Context, sel ast.Selecti
 	return res
 }
 
-func (ec *executionContext) unmarshalNNameFilterTypes2exampleᚋgraphᚋmodelᚐNameFilterTypes(ctx context.Context, v interface{}) (model.NameFilterTypes, error) {
+func (ec *executionContext) unmarshalNNameFilterTypes2schoolᚋgraphᚋmodelᚐNameFilterTypes(ctx context.Context, v interface{}) (model.NameFilterTypes, error) {
 	var res model.NameFilterTypes
 	err := res.UnmarshalGQL(v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalNNameFilterTypes2exampleᚋgraphᚋmodelᚐNameFilterTypes(ctx context.Context, sel ast.SelectionSet, v model.NameFilterTypes) graphql.Marshaler {
+func (ec *executionContext) marshalNNameFilterTypes2schoolᚋgraphᚋmodelᚐNameFilterTypes(ctx context.Context, sel ast.SelectionSet, v model.NameFilterTypes) graphql.Marshaler {
 	return v
 }
 
-func (ec *executionContext) unmarshalNSchoolInput2exampleᚋgraphᚋmodelᚐSchoolInput(ctx context.Context, v interface{}) (model.SchoolInput, error) {
+func (ec *executionContext) unmarshalNSchoolInput2schoolᚋgraphᚋmodelᚐSchoolInput(ctx context.Context, v interface{}) (model.SchoolInput, error) {
 	res, err := ec.unmarshalInputSchoolInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
@@ -4675,7 +4590,7 @@ func (ec *executionContext) marshalOID2ᚖstring(ctx context.Context, sel ast.Se
 	return res
 }
 
-func (ec *executionContext) unmarshalOListSchoolFilter2ᚖexampleᚋgraphᚋmodelᚐListSchoolFilter(ctx context.Context, v interface{}) (*model.ListSchoolFilter, error) {
+func (ec *executionContext) unmarshalOListSchoolFilter2ᚖschoolᚋgraphᚋmodelᚐListSchoolFilter(ctx context.Context, v interface{}) (*model.ListSchoolFilter, error) {
 	if v == nil {
 		return nil, nil
 	}
@@ -4683,7 +4598,7 @@ func (ec *executionContext) unmarshalOListSchoolFilter2ᚖexampleᚋgraphᚋmode
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) unmarshalOLocationFilter2ᚖexampleᚋgraphᚋmodelᚐLocationFilter(ctx context.Context, v interface{}) (*model.LocationFilter, error) {
+func (ec *executionContext) unmarshalOLocationFilter2ᚖschoolᚋgraphᚋmodelᚐLocationFilter(ctx context.Context, v interface{}) (*model.LocationFilter, error) {
 	if v == nil {
 		return nil, nil
 	}
@@ -4691,7 +4606,7 @@ func (ec *executionContext) unmarshalOLocationFilter2ᚖexampleᚋgraphᚋmodel�
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) unmarshalONameFilter2ᚖexampleᚋgraphᚋmodelᚐNameFilter(ctx context.Context, v interface{}) (*model.NameFilter, error) {
+func (ec *executionContext) unmarshalONameFilter2ᚖschoolᚋgraphᚋmodelᚐNameFilter(ctx context.Context, v interface{}) (*model.NameFilter, error) {
 	if v == nil {
 		return nil, nil
 	}
@@ -4699,7 +4614,7 @@ func (ec *executionContext) unmarshalONameFilter2ᚖexampleᚋgraphᚋmodelᚐNa
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) unmarshalOPaginator2ᚖexampleᚋgraphᚋmodelᚐPaginator(ctx context.Context, v interface{}) (*model.Paginator, error) {
+func (ec *executionContext) unmarshalOPaginator2ᚖschoolᚋgraphᚋmodelᚐPaginator(ctx context.Context, v interface{}) (*model.Paginator, error) {
 	if v == nil {
 		return nil, nil
 	}
@@ -4707,14 +4622,14 @@ func (ec *executionContext) unmarshalOPaginator2ᚖexampleᚋgraphᚋmodelᚐPag
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalOSchool2ᚖexampleᚋgraphᚋmodelᚐSchool(ctx context.Context, sel ast.SelectionSet, v *model.School) graphql.Marshaler {
+func (ec *executionContext) marshalOSchool2ᚖschoolᚋgraphᚋmodelᚐSchool(ctx context.Context, sel ast.SelectionSet, v *model.School) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
 	return ec._School(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalOSchoolInfo2ᚕᚖexampleᚋgraphᚋmodelᚐSchoolInfo(ctx context.Context, sel ast.SelectionSet, v []*model.SchoolInfo) graphql.Marshaler {
+func (ec *executionContext) marshalOSchoolInfo2ᚕᚖschoolᚋgraphᚋmodelᚐSchoolInfo(ctx context.Context, sel ast.SelectionSet, v []*model.SchoolInfo) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
@@ -4741,7 +4656,7 @@ func (ec *executionContext) marshalOSchoolInfo2ᚕᚖexampleᚋgraphᚋmodelᚐS
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalOSchoolInfo2ᚖexampleᚋgraphᚋmodelᚐSchoolInfo(ctx, sel, v[i])
+			ret[i] = ec.marshalOSchoolInfo2ᚖschoolᚋgraphᚋmodelᚐSchoolInfo(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -4755,7 +4670,7 @@ func (ec *executionContext) marshalOSchoolInfo2ᚕᚖexampleᚋgraphᚋmodelᚐS
 	return ret
 }
 
-func (ec *executionContext) marshalOSchoolInfo2ᚖexampleᚋgraphᚋmodelᚐSchoolInfo(ctx context.Context, sel ast.SelectionSet, v *model.SchoolInfo) graphql.Marshaler {
+func (ec *executionContext) marshalOSchoolInfo2ᚖschoolᚋgraphᚋmodelᚐSchoolInfo(ctx context.Context, sel ast.SelectionSet, v *model.SchoolInfo) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}

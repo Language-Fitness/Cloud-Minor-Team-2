@@ -77,7 +77,6 @@ type ComplexityRoot struct {
 
 	Mutation struct {
 		CreateModule func(childComplexity int, input model.ModuleInputCreate) int
-		DeleteModule func(childComplexity int, id string, filter *model.ModuleFilter) int
 		UpdateModule func(childComplexity int, id string, input model.ModuleInputUpdate) int
 	}
 
@@ -90,7 +89,6 @@ type ComplexityRoot struct {
 type MutationResolver interface {
 	CreateModule(ctx context.Context, input model.ModuleInputCreate) (*model.Module, error)
 	UpdateModule(ctx context.Context, id string, input model.ModuleInputUpdate) (*model.Module, error)
-	DeleteModule(ctx context.Context, id string, filter *model.ModuleFilter) (*string, error)
 }
 type QueryResolver interface {
 	GetModule(ctx context.Context, id string) (*model.Module, error)
@@ -282,18 +280,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.CreateModule(childComplexity, args["input"].(model.ModuleInputCreate)), true
 
-	case "Mutation.deleteModule":
-		if e.complexity.Mutation.DeleteModule == nil {
-			break
-		}
-
-		args, err := ec.field_Mutation_deleteModule_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Mutation.DeleteModule(childComplexity, args["id"].(string), args["filter"].(*model.ModuleFilter)), true
-
 	case "Mutation.updateModule":
 		if e.complexity.Mutation.UpdateModule == nil {
 			break
@@ -471,30 +457,6 @@ func (ec *executionContext) field_Mutation_createModule_args(ctx context.Context
 		}
 	}
 	args["input"] = arg0
-	return args, nil
-}
-
-func (ec *executionContext) field_Mutation_deleteModule_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 string
-	if tmp, ok := rawArgs["id"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
-		arg0, err = ec.unmarshalNID2string(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["id"] = arg0
-	var arg1 *model.ModuleFilter
-	if tmp, ok := rawArgs["filter"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
-		arg1, err = ec.unmarshalOModuleFilter2ᚖModuleᚋgraphᚋmodelᚐModuleFilter(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["filter"] = arg1
 	return args, nil
 }
 
@@ -1724,58 +1686,6 @@ func (ec *executionContext) fieldContext_Mutation_updateModule(ctx context.Conte
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_updateModule_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
-		ec.Error(ctx, err)
-		return fc, err
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Mutation_deleteModule(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Mutation_deleteModule(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().DeleteModule(rctx, fc.Args["id"].(string), fc.Args["filter"].(*model.ModuleFilter))
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*string)
-	fc.Result = res
-	return ec.marshalOID2ᚖstring(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Mutation_deleteModule(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Mutation",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type ID does not have child fields")
-		},
-	}
-	defer func() {
-		if r := recover(); r != nil {
-			err = ec.Recover(ctx, r)
-			ec.Error(ctx, err)
-		}
-	}()
-	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Mutation_deleteModule_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -4362,10 +4272,6 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_updateModule(ctx, field)
 			})
-		case "deleteModule":
-			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Mutation_deleteModule(ctx, field)
-			})
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -5222,22 +5128,6 @@ func (ec *executionContext) marshalOCategory2ᚖModuleᚋgraphᚋmodelᚐCategor
 		return graphql.Null
 	}
 	return v
-}
-
-func (ec *executionContext) unmarshalOID2ᚖstring(ctx context.Context, v interface{}) (*string, error) {
-	if v == nil {
-		return nil, nil
-	}
-	res, err := graphql.UnmarshalID(v)
-	return &res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) marshalOID2ᚖstring(ctx context.Context, sel ast.SelectionSet, v *string) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	res := graphql.MarshalID(*v)
-	return res
 }
 
 func (ec *executionContext) unmarshalOLanguageLevel2ᚖModuleᚋgraphᚋmodelᚐLanguageLevel(ctx context.Context, v interface{}) (*model.LanguageLevel, error) {

@@ -23,8 +23,8 @@ service gRPCSagaService {
   // RPC method to get user information
   rpc FindSagaObject (ObjectRequest) returns (SagaObject);
   rpc FindSagaObjectChildren (ObjectRequest) returns (ObjectResponse);
-  rpc DeleteObject (ObjectRequest) returns (ObjectResponse);
-  rpc UnDeleteObject (ObjectRequest) returns (ObjectResponse);
+  rpc DeleteObject (ObjectRequest) returns (SagaObject);
+  rpc UnDeleteObject (ObjectRequest) returns (SagaObject);
 }
 
 // Request message for getting a user
@@ -44,5 +44,3 @@ message SagaObject {
   SagaObjectType object_type = 2;
   SagaObjectStatus object_status = 3;
 }
-
-//protoc --proto_path=.\proto --go_out=.\proto --go-grpc_out=.\proto .\proto\SagaAction.proto

@@ -34,18 +34,6 @@ func (r *mutationResolver) UpdateClass(ctx context.Context, id string, input mod
 	return class, nil
 }
 
-// DeleteClass is the resolver for the deleteClass field.
-func (r *mutationResolver) DeleteClass(ctx context.Context, id string) (*string, error) {
-	token := auth.TokenFromContext(ctx)
-
-	err := r.Service.DeleteClass(token, id)
-	if err != nil {
-		return nil, err
-	}
-
-	return &id, nil
-}
-
 // GetClass is the resolver for the getClass field.
 func (r *queryResolver) GetClass(ctx context.Context, id string) (*model.Class, error) {
 	token := auth.TokenFromContext(ctx)

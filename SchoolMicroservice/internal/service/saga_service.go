@@ -1,35 +1,32 @@
 package service
 
 import (
-	"Module/graph/model"
-	"Module/internal/helper"
-	"Module/proto/pb"
 	"context"
-	"fmt"
 	"go.mongodb.org/mongo-driver/mongo"
+	"school/proto/pb"
 )
 
 type SagaService struct {
 	pb.UnimplementedGRPCSagaServiceServer
-	service IModuleService
+	service ISchoolService
 }
 
 func NewSagaService(collection *mongo.Collection) *SagaService {
 	return &SagaService{
-		service: NewModuleService(collection),
+		service: NewSchoolService(),
 	}
 }
 
 // FindSagaObject implements the FindSagaObject RPC method
 func (s *SagaService) FindSagaObject(ctx context.Context, req *pb.ObjectRequest) (*pb.SagaObject, error) {
-	module, err := s.service.GetModuleById(req.BearerToken, req.ObjectId)
+	sagaObject, err := s.service.GetSchoolById(req.BearerToken, req.ObjectId)
 	if err != nil {
 		return nil, err
 	}
 
 	response := &pb.SagaObject{
-		ObjectId:     module.ID,
-		ObjectType:   pb.SagaObjectType_MODULE,
+		ObjectId:     sagaObject.ID,
+		ObjectType:   pb.SagaObjectType_SCHOOL,
 		ObjectStatus: pb.SagaObjectStatus_EXIST,
 	}
 
@@ -39,56 +36,21 @@ func (s *SagaService) FindSagaObject(ctx context.Context, req *pb.ObjectRequest)
 // FindSagaObjectChildren implements the FindSagaObjectChildren RPC method
 func (s *SagaService) FindSagaObjectChildren(ctx context.Context, req *pb.ObjectRequest) (*pb.ObjectResponse, error) {
 
-	filter := model.ModuleFilter{
-		MadeBy: helper.StringPointer(req.ObjectId),
-	}
+	//No need for implementations because this can never be a child
 
-	paginate := model.Paginator{
-		Amount: 100,
-		Step:   0,
-	}
-
-	modules, err := s.service.ListModules(req.BearerToken, helper.ModuleFilterPointer(filter), helper.PaginatorPointer(paginate))
-	if err != nil {
-		return nil, err
-	}
-
-	fmt.Println("test modules:")
-	fmt.Println(modules)
-	fmt.Println("test 1")
-	fmt.Println("test 2")
-
-	for i := range modules {
-		fmt.Println(*modules[i])
-	}
-
-	response := &pb.ObjectResponse{
-		Objects: make([]*pb.SagaObject, len(modules)),
-	}
-
-	for i := range modules {
-		object := &pb.SagaObject{
-			ObjectId:     fmt.Sprintf(modules[i].ID),
-			ObjectType:   pb.SagaObjectType_MODULE,
-			ObjectStatus: pb.SagaObjectStatus_EXIST,
-		}
-
-		response.Objects[i] = object
-	}
-
-	return response, nil
+	return nil, nil
 }
 
 // DeleteObject implements the DeleteObject RPC method
 func (s *SagaService) DeleteObject(ctx context.Context, req *pb.ObjectRequest) (*pb.SagaObject, error) {
-	err := s.service.DeleteModule(req.BearerToken, req.ObjectId, true)
+	err := s.service.DeleteSchool(req.BearerToken, req.ObjectId, true)
 	if err != nil {
 		return nil, err
 	}
 
 	response := pb.SagaObject{
 		ObjectId:     req.ObjectId,
-		ObjectType:   pb.SagaObjectType_MODULE,
+		ObjectType:   pb.SagaObjectType_SCHOOL,
 		ObjectStatus: pb.SagaObjectStatus_DELETED,
 	}
 
@@ -97,14 +59,14 @@ func (s *SagaService) DeleteObject(ctx context.Context, req *pb.ObjectRequest) (
 
 // UnDeleteObject implements the UnDeleteObject RPC method
 func (s *SagaService) UnDeleteObject(ctx context.Context, req *pb.ObjectRequest) (*pb.SagaObject, error) {
-	err := s.service.DeleteModule(req.BearerToken, req.ObjectId, false)
+	err := s.service.DeleteSchool(req.BearerToken, req.ObjectId, false)
 	if err != nil {
 		return nil, err
 	}
 
 	response := pb.SagaObject{
 		ObjectId:     req.ObjectId,
-		ObjectType:   pb.SagaObjectType_MODULE,
+		ObjectType:   pb.SagaObjectType_SCHOOL,
 		ObjectStatus: pb.SagaObjectStatus_EXIST,
 	}
 

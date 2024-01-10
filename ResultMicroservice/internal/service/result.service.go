@@ -23,8 +23,7 @@ const ValidationPrefix = "Validation errors: "
 type IResultService interface {
 	CreateResult(token string, newResult model.InputResult) (*model.Result, error)
 	UpdateResult(token string, id string, updateData model.InputResult) (*model.Result, error)
-	DeleteResult(token string, id string) error
-	UnDeleteResult(token string, id string) error
+	DeleteResult(token string, id string, deleteFlag bool) error
 	GetResultById(token string, id string) (*model.Result, error)
 	ListResults(token string, filter *model.ResultFilter, paginate *model.Paginator) ([]*model.ResultInfo, error)
 }
@@ -124,7 +123,7 @@ func (r *ResultService) UpdateResult(token string, id string, updateData model.I
 	return updatedResult, nil
 }
 
-func (r *ResultService) DeleteResult(token string, id string) error {
+func (r *ResultService) DeleteResult(token string, id string, deleteFlag bool) error {
 	r.Validator.Validate(id, []string{"IsUUID"}, "ID")
 
 	validationErrors := r.Validator.GetErrors()
@@ -140,42 +139,7 @@ func (r *ResultService) DeleteResult(token string, id string) error {
 		return err
 	}
 
-	if existingResult.SoftDeleted {
-		return errors.New("result already soft deleted")
-	}
-
-	existingResult.SoftDeleted = true
-	existingResult.UpdatedAt = time.Now().String()
-
-	_, err = r.Repo.UpdateResult(id, *existingResult)
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (r *ResultService) UnDeleteResult(token string, id string) error {
-	r.Validator.Validate(id, []string{"IsUUID"}, "ID")
-
-	validationErrors := r.Validator.GetErrors()
-	if len(validationErrors) > 0 {
-		errorMessage := ValidationPrefix + strings.Join(validationErrors, ", ")
-		r.Validator.ClearErrors()
-		return errors.New(errorMessage)
-	}
-
-	//validate first because policy does not validate, and does a database request
-	existingResult, err := r.ResultPolicy.DeleteResult(token, id)
-	if err != nil {
-		return err
-	}
-
-	if !existingResult.SoftDeleted {
-		return errors.New("result already un-deleted")
-	}
-
-	existingResult.SoftDeleted = false
+	existingResult.SoftDeleted = deleteFlag
 	existingResult.UpdatedAt = time.Now().String()
 
 	_, err = r.Repo.UpdateResult(id, *existingResult)

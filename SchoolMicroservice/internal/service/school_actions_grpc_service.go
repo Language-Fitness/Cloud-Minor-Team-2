@@ -11,19 +11,19 @@ import (
 	"school/proto/pb"
 )
 
-type SchoolGRPCService struct {
+type SchoolActionsGRPCService struct {
 	pb.UnimplementedSchoolServiceServer
 	service ISchoolService
 }
 
-func NewSchoolGRPCService() *SchoolGRPCService {
-	return &SchoolGRPCService{
+func NewSchoolGRPCService() *SchoolActionsGRPCService {
+	return &SchoolActionsGRPCService{
 		service: NewSchoolService(),
 	}
 }
 
 // GetKey implements the GetKey RPC method
-func (s *SchoolGRPCService) GetKey(ctx context.Context, req *pb.KeyRequest) (*pb.KeyResponse, error) {
+func (s *SchoolActionsGRPCService) GetKey(ctx context.Context, req *pb.KeyRequest) (*pb.KeyResponse, error) {
 	response := &pb.KeyResponse{}
 
 	// get user uuid from bearer

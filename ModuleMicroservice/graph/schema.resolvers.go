@@ -34,18 +34,6 @@ func (r *mutationResolver) UpdateModule(ctx context.Context, id string, input mo
 	return updatedModule, nil
 }
 
-// DeleteModule is the resolver for the deleteModule field.
-func (r *mutationResolver) DeleteModule(ctx context.Context, id string, filter *model.ModuleFilter) (*string, error) {
-	token := auth.TokenFromContext(ctx)
-
-	err := r.Service.DeleteModule(token, id, filter)
-	if err != nil {
-		return nil, err
-	}
-
-	return &id, nil
-}
-
 // GetModule is the resolver for the getModule field.
 func (r *queryResolver) GetModule(ctx context.Context, id string) (*model.Module, error) {
 	token := auth.TokenFromContext(ctx)

@@ -22,7 +22,7 @@ const ValidationPrefix = "Validation errors: "
 type IClassService interface {
 	CreateClass(token string, newClass model.ClassInput) (*model.Class, error)
 	UpdateClass(token string, id string, updatedData model.ClassInput) (*model.Class, error)
-	DeleteClass(token string, id string) error
+	DeleteClass(token string, id string, deleteFlag bool) error
 	GetClassById(token string, id string) (*model.Class, error)
 	ListClasses(token string, filter *model.ListClassFilter, paginate *model.Paginator) ([]*model.ClassInfo, error)
 }
@@ -118,14 +118,14 @@ func (c *ClassService) UpdateClass(token string, id string, updatedData model.Cl
 	return result, nil
 }
 
-func (c *ClassService) DeleteClass(token string, id string) error {
+func (c *ClassService) DeleteClass(token string, id string, deleteFlag bool) error {
 	existingClass, err := c.Policy.DeleteClass(token, id)
 	if err != nil {
 		return err
 	}
 
 	if !*existingClass.SoftDeleted {
-		softDelete := true
+		softDelete := deleteFlag
 		existingClass.SoftDeleted = &softDelete
 
 		err := c.Repo.DeleteClass(id, *existingClass)

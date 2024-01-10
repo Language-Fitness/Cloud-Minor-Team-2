@@ -9,6 +9,7 @@ import (
 	"os"
 	"school/graph"
 	"school/internal/auth"
+	"school/internal/database"
 	"school/internal/service"
 	"school/proto/pb"
 
@@ -37,6 +38,7 @@ func main() {
 	http.Handle("/", playground.Handler("GraphQL playground", "/query"))
 
 	go grpcSchoolServer()
+	go grpcSagaServer()
 
 	log.Printf("connect to http://localhost:%s/ for GraphQL playground", port)
 	log.Fatal(http.ListenAndServe(":"+port, nil))
@@ -50,6 +52,22 @@ func grpcSchoolServer() {
 
 	grpcServer := grpc.NewServer()
 	pb.RegisterSchoolServiceServer(grpcServer, service.NewSchoolGRPCService())
+
+	log.Printf("server listening at %v", lis.Addr())
+	if err := grpcServer.Serve(lis); err != nil {
+		log.Fatalf("Failed to serve: %v", err)
+	}
+}
+
+func grpcSagaServer() {
+	lis, err := net.Listen("tcp", ":9095")
+	if err != nil {
+		log.Fatalf("Failed to listen: %v", err)
+	}
+
+	grpcServer := grpc.NewServer()
+	collection, _ := database.GetCollection()
+	pb.RegisterGRPCSagaServiceServer(grpcServer, service.NewSagaService(collection))
 
 	log.Printf("server listening at %v", lis.Addr())
 	if err := grpcServer.Serve(lis); err != nil {

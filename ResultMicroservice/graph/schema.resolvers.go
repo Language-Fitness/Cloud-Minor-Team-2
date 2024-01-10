@@ -34,18 +34,6 @@ func (r *mutationResolver) UpdateResult(ctx context.Context, id string, input mo
 	return result, nil
 }
 
-// DeleteResult is the resolver for the DeleteResult field.
-func (r *mutationResolver) DeleteResult(ctx context.Context, id string) (*string, error) {
-	token := auth.TokenFromContext(ctx)
-
-	err2 := r.Service.DeleteResult(token, id)
-	if err2 != nil {
-		return nil, err2
-	}
-
-	return &id, nil
-}
-
 // ListResults is the resolver for the ListResults field.
 func (r *queryResolver) ListResults(ctx context.Context, filter model.ResultFilter, paginator model.Paginator) ([]*model.ResultInfo, error) {
 	token := auth.TokenFromContext(ctx)

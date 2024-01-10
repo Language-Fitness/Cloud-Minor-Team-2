@@ -31,7 +31,6 @@ type Query {
 type Mutation {
   createSchool(input: SchoolInput!): School
   updateSchool(id: ID!, input: SchoolInput!): School
-  deleteSchool(id: ID!): ID
 }
 
 input SchoolInput {
