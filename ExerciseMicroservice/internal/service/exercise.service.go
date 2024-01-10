@@ -55,6 +55,11 @@ func (e *ExerciseService) CreateExercise(token string, newExercise model.Exercis
 		return nil, err
 	}
 
+	err2 := validateAnswers(e.Validator, newExercise.Answers)
+	if err2 != nil {
+		return nil, err2
+	}
+
 	validateNewExercise(e.Validator, newExercise)
 	validationErrors := e.Validator.GetErrors()
 	if len(validationErrors) > 0 {
@@ -99,6 +104,11 @@ func (e *ExerciseService) CreateExercise(token string, newExercise model.Exercis
 
 func (e *ExerciseService) UpdateExercise(token string, id string, updateData model.ExerciseInput) (*model.Exercise, error) {
 	validateUpdatedExercise(e.Validator, id, updateData)
+	err := validateAnswers(e.Validator, updateData.Answers)
+	if err != nil {
+		return nil, err
+	}
+
 	validationErrors := e.Validator.GetErrors()
 	if len(validationErrors) > 0 {
 		errorMessage := ValidationPrefix + strings.Join(validationErrors, ", ")
@@ -223,10 +233,10 @@ func (e *ExerciseService) GetExerciseById(token string, id string) (*model.Exerc
 }
 
 func (e *ExerciseService) ListExercises(token string, filter *model.ExerciseFilter, paginate *model.Paginator) ([]*model.ExerciseInfo, error) {
-	//_, err := e.Policy.ListExercises(token)
-	//if err != nil {
-	//	return nil, err
-	//}
+	_, err := e.Policy.ListExercises(token)
+	if err != nil {
+		return nil, err
+	}
 
 	validateListExerciseFilter(e.Validator, filter, paginate)
 	validationErrors := e.Validator.GetErrors()
@@ -271,7 +281,30 @@ func validateUpdatedExercise(validator validation.IValidator, id string, updated
 	validator.Validate(updatedData.ModuleID, []string{"IsUUID"}, "ModuleID")
 }
 
-// todo look if they need to be Dereferenced
+func validateAnswers(validator validation.IValidator, answers []*model.AnswerInput) error {
+	if len(answers) < 2 {
+		return errors.New("exercise must have at least two answers")
+	}
+
+	var correctCount int
+	for _, answer := range answers {
+		validator.Validate(answer.Value, []string{"IsString", "Length:<100"}, "Answer Value")
+		validator.Validate(answer.Correct, []string{"IsBoolean"}, "Answer Correct")
+
+		if answer.Correct {
+			correctCount++
+		}
+	}
+
+	// Check conditions
+	if correctCount == 0 {
+		return errors.New("at least one answer must be correct")
+	} else if correctCount > 1 {
+		return errors.New("only one answer can be correct")
+	}
+	return nil
+}
+
 func validateNewExercise(validator validation.IValidator, newExercise model.ExerciseInput) {
 	validator.Validate(newExercise.ClassID, []string{"IsUUID"}, "ClassID")
 	validator.Validate(newExercise.Name, []string{"IsString", "Length:<50"}, "Name")
