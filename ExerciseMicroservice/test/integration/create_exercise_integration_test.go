@@ -70,3 +70,165 @@ func TestResolver_CreateExercise_InvalidClassID(t *testing.T) {
 		assert.Equal(t, r.InvalidClassIDResponseError, errorResponse[0].Message)
 	})
 }
+
+func TestResolver_CreateExercise_InvalidModuleID(t *testing.T) {
+	fmt.Println("\nRunning TestResolver_CreateExercise_InvalidModuleID")
+	c := helper.CreateClient()
+
+	t.Run("Create exercise with invalid ModuleID", func(t *testing.T) {
+		// Call the resolver via the client and modify the context via functional options
+		err := c.Post(
+			requests.CreateExerciseMutation,
+			&r.CreateExerciseResponse,
+			client.Var("exerciseInput", requests.GenerateExerciseInputInvalidModuleId()),
+			helper.AddContext(Token),
+		)
+		if err != nil {
+			assert.NotNil(t, err)
+		}
+
+		// In your test, after getting the error
+		var errorResponse []r.ErrorType
+		err2 := json.NewDecoder(strings.NewReader(err.Error())).Decode(&errorResponse)
+		if err2 != nil {
+			assert.Nil(t, err2)
+		}
+
+		assert.Equal(t, r.InvalidModuleIDResponseError, errorResponse[0].Message)
+	})
+}
+
+func TestResolver_CreateExercise_InvalidName(t *testing.T) {
+	fmt.Println("\nRunning TestResolver_CreateExercise_InvalidName")
+	c := helper.CreateClient()
+
+	t.Run("Create exercise with invalid Name", func(t *testing.T) {
+		// Call the resolver via the client and modify the context via functional options
+		err := c.Post(
+			requests.CreateExerciseMutation,
+			&r.CreateExerciseResponse,
+			client.Var("exerciseInput", requests.GenerateExerciseInputInvalidName()),
+			helper.AddContext(Token),
+		)
+		if err != nil {
+			assert.NotNil(t, err)
+		}
+
+		// In your test, after getting the error
+		var errorResponse []r.ErrorType
+		err2 := json.NewDecoder(strings.NewReader(err.Error())).Decode(&errorResponse)
+		if err2 != nil {
+			assert.Nil(t, err2)
+		}
+
+		assert.Equal(t, r.InvalidNameResponseError, errorResponse[0].Message)
+	})
+}
+
+func TestResolver_CreateExercise_InvalidQuestion(t *testing.T) {
+	fmt.Println("\nRunning TestResolver_CreateExercise_InvalidQuestion")
+	c := helper.CreateClient()
+
+	t.Run("Create exercise with invalid Question", func(t *testing.T) {
+		// Call the resolver via the client and modify the context via functional options
+		err := c.Post(
+			requests.CreateExerciseMutation,
+			&r.CreateExerciseResponse,
+			client.Var("exerciseInput", requests.GenerateExerciseInputInvalidQuestion()),
+			helper.AddContext(Token),
+		)
+		if err != nil {
+			assert.NotNil(t, err)
+		}
+
+		// In your test, after getting the error
+		var errorResponse []r.ErrorType
+		err2 := json.NewDecoder(strings.NewReader(err.Error())).Decode(&errorResponse)
+		if err2 != nil {
+			assert.Nil(t, err2)
+		}
+
+		assert.Equal(t, r.InvalidQuestionResponseError, errorResponse[0].Message)
+	})
+}
+
+func TestResolver_CreateExercise_NoCorrectAnswers(t *testing.T) {
+	fmt.Println("\nRunning TestResolver_CreateExercise_NoCorrectAnswers")
+	c := helper.CreateClient()
+
+	t.Run("Create exercise with invalid Answers", func(t *testing.T) {
+		// Call the resolver via the client and modify the context via functional options
+		err := c.Post(
+			requests.CreateExerciseMutation,
+			&r.CreateExerciseResponse,
+			client.Var("exerciseInput", requests.GenerateExerciseInputNoCorrectAnswers()),
+			helper.AddContext(Token),
+		)
+		if err != nil {
+			assert.NotNil(t, err)
+		}
+
+		// In your test, after getting the error
+		var errorResponse []r.ErrorType
+		err2 := json.NewDecoder(strings.NewReader(err.Error())).Decode(&errorResponse)
+		if err2 != nil {
+			assert.Nil(t, err2)
+		}
+
+		assert.Equal(t, r.NoCorrectAnswersResponseError, errorResponse[0].Message)
+	})
+}
+
+func TestResolver_CreateExercise_NoAnswers(t *testing.T) {
+	fmt.Println("\nRunning TestResolver_CreateExercise_NoAnswers")
+	c := helper.CreateClient()
+
+	t.Run("Create exercise with invalid Answers", func(t *testing.T) {
+		// Call the resolver via the client and modify the context via functional options
+		err := c.Post(
+			requests.CreateExerciseMutation,
+			&r.CreateExerciseResponse,
+			client.Var("exerciseInput", requests.GenerateExerciseInputNoAnswers()),
+			helper.AddContext(Token),
+		)
+		if err != nil {
+			assert.NotNil(t, err)
+		}
+
+		// In your test, after getting the error
+		var errorResponse []r.ErrorType
+		err2 := json.NewDecoder(strings.NewReader(err.Error())).Decode(&errorResponse)
+		if err2 != nil {
+			assert.Nil(t, err2)
+		}
+
+		assert.Equal(t, r.NoAnswersResponseError, errorResponse[0].Message)
+	})
+}
+
+func TestResolver_CreateExercise_NoIncorrectAnswer(t *testing.T) {
+	fmt.Println("\nRunning TestResolver_CreateExercise_NoIncorrectAnswer")
+	c := helper.CreateClient()
+
+	t.Run("Create exercise with invalid Answers", func(t *testing.T) {
+		// Call the resolver via the client and modify the context via functional options
+		err := c.Post(
+			requests.CreateExerciseMutation,
+			&r.CreateExerciseResponse,
+			client.Var("exerciseInput", requests.GenerateExerciseInputNoIncorrectAnswers()),
+			helper.AddContext(Token),
+		)
+		if err != nil {
+			assert.NotNil(t, err)
+		}
+
+		// In your test, after getting the error
+		var errorResponse []r.ErrorType
+		err2 := json.NewDecoder(strings.NewReader(err.Error())).Decode(&errorResponse)
+		if err2 != nil {
+			assert.Nil(t, err2)
+		}
+
+		assert.Equal(t, r.NoIncorrectAnswersResponseError, errorResponse[0].Message)
+	})
+}
