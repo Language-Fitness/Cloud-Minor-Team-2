@@ -1,0 +1,49 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: run-tests
+spec:
+  workspaces:
+    - name: output
+  params:
+    - description: url referencing new image.
+      name: IMAGE-REGISTRY-URL
+      type: string
+  results:
+    - description: new tag for the image to be
+      name: IMAGE-REGISTRY-URL-TAGGED
+      type: string
+  steps:
+    - name: build-run-tests
+      image: golang:1.20.0-alpine
+      resources: { }
+      script: |
+        cd /workspace/output
+
+        go mod download
+
+        cd /workspace/output/test/internal/service
+        go test . >> /workspace/output/all_test_results.txt
+
+        cd /workspace/output/test/internal/validation
+        go test . >> /workspace/output/all_test_results.txt
+
+        cd /workspace/output/test/internal/auth
+        go test . >> /workspace/output/all_test_results.txt
+
+        # Check if 'FAIL' exists in the file
+        if grep -q 'FAIL' /workspace/output/all_test_results.txt; then
+          echo "Tests failed: 'FAIL' found in the results."
+          cat /workspace/output/all_test_results.txt  # Print the contents of the file
+          exit 1
+        else
+          echo "All tests passed."
+          image_registry_url=$(params.IMAGE-REGISTRY-URL)
+        
+          timestamp=$(date +'%Y%m%d.%H%M')
+          version="v1.0.0-$timestamp"
+          
+          tagged_image="$image_registry_url:$version"
+          echo -n "${tagged_image}" | tee "$(results.IMAGE-REGISTRY-URL-TAGGED.path)"
+          exit 0
+        fi

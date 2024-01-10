@@ -1,0 +1,24 @@
+apiVersion: tekton.dev/v1beta1
+kind: PipelineRun
+metadata:
+  name: test-0ij93k
+  namespace: bramterlouw-dev
+spec:
+  params:
+    - name: GITHUB-URL
+      value: git@github.com:BramTerlouw/Test-Microservice.git
+    - name: IMAGE-REGISTRY-URL
+      value: quay.io/bramterlouw/school-microservice
+  pipelineRef:
+    name: go-test-pipeline
+  timeout: 1h0m0s
+  workspaces:
+    - name: ssh-creds
+      secret:
+        secretName: test-github-ssh-key
+    - name: docker-credentials
+      secret:
+        secretName: quay-registry-secret
+    - name: source
+      persistentVolumeClaim:
+        claimName: claim1

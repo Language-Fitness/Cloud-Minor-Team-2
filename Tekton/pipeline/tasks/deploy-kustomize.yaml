@@ -1,0 +1,22 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: deploy-with-kustomize
+spec:
+  params:
+    - description: url where image resides.
+      name: IMAGE-REGISTRY-URL-TAGGED
+      type: string
+  workspaces:
+    - name: output
+  steps:
+    - name: deploy-with-kustomize
+      image: line/kubectl-kustomize
+      script: |
+        cd /workspace/output/openshift
+
+        tagged_image=$(params.IMAGE-REGISTRY-URL-TAGGED)
+
+        sed -i "s|IMAGE|${tagged_image}|g" /workspace/output/openshift/kustomization.yml
+
+        kustomize build /workspace/output/openshift | kubectl apply -f -

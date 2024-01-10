@@ -1,0 +1,65 @@
+apiVersion: triggers.tekton.dev/v1alpha1
+kind: TriggerTemplate
+metadata:
+  name: triggertemplate
+  namespace: bramterlouw-dev
+spec:
+  params:
+    - name: registryurl
+      description: the registry url.
+    - name: gitrepositoryurl
+      description: the git repository url.
+    - name: projectname
+      description: the name of the project.
+  resourceTemplates:
+    - apiVersion: tekton.dev/v1beta1
+      kind: PipelineRun
+      metadata:
+        generateName: pipeline-run-
+        namespace: bramterlouw-dev
+      spec:
+        serviceAccountName: pipeline
+        pipelineRef:
+          name: go-test-pipeline
+        params:
+          - name: GITHUB-URL
+            value: $(tt.params.gitrepositoryurl)
+          - name: IMAGE-REGISTRY-URL
+            value: $(tt.params.registryurl)
+        workspaces:
+          - name: ssh-creds
+            secret:
+              secretName: "$(tt.params.projectname)-github-ssh-key"
+          - name: docker-credentials
+            secret:
+              secretName: quay-registry-secret
+          - name: source
+            persistentVolumeClaim:
+              claimName: claim1
+---
+apiVersion: triggers.tekton.dev/v1alpha1
+kind: TriggerBinding
+metadata:
+  name: pipelinebinding
+  namespace: bramterlouw-dev
+spec:
+  params:
+    - name: gitrepositoryurl
+      value: "git@github.com:BramTerlouw/$(body.gitrepositoryurl)"
+    - name: registryurl
+      value: "$(body.registryurl)"
+    - name: projectname
+      value: "$(body.project)"
+---
+apiVersion: triggers.tekton.dev/v1alpha1
+kind: EventListener
+metadata:
+  name: eventlistener
+  namespace: bramterlouw-dev
+spec:
+  serviceAccountName: pipeline
+  triggers:
+    - bindings:
+        - ref: pipelinebinding
+      template:
+        ref: triggertemplate

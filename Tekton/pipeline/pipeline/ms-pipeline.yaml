@@ -1,0 +1,71 @@
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: go-test-pipeline
+spec:
+  workspaces:
+    - name: source
+    - name: ssh-creds
+    - name: docker-credentials
+  params:
+    - description: url github to be cloned.
+      name: GITHUB-URL
+      type: string
+    - description: url referencing new image.
+      name: IMAGE-REGISTRY-URL
+      type: string
+  tasks:
+
+    - name: clone-repo
+      taskRef:
+        kind: Task
+        name: git-clone
+      params:
+        - name: url
+          value: "$(params.GITHUB-URL)"
+      workspaces:
+        - name: output
+          workspace: source
+        - name: ssh-directory
+          workspace: ssh-creds
+
+    - name: run-tests
+      runAfter:
+        - clone-repo
+      taskRef:
+        kind: Task
+        name: run-tests
+      workspaces:
+        - name: output
+          workspace: source
+      params:
+        - name: IMAGE-REGISTRY-URL
+          value: $(params.IMAGE-REGISTRY-URL)
+
+    - name: build-push
+      runAfter:
+        - run-tests
+      taskRef:
+        kind: Task
+        name: kaniko
+      workspaces:
+        - name: dockerconfig
+          workspace: docker-credentials
+        - name: source
+          workspace: source
+      params:
+        - name: IMAGE
+          value: $(tasks.run-tests.results.IMAGE-REGISTRY-URL-TAGGED)
+
+    - name: build-kustomize-and-deploy
+      runAfter:
+        - build-push
+      taskRef:
+        kind: Task
+        name: deploy-with-kustomize
+      workspaces:
+        - name: output
+          workspace: source
+      params:
+        - name: IMAGE-REGISTRY-URL-TAGGED
+          value: "$(tasks.build-push.results.IMAGE_URL)"
