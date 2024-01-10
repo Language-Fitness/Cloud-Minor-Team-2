@@ -28,6 +28,7 @@ enum join__Graph {
     EXERCISES @join__graph(name: "exercises", url: "http://exercise-microservice-service:8084/query")
     OPENAI @join__graph(name: "openai", url: "http://openai-microservice-service:4000/query")
     RESULTS @join__graph(name: "results", url: "http://result-microservice-service:8085/query")
+    SAGA @join__graph(name: "saga", url: "http://saga-microservice-service:3/query")
 }
 
 scalar link__Import
@@ -287,6 +288,7 @@ type Mutation
 @join__type(graph: EXERCISES)
 @join__type(graph: OPENAI)
 @join__type(graph: RESULTS)
+@join__type(graph: SAGA)
 {
     createModule(input: ModuleInputCreate!): Module @join__field(graph: MODULES)
     updateModule(id: ID!, input: ModuleInputUpdate!): Module @join__field(graph: MODULES)
@@ -313,6 +315,7 @@ type Mutation
         questionLevel: LevelEnum!
         questionSubject: SubjectEnum!
     ): GenerateMultipleChoiceQuestions @join__field(graph: OPENAI)
+    deleteObject(filter: SagaFilter): SuccessMessage @join__field(graph: SAGA)
 }
 
 # FILTERS
@@ -517,4 +520,63 @@ type GenerateMultipleChoiceQuestions
 @join__type(graph: OPENAI)
 {
     response: TokenResponse!
+}
+
+# SAGA ORCHESTRATOR OBJECTS
+type SuccessMessage
+@join__type(graph: SAGA)
+{
+    id: ID!
+    text: String!
+    status: SagaObjectStatus!
+    object_id: ID!
+    object_type: SagaObjectTypes!
+}
+
+type SagaObject
+@join__type(graph: SAGA)
+{
+    id: ID!
+    copy: SagaObject
+    object_id: ID!
+    object_type: SagaObjectTypes!
+    created_at: String!
+    updated_at: String
+    status: SagaObjectStatusProgress
+    object_status: SagaObjectStatus!
+    action_done_by: ID!
+    parent_id: ID
+}
+
+input SagaFilter
+@join__type(graph: SAGA)
+{
+    soft_deleted: Boolean!
+    object_id: String!
+    object_type: SagaObjectTypes!
+}
+
+enum SagaObjectTypes
+@join__type(graph: SAGA)
+{
+    School
+    Class
+    Exercise
+    Result
+    Module
+}
+
+enum SagaObjectStatusProgress
+@join__type(graph: SAGA)
+{
+    Started
+    InProgress
+    Finished
+}
+
+enum SagaObjectStatus
+@join__type(graph: SAGA)
+{
+    Exist
+    Deleted
 }
