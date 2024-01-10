@@ -268,7 +268,6 @@ func validateUpdatedExercise(validator validation.IValidator, id string, updated
 	validator.Validate(updatedData.ClassID, []string{"IsString"}, "ClassID")
 	validator.Validate(updatedData.Name, []string{"IsString", "Length:<50"}, "Name")
 	validator.Validate(updatedData.Question, []string{"IsString", "Length:<100"}, "Question")
-	validator.Validate(updatedData.Answers, []string{"IsString"}, "Answers")
 	validator.Validate(updatedData.ModuleID, []string{"IsString"}, "ModuleID")
 }
 
@@ -277,7 +276,6 @@ func validateNewExercise(validator validation.IValidator, newExercise model.Exer
 	validator.Validate(newExercise.ClassID, []string{"IsString"}, "ClassID")
 	validator.Validate(newExercise.Name, []string{"IsString", "Length:<50"}, "Name")
 	validator.Validate(newExercise.Question, []string{"IsString", "Length:<100"}, "Question")
-	validator.Validate(newExercise.Answers, []string{"IsString"}, "Answers")
 	validator.Validate(newExercise.ModuleID, []string{"IsString"}, "ModuleID")
 }
 

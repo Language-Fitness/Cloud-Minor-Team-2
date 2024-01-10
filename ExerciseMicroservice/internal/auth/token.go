@@ -75,9 +75,10 @@ func (a *Token) IntrospectToken(bearerToken string) (bool, error) {
 
 func (a *Token) DecodeToken(token string) (map[string]interface{}, error) {
 	// JWTs are typically in the format "header.payload.signature"
+
 	parts := strings.Split(token, ".")
 	if len(parts) != 3 {
-		return nil, fmt.Errorf("invalid token format")
+		return nil, fmt.Errorf("invalid token format: %s", token)
 	}
 
 	// Decode the payload (second part)

@@ -56,8 +56,6 @@ func (v *Validator) Validate(input interface{}, arr []string, name string) {
 		return
 	}
 
-	fmt.Println("error here")
-
 	for _, value := range arr {
 		functionName := value
 

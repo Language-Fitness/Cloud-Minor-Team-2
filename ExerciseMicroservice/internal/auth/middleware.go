@@ -6,7 +6,7 @@ import (
 	"strings"
 )
 
-var tokenCtxKey = &contextKey{"token"}
+var TokenCtxKey = &contextKey{"token"}
 
 type contextKey struct {
 	name string
@@ -28,7 +28,7 @@ func Middleware(next http.Handler) http.Handler {
 		}
 
 		// Store the token in the context
-		ctx := context.WithValue(r.Context(), tokenCtxKey, token)
+		ctx := context.WithValue(r.Context(), TokenCtxKey, token)
 
 		// Call the next with our new context
 		next.ServeHTTP(w, r.WithContext(ctx))
@@ -38,6 +38,6 @@ func Middleware(next http.Handler) http.Handler {
 // TokenFromContext retrieves the Bearer token from the context.
 // REQUIRES Middleware to have run.
 func TokenFromContext(ctx context.Context) string {
-	raw, _ := ctx.Value(tokenCtxKey).(string)
+	raw, _ := ctx.Value(TokenCtxKey).(string)
 	return raw
 }
