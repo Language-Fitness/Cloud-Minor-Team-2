@@ -16,7 +16,6 @@ var (
 
 // GetDBClient returns a singleton MongoDB client instance.
 func GetDBClient() (*mongo.Client, error) {
-	fmt.Println("ewaeaw")
 	fmt.Println(getDatabaseConnectionString())
 
 	clientOnce.Do(func() {
@@ -24,7 +23,6 @@ func GetDBClient() (*mongo.Client, error) {
 		clientOptions := options.Client().ApplyURI(getDatabaseConnectionString())
 		c, err := mongo.Connect(context.Background(), clientOptions)
 		if err != nil {
-			fmt.Println("here")
 			panic(err)
 		}
 		client = c

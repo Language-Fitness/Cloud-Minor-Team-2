@@ -12,6 +12,23 @@ var (
 	}
 )
 
+var CreateExerciseMutation = `
+    mutation($exerciseInput: ExerciseInput!) {
+        CreateExercise(exercise: $exerciseInput) {
+            id
+            class_Id
+            module_id
+            name
+            question
+            answers {
+                value
+                correct
+            }
+            difficulty
+            made_by
+        }
+    }`
+
 func GenerateExerciseInput() map[string]interface{} {
 	return map[string]interface{}{
 		"class_Id":   ClassID,
