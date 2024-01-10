@@ -238,10 +238,10 @@ func (r *ResultService) ListResults(token string, filter *model.ResultFilter, pa
 
 func validateListResultFilter(validator validation.IValidator, filter *model.ResultFilter, paginate *model.Paginator) {
 	validator.Validate(filter.SoftDelete, []string{"IsNull", "IsBoolean"}, "Filter SoftDelete")
-	validator.Validate(filter.ExerciseID, []string{"IsNull", "IsString"}, "Filter ExerciseID")
-	validator.Validate(filter.UserID, []string{"IsNull", "IsString"}, "Filter UserID")
-	validator.Validate(filter.ClassID, []string{"IsNull", "IsString"}, "Filter ClassID")
-	validator.Validate(filter.ModuleID, []string{"IsNull", "IsString"}, "Filter ModuleID")
+	validator.Validate(filter.ExerciseID, []string{"IsNull", "IsUUID"}, "Filter ExerciseID")
+	validator.Validate(filter.UserID, []string{"IsNull", "IsUUID"}, "Filter UserID")
+	validator.Validate(filter.ClassID, []string{"IsNull", "IsUUID"}, "Filter ClassID")
+	validator.Validate(filter.ModuleID, []string{"IsNull", "IsUUID"}, "Filter ModuleID")
 	validator.Validate(paginate.Amount, []string{"IsInt", "Size:>0", "Size:<101"}, "Paginate Amount")
 	validator.Validate(paginate.Step, []string{"IsInt", "Size:>=0"}, "Paginate Step")
 }

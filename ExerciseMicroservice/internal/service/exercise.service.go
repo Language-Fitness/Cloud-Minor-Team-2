@@ -256,8 +256,8 @@ func (e *ExerciseService) ListExercises(token string, filter *model.ExerciseFilt
 func validateListExerciseFilter(validator validation.IValidator, filter *model.ExerciseFilter, paginate *model.Paginator) {
 	validator.Validate(filter.SoftDelete, []string{"IsNull", "IsBoolean"}, "Filter SoftDelete")
 	validator.Validate(filter.Name, []string{"IsNull", "IsString"}, "Filter Name")
-	validator.Validate(filter.ClassID, []string{"IsNull", "IsString"}, "Filter ClassID")
-	validator.Validate(filter.ModuleID, []string{"IsNull", "IsString"}, "Filter ModuleID")
+	validator.Validate(filter.ClassID, []string{"IsNull", "IsUUID"}, "Filter ClassID")
+	validator.Validate(filter.ModuleID, []string{"IsNull", "IsUUID"}, "Filter ModuleID")
 	validator.Validate(filter.MadeBy, []string{"IsNull", "IsString"}, "Filter MadeBy")
 	validator.Validate(paginate.Amount, []string{"IsInt", "Size:>0", "Size:<101"}, "Paginate Amount")
 	validator.Validate(paginate.Step, []string{"IsInt", "Size:>=0"}, "Paginate Step")
@@ -265,18 +265,18 @@ func validateListExerciseFilter(validator validation.IValidator, filter *model.E
 
 func validateUpdatedExercise(validator validation.IValidator, id string, updatedData model.ExerciseInput) {
 	validator.Validate(id, []string{"IsUUID"}, "ID")
-	validator.Validate(updatedData.ClassID, []string{"IsString"}, "ClassID")
+	validator.Validate(updatedData.ClassID, []string{"IsUUID"}, "ClassID")
 	validator.Validate(updatedData.Name, []string{"IsString", "Length:<50"}, "Name")
 	validator.Validate(updatedData.Question, []string{"IsString", "Length:<100"}, "Question")
-	validator.Validate(updatedData.ModuleID, []string{"IsString"}, "ModuleID")
+	validator.Validate(updatedData.ModuleID, []string{"IsUUID"}, "ModuleID")
 }
 
 // todo look if they need to be Dereferenced
 func validateNewExercise(validator validation.IValidator, newExercise model.ExerciseInput) {
-	validator.Validate(newExercise.ClassID, []string{"IsString"}, "ClassID")
+	validator.Validate(newExercise.ClassID, []string{"IsUUID"}, "ClassID")
 	validator.Validate(newExercise.Name, []string{"IsString", "Length:<50"}, "Name")
-	validator.Validate(newExercise.Question, []string{"IsString", "Length:<100"}, "Question")
-	validator.Validate(newExercise.ModuleID, []string{"IsString"}, "ModuleID")
+	validator.Validate(newExercise.Question, []string{"IsUUID", "Length:<100"}, "Question")
+	validator.Validate(newExercise.ModuleID, []string{"IsUUID"}, "ModuleID")
 }
 
 func buildBsonFilterForListExercise(policy auth.IExercisePolicy, token string, filter *model.ExerciseFilter) (bson.D, []error) {
