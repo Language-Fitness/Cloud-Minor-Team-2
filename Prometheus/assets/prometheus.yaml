@@ -1,0 +1,16 @@
+apiVersion: monitoring.coreos.com/v1
+kind: Prometheus
+metadata:
+  name: prometheus
+  namespace: grafana
+  labels:
+    name: prometheus
+    app: prometheus
+spec:
+  replicas: 2
+  serviceAccountName: prometheus-sa
+  securityContext: {}
+  serviceMonitorSelector:
+    matchLabels:
+      name: prometheus-service-monitor
+    ruleSelector: {}
