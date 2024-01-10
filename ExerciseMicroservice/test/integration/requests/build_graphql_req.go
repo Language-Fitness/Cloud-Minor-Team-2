@@ -39,3 +39,15 @@ func GenerateExerciseInput() map[string]interface{} {
 		"answers":    Answers,
 	}
 }
+
+func GenerateExerciseInputInvalidClassId() map[string]interface{} {
+	// Set an invalid UUID for ClassID
+	return map[string]interface{}{
+		"class_Id":   "56565656b", // This is an invalid UUID
+		"module_id":  ModuleID,
+		"name":       Name,
+		"question":   Question,
+		"difficulty": Difficulty,
+		"answers":    Answers,
+	}
+}

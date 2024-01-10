@@ -2,7 +2,6 @@ package validation
 
 import (
 	"ExerciseMicroservice/internal/helper"
-	"fmt"
 	"strings"
 )
 
@@ -23,7 +22,7 @@ type Validator struct {
 // NewValidator GOLANG FACTORY
 // Returns a Validator implementing IValidator.
 func NewValidator() IValidator {
-	fmt.Println("initilizing validator")
+	//fmt.Println("initilizing validator")
 
 	return &Validator{}
 }
