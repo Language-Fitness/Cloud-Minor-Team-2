@@ -84,7 +84,14 @@ func (s SagaService) InitSagaSteps(token string, filter *model.SagaFilter) (*mod
 		log.Printf("failed to call FindObject RPC: %v", err)
 	}
 
-	sagaObject, err = s.updateSagaObject(sagaObject, response, sagaObject, err)
+	requestUpdated := pb.ObjectRequest{
+		BearerToken:  token,
+		ObjectId:     sagaObject.ObjectID,
+		ObjectType:   response.ObjectType,
+		ObjectStatus: response.ObjectStatus,
+	}
+
+	sagaObject, err = s.updateSagaObject(sagaObject, &requestUpdated, sagaObject, err)
 	if err != nil {
 		return nil, err
 	}
@@ -242,7 +249,14 @@ func (s SagaService) softDeleteChildren(token string, sagaObject *model.SagaObje
 				log.Printf("failed to call FindObject RPC: %v", err)
 			}
 
-			updateSagaObject, err3 := s.updateSagaObject(child, response, sagaObject, err)
+			requestUpdated := pb.ObjectRequest{
+				BearerToken:  token,
+				ObjectId:     sagaObject.ObjectID,
+				ObjectType:   response.ObjectType,
+				ObjectStatus: response.ObjectStatus,
+			}
+
+			updateSagaObject, err3 := s.updateSagaObject(sagaObject, &requestUpdated, sagaObject, err)
 			if err3 != nil {
 				return err3
 			}
