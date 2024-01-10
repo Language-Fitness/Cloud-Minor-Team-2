@@ -132,14 +132,32 @@ type Exercise
     module_id: ID!
     name: String!
     question: String!
-    answers: String!
-    pos_correct_answer: Int!
-    question_type_id: ID!
+    answers: [Answer]!
     difficulty: LanguageLevel!
     created_at: String!
     updated_at: String!
     soft_deleted: Boolean!
     made_by: ID!
+}
+
+type ExerciseInfo
+@join__type(graph: EXERCISES, key: "id")
+{
+    id: ID!
+    class_Id: ID!
+    module_id: ID!
+    name: String!
+    question: String!
+    answers: [Answer]!
+    difficulty: LanguageLevel!
+    made_by: ID!
+}
+
+type Answer
+@join__type(graph: EXERCISES)
+{
+    value: String!
+    correct: Boolean!
 }
 
 type Result
@@ -217,10 +235,15 @@ input ExerciseInput
     module_id: ID!
     name: String!
     question: String!
-    answers: String!
-    pos_correct_answer: Int!
-    question_type_id: ID!
+    answers: [AnswerInput]!
     difficulty: LanguageLevel!
+}
+
+input AnswerInput
+@join__type(graph: EXERCISES)
+{
+    value: String!
+    correct: Boolean!
 }
 
 input InputResult
@@ -249,7 +272,7 @@ type Query
     getSchool(id: ID!): School @join__field(graph: SCHOOLS)
     listSchools(filter: ListSchoolFilter, paginate: Paginator): [SchoolInfo] @join__field(graph: SCHOOLS)
     GetExercise(ExerciseId: ID!): Exercise @join__field(graph: EXERCISES)
-    ListExercise(filter: ExerciseFilter!, paginator: Paginator!): [Exercise] @join__field(graph: EXERCISES)
+    ListExercise(filter: ExerciseFilter!, paginator: Paginator!): [ExerciseInfo] @join__field(graph: EXERCISES)
     ListResults(filter: ResultFilter!, paginator: Paginator!): [resultInfo] @join__field(graph: RESULTS)
     GetResultsByID(id: ID!): Result @join__field(graph: RESULTS)
     retrieveMultipleChoiceQuestions(token: String!): ResponseMultipleChoiceQuestion @join__field(graph: OPENAI)
@@ -276,7 +299,7 @@ type Mutation
     deleteSchool(id: ID!): ID @join__field(graph: SCHOOLS)
     CreateExercise(exercise: ExerciseInput!): Exercise @join__field(graph: EXERCISES)
     UpdateExercise(id: ID!, exercise: ExerciseInput!): Exercise @join__field(graph: EXERCISES)
-    DeleteExercise(ExerciseID: ID!): Exercise @join__field(graph: EXERCISES)
+    DeleteExercise(ExerciseID: ID!): ID @join__field(graph: EXERCISES)
     CreateResult(input: InputResult!): Result @join__field(graph: RESULTS)
     UpdateResult(id: ID!, input: InputResult!): Result @join__field(graph: RESULTS)
     DeleteResult(id: ID!): ID @join__field(graph: RESULTS)

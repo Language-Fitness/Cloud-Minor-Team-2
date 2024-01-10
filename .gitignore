@@ -6,3 +6,8 @@ key.pem
 dist
 .env
 **/*.env
+/shelf/
+/workspace.xml
+/httpRequests/
+.idea
+node_modules/
