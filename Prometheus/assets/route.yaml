@@ -6,6 +6,7 @@ metadata:
   labels:
     name: prometheus-route
     app: prometheus
+    project: language-fitness
     operated-prometheus: "true"
 spec:
   path: /
