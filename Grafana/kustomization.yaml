@@ -4,5 +4,5 @@ resources:
   - assets/subscription.yaml
   - assets/dashboard.yaml
   - assets/datasource.yaml
-  - assets/grafana-instance.yaml
+  - assets/grafana.yaml
   - assets/route.yaml

@@ -3,6 +3,10 @@ kind: GrafanaDashboard
 metadata:
   name: grafana-dashboard
   namespace: grafana
+  labels:
+    name: grafana-dashboard
+    app: grafana
+    project: language-fitness
 spec:
   instanceSelector:
     matchLabels:

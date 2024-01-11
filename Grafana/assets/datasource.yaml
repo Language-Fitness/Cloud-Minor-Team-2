@@ -1,8 +1,12 @@
 apiVersion: grafana.integreatly.org/v1beta1
 kind: GrafanaDatasource
 metadata:
-  name: grafanadatasource
+  name: grafana-datasource
   namespace: grafana
+  labels:
+    name: grafana-datasource
+    app: grafana
+    project: language-fitness
 spec:
   instanceSelector:
     matchLabels:

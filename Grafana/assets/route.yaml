@@ -5,13 +5,14 @@ metadata:
   namespace: grafana
   labels:
     name: grafana-route
-    app: grafana-app
+    app: grafana
+    project: language-fitness
     operated-prometheus: "true"
 spec:
   path: /
   to:
     kind: Service
-    name: grafana-service
+    name: grafana-instance-service
     weight: 100
   port:
     targetPort: grafana
