@@ -2,8 +2,8 @@ import base64
 import json
 import unittest
 from unittest.mock import patch, MagicMock
-from Services.OpenAI.assistant_api_adapter import AssistantAPIAdapter
-from Utils.Exceptions.AssistantAPIException import AssistantAPIException
+from services.openai.assistant_api_adapter import AssistantAPIAdapter
+from utils.exceptions.assistant_api_exception import AssistantAPIException
 import logging
 
 
@@ -24,12 +24,12 @@ class TestAssistantAPIAdapter(unittest.TestCase):
     # SUCCESS TESTS
 
     # 1. Successfully running the method
-    @patch('Services.OpenAI.assistant_api_adapter.AssistantAPIAdapter.encode_token')
-    @patch('Services.OpenAI.openai_assistant_manager.OpenAIAssistantManager.run_thread')
-    @patch('Services.OpenAI.openai_assistant_manager.OpenAIAssistantManager.create_message')
-    @patch('Services.OpenAI.openai_assistant_manager.OpenAIAssistantManager.create_thread')
-    @patch('Services.OpenAI.openai_assistant_manager.OpenAIAssistantManager.create_assistant')
-    @patch('Services.OpenAI.openai_assistant_manager.OpenAIAssistantManager.load_assistant')
+    @patch('services.openai.assistant_api_adapter.AssistantAPIAdapter.encode_token')
+    @patch('services.openai.openai_assistant_manager.OpenAIAssistantManager.run_thread')
+    @patch('services.openai.openai_assistant_manager.OpenAIAssistantManager.create_message')
+    @patch('services.openai.openai_assistant_manager.OpenAIAssistantManager.create_thread')
+    @patch('services.openai.openai_assistant_manager.OpenAIAssistantManager.create_assistant')
+    @patch('services.openai.openai_assistant_manager.OpenAIAssistantManager.load_assistant')
     def test_generate_multiple_choice_questions_success(
             self, mock_load_assistant, mock_create_assistant, mock_create_thread,
             mock_create_message, mock_run_thread, mock_encode_token
@@ -74,15 +74,15 @@ class TestAssistantAPIAdapter(unittest.TestCase):
     # FAIL TESTS
 
     # 1.1 Failure in Loading Assistant
-    @patch('Services.OpenAI.openai_assistant_manager.OpenAIAssistantManager.load_assistant')
+    @patch('services.openai.openai_assistant_manager.OpenAIAssistantManager.load_assistant')
     def test_load_assistant_failure_exception(self, mock_load_assistant):
         mock_load_assistant.side_effect = Exception("Load assistant failure")
         with self.assertRaises(Exception):
             self.assistantAPIAdapter.generate_multiple_choice_questions("Subject", "Level", 5)
 
     # 1.2 Failure in Creating Assistant (Exception)
-    @patch('Services.OpenAI.openai_assistant_manager.OpenAIAssistantManager.load_assistant')
-    @patch('Services.OpenAI.openai_assistant_manager.OpenAIAssistantManager.create_assistant')
+    @patch('services.openai.openai_assistant_manager.OpenAIAssistantManager.load_assistant')
+    @patch('services.openai.openai_assistant_manager.OpenAIAssistantManager.create_assistant')
     def test_create_assistant_failure_exception(self, mock_create_assistant, mock_load_assistant):
         mock_load_assistant.return_value = MagicMock()
         mock_create_assistant.side_effect = Exception(
@@ -91,8 +91,8 @@ class TestAssistantAPIAdapter(unittest.TestCase):
             self.assistantAPIAdapter.generate_multiple_choice_questions("Subject", "Level", 5)
 
     # 1.3 Failure in Creating Assistant (AssistantAPIException)
-    @patch('Services.OpenAI.openai_assistant_manager.OpenAIAssistantManager.load_assistant')
-    @patch('Services.OpenAI.openai_assistant_manager.OpenAIAssistantManager.create_assistant')
+    @patch('services.openai.openai_assistant_manager.OpenAIAssistantManager.load_assistant')
+    @patch('services.openai.openai_assistant_manager.OpenAIAssistantManager.create_assistant')
     def test_create_assistant_failure_assistant_api_exception(self, mock_create_assistant, mock_load_assistant):
         mock_load_assistant.return_value = MagicMock()
         mock_create_assistant.side_effect = AssistantAPIException(
@@ -101,9 +101,9 @@ class TestAssistantAPIAdapter(unittest.TestCase):
             self.assistantAPIAdapter.generate_multiple_choice_questions("Subject", "Level", 5)
 
     # 1.4 Failure in Creating Thread (Exception)
-    @patch('Services.OpenAI.openai_assistant_manager.OpenAIAssistantManager.load_assistant')
-    @patch('Services.OpenAI.openai_assistant_manager.OpenAIAssistantManager.create_assistant')
-    @patch('Services.OpenAI.openai_assistant_manager.OpenAIAssistantManager.create_thread')
+    @patch('services.openai.openai_assistant_manager.OpenAIAssistantManager.load_assistant')
+    @patch('services.openai.openai_assistant_manager.OpenAIAssistantManager.create_assistant')
+    @patch('services.openai.openai_assistant_manager.OpenAIAssistantManager.create_thread')
     def test_create_thread_failure_exception(self, mock_create_thread, mock_create_assistant, mock_load_assistant):
         mock_load_assistant.return_value = MagicMock()
         mock_create_assistant.return_value = MagicMock()
@@ -112,9 +112,9 @@ class TestAssistantAPIAdapter(unittest.TestCase):
             self.assistantAPIAdapter.generate_multiple_choice_questions("Subject", "Level", 5)
 
     # 1.5 Failure in Creating Thread (AssistantAPIException)
-    @patch('Services.OpenAI.openai_assistant_manager.OpenAIAssistantManager.load_assistant')
-    @patch('Services.OpenAI.openai_assistant_manager.OpenAIAssistantManager.create_assistant')
-    @patch('Services.OpenAI.openai_assistant_manager.OpenAIAssistantManager.create_thread')
+    @patch('services.openai.openai_assistant_manager.OpenAIAssistantManager.load_assistant')
+    @patch('services.openai.openai_assistant_manager.OpenAIAssistantManager.create_assistant')
+    @patch('services.openai.openai_assistant_manager.OpenAIAssistantManager.create_thread')
     def test_create_thread_failure_assistant_api_exception(self, mock_create_thread, mock_create_assistant,
                                                            mock_load_assistant):
         mock_load_assistant.return_value = MagicMock()
@@ -125,10 +125,10 @@ class TestAssistantAPIAdapter(unittest.TestCase):
             self.assistantAPIAdapter.generate_multiple_choice_questions("Subject", "Level", 5)
 
     # 1.6 Failure in Creating Message(AssistantAPIException)
-    @patch('Services.OpenAI.openai_assistant_manager.OpenAIAssistantManager.load_assistant')
-    @patch('Services.OpenAI.openai_assistant_manager.OpenAIAssistantManager.create_assistant')
-    @patch('Services.OpenAI.openai_assistant_manager.OpenAIAssistantManager.create_thread')
-    @patch('Services.OpenAI.openai_assistant_manager.OpenAIAssistantManager.create_message')
+    @patch('services.openai.openai_assistant_manager.OpenAIAssistantManager.load_assistant')
+    @patch('services.openai.openai_assistant_manager.OpenAIAssistantManager.create_assistant')
+    @patch('services.openai.openai_assistant_manager.OpenAIAssistantManager.create_thread')
+    @patch('services.openai.openai_assistant_manager.OpenAIAssistantManager.create_message')
     def test_create_message_failure_assistant_api_exception(self, mock_create_message, mock_create_thread,
                                                             mock_create_assistant, mock_load_assistant):
         mock_load_assistant.return_value = MagicMock()
@@ -140,10 +140,10 @@ class TestAssistantAPIAdapter(unittest.TestCase):
             self.assistantAPIAdapter.generate_multiple_choice_questions("Subject", "Level", 5)
 
     # 1.7 Failure in Creating Message(Exception)
-    @patch('Services.OpenAI.openai_assistant_manager.OpenAIAssistantManager.load_assistant')
-    @patch('Services.OpenAI.openai_assistant_manager.OpenAIAssistantManager.create_assistant')
-    @patch('Services.OpenAI.openai_assistant_manager.OpenAIAssistantManager.create_thread')
-    @patch('Services.OpenAI.openai_assistant_manager.OpenAIAssistantManager.create_message')
+    @patch('services.openai.openai_assistant_manager.OpenAIAssistantManager.load_assistant')
+    @patch('services.openai.openai_assistant_manager.OpenAIAssistantManager.create_assistant')
+    @patch('services.openai.openai_assistant_manager.OpenAIAssistantManager.create_thread')
+    @patch('services.openai.openai_assistant_manager.OpenAIAssistantManager.create_message')
     def test_create_message_failure_exception(self, mock_create_message, mock_create_thread, mock_create_assistant,
                                               mock_load_assistant):
         mock_load_assistant.return_value = MagicMock()
@@ -154,11 +154,11 @@ class TestAssistantAPIAdapter(unittest.TestCase):
             self.assistantAPIAdapter.generate_multiple_choice_questions("Subject", "Level", 5)
 
     # 1.8 Failure in Running Thread(AssistantAPIException)
-    @patch('Services.OpenAI.openai_assistant_manager.OpenAIAssistantManager.load_assistant')
-    @patch('Services.OpenAI.openai_assistant_manager.OpenAIAssistantManager.create_assistant')
-    @patch('Services.OpenAI.openai_assistant_manager.OpenAIAssistantManager.create_thread')
-    @patch('Services.OpenAI.openai_assistant_manager.OpenAIAssistantManager.create_message')
-    @patch('Services.OpenAI.openai_assistant_manager.OpenAIAssistantManager.run_thread')
+    @patch('services.openai.openai_assistant_manager.OpenAIAssistantManager.load_assistant')
+    @patch('services.openai.openai_assistant_manager.OpenAIAssistantManager.create_assistant')
+    @patch('services.openai.openai_assistant_manager.OpenAIAssistantManager.create_thread')
+    @patch('services.openai.openai_assistant_manager.OpenAIAssistantManager.create_message')
+    @patch('services.openai.openai_assistant_manager.OpenAIAssistantManager.run_thread')
     def test_run_thread_failure_assistant_api_exception(self, mock_run_thread, mock_create_message, mock_create_thread,
                                                         mock_create_assistant, mock_load_assistant):
         mock_load_assistant.return_value = MagicMock()
@@ -171,11 +171,11 @@ class TestAssistantAPIAdapter(unittest.TestCase):
             self.assistantAPIAdapter.generate_multiple_choice_questions("Subject", "Level", 5)
 
     # 1.9 Failure in Running Thread
-    @patch('Services.OpenAI.openai_assistant_manager.OpenAIAssistantManager.load_assistant')
-    @patch('Services.OpenAI.openai_assistant_manager.OpenAIAssistantManager.create_assistant')
-    @patch('Services.OpenAI.openai_assistant_manager.OpenAIAssistantManager.create_thread')
-    @patch('Services.OpenAI.openai_assistant_manager.OpenAIAssistantManager.create_message')
-    @patch('Services.OpenAI.openai_assistant_manager.OpenAIAssistantManager.run_thread')
+    @patch('services.openai.openai_assistant_manager.OpenAIAssistantManager.load_assistant')
+    @patch('services.openai.openai_assistant_manager.OpenAIAssistantManager.create_assistant')
+    @patch('services.openai.openai_assistant_manager.OpenAIAssistantManager.create_thread')
+    @patch('services.openai.openai_assistant_manager.OpenAIAssistantManager.create_message')
+    @patch('services.openai.openai_assistant_manager.OpenAIAssistantManager.run_thread')
     def test_run_thread_failure_exception(self, mock_run_thread, mock_create_message, mock_create_thread,
                                           mock_create_assistant, mock_load_assistant):
         mock_load_assistant.return_value = MagicMock()
@@ -187,12 +187,12 @@ class TestAssistantAPIAdapter(unittest.TestCase):
             self.assistantAPIAdapter.generate_multiple_choice_questions("Subject", "Level", 5)
 
     # 1.10 Failure in Token Encoding
-    @patch('Services.OpenAI.openai_assistant_manager.OpenAIAssistantManager.load_assistant')
-    @patch('Services.OpenAI.openai_assistant_manager.OpenAIAssistantManager.create_assistant')
-    @patch('Services.OpenAI.openai_assistant_manager.OpenAIAssistantManager.create_thread')
-    @patch('Services.OpenAI.openai_assistant_manager.OpenAIAssistantManager.create_message')
-    @patch('Services.OpenAI.openai_assistant_manager.OpenAIAssistantManager.run_thread')
-    @patch('Services.OpenAI.assistant_api_adapter.AssistantAPIAdapter.encode_token')
+    @patch('services.openai.openai_assistant_manager.OpenAIAssistantManager.load_assistant')
+    @patch('services.openai.openai_assistant_manager.OpenAIAssistantManager.create_assistant')
+    @patch('services.openai.openai_assistant_manager.OpenAIAssistantManager.create_thread')
+    @patch('services.openai.openai_assistant_manager.OpenAIAssistantManager.create_message')
+    @patch('services.openai.openai_assistant_manager.OpenAIAssistantManager.run_thread')
+    @patch('services.openai.assistant_api_adapter.AssistantAPIAdapter.encode_token')
     def test_encode_token_failure(self, mock_encode_token, mock_run_thread, mock_create_message, mock_create_thread,
                                   mock_create_assistant, mock_load_assistant):
         mock_load_assistant.return_value = MagicMock()
@@ -211,12 +211,12 @@ class TestAssistantAPIAdapter(unittest.TestCase):
 
     # 2. Successfully running the method
 
-    @patch('Services.OpenAI.assistant_api_adapter.AssistantAPIAdapter.encode_token')
-    @patch('Services.OpenAI.openai_assistant_manager.OpenAIAssistantManager.run_thread')
-    @patch('Services.OpenAI.openai_assistant_manager.OpenAIAssistantManager.create_message')
-    @patch('Services.OpenAI.openai_assistant_manager.OpenAIAssistantManager.create_thread')
-    @patch('Services.OpenAI.openai_assistant_manager.OpenAIAssistantManager.create_assistant')
-    @patch('Services.OpenAI.openai_assistant_manager.OpenAIAssistantManager.load_assistant')
+    @patch('services.openai.assistant_api_adapter.AssistantAPIAdapter.encode_token')
+    @patch('services.openai.openai_assistant_manager.OpenAIAssistantManager.run_thread')
+    @patch('services.openai.openai_assistant_manager.OpenAIAssistantManager.create_message')
+    @patch('services.openai.openai_assistant_manager.OpenAIAssistantManager.create_thread')
+    @patch('services.openai.openai_assistant_manager.OpenAIAssistantManager.create_assistant')
+    @patch('services.openai.openai_assistant_manager.OpenAIAssistantManager.load_assistant')
     def test_generate_explanation_success(
             self, mock_load_assistant, mock_create_assistant, mock_create_thread,
             mock_create_message, mock_run_thread, mock_encode_token

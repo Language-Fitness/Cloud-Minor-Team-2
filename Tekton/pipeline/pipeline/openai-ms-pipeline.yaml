@@ -1,7 +1,7 @@
 apiVersion: tekton.dev/v1beta1
 kind: Pipeline
 metadata:
-  name: ms-pipeline
+  name: openai-ms-pipeline
 spec:
   workspaces:
     - name: source
@@ -29,19 +29,19 @@ spec:
         - name: ssh-directory
           workspace: ssh-creds
 
-    - name: run-tests-go
+    - name: run-tests-python
       runAfter:
         - clone-repo
       taskRef:
         kind: Task
-        name: run-tests-go
+        name: run-tests-python
       workspaces:
         - name: output
           workspace: source
 
     - name: generate-tag
       runAfter:
-        - run-tests-go
+        - run-tests-python
       taskRef:
         kind: Task
         name: generate-tag

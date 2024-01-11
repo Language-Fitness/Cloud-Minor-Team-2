@@ -1,10 +1,10 @@
 apiVersion: monitoring.coreos.com/v1
 kind: Prometheus
 metadata:
-  name: prometheus
+  name: prometheus-instance
   namespace: grafana
   labels:
-    name: prometheus
+    name: prometheus-instance
     app: prometheus
 spec:
   replicas: 2
