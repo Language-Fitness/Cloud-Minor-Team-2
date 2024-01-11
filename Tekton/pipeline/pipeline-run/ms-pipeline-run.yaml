@@ -1,7 +1,7 @@
 apiVersion: tekton.dev/v1beta1
 kind: PipelineRun
 metadata:
-  name: test-0ij93k
+  name: ms-pipeline-run
   namespace: bramterlouw-dev
 spec:
   params:
@@ -10,7 +10,7 @@ spec:
     - name: IMAGE-REGISTRY-URL
       value: quay.io/bramterlouw/school-microservice
   pipelineRef:
-    name: go-test-pipeline
+    name: ms-pipeline
   timeout: 1h0m0s
   workspaces:
     - name: ssh-creds

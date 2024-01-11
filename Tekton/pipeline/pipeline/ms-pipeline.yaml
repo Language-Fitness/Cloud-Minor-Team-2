@@ -1,7 +1,7 @@
 apiVersion: tekton.dev/v1beta1
 kind: Pipeline
 metadata:
-  name: go-test-pipeline
+  name: ms-pipeline
 spec:
   workspaces:
     - name: source
@@ -38,13 +38,23 @@ spec:
       workspaces:
         - name: output
           workspace: source
+
+    - name: generate-tag
+      runAfter:
+        - run-tests
+      taskRef:
+        kind: Task
+        name: generate-tag
       params:
         - name: IMAGE-REGISTRY-URL
           value: $(params.IMAGE-REGISTRY-URL)
+      workspaces:
+        - name: output
+          workspace: source
 
     - name: build-push
       runAfter:
-        - run-tests
+        - generate-tag
       taskRef:
         kind: Task
         name: kaniko
@@ -55,7 +65,7 @@ spec:
           workspace: source
       params:
         - name: IMAGE
-          value: $(tasks.run-tests.results.IMAGE-REGISTRY-URL-TAGGED)
+          value: $(tasks.generate-tag.results.IMAGE-REGISTRY-URL-TAGGED)
 
     - name: build-kustomize-and-deploy
       runAfter:

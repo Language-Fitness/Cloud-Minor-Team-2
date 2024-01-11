@@ -2,25 +2,25 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   labels:
-    app: el-eventlistener
+    app: pipeline-event-listener
   annotations:
     cert-manager.io/issuer: acme-issuer-production
     acme.cert-manager.io/http01-edit-in-place: "true"
-  name: el-eventlistener-ingres
+  name: pipeline-event-listener-ingres
   namespace: bramterlouw-dev
 spec:
   rules:
-    - host: el-eventlistener-bramterlouw-dev.apps.ocp2-inholland.joran-bergfeld.com
+    - host: el-pipeline-event-listener-bramterlouw-dev.apps.ocp2-inholland.joran-bergfeld.com
       http:
         paths:
           - pathType: Prefix
             path: /
             backend:
               service:
-                name: el-eventlistener
+                name: el-pipeline-event-listener
                 port:
                   number: 8080
   tls:
     - hosts:
-        - el-eventlistener-bramterlouw-dev.apps.ocp2-inholland.joran-bergfeld.com
-      secretName: el-eventlistener-ingres-cert
+        - el-pipeline-event-listener-bramterlouw-dev.apps.ocp2-inholland.joran-bergfeld.com
+      secretName: pipeline-event-listener-ingres-cert

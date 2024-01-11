@@ -9,4 +9,4 @@ resources:
 images:
   - name: gateway_image
     newName: quay.io/bramterlouw/gateway
-    newTag: latest
+    newTag: latest.saga

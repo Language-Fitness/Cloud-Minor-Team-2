@@ -1,1 +1,24 @@
-# To be done ...
+apiVersion: tekton.dev/v1beta1
+kind: PipelineRun
+metadata:
+  name: gateway-pipeline-run
+  namespace: bramterlouw-dev
+spec:
+  params:
+    - name: GITHUB-URL
+      value: <!!!!>
+    - name: IMAGE-REGISTRY-URL
+      value: quay.io/bramterlouw/gateway
+  pipelineRef:
+    name: gateway-pipeline
+  timeout: 1h0m0s
+  workspaces:
+    - name: ssh-creds
+      secret:
+        secretName: <!!!!>-github-ssh-key
+    - name: docker-credentials
+      secret:
+        secretName: quay-registry-secret
+    - name: source
+      persistentVolumeClaim:
+        claimName: claim1

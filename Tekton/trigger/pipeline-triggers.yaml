@@ -1,16 +1,18 @@
 apiVersion: triggers.tekton.dev/v1alpha1
 kind: TriggerTemplate
 metadata:
-  name: triggertemplate
+  name: pipeline-trigger-template
   namespace: bramterlouw-dev
 spec:
   params:
-    - name: registryurl
+    - name: IMAGE-REGISTRY-URL
       description: the registry url.
-    - name: gitrepositoryurl
+    - name: GITHUB-URL
       description: the git repository url.
-    - name: projectname
+    - name: PROJECT-NAME
       description: the name of the project.
+    - name: PIPELINE-NAME
+      description: the pipeline to be run.
   resourceTemplates:
     - apiVersion: tekton.dev/v1beta1
       kind: PipelineRun
@@ -20,16 +22,16 @@ spec:
       spec:
         serviceAccountName: pipeline
         pipelineRef:
-          name: go-test-pipeline
+          name: "$(tt.params.PIPELINE-NAME)-pipeline"
         params:
           - name: GITHUB-URL
-            value: $(tt.params.gitrepositoryurl)
+            value: $(tt.params.GITHUB-URL)
           - name: IMAGE-REGISTRY-URL
-            value: $(tt.params.registryurl)
+            value: $(tt.params.IMAGE-REGISTRY-URL)
         workspaces:
           - name: ssh-creds
             secret:
-              secretName: "$(tt.params.projectname)-github-ssh-key"
+              secretName: "$(tt.params.PROJECT-NAME)-github-ssh-key"
           - name: docker-credentials
             secret:
               secretName: quay-registry-secret
@@ -40,26 +42,28 @@ spec:
 apiVersion: triggers.tekton.dev/v1alpha1
 kind: TriggerBinding
 metadata:
-  name: pipelinebinding
+  name: pipeline-binding
   namespace: bramterlouw-dev
 spec:
   params:
-    - name: gitrepositoryurl
-      value: "git@github.com:BramTerlouw/$(body.gitrepositoryurl)"
-    - name: registryurl
-      value: "$(body.registryurl)"
-    - name: projectname
-      value: "$(body.project)"
+    - name: GITHUB-URL
+      value: "git@github.com:BramTerlouw/$(body.GITHUB-URL)"
+    - name: IMAGE-REGISTRY-URL
+      value: "$(body.IMAGE-REGISTRY-URL)"
+    - name: PROJECT-NAME
+      value: "$(body.PROJECT-NAME)"
+    - name: PIPELINE-NAME
+      value: "$(body.PIPELINE-NAME)"
 ---
 apiVersion: triggers.tekton.dev/v1alpha1
 kind: EventListener
 metadata:
-  name: eventlistener
+  name: pipeline-event-listener
   namespace: bramterlouw-dev
 spec:
   serviceAccountName: pipeline
   triggers:
     - bindings:
-        - ref: pipelinebinding
+        - ref: pipeline-binding
       template:
-        ref: triggertemplate
+        ref: pipeline-trigger-template

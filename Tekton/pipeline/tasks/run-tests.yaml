@@ -5,14 +5,6 @@ metadata:
 spec:
   workspaces:
     - name: output
-  params:
-    - description: url referencing new image.
-      name: IMAGE-REGISTRY-URL
-      type: string
-  results:
-    - description: new tag for the image to be
-      name: IMAGE-REGISTRY-URL-TAGGED
-      type: string
   steps:
     - name: build-run-tests
       image: golang:1.20.0-alpine
@@ -38,12 +30,5 @@ spec:
           exit 1
         else
           echo "All tests passed."
-          image_registry_url=$(params.IMAGE-REGISTRY-URL)
-        
-          timestamp=$(date +'%Y%m%d.%H%M')
-          version="v1.0.0-$timestamp"
-          
-          tagged_image="$image_registry_url:$version"
-          echo -n "${tagged_image}" | tee "$(results.IMAGE-REGISTRY-URL-TAGGED.path)"
           exit 0
         fi
