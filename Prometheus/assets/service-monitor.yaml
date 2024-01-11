@@ -9,15 +9,10 @@ metadata:
 spec:
   namespaceSelector:
     matchNames:
-      - dev-gan-app1-ns
-      - dev-gan-app2-ns
-      - dev-gan-app3-ns
-      - dev-gan-app4-ns
-      - dev-gan-app5-ns
-      - dev-gan-app6-ns
+      - bramterlouw-dev
   selector:
     matchLabels:
-      project: g-monitoring-project
+      project: language-fitness
   endpoints:
     - port: main-container
       path: /actuator/prometheus
