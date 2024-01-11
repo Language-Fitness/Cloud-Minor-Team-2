@@ -1,0 +1,28 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: run-tests-python
+spec:
+  workspaces:
+    - name: output
+  steps:
+    - name: build-run-tests
+      image: python:3.10.6-slim
+      resources: { }
+      script: |
+        cd /workspace/output/App
+
+        pip install -r requirements.txt
+
+        python /workspace/output/App/Tests/Unit/test_assistant_api_adapter.py >> /workspace/output/all_test_results.txt
+        python /workspace/output/App/Tests/Unit/test_openai_assistant_manager.py >> /workspace/output/all_test_results.txt
+
+        # Check if 'OK' exists in the file
+        if grep -q 'OK' /workspace/output/all_test_results.txt; then
+          echo "All tests passed."
+          exit 0
+        else
+          echo "Tests failed: 'FAIL' found in the results."
+          cat /workspace/output/all_test_results.txt  # Print the contents of the file
+          exit 1
+        fi
