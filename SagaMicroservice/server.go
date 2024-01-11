@@ -16,9 +16,6 @@ import (
 const defaultPort = "8083"
 
 func main() {
-	go func() {
-		log.Println(http.ListenAndServe("localhost:9090", nil))
-	}()
 	err := os.Setenv("GODEBUG", "http2debug=2")
 	if err != nil {
 		return
