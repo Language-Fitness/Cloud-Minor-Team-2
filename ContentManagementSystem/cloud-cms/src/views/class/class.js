@@ -1,9 +1,8 @@
 export const headers = [
-    {title: 'Module_Id', align: 'start', sortable: false, key: 'module_id',},
     {title: 'Name', key: 'name', align: 'start', sortable: false},
+    {title: 'Module_Id', align: 'start', sortable: false, key: 'module_Id',},
     {title: 'Description', key: 'description', align: 'start', sortable: false},
     {title: 'Difficulty', key: 'difficulty', align: 'start', sortable: false},
-    {title: 'Made by', key: 'made_by', align: 'start', sortable: false},
     {title: 'Actions', key: 'actions', align: 'start', sortable: false},
     {title: 'Exercises', key: 'exercises', align: 'center', sortable: false},
 ]

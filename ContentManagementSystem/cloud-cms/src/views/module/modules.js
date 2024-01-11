@@ -3,7 +3,6 @@ export const headers = [
     {title: 'Description', key: 'description', align: 'start', sortable: false},
     {title: 'Difficulty', key: 'difficulty', align: 'start', sortable: false},
     {title: 'Category', key: 'category', align: 'start', sortable: false},
-    {title: 'Made by', key: 'made_by', align: 'start', sortable: false},
     {title: 'Actions', key: 'actions', align: 'start', sortable: false},
     {title: 'Classes', key: 'classes', align: 'center', sortable: false},
 ]
