@@ -4,7 +4,7 @@ import SideNav from "@/components/nav/side-nav.vue";
 </script>
 
 <template>
-  <header>
+  <header v-if="true">
     <side-nav></side-nav>
   </header>
 
