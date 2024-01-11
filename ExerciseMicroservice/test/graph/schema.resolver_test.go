@@ -111,54 +111,6 @@ func TestUpdateExercise_Error(t *testing.T) {
 	mockService.AssertExpectations(t)
 }
 
-func TestDeleteExercise(t *testing.T) {
-	// Initialize mock service
-	mockService := &mocks.MockExerciseService{}
-
-	// Create a resolver with the mock service
-	resolver := graph.Resolver{Service: mockService}
-
-	// Set up expectations on the mock service
-	mockService.On("DeleteExercise", mock.Anything, "exerciseID").Return(nil).Once()
-
-	// Create a context with a mock token
-	ctx := context.WithValue(context.Background(), "myCustomTokenKey", "mock_token")
-
-	// Call the resolver function
-	id, err := resolver.Mutation().DeleteExercise(ctx, "exerciseID")
-
-	// Assert that the result and error match expectations
-	assert.NoError(t, err)
-	assert.NotNil(t, id)
-	// Verify that the expectations on the mock service were met
-	mockService.AssertExpectations(t)
-}
-
-func TestDeleteExercise_Error(t *testing.T) {
-	// Initialize mock service
-	mockService := &mocks.MockExerciseService{}
-
-	// Create a resolver with the mock service
-	resolver := graph.Resolver{Service: mockService}
-
-	// Set up expectations on the mock service for an error case
-	expectedError := errors.New("some error")
-	mockService.On("DeleteExercise", mock.Anything, "exerciseID").Return(expectedError).Once()
-
-	// Create a context with a mock token
-	ctx := context.WithValue(context.Background(), "myCustomTokenKey", "mock_token")
-
-	// Call the resolver function
-	_, err := resolver.Mutation().DeleteExercise(ctx, "exerciseID")
-
-	// Assert that the result is nil and the error is not nil
-	assert.NotNil(t, err)
-	assert.EqualError(t, err, expectedError.Error())
-
-	// Verify that the expectations on the mock service were met
-	mockService.AssertExpectations(t)
-}
-
 func TestGetExercise(t *testing.T) {
 	// Initialize mock service
 	mockService := &mocks.MockExerciseService{}

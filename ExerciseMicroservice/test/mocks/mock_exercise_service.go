@@ -19,8 +19,8 @@ func (m *MockExerciseService) UpdateExercise(token string, id string, updateData
 	return args.Get(0).(*model.Exercise), args.Error(1)
 }
 
-func (m *MockExerciseService) DeleteExercise(token string, id string) error {
-	args := m.Called(token, id)
+func (m *MockExerciseService) DeleteExercise(token string, id string, deleteFlag bool) error {
+	args := m.Called(token, id, deleteFlag)
 	return args.Error(0)
 }
 

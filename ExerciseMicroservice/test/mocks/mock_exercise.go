@@ -21,12 +21,22 @@ var MockAnswerInput = model.AnswerInput{
 	Correct: false,
 }
 
+var MockAnswer = model.AnswerInput{
+	Value:   "Option A",
+	Correct: true,
+}
+
+var mockAnswers = []*model.AnswerInput{
+	&MockAnswer,
+	&MockAnswerInput,
+}
+
 var MockExerciseInput = model.ExerciseInput{
 	ClassID:    ClassID,
 	ModuleID:   ModuleID,
 	Name:       ExerciseName,
 	Question:   ExerciseQuestion,
-	Answers:    []*model.AnswerInput{&MockAnswerInput},
+	Answers:    mockAnswers,
 	Difficulty: ExerciseDifficulty,
 }
 

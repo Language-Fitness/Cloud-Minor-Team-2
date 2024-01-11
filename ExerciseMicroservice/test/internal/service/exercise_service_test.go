@@ -34,7 +34,7 @@ func TestExerciseService_CreateExercise(t *testing.T) {
 	mockRepo.On("CreateExercise", mock.AnythingOfType("*model.Exercise")).Return(&model.Exercise{ID: mocks.ExerciseID}, nil)
 
 	// Call the method being tested
-	result, err := exerciseService.CreateExercise(userToken, model.ExerciseInput{})
+	result, err := exerciseService.CreateExercise(userToken, mocks.MockExerciseInput)
 
 	// Assertions
 	assert.Nil(t, err)
@@ -72,7 +72,7 @@ func TestExerciseService_UpdateExercise(t *testing.T) {
 		Return(&model.Exercise{ID: mocks.ExerciseID}, nil)
 
 	// Call the method being tested
-	result, err := exerciseService.UpdateExercise(userToken, mocks.ExerciseID, model.ExerciseInput{})
+	result, err := exerciseService.UpdateExercise(userToken, mocks.ExerciseID, mocks.MockExerciseInput)
 
 	// Assertions
 	assert.Nil(t, err)
@@ -110,7 +110,7 @@ func TestExerciseService_DeleteExercise(t *testing.T) {
 		Return(&mocks.MockDeletedExercise, nil)
 
 	// Call the method being tested
-	err := exerciseService.DeleteExercise(userToken, mocks.ExerciseID)
+	err := exerciseService.DeleteExercise(userToken, mocks.ExerciseID, true)
 
 	// Assertions
 	assert.Nil(t, err)
@@ -145,7 +145,7 @@ func TestExerciseService_UnDeleteExercise(t *testing.T) {
 		Return(&mocks.MockExercise, nil)
 
 	// Call the method being tested
-	err := exerciseService.UnDeleteExercise(userToken, mocks.ExerciseID)
+	err := exerciseService.DeleteExercise(userToken, mocks.ExerciseID, false)
 
 	// Assertions
 	assert.Nil(t, err)
