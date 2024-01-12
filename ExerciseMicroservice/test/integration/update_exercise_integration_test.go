@@ -212,3 +212,27 @@ func TestResolver_UpdateExercise_NoIncorrectAnswer(t *testing.T) {
 		assert.Equal(t, r.NoIncorrectAnswersResponseError, errorResponse[0].Message)
 	})
 }
+
+func TestResolver_UpdateExerciseStudentToken_InvalidPermission(t *testing.T) {
+	fmt.Println("\nRunning TestResolver_UpdateExerciseStudentToken_InvalidPermission")
+	c := helper.CreateClient()
+
+	t.Run("Update exercise with invalid permission", func(t *testing.T) {
+		// Call the resolver via the client and modify the context via functional options
+		err := c.Post(
+			requests.UpdateExerciseMutation,
+			&r.UpdateExerciseResponse,
+			client.Var("exerciseID", "95f964a0-9749-4064-9162-cdd1b7b5d776"),
+			client.Var("exerciseInput", requests.GenerateExerciseInput()),
+			helper.AddContext(StudentToken),
+		)
+		assert.NotNil(t, err)
+
+		// In your test, after getting the error
+		var errorResponse []r.ErrorType
+		err2 := json.NewDecoder(strings.NewReader(err.Error())).Decode(&errorResponse)
+
+		assert.Nil(t, err2)
+		assert.Equal(t, r.InvalidPermissionResponseError, errorResponse[0].Message)
+	})
+}
