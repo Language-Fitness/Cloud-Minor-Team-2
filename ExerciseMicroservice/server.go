@@ -4,6 +4,7 @@ import (
 	"ExerciseMicroservice/graph"
 	"ExerciseMicroservice/internal/auth"
 	"ExerciseMicroservice/internal/database"
+	"ExerciseMicroservice/internal/database/migrations"
 	service "ExerciseMicroservice/internal/rpc"
 	"ExerciseMicroservice/proto/pb"
 	"github.com/joho/godotenv"
@@ -35,7 +36,7 @@ func main() {
 
 	tokenMiddleware := auth.Middleware
 
-	//migrations.InitExercise()
+	migrations.InitExercise()
 
 	srv := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{Resolvers: graph.NewResolver()}))
 

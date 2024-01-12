@@ -135,6 +135,7 @@ func (e *ExerciseService) UpdateExercise(token string, id string, updateData mod
 	timestamp := time.Now().String()
 	newExercise := model.Exercise{
 		ID:          existingExercise.ID,
+		ModuleID:    updateData.ModuleID,
 		ClassID:     updateData.ClassID,
 		Name:        updateData.Name,
 		Question:    updateData.Question,
