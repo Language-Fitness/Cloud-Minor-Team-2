@@ -2,7 +2,7 @@ apiVersion: grafana.integreatly.org/v1beta1
 kind: GrafanaDashboard
 metadata:
   name: grafana-dashboard
-  namespace: grafana
+  namespace: monitoring
   labels:
     name: grafana-dashboard
     app: grafana
@@ -420,7 +420,7 @@ spec:
               "text": "All",
               "value": "$__all"
             },
-            "datasource": "Prometheus",
+            "datasource": "prometheus",
             "definition": "label_values(namespace)",
             "hide": 0,
             "includeAll": true,
@@ -446,7 +446,7 @@ spec:
               "text": "All",
               "value": "$__all"
             },
-            "datasource": "Prometheus",
+            "datasource": "prometheus",
             "definition": "label_values(service)",
             "hide": 0,
             "includeAll": true,
@@ -469,10 +469,10 @@ spec:
             "allValue": null,
             "current": {
               "tags": [],
-              "text": "g-monitoring-app1-deployment-f8c5579b7-2t87z",
-              "value": "g-monitoring-app1-deployment-f8c5579b7-2t87z"
+              "text": "test-app-deployment",
+              "value": "test-app-deployment"
             },
-            "datasource": "Prometheus",
+            "datasource": "prometheus",
             "definition": "label_values(pod)",
             "hide": 0,
             "includeAll": true,
@@ -498,7 +498,7 @@ spec:
               "text": "main-container",
               "value": "main-container"
             },
-            "datasource": "Prometheus",
+            "datasource": "prometheus",
             "definition": "label_values(endpoint)",
             "hide": 0,
             "includeAll": true,
@@ -523,7 +523,7 @@ spec:
               "text": "All",
               "value": "$__all"
             },
-            "datasource": "Prometheus",
+            "datasource": "prometheus",
             "definition": "label_values(outcome)",
             "hide": 0,
             "includeAll": true,

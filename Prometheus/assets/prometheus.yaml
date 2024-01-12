@@ -2,7 +2,7 @@ apiVersion: monitoring.coreos.com/v1
 kind: Prometheus
 metadata:
   name: prometheus-instance
-  namespace: grafana
+  namespace: monitoring
   labels:
     name: prometheus-instance
     app: prometheus

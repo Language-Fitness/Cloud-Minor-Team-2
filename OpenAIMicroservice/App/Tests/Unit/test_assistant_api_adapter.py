@@ -16,8 +16,9 @@ class TestAssistantAPIAdapter(unittest.TestCase):
     def tearDownClass(cls):
         logging.disable(logging.NOTSET)
 
+    @patch.dict('os.environ', {'OPENAI_API_KEY': 'mocked_api_key'})
     def setUp(self):
-        self.assistantAPIAdapter = AssistantAPIAdapter()
+        self.assistantAPIAdapter = AssistantAPIAdapter("mocked_bearer_token")
 
     # ALL TESTS FOR: GENERATE_MULTIPLE_CHOICE_QUESTIONS
 
