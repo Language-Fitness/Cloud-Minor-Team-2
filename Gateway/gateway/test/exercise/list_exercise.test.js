@@ -173,3 +173,115 @@ describe('ListExercise with No Token', () => {
         await ListExerciseTestWithNoToken();
     });
 });
+
+async function ListExerciseTestWithNoFilter() {
+    const postData = {
+        query: `query {
+      ListExercise(
+        paginator: {
+          amount: 10
+          Step: 1
+        }
+      ) {
+        id
+        class_Id
+        module_id
+        name
+        question
+        answers {
+          value
+          correct
+        }
+        difficulty
+        made_by
+      }
+    }`,
+        variables: {}
+    };
+
+    const headers = {
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json',
+    };
+
+    try {
+        // Attempt with no filter
+        const responseWithNoFilter = await axios.post(url, postData, { headers, validateStatus: () => true});
+        const responseDataWithNoFilter = responseWithNoFilter.data;
+
+        // Perform assertions based on the response data for the no filter
+        expect(responseDataWithNoFilter).toEqual({
+            errors: [
+                {
+                    message: "Field \"ListExercise\" argument \"filter\" of type \"ExerciseFilter!\" is required, but it was not provided.",
+                },
+            ],
+        });
+
+        //console.log('Test passed with no filter:', responseDataWithNoFilter);
+    } catch (error) {
+        console.error('Test failed:', error.message);
+        throw error;
+    }
+}
+
+describe('ListExercise with No Filter', () => {
+    test('should return error', async () => {
+        await ListExerciseTestWithNoFilter();
+    });
+});
+
+async function ListExerciseTestWithNoPaginator() {
+    const postData = {
+        query: `query {
+      ListExercise(
+        filter: {
+        }
+      ) {
+        id
+        class_Id
+        module_id
+        name
+        question
+        answers {
+          value
+          correct
+        }
+        difficulty
+        made_by
+      }
+    }`,
+        variables: {}
+    };
+
+    const headers = {
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json',
+    };
+
+    try {
+        // Attempt with no paginator
+        const responseWithNoPaginator = await axios.post(url, postData, { headers, validateStatus: () => true});
+        const responseDataWithNoPaginator = responseWithNoPaginator.data;
+
+        // Perform assertions based on the response data for the no paginator
+        expect(responseDataWithNoPaginator).toEqual({
+            errors: [
+                {
+                    message: "Field \"ListExercise\" argument \"paginator\" of type \"Paginator!\" is required, but it was not provided.",
+                },
+            ],
+        });
+
+        //console.log('Test passed with no paginator:', responseDataWithNoPaginator);
+    } catch (error) {
+        console.error('Test failed:', error.message);
+        throw error;
+    }
+}
+
+describe('ListExercise with No Paginator', () => {
+    test('should return error', async () => {
+        await ListExerciseTestWithNoPaginator();
+    });
+});

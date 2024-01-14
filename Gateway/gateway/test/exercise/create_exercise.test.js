@@ -586,3 +586,279 @@ describe('CreateExercise with Invalid Difficulty', () => {
         await CreateExerciseInvalidDifficultyTest();
     });
 });
+
+async function CreateExerciseNoTokenTest() {
+    const postData = {
+        query: `mutation {
+              CreateExercise(exercise: {
+                class_Id: "4bdaaf03-f5d0-43a9-a1d2-f5cc54ca7a4b"
+                module_id: "4bdaaf03-f5d0-43a9-a1d2-f5cc54ca7a8b"
+                name: "New Exercise"
+                question: "What is the question?"
+                answers: [
+                  { value: "Option 1", correct: true },
+                  { value: "Option 2", correct: false },
+                  { value: "Option 3", correct: false }
+                ]
+                difficulty: A2
+              }) {
+                id
+                class_Id
+                module_id
+                name
+                question
+                answers {
+                  value
+                  correct
+                }
+                difficulty
+                made_by
+              }
+            }`,
+        variables: {}
+    };
+    try {
+        const response = await axios.post(url, postData, { validateStatus: () => true });
+        const responseData = response.data;
+
+        // Perform assertions based on the response data
+        expect(responseData).toEqual({
+            errors: [
+                {
+                    message: "invalid token format: null",
+                },
+            ],
+            data: {
+                CreateExercise: null,
+            },
+        });
+
+        console.log('Test passed with no token:', responseData);
+    } catch (error) {
+        console.error('Test failed:', error.message);
+        throw error;
+    }
+}
+
+describe('CreateExercise with No Token', () => {
+    test('should return invalid token introspect error', async () => {
+        await CreateExerciseNoTokenTest();
+    });
+});
+
+async function CreateExerciseClassIdAsIntTest() {
+    const postData = {
+        query: `mutation {
+              CreateExercise(exercise: {
+                class_Id: 1
+                module_id: "4bdaaf03-f5d0-43a9-a1d2-f5cc54ca7a8b"
+                name: "New Exercise"
+                question: "What is the question?"
+                answers: [
+                  { value: "Option 1", correct: true },
+                  { value: "Option 2", correct: false },
+                  { value: "Option 3", correct: false }
+                ]
+                difficulty: A2
+              }) {
+                id
+                class_Id
+                module_id
+                name
+                question
+                answers {
+                  value
+                  correct
+                }
+                difficulty
+              }
+            }`,
+        variables: {}
+    };
+    try {
+        const response = await axios.post(url, postData, { headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' } });
+        const responseData = response.data;
+
+        // Perform assertions based on the response data
+        expect(responseData).toEqual({
+            errors: [
+                {
+                    message: "Validation errors: ClassID :'1' is not a valid UUID"
+                }
+            ],
+            data: {
+                CreateExercise: null
+            }
+        });
+
+        console.log('Test passed with ClassId as int:', responseData);
+    } catch (error) {
+        console.error('Test failed:', error.message);
+        throw error;
+    }
+}
+
+describe('CreateExercise with ClassId as int', () => {
+    test('should return validation error for ClassId as int', async () => {
+        await CreateExerciseClassIdAsIntTest();
+    });
+});
+
+async function CreateExerciseModuleIdAsIntTest() {
+    const postData = {
+        query: `mutation {
+              CreateExercise(exercise: {
+                class_Id: "4bdaaf03-f5d0-43a9-a1d2-f5cc54ca7a4b"
+                module_id: 1
+                name: "New Exercise"
+                question: "What is the question?"
+                answers: [
+                  { value: "Option 1", correct: true },
+                  { value: "Option 2", correct: false },
+                  { value: "Option 3", correct: false }
+                ]
+                difficulty: A2
+              }) {
+                id
+                module_id
+                name
+                question
+                answers {
+                  value
+                  correct
+                }
+                difficulty
+              }
+            }`,
+        variables: {}
+    };
+    try {
+        const response = await axios.post(url, postData, { headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' } });
+        const responseData = response.data;
+
+        // Perform assertions based on the response data
+        expect(responseData).toEqual({
+            errors: [
+                {
+                    message: "Validation errors: ModuleID :'1' is not a valid UUID"
+                }
+            ],
+            data: {
+                CreateExercise: null
+            }
+        });
+
+        console.log('Test passed with ModuleId as int:', responseData);
+    } catch (error) {
+        console.error('Test failed:', error.message);
+        throw error;
+    }
+}
+
+describe('CreateExercise with ModuleId as int', () => {
+    test('should return validation error for ModuleId as int', async () => {
+        await CreateExerciseModuleIdAsIntTest();
+    });
+});
+
+async function CreateExerciseNameAsIntTest() {
+    const postData = {
+        query: `mutation {
+              CreateExercise(exercise: {
+                class_Id: "4bdaaf03-f5d0-43a9-a1d2-f5cc54ca7a4b",
+                module_id: "4bdaaf03-f5d0-43a9-a1d2-f5cc54ca7a8b",
+                name: 1,
+                question: "What is the question?",
+                answers: [
+                  { value: "Option 1", correct: true },
+                  { value: "Option 2", correct: false },
+                  { value: "Option 3", correct: false },
+                ],
+                difficulty: A2,
+              }) {
+                id,
+                name,
+                question,
+                answers {
+                  value,
+                  correct,
+                },
+                difficulty,
+              },
+            }`,
+        variables: {}
+    };
+    try {
+        const response = await axios.post(url, postData, { headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' }, validateStatus: () => true });
+        const responseData = response.data;
+
+        // Perform assertions based on the response data
+        expect(responseData).toEqual({
+            errors: [
+                { message: "String cannot represent a non string value: 1",}
+            ],
+        });
+
+        console.log('Test passed with Name as int:', responseData);
+    } catch (error) {
+        console.error('Test failed:', error.message);
+        throw error;
+    }
+}
+
+describe('CreateExercise with Name as int', () => {
+    test('should return validation error for Name as int', async () => {
+        await CreateExerciseNameAsIntTest();
+    });
+});
+
+async function CreateExerciseQuestionAsIntTest() {
+    const postData = {
+        query: `mutation {
+              CreateExercise(exercise: {
+                class_Id: "4bdaaf03-f5d0-43a9-a1d2-f5cc54ca7a4b",
+                module_id: "4bdaaf03-f5d0-43a9-a1d2-f5cc54ca7a8b",
+                name: "New Exercise",
+                question: 1,
+                answers: [
+                  { value: "Option 1", correct: true },
+                  { value: "Option 2", correct: false },
+                  { value: "Option 3", correct: false },
+                ],
+                difficulty: A2,
+              }) {
+                id,
+                name,
+                question,
+                answers {
+                  value,
+                  correct,
+                },
+                difficulty,
+              },
+            }`,
+        variables: {}
+    };
+    try {
+        const response = await axios.post(url, postData, { headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' }, validateStatus: () => true });
+        const responseData = response.data;
+
+        // Perform assertions based on the response data
+        expect(responseData).toEqual({
+            errors: [
+                { message: "String cannot represent a non string value: 1",}
+            ],
+        });
+
+        console.log('Test passed with Question as int:', responseData);
+    } catch (error) {
+        console.error('Test failed:', error.message);
+        throw error;
+    }
+}
+
+describe('CreateExercise with Question as int', () => {
+    test('should return validation error for Question as int', async () => {
+        await CreateExerciseQuestionAsIntTest();
+    });
+});
