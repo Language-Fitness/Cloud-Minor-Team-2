@@ -10,7 +10,7 @@ async function ListExerciseTest() {
         }
         paginator: {
           amount: 10
-          Step: 1
+          Step: 0
         }
       ) {
         id
