@@ -89,6 +89,7 @@ class AssistantAPIAdapter:
         try:
             thread_id, assistant_id, file_id = self.decode_and_check_token(token, endpoint_id_for_check)
             messages = self.assistant_manager.retrieve_messages(thread_id)
+
             last_message_data = self.get_last_message(messages)
 
             json_data_dict = self.extract_json_from_message(last_message_data)
