@@ -124,18 +124,14 @@ func (c *ClassService) DeleteClass(token string, id string, deleteFlag bool) err
 		return err
 	}
 
-	if !*existingClass.SoftDeleted {
-		softDelete := deleteFlag
-		existingClass.SoftDeleted = &softDelete
+	softDelete := deleteFlag
+	existingClass.SoftDeleted = &softDelete
 
-		err := c.Repo.DeleteClass(id, *existingClass)
-		if err != nil {
-			return err
-		}
-		return nil
+	err = c.Repo.DeleteClass(id, *existingClass)
+	if err != nil {
+		return err
 	}
-
-	return errors.New("class could not be deleted")
+	return nil
 }
 
 func (c *ClassService) GetClassById(token string, id string) (*model.Class, error) {

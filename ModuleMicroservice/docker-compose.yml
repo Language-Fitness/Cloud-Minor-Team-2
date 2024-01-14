@@ -1,6 +1,6 @@
 services:
   api:
-    container_name: go-api
+    container_name: go-api-module
     restart: always
     build:
       context: .

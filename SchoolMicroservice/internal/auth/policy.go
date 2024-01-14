@@ -132,10 +132,10 @@ func (p *Policy) HasPermissions(bearerToken string, role string) bool {
 }
 
 func (p *Policy) getSubAndRoles(bearerToken string) (string, []interface{}, error) {
-	token, err := p.Token.IntrospectToken(bearerToken)
-	if err != nil || token == false {
-		return "", nil, errors.New(InvalidTokenMessage)
-	}
+	//token, err := p.Token.IntrospectToken(bearerToken)
+	//if err != nil || token == false {
+	//	return "", nil, errors.New(InvalidTokenMessage)
+	//}
 
 	decodeToken, err := p.Token.DecodeToken(bearerToken)
 	if err != nil {

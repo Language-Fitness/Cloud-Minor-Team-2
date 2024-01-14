@@ -23,7 +23,7 @@ func NewSagaService() *SagaService {
 func (s *SagaService) FindSagaObject(context.Context, *pb.ObjectRequest) (*pb.SagaObject, error) {
 	response := &pb.SagaObject{
 		ObjectId:     "0e520bea-a96b-47cc-96bc-83633e47c58e",
-		ObjectType:   pb.SagaObjectType_SCHOOL,
+		ObjectType:   pb.SagaObjectType_CLASS,
 		ObjectStatus: pb.SagaObjectStatus_EXIST,
 	}
 
@@ -78,6 +78,8 @@ func (s *SagaService) DeleteObject(ctx context.Context, req *pb.ObjectRequest) (
 	if err != nil {
 		return nil, err
 	}
+
+	fmt.Println("i execute this")
 
 	response := pb.SagaObject{
 		ObjectId:     req.ObjectId,

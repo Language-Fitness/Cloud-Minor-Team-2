@@ -162,18 +162,14 @@ func (m *ModuleService) DeleteModule(token string, id string, deleteFlag bool) e
 		return err
 	}
 
-	if !*existingModule.SoftDeleted {
-		softDelete := deleteFlag
-		existingModule.SoftDeleted = &softDelete
+	softDelete := deleteFlag
+	existingModule.SoftDeleted = &softDelete
 
-		err := m.Repo.DeleteModuleByID(id, *existingModule)
-		if err != nil {
-			return err
-		}
-		return nil
+	err = m.Repo.DeleteModuleByID(id, *existingModule)
+	if err != nil {
+		return err
 	}
-
-	return errors.New("module could not be deleted")
+	return nil
 }
 
 func (m *ModuleService) GetModuleById(token string, id string) (*model.Module, error) {

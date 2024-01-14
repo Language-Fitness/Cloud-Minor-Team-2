@@ -76,7 +76,7 @@ func (p *Policy) DeleteClass(bearerToken string, id string) (*model.Class, error
 
 	class, err := p.ClassRepository.GetClassByID(id)
 	if err != nil {
-		return nil, errors.New(InvalidActionsMessage)
+		return nil, errors.New("class not found")
 	}
 
 	if p.hasRole(roles, "delete_class_all") {
