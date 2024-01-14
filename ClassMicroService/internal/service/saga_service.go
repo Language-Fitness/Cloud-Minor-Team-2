@@ -20,11 +20,16 @@ func NewSagaService() *SagaService {
 }
 
 // FindSagaObject implements the FindSagaObject RPC method
-func (s *SagaService) FindSagaObject(context.Context, *pb.ObjectRequest) (*pb.SagaObject, error) {
+func (s *SagaService) FindSagaObject(context context.Context, req *pb.ObjectRequest) (*pb.SagaObject, error) {
+	class, err := s.service.GetClassById(req.BearerToken, req.ObjectId)
+	if err != nil {
+		return nil, err
+	}
+
 	response := &pb.SagaObject{
-		ObjectId:     "0e520bea-a96b-47cc-96bc-83633e47c58e",
+		ObjectId:     class.ID,
 		ObjectType:   pb.SagaObjectType_CLASS,
-		ObjectStatus: pb.SagaObjectStatus_EXIST,
+		ObjectStatus: setStatus(class.SoftDeleted),
 	}
 
 	return response, nil
@@ -104,4 +109,12 @@ func (s *SagaService) UnDeleteObject(ctx context.Context, req *pb.ObjectRequest)
 	}
 
 	return &response, nil
+}
+
+func setStatus(bool *bool) pb.SagaObjectStatus {
+	if bool == helper.BoolPointer(true) {
+		return pb.SagaObjectStatus_EXIST
+	}
+
+	return pb.SagaObjectStatus_DELETED
 }

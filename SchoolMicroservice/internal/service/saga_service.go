@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"go.mongodb.org/mongo-driver/mongo"
+	"school/internal/helper"
 	"school/proto/pb"
 )
 
@@ -27,7 +28,7 @@ func (s *SagaService) FindSagaObject(ctx context.Context, req *pb.ObjectRequest)
 	response := &pb.SagaObject{
 		ObjectId:     sagaObject.ID,
 		ObjectType:   pb.SagaObjectType_SCHOOL,
-		ObjectStatus: pb.SagaObjectStatus_EXIST,
+		ObjectStatus: setStatus(sagaObject.SoftDeleted),
 	}
 
 	return response, nil
@@ -71,4 +72,12 @@ func (s *SagaService) UnDeleteObject(ctx context.Context, req *pb.ObjectRequest)
 	}
 
 	return &response, nil
+}
+
+func setStatus(bool *bool) pb.SagaObjectStatus {
+	if bool == helper.BoolPointer(true) {
+		return pb.SagaObjectStatus_EXIST
+	}
+
+	return pb.SagaObjectStatus_DELETED
 }

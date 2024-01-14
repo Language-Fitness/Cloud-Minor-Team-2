@@ -30,7 +30,7 @@ func (s *SagaService) FindSagaObject(ctx context.Context, req *pb.ObjectRequest)
 	response := &pb.SagaObject{
 		ObjectId:     module.ID,
 		ObjectType:   pb.SagaObjectType_MODULE,
-		ObjectStatus: pb.SagaObjectStatus_EXIST,
+		ObjectStatus: setStatus(module.SoftDeleted),
 	}
 
 	return response, nil
@@ -109,4 +109,12 @@ func (s *SagaService) UnDeleteObject(ctx context.Context, req *pb.ObjectRequest)
 	}
 
 	return &response, nil
+}
+
+func setStatus(bool *bool) pb.SagaObjectStatus {
+	if bool == helper.BoolPointer(true) {
+		return pb.SagaObjectStatus_EXIST
+	}
+
+	return pb.SagaObjectStatus_DELETED
 }

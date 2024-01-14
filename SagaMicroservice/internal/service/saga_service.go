@@ -280,37 +280,35 @@ func (s SagaService) areAllItemsDeleted(token string, sagaObject *model.SagaObje
 		return false
 	}
 
+	client, conn3, err := createGRPCClient(getChildTypeByType(sagaObject.ObjectType))
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	defer conn3.Close()
+
 	for _, child := range objects {
+		request := pb.ObjectRequest{
+			BearerToken:  token,
+			ObjectId:     sagaObject.ObjectID,
+			ObjectType:   convertToPBObjectType(sagaObject.ObjectType),
+			ObjectStatus: pb.SagaObjectStatus_EXIST,
+		}
 
-		boolRes := func(child *model.SagaObject) bool {
-			client, conn3, err := createGRPCClient(child.ObjectType)
-			if err != nil {
-				fmt.Println(err)
-			}
+		fmt.Println("Calling FindObject RPC...")
+		response, err := client.FindSagaObject(context.Background(), &request)
+		if err != nil {
+			log.Printf("failed to call FindObject RPC: %v", err)
+		}
 
-			defer conn3.Close()
+		if convertToModelObjectStatus(response.ObjectStatus) != child.ObjectStatus {
+			return false
+		}
 
-			request := pb.ObjectRequest{
-				BearerToken:  token,
-				ObjectId:     sagaObject.ObjectID,
-				ObjectType:   convertToPBObjectType(sagaObject.ObjectType),
-				ObjectStatus: pb.SagaObjectStatus_EXIST,
-			}
-
-			fmt.Println("Calling FindObject RPC...")
-			response, err := client.FindSagaObject(context.Background(), &request)
-			if err != nil {
-				log.Printf("failed to call FindObject RPC: %v", err)
-			}
-
-			if convertToModelObjectStatus(response.ObjectStatus) != child.ObjectStatus {
-				return false
-			}
-
-			res := s.areAllItemsDeleted(token, child)
+		res := s.areAllItemsDeleted(token, child)
+		if !res {
 			return res
-		}(child)
-		return boolRes
+		}
 	}
 
 	return true
@@ -326,41 +324,33 @@ func (s SagaService) undeleteItems(token string, sagaObject *model.SagaObject) e
 		return err
 	}
 
+	client, conn3, err := createGRPCClient(getChildTypeByType(sagaObject.ObjectType))
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	defer conn3.Close()
+
 	for _, child := range objects {
 
-		boolRes := func(child *model.SagaObject) error {
-			client, conn3, err := createGRPCClient(child.ObjectType)
-			if err != nil {
-				fmt.Println(err)
-				return err
-			}
+		request := pb.ObjectRequest{
+			BearerToken:  token,
+			ObjectId:     sagaObject.ObjectID,
+			ObjectType:   convertToPBObjectType(child.ObjectType),
+			ObjectStatus: pb.SagaObjectStatus_EXIST,
+		}
 
-			defer conn3.Close()
+		_, err = client.UnDeleteObject(context.Background(), &request)
+		if err != nil {
+			log.Printf("failed to call FindObject RPC: %v", err)
+			return err
+		}
 
-			request := pb.ObjectRequest{
-				BearerToken:  token,
-				ObjectId:     sagaObject.ObjectID,
-				ObjectType:   convertToPBObjectType(sagaObject.ObjectType),
-				ObjectStatus: pb.SagaObjectStatus_EXIST,
-			}
-
-			fmt.Println("Calling FindObject RPC...")
-			_, err = client.UnDeleteObject(context.Background(), &request)
-			if err != nil {
-				log.Printf("failed to call FindObject RPC: %v", err)
-				return err
-			}
-
-			res := s.undeleteItems(token, child)
-
-			if res != nil {
-				log.Printf("failed to call FindObject RPC: %v", err)
-				return res
-			}
-
-			return nil
-		}(child)
-		return boolRes
+		res := s.undeleteItems(token, child)
+		if res != nil {
+			log.Printf("failed to call FindObject RPC: %v", err)
+			return res
+		}
 	}
 
 	return nil
