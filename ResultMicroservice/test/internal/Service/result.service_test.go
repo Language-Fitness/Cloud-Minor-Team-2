@@ -104,7 +104,7 @@ func TestResultService_DeleteResult(t *testing.T) {
 	mockRepo.On("UpdateResult", mock.AnythingOfType("string"), mock.AnythingOfType("model.Result")).
 		Return(&mocks.MockResult, nil)
 
-	err := resultService.DeleteResult(userToken, "some_result_id")
+	err := resultService.DeleteResult(userToken, "some_result_id", true)
 
 	assert.Nil(t, err)
 
@@ -132,7 +132,7 @@ func TestResultService_UnDeleteResult(t *testing.T) {
 	mockRepo.On("UpdateResult", mock.AnythingOfType("string"), mock.AnythingOfType("model.Result")).
 		Return(&model.Result{ID: "some_result_id"}, nil)
 
-	err := resultService.UnDeleteResult(userToken, "some_result_id")
+	err := resultService.DeleteResult(userToken, "some_result_id", false)
 
 	assert.Nil(t, err)
 

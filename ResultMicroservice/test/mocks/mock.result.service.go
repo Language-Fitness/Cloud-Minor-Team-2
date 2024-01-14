@@ -24,9 +24,9 @@ func (m *MockResultService) UpdateResult(token string, id string, updateData mod
 	return args.Get(0).(*model.Result), args.Error(1)
 }
 
-func (m *MockResultService) DeleteResult(token string, id string) error {
-	args := m.Called(token, id)
-	return args.Error(0)
+func (m *MockResultService) DeleteResult(token string, id string, deleteFlag bool) error {
+	args := m.Called(token, id, deleteFlag)
+	return args.Error(1)
 }
 
 func (m *MockResultService) UnDeleteResult(token string, id string) error {
