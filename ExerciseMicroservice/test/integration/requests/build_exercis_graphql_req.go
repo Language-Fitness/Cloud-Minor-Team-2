@@ -29,6 +29,40 @@ var CreateExerciseMutation = `
         }
     }`
 
+var UpdateExerciseMutation = `
+	mutation($exerciseID: ID!, $exerciseInput: ExerciseInput!) {
+		UpdateExercise(id: $exerciseID, exercise: $exerciseInput) {
+			id
+			class_Id
+			module_id
+			name
+			question
+			answers {
+			  value
+			  correct
+			}
+			difficulty
+			made_by
+		  }
+	}`
+
+var GetExerciseQuery = `
+	query($exerciseID: ID!) {	
+		GetExercise(ExerciseId: $exerciseID) {
+			id
+			class_Id
+			module_id
+			name
+			question
+			answers {
+			  value
+			  correct
+			}
+			difficulty
+			made_by
+		  }
+	}`
+
 func GenerateExerciseInput() map[string]interface{} {
 	return map[string]interface{}{
 		"class_Id":   ClassID,
