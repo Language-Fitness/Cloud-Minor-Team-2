@@ -645,7 +645,7 @@ async function UpdateExerciseNoTokenTest() {
         expect(responseData).toEqual({
             errors: [
                 {
-                    message: "invalid token format: null"
+                    message: "invalid token introspect",
                 }
             ],
             data: {

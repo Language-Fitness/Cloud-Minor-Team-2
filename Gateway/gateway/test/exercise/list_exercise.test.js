@@ -153,7 +153,7 @@ async function ListExerciseTestWithNoToken() {
         expect(responseDataWithNoToken).toEqual({
             errors: [
                 {
-                    message: "invalid token format: null",
+                    message: "invalid token introspect",
                 },
             ],
             data: {
