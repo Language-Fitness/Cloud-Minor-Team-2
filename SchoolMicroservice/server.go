@@ -15,6 +15,7 @@ import (
 	"school/graph"
 	"school/internal/auth"
 	"school/internal/database"
+	"school/internal/database/migrations"
 	"school/internal/service"
 	"school/proto/pb"
 )
@@ -33,7 +34,7 @@ func main() {
 
 	tokenMiddleware := auth.Middleware
 
-	//migrations.Init()
+	migrations.Init()
 	srv := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{Resolvers: graph.NewResolver()}))
 
 	r := mux.NewRouter()
