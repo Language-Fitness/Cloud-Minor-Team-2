@@ -173,7 +173,7 @@ func TestService_DeleteSchoolWithoutAdminToken(t *testing.T) {
 			"3a3bd756-6353-4e29-8aba-5b3531bdb9ed", mock.AnythingOfType("model.School")).
 		Return(nil)
 
-	err := service.DeleteSchool(adminToken, "3a3bd756-6353-4e29-8aba-5b3531bdb9ed")
+	err := service.DeleteSchool(adminToken, "3a3bd756-6353-4e29-8aba-5b3531bdb9ed", true)
 
 	assert.Nil(t, err)
 
@@ -190,7 +190,7 @@ func TestService_DeleteSchool_CatchDeleteError_WithoutAdminToken_AlreadySoftDele
 	mockPolicy.On("DeleteSchool", mock.AnythingOfType("string"), mock.AnythingOfType("string")).
 		Return(&mocks.SoftDeletedMockSchool, nil)
 
-	err := service.DeleteSchool(adminToken, "3a3bd756-6353-4e29-8aba-5b3531bdb9ed")
+	err := service.DeleteSchool(adminToken, "3a3bd756-6353-4e29-8aba-5b3531bdb9ed", true)
 
 	assert.NotNil(t, err)
 	assert.Equal(t, "school could not be deleted", err.Error())
@@ -208,7 +208,7 @@ func TestService_DeleteSchool_CatchDeleteError_WithAdminToken_AlreadySoftDeleted
 	mockPolicy.On("DeleteSchool", mock.AnythingOfType("string"), mock.AnythingOfType("string")).
 		Return(&mocks.SoftDeletedMockSchool, nil)
 
-	err := service.DeleteSchool(adminToken, "3a3bd756-6353-4e29-8aba-5b3531bdb9ed")
+	err := service.DeleteSchool(adminToken, "3a3bd756-6353-4e29-8aba-5b3531bdb9ed", true)
 
 	assert.NotNil(t, err)
 	assert.Equal(t, "school could not be deleted", err.Error())

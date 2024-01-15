@@ -6,16 +6,12 @@ import (
 	"Module/internal/helper"
 	"Module/internal/repository"
 	"Module/internal/validation"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/google/uuid"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
-	"io"
-	"net/http"
-	"os"
 	"strings"
 	"time"
 )
@@ -33,18 +29,20 @@ type IModuleService interface {
 // ModuleService GOLANG STRUCT
 // Contains two interfaces for a Validator and a Repo.
 type ModuleService struct {
-	Validator validation.IValidator
-	Repo      repository.IModuleRepository
-	Policy    auth.IPolicy
+	Validator    validation.IValidator
+	Repo         repository.IModuleRepository
+	Policy       auth.IPolicy
+	UserProvider helper.IUserInfoProvider
 }
 
 // NewModuleService GOLANG FACTORY
 // Returns a ModuleService implementing IModuleService.
 func NewModuleService(collection *mongo.Collection) IModuleService {
 	return &ModuleService{
-		Validator: validation.NewValidator(),
-		Repo:      repository.NewModuleRepository(collection),
-		Policy:    auth.NewPolicy(collection),
+		Validator:    validation.NewValidator(),
+		Repo:         repository.NewModuleRepository(collection),
+		Policy:       auth.NewPolicy(collection),
+		UserProvider: helper.NewUserProvider(),
 	}
 }
 
@@ -54,11 +52,10 @@ func (m *ModuleService) CreateModule(token string, newModule model.ModuleInputCr
 		return nil, err
 	}
 
-	//subName, err := getUserInfo(token, sub)
-	//if err != nil {
-	//	return nil, fmt.Errorf("no user information could be extracted")
-	//}
-	subName := "Merlin"
+	subName, err := m.UserProvider.GetUserInfo(token, sub)
+	if err != nil {
+		return nil, fmt.Errorf("no user information could be extracted")
+	}
 
 	m.Validator.Validate(newModule.SchoolID, []string{"IsUUID"}, "Filter School")
 	m.Validator.Validate(newModule.Name, []string{"IsString", "Length:<25"}, "Name")
@@ -182,10 +179,10 @@ func (m *ModuleService) GetModuleById(token string, id string) (*model.Module, e
 }
 
 func (m *ModuleService) ListModules(token string, filter *model.ModuleFilter, paginate *model.Paginator) ([]*model.ModuleInfo, error) {
-	//err := m.Policy.ListModules(token)
-	//if err != nil {
-	//	return nil, err
-	//}
+	err := m.Policy.ListModules(token)
+	if err != nil {
+		return nil, err
+	}
 
 	fmt.Println(filter)
 	fmt.Println("init")
@@ -193,9 +190,9 @@ func (m *ModuleService) ListModules(token string, filter *model.ModuleFilter, pa
 	if helper.IsNil(filter.Name) == false {
 		m.Validator.Validate(helper.DereferenceArrayIfNeeded(filter.Name.Input), []string{"IsNull", "ArrayType:string"}, "Filter Name input")
 	}
-	//if helper.IsNil(filter.MadeByName) == false {
-	//	m.Validator.Validate(helper.DereferenceArrayIfNeeded(filter.MadeByName.Input), []string{"IsNull", "ArrayType:string"}, "Filter Made by Name input")
-	//}
+	if helper.IsNil(filter.MadeByName) == false {
+		m.Validator.Validate(helper.DereferenceArrayIfNeeded(filter.MadeByName.Input), []string{"IsNull", "ArrayType:string"}, "Filter Made by Name input")
+	}
 
 	m.Validator.Validate(filter.SoftDelete, []string{"IsNull", "IsBoolean"}, "Filter softDelete")
 	m.Validator.Validate(filter.Private, []string{"IsNull", "IsBoolean"}, "Filter Private")
@@ -230,9 +227,9 @@ func (m *ModuleService) ListModules(token string, filter *model.ModuleFilter, pa
 		bsonFilter = append(bsonFilter, bson.E{Key: "madeby", Value: helper.DereferenceIfNeeded(filter.MadeBy)})
 	}
 
-	//if m.Policy.HasPermissions(token, "filter_module_made_by_name") == true && helper.IsNil(filter.MadeByName) == false {
-	//	bsonFilter = helper.AddFilter(bsonFilter, "madebyname", string(filter.MadeByName.Type), helper.DereferenceArrayIfNeeded(filter.MadeByName.Input))
-	//}
+	if m.Policy.HasPermissions(token, "filter_module_made_by_name") == true && helper.IsNil(filter.MadeByName) == false {
+		bsonFilter = helper.AddFilter(bsonFilter, "madebyname", string(filter.MadeByName.Type), helper.DereferenceArrayIfNeeded(filter.MadeByName.Input))
+	}
 
 	if m.Policy.HasPermissions(token, "filter_module_name") == true && helper.IsNil(filter.Name) == false {
 		bsonFilter = helper.AddFilter(bsonFilter, "name", string(filter.Name.Type), helper.DereferenceArrayIfNeeded(filter.Name.Input))
@@ -264,57 +261,4 @@ func (m *ModuleService) ListModules(token string, filter *model.ModuleFilter, pa
 	}
 
 	return modules, nil
-}
-
-func getUserInfo(token string, userId string) (string, error) {
-	baseUrl := os.Getenv("KEYCLOAK_HOST")
-	path := "admin/realms/cloud-project/users/"
-	fullUrl := baseUrl + path + userId
-
-	req, err := http.NewRequest("GET", fullUrl, nil)
-	if err != nil {
-		return "", err
-	}
-
-	req.Header.Set("Authorization", "Bearer "+token)
-
-	client := &http.Client{}
-	res, err := client.Do(req)
-	if err != nil {
-		return "", err
-	}
-
-	defer res.Body.Close()
-	body, err := io.ReadAll(res.Body)
-	if err != nil {
-		return "", err
-	}
-
-	var result map[string]interface{}
-	err = json.Unmarshal(body, &result)
-	if err != nil {
-		return "", err
-	}
-
-	fullName, err := extractNamesFromJson(result)
-	if err != nil {
-		return "", err
-	}
-
-	return fullName, nil
-}
-
-func extractNamesFromJson(result map[string]interface{}) (string, error) {
-	firstName, ok := result["firstName"].(string)
-	if !ok {
-		return "", fmt.Errorf("failed to extract firstName")
-	}
-
-	lastName, ok := result["lastName"].(string)
-	if !ok {
-		return "", fmt.Errorf("failed to extract lastName")
-	}
-
-	fullName := firstName + " " + lastName
-	return fullName, nil
 }

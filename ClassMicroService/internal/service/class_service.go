@@ -144,10 +144,10 @@ func (c *ClassService) GetClassById(token string, id string) (*model.Class, erro
 }
 
 func (c *ClassService) ListClasses(token string, filter *model.ListClassFilter, paginate *model.Paginator) ([]*model.ClassInfo, error) {
-	//err := c.Policy.ListClasses(token)
-	//if err != nil {
-	//	return nil, err
-	//}
+	err := c.Policy.ListClasses(token)
+	if err != nil {
+		return nil, err
+	}
 
 	validateListClassFilter(c.Validator, filter, paginate)
 	validationErrors := c.Validator.GetErrors()

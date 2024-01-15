@@ -173,7 +173,7 @@ func TestService_DeleteClassWithoutAdminToken(t *testing.T) {
 			"3a3bd756-6353-4e29-8aba-5b3531bdb9ed", mock.AnythingOfType("model.Class")).
 		Return(nil)
 
-	err := service.DeleteClass(adminToken, "3a3bd756-6353-4e29-8aba-5b3531bdb9ed")
+	err := service.DeleteClass(adminToken, "3a3bd756-6353-4e29-8aba-5b3531bdb9ed", true)
 
 	assert.Nil(t, err)
 
@@ -181,7 +181,7 @@ func TestService_DeleteClassWithoutAdminToken(t *testing.T) {
 	mockRepo.AssertExpectations(t)
 }
 
-func TestService_DeleteClass_CatchDeleteError_WithoutAdminToken_AlreadySoftDeleted(t *testing.T) {
+func TestService_DeleteClass_CatchDeleteError_WithoutAdminToken(t *testing.T) {
 	mockRepo := new(mocks.MockRepository)
 	mockValidator := new(mocks.MockValidator)
 	mockPolicy := new(mocks.MockPolicy)
@@ -190,25 +190,13 @@ func TestService_DeleteClass_CatchDeleteError_WithoutAdminToken_AlreadySoftDelet
 	mockPolicy.On("DeleteClass", mock.AnythingOfType("string"), mock.AnythingOfType("string")).
 		Return(&mocks.SoftDeletedMockClass, nil)
 
-	err := service.DeleteClass(adminToken, "3a3bd756-6353-4e29-8aba-5b3531bdb9ed")
+	mockRepo.
+		On(
+			"DeleteClass",
+			"3a3bd756-6353-4e29-8aba-5b3531bdb9ed", mock.AnythingOfType("model.Class")).
+		Return(errors.New("class could not be deleted"))
 
-	assert.NotNil(t, err)
-	assert.Equal(t, "class could not be deleted", err.Error())
-
-	mockPolicy.AssertExpectations(t)
-	mockRepo.AssertExpectations(t)
-}
-
-func TestService_DeleteClass_CatchDeleteError_WithAdminToken_AlreadySoftDeleted_NoFilter(t *testing.T) {
-	mockRepo := new(mocks.MockRepository)
-	mockValidator := new(mocks.MockValidator)
-	mockPolicy := new(mocks.MockPolicy)
-	service := &service2.ClassService{Validator: mockValidator, Repo: mockRepo, Policy: mockPolicy}
-
-	mockPolicy.On("DeleteClass", mock.AnythingOfType("string"), mock.AnythingOfType("string")).
-		Return(&mocks.SoftDeletedMockClass, nil)
-
-	err := service.DeleteClass(adminToken, "3a3bd756-6353-4e29-8aba-5b3531bdb9ed")
+	err := service.DeleteClass(adminToken, "3a3bd756-6353-4e29-8aba-5b3531bdb9ed", true)
 
 	assert.NotNil(t, err)
 	assert.Equal(t, "class could not be deleted", err.Error())
@@ -239,7 +227,7 @@ func TestService_ListClasses(t *testing.T) {
 	mockPolicy := new(mocks.MockPolicy)
 	service := &service2.ClassService{Validator: mockValidator, Repo: mockRepo, Policy: mockPolicy}
 
-	//mockPolicy.On("ListClasses", mock.AnythingOfType("string")).Return(nil)
+	mockPolicy.On("ListClasses", mock.AnythingOfType("string")).Return(nil)
 
 	mockPolicy.On("HasPermissions", mock.AnythingOfType("string"), mock.AnythingOfType("string")).
 		Return(true)
