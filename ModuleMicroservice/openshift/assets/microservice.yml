@@ -2,6 +2,8 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: module-microservice
+  labels:
+    app.kubernetes.io/part-of: module-microservice
 spec:
   replicas: 1
   selector:
