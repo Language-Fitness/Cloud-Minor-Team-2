@@ -4,7 +4,7 @@ var (
 	Name            = "FakeName"
 	Location        = "FakeLocation"
 	HasOpenaiAccess = true
-	OpenAIKey       = "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"
+	OpenAIKey       = "<set key>"
 )
 
 var CreateSchoolMutation = `
