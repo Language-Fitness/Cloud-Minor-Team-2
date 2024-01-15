@@ -3489,6 +3489,8 @@ func (ec *executionContext) unmarshalInputInputResult(ctx context.Context, obj i
 		}
 		switch k {
 		case "exercise_id":
+			var err error
+
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("exercise_id"))
 			data, err := ec.unmarshalNID2string(ctx, v)
 			if err != nil {
@@ -3496,6 +3498,8 @@ func (ec *executionContext) unmarshalInputInputResult(ctx context.Context, obj i
 			}
 			it.ExerciseID = data
 		case "user_id":
+			var err error
+
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("user_id"))
 			data, err := ec.unmarshalNID2string(ctx, v)
 			if err != nil {
@@ -3503,6 +3507,8 @@ func (ec *executionContext) unmarshalInputInputResult(ctx context.Context, obj i
 			}
 			it.UserID = data
 		case "class_id":
+			var err error
+
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("class_id"))
 			data, err := ec.unmarshalNID2string(ctx, v)
 			if err != nil {
@@ -3510,6 +3516,8 @@ func (ec *executionContext) unmarshalInputInputResult(ctx context.Context, obj i
 			}
 			it.ClassID = data
 		case "module_id":
+			var err error
+
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("module_id"))
 			data, err := ec.unmarshalNID2string(ctx, v)
 			if err != nil {
@@ -3517,6 +3525,8 @@ func (ec *executionContext) unmarshalInputInputResult(ctx context.Context, obj i
 			}
 			it.ModuleID = data
 		case "input":
+			var err error
+
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
 			data, err := ec.unmarshalNString2string(ctx, v)
 			if err != nil {
@@ -3524,6 +3534,8 @@ func (ec *executionContext) unmarshalInputInputResult(ctx context.Context, obj i
 			}
 			it.Input = data
 		case "result":
+			var err error
+
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("result"))
 			data, err := ec.unmarshalNBoolean2bool(ctx, v)
 			if err != nil {
@@ -3543,7 +3555,7 @@ func (ec *executionContext) unmarshalInputPaginator(ctx context.Context, obj int
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"amount", "step"}
+	fieldsInOrder := [...]string{"amount", "Step"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -3551,14 +3563,18 @@ func (ec *executionContext) unmarshalInputPaginator(ctx context.Context, obj int
 		}
 		switch k {
 		case "amount":
+			var err error
+
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("amount"))
 			data, err := ec.unmarshalNInt2int(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.Amount = data
-		case "step":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("step"))
+		case "Step":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("Step"))
 			data, err := ec.unmarshalNInt2int(ctx, v)
 			if err != nil {
 				return it, err
@@ -3585,6 +3601,8 @@ func (ec *executionContext) unmarshalInputResultFilter(ctx context.Context, obj 
 		}
 		switch k {
 		case "softDelete":
+			var err error
+
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("softDelete"))
 			data, err := ec.unmarshalOBoolean2ᚖbool(ctx, v)
 			if err != nil {
@@ -3592,6 +3610,8 @@ func (ec *executionContext) unmarshalInputResultFilter(ctx context.Context, obj 
 			}
 			it.SoftDelete = data
 		case "exerciseId":
+			var err error
+
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("exerciseId"))
 			data, err := ec.unmarshalOID2ᚖstring(ctx, v)
 			if err != nil {
@@ -3599,6 +3619,8 @@ func (ec *executionContext) unmarshalInputResultFilter(ctx context.Context, obj 
 			}
 			it.ExerciseID = data
 		case "userId":
+			var err error
+
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("userId"))
 			data, err := ec.unmarshalOID2ᚖstring(ctx, v)
 			if err != nil {
@@ -3606,6 +3628,8 @@ func (ec *executionContext) unmarshalInputResultFilter(ctx context.Context, obj 
 			}
 			it.UserID = data
 		case "classId":
+			var err error
+
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("classId"))
 			data, err := ec.unmarshalOID2ᚖstring(ctx, v)
 			if err != nil {
@@ -3613,6 +3637,8 @@ func (ec *executionContext) unmarshalInputResultFilter(ctx context.Context, obj 
 			}
 			it.ClassID = data
 		case "moduleId":
+			var err error
+
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("moduleId"))
 			data, err := ec.unmarshalOID2ᚖstring(ctx, v)
 			if err != nil {
@@ -3620,6 +3646,8 @@ func (ec *executionContext) unmarshalInputResultFilter(ctx context.Context, obj 
 			}
 			it.ModuleID = data
 		case "input":
+			var err error
+
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
 			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
@@ -3627,6 +3655,8 @@ func (ec *executionContext) unmarshalInputResultFilter(ctx context.Context, obj 
 			}
 			it.Input = data
 		case "result":
+			var err error
+
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("result"))
 			data, err := ec.unmarshalOBoolean2ᚖbool(ctx, v)
 			if err != nil {

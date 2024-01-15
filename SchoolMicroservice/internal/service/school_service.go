@@ -283,6 +283,5 @@ func validateOpenAiAttr(updatedData *model.SchoolInput, existingKey *string) err
 		emptyStr := ""
 		updatedData.OpenaiKey = &emptyStr
 	}
-
 	return nil
 }

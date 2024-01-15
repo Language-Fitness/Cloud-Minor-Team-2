@@ -14,7 +14,7 @@ input ResultFilter {
 
 input Paginator {
     amount: Int!
-    step: Int!
+    Step: Int!
 }
 
 type Result {
