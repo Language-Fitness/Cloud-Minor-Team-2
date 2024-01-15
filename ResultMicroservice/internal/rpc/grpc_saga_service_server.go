@@ -80,7 +80,7 @@ func (s *SagaService) FindSagaObjectChildren(ctx context.Context, req *pb.Object
 
 // DeleteObject implements the DeleteObject RPC method
 func (s *SagaService) DeleteObject(ctx context.Context, req *pb.ObjectRequest) (*pb.SagaObject, error) {
-	err := s.service.DeleteResult(req.BearerToken, req.ObjectId, false)
+	err := s.service.DeleteResult(req.BearerToken, req.ObjectId, true)
 	if err != nil {
 		return nil, err
 	}
@@ -111,7 +111,7 @@ func (s *SagaService) UnDeleteObject(ctx context.Context, req *pb.ObjectRequest)
 }
 
 func setStatus(bool bool) pb.SagaObjectStatus {
-	if bool == true {
+	if bool == false {
 		return pb.SagaObjectStatus_EXIST
 	}
 

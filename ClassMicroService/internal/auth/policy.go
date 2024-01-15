@@ -4,6 +4,7 @@ import (
 	"Class/graph/model"
 	"Class/internal/repository"
 	"errors"
+	"fmt"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
@@ -98,13 +99,16 @@ func (p *Policy) GetClass(bearerToken string, id string) (*model.Class, error) {
 
 	class, err := p.ClassRepository.GetClassByID(id)
 	if err != nil {
+		fmt.Println(err)
 		return nil, errors.New(InvalidActionsMessage)
 	}
 
 	if p.hasRole(roles, "get_class") {
+		fmt.Println("does have role")
 		return class, nil
 	}
 
+	fmt.Println("does not have role")
 	return nil, errors.New(InvalidActionsMessage)
 }
 

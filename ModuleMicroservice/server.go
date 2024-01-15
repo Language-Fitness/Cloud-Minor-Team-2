@@ -4,6 +4,7 @@ import (
 	"Module/graph"
 	"Module/internal/auth"
 	"Module/internal/database"
+	"Module/internal/database/migrations"
 	"Module/internal/service"
 	"Module/proto/pb"
 	"github.com/99designs/gqlgen/graphql/handler"
@@ -31,7 +32,7 @@ func main() {
 		log.Fatal("Error loading .env file")
 	}
 
-	//migrations.Init()
+	migrations.Init()
 	graphQLServer := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{Resolvers: graph.NewResolver()}))
 
 	tokenMiddleware := auth.Middleware

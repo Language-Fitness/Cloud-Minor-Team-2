@@ -63,6 +63,23 @@ var GetExerciseQuery = `
 		  }
 	}`
 
+var ListExerciseQuery = `
+	query($filter: ExerciseFilter!, $paginator: Paginator!) {
+		ListExercise(filter: $filter, paginator: $paginator) {
+			id
+			class_Id
+			module_id
+			name
+			question
+			answers {
+			  value
+			  correct	
+			}
+			difficulty
+			made_by
+		  }
+	}`
+
 func GenerateExerciseInput() map[string]interface{} {
 	return map[string]interface{}{
 		"class_Id":   ClassID,
@@ -161,5 +178,16 @@ func GenerateExerciseInputNoIncorrectAnswers() map[string]interface{} {
 			{"value": "Option A", "correct": true},
 			{"value": "Option B", "correct": true},
 		},
+	}
+}
+
+func GenerateExerciseFilterEmpty() map[string]interface{} {
+	return map[string]interface{}{}
+}
+
+func GenerateExercisePaginator() map[string]interface{} {
+	return map[string]interface{}{
+		"limit":  10,
+		"offset": 0,
 	}
 }

@@ -28,6 +28,10 @@ func (s *SagaService) FindSagaObject(ctx context.Context, req *pb.ObjectRequest)
 		return nil, err
 	}
 
+	fmt.Println(result.ID)
+	fmt.Println(result.SoftDeleted)
+	fmt.Println(setStatus(result.SoftDeleted))
+
 	response := &pb.SagaObject{
 		ObjectId:     result.ID,
 		ObjectType:   pb.SagaObjectType_EXERCISE,
@@ -111,7 +115,7 @@ func (s *SagaService) UnDeleteObject(ctx context.Context, req *pb.ObjectRequest)
 }
 
 func setStatus(bool bool) pb.SagaObjectStatus {
-	if bool == true {
+	if bool == false {
 		return pb.SagaObjectStatus_EXIST
 	}
 

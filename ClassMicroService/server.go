@@ -3,6 +3,7 @@ package main
 import (
 	"Class/graph"
 	"Class/internal/auth"
+	"Class/internal/database/migrations"
 	"Class/internal/service"
 	"Class/proto/pb"
 	"github.com/99designs/gqlgen/graphql/handler"
@@ -43,7 +44,7 @@ func main() {
 
 	//tokenMiddleware := auth.Middleware
 	//
-	////migrations.Init()
+	migrations.Init()
 	//
 	//srv := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{Resolvers: graph.NewResolver()}))
 	//

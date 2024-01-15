@@ -112,7 +112,7 @@ func (s *SagaService) UnDeleteObject(ctx context.Context, req *pb.ObjectRequest)
 }
 
 func setStatus(bool *bool) pb.SagaObjectStatus {
-	if bool == helper.BoolPointer(true) {
+	if bool == helper.BoolPointer(false) {
 		return pb.SagaObjectStatus_EXIST
 	}
 

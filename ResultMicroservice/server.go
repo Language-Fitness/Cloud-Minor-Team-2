@@ -4,6 +4,7 @@ import (
 	"ResultMicroservice/graph"
 	"ResultMicroservice/internal/auth"
 	"ResultMicroservice/internal/database"
+	"ResultMicroservice/internal/database/migrations"
 	service "ResultMicroservice/internal/rpc"
 	"ResultMicroservice/proto/pb"
 	"github.com/joho/godotenv"
@@ -30,7 +31,7 @@ func main() {
 		log.Fatal("Error loading .env file")
 	}
 
-	//migrations.InitResult()
+	migrations.InitResult()
 	// Prometheus Metrics
 	http.Handle("/metrics", promhttp.Handler())
 
