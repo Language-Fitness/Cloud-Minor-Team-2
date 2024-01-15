@@ -109,7 +109,7 @@ class AssistantAPIAdapter:
 
         except Exception as e:
             logging.error(f"Unexpected API error in retrieve_response: {e}")
-            raise
+            raise Exception(f"An unexpected error occurred: {e}")
 
     def retrieve_generated_multiple_choice_questions_response(self, token):
         return self.retrieve_response(token, "questions", self.is_valid_generated_questions_json)
