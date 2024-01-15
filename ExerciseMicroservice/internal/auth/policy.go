@@ -8,6 +8,8 @@ import (
 )
 
 const InvalidTokenMessage = "invalid token"
+const NotFoundMessage = "exercise not found"
+const InvalidPermissionsMessage = "invalid permissions for this action"
 
 type IExercisePolicy interface {
 	CreateExercise(bearerToken string) (string, error)
@@ -53,7 +55,7 @@ func (p *ExercisePolicy) UpdateExercise(bearerToken string, id string) (*model.E
 
 	exercise, err2 := p.ExerciseRepository.GetExerciseByID(id)
 	if err2 != nil {
-		return nil, errors.New("exercise not found")
+		return nil, errors.New(NotFoundMessage)
 	}
 
 	if p.hasRole(roles, "update_exercise") && exercise.MadeBy == uuid {
@@ -64,7 +66,7 @@ func (p *ExercisePolicy) UpdateExercise(bearerToken string, id string) (*model.E
 		return exercise, nil
 	}
 
-	return nil, errors.New("invalid permissions for this action")
+	return nil, errors.New(InvalidPermissionsMessage)
 }
 
 func (p *ExercisePolicy) DeleteExercise(bearerToken string, id string) (bool, *model.Exercise, error) {
@@ -75,7 +77,7 @@ func (p *ExercisePolicy) DeleteExercise(bearerToken string, id string) (bool, *m
 
 	exercise, err := p.ExerciseRepository.GetExerciseByID(id)
 	if err != nil {
-		return false, nil, errors.New("exercise not found")
+		return false, nil, errors.New(NotFoundMessage)
 	}
 
 	if p.hasRole(roles, "delete_exercise_all") {
@@ -86,7 +88,7 @@ func (p *ExercisePolicy) DeleteExercise(bearerToken string, id string) (bool, *m
 		return false, exercise, nil
 	}
 
-	return false, nil, errors.New("invalid permissions for this action")
+	return false, nil, errors.New(InvalidPermissionsMessage)
 }
 
 func (p *ExercisePolicy) GetExercise(bearerToken string, id string) (*model.Exercise, error) {
@@ -97,14 +99,14 @@ func (p *ExercisePolicy) GetExercise(bearerToken string, id string) (*model.Exer
 
 	exercise, err := p.ExerciseRepository.GetExerciseByID(id)
 	if err != nil {
-		return nil, errors.New("exercise not found")
+		return nil, errors.New(NotFoundMessage)
 	}
 
 	if p.hasRole(roles, "get_exercise") {
 		return exercise, nil
 	}
 
-	return nil, errors.New("invalid permissions for this action")
+	return nil, errors.New(InvalidPermissionsMessage)
 }
 
 func (p *ExercisePolicy) ListExercises(bearerToken string) (bool, error) {
@@ -118,7 +120,7 @@ func (p *ExercisePolicy) ListExercises(bearerToken string) (bool, error) {
 	}
 
 	if !p.hasRole(roles, "get_exercises") {
-		return false, errors.New("invalid permissions for this action")
+		return false, errors.New(InvalidPermissionsMessage)
 	}
 
 	return false, nil

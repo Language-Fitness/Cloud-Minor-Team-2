@@ -286,7 +286,6 @@ func buildBsonFilterForListExercise(policy auth.IExercisePolicy, token string, f
 	fmt.Println(token)
 
 	appendCondition := func(key string, value interface{}, dbKey string) bool {
-
 		if value != nil && !reflect.ValueOf(value).IsZero() && policy.HasPermissions(token, "filter_exercise_"+key) {
 			bsonFilter = append(bsonFilter, bson.E{Key: dbKey, Value: helper.DereferenceIfNeeded(value)})
 			return true
