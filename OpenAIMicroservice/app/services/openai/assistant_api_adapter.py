@@ -183,7 +183,7 @@ class AssistantAPIAdapter:
 
             return ids_dict['thread_id'], ids_dict['assistant_id'], file_id
         except Exception as e:
-            # adding loging with prometheus
+
             logging.error(f"Error in decode_and_check_token: {e}")
             raise AssistantAPIException("Invalid token!")
 

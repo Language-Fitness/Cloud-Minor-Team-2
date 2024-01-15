@@ -16,7 +16,7 @@ class TokenProvider:
 
     def introspect_token(self, bearer_token):
         auth_header = self.generate_basic_auth_header()
-        print(self.endpoint)
+
         req_body = f"token_type_hint=requesting_party_token&token={bearer_token}"
         headers = {
             "Authorization": auth_header,

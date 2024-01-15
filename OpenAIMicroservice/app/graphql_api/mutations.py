@@ -37,8 +37,6 @@ class GenerateMultipleChoiceQuestions(graphene.Mutation):
         except AssistantAPIException as e:
             return GenerateMultipleChoiceQuestions(TokenResponse(status="error", message=str(e)))
         except Exception as e:
-            # Generic error for unexpected exceptions
-            print(str(e))
             return GenerateMultipleChoiceQuestions(TokenResponse(status="error",
                                                                  message="An unexpected error occurred while generating questions. Please try again later."))
 
