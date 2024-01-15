@@ -57,7 +57,7 @@ async function GetExerciseTest() {
                         }
                     ],
                     difficulty: "B1",
-                    created_at: "2024-01-02T14:01:49Z",
+                    created_at: expect.any(String),
                     updated_at: expect.any(String),
                     soft_deleted: false,
                     made_by: expect.any(String)

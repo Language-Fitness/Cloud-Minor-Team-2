@@ -187,7 +187,7 @@ func GenerateExerciseFilterEmpty() map[string]interface{} {
 
 func GenerateExercisePaginator() map[string]interface{} {
 	return map[string]interface{}{
-		"limit":  10,
-		"offset": 0,
+		"amount": 10,
+		"Step":   0,
 	}
 }
