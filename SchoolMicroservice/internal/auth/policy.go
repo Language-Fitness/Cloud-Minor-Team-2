@@ -7,6 +7,7 @@ import (
 	"school/internal/repository"
 )
 
+const NotFoundMessage = "school not found"
 const InvalidActionsMessage = "invalid permissions for this action"
 const InvalidTokenMessage = "invalid token"
 
@@ -54,7 +55,7 @@ func (p *Policy) UpdateSchool(bearerToken string, id string) (*model.School, err
 
 	school, err := p.SchoolRepository.GetSchoolByID(id)
 	if err != nil {
-		return nil, errors.New(InvalidActionsMessage)
+		return nil, errors.New(NotFoundMessage)
 	}
 
 	if p.hasRole(roles, "update_school") && school.MadeBy == uuid {
@@ -76,7 +77,7 @@ func (p *Policy) DeleteSchool(bearerToken string, id string) (*model.School, err
 
 	school, err := p.SchoolRepository.GetSchoolByID(id)
 	if err != nil {
-		return nil, errors.New(InvalidActionsMessage)
+		return nil, errors.New(NotFoundMessage)
 	}
 
 	if p.hasRole(roles, "delete_school_all") {

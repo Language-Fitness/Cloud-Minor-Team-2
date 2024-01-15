@@ -62,6 +62,25 @@ func GenerateRandomSchool(n int) []FakeSchool {
 		schools = append(schools, school)
 	}
 
+	fakeSchoolWithIdSet := FakeSchool{}
+	err := faker.FakeData(&fakeSchoolWithIdSet)
+	if err != nil {
+		fmt.Println("Error:", err)
+		return nil
+	}
+
+	fakeSchoolWithIdSet.ID = "09d6be4b-da77-4be0-9094-445e1a5e639a"
+	fakeSchoolWithIdSet.Name = "FakeName"
+	fakeSchoolWithIdSet.Location = "FakeLocation"
+	fakeSchoolWithIdSet.HasOpenaiAccess = false
+	fakeSchoolWithIdSet.JoinCode = "code"
+	fakeSchoolWithIdSet.MadeBy = "0e520bea-a96b-47cc-96bc-83633e47c58e"
+	fakeSchoolWithIdSet.SoftDeleted = false
+	fakeSchoolWithIdSet.CreatedAt = generateRandomDate()
+	fakeSchoolWithIdSet.UpdatedAt = generateRandomDate()
+
+	schools = append(schools, fakeSchoolWithIdSet)
+
 	return schools
 }
 

@@ -113,9 +113,8 @@ func (s *SchoolService) UpdateSchool(token string, id string, updatedData model.
 		return nil, errors.New(errorMessage)
 	}
 
-	if existingSchool.OpenaiKey != updatedData.OpenaiKey {
+	if updatedData.HasOpenaiAccess && existingSchool.OpenaiKey != updatedData.OpenaiKey {
 		err := s.ValidateOpenAiKey(*updatedData.OpenaiKey)
-
 		if err != nil {
 			return nil, err
 		}
