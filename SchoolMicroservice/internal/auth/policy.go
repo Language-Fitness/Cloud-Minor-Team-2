@@ -95,7 +95,7 @@ func (p *Policy) GetSchool(bearerToken string, id string) (*model.School, error)
 
 	school, err := p.SchoolRepository.GetSchoolByID(id)
 	if err != nil {
-		return nil, errors.New(InvalidActionsMessage)
+		return nil, errors.New(NotFoundMessage)
 	}
 
 	if p.hasRole(roles, "get_school") {

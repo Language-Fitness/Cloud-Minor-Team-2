@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"os"
 	"school/internal/auth"
+	"school/internal/helper"
 	"school/proto/pb"
 )
 
@@ -48,7 +49,7 @@ func (s *SchoolActionsGRPCService) GetKey(ctx context.Context, req *pb.KeyReques
 	}
 
 	// validate retrieved key using test request
-	err = s.service.ValidateOpenAiKey(*school.OpenaiKey)
+	err = helper.ValidateOpenAiKey(*school.OpenaiKey)
 	if err != nil {
 		response.Error = "key is not valid"
 		return response, nil

@@ -2,12 +2,9 @@ package service
 
 import (
 	"errors"
-	"fmt"
 	"github.com/google/uuid"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo/options"
-	"io"
-	"net/http"
 	"school/graph/model"
 	"school/internal/auth"
 	"school/internal/database"
@@ -28,7 +25,6 @@ type ISchoolService interface {
 	DeleteSchool(token string, id string, deleteFlag bool) error
 	GetSchoolById(token string, id string) (*model.School, error)
 	ListSchools(token string, filter *model.ListSchoolFilter, paginate *model.Paginator) ([]*model.SchoolInfo, error)
-	ValidateOpenAiKey(apiKey string) error
 }
 
 // SchoolService GOLANG STRUCT
@@ -66,7 +62,7 @@ func (s *SchoolService) CreateSchool(token string, newSchool model.SchoolInput) 
 	}
 
 	if !helper.IsNil(newSchool.OpenaiKey) {
-		err := s.ValidateOpenAiKey(*newSchool.OpenaiKey)
+		err := helper.ValidateOpenAiKey(*newSchool.OpenaiKey)
 
 		if err != nil {
 			return nil, err
@@ -113,11 +109,9 @@ func (s *SchoolService) UpdateSchool(token string, id string, updatedData model.
 		return nil, errors.New(errorMessage)
 	}
 
-	if updatedData.HasOpenaiAccess && existingSchool.OpenaiKey != updatedData.OpenaiKey {
-		err := s.ValidateOpenAiKey(*updatedData.OpenaiKey)
-		if err != nil {
-			return nil, err
-		}
+	err = validateOpenAiAttr(&updatedData, existingSchool.OpenaiKey)
+	if err != nil {
+		return nil, err
 	}
 
 	timestamp := time.Now().String()
@@ -277,31 +271,18 @@ func buildBsonFilter(policy auth.IPolicy, token string, filter *model.ListSchool
 	return bsonFilter
 }
 
-func (s *SchoolService) ValidateOpenAiKey(apiKey string) error {
-	url := "https://api.openai.com/v1/engines"
-
-	req, err := http.NewRequest("GET", url, nil)
-	if err != nil {
-		return fmt.Errorf("error creating request: %v", err)
+func validateOpenAiAttr(updatedData *model.SchoolInput, existingKey *string) error {
+	if updatedData.HasOpenaiAccess && existingKey != updatedData.OpenaiKey {
+		err := helper.ValidateOpenAiKey(*updatedData.OpenaiKey)
+		if err != nil {
+			return err
+		}
 	}
 
-	req.Header.Set("Authorization", "Bearer "+apiKey)
-
-	client := http.Client{}
-	resp, err := client.Do(req)
-	if err != nil {
-		return fmt.Errorf("error making request: %v", err)
-	}
-	defer resp.Body.Close()
-
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return fmt.Errorf("error reading response body: %v", err)
+	if !updatedData.HasOpenaiAccess {
+		emptyStr := ""
+		updatedData.OpenaiKey = &emptyStr
 	}
 
-	if resp.StatusCode == http.StatusOK {
-		return nil
-	} else {
-		return fmt.Errorf("API key validation failded. Status code %d, Response %s\n", resp.StatusCode, string(body))
-	}
+	return nil
 }
