@@ -1,7 +1,12 @@
 package main
 
 import (
+	"github.com/99designs/gqlgen/graphql/handler"
+	"github.com/99designs/gqlgen/graphql/playground"
+	"github.com/gorilla/handlers"
+	"github.com/gorilla/mux"
 	"github.com/joho/godotenv"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"google.golang.org/grpc"
 	"log"
 	"net"
@@ -12,9 +17,6 @@ import (
 	"school/internal/database"
 	"school/internal/service"
 	"school/proto/pb"
-
-	"github.com/99designs/gqlgen/graphql/handler"
-	"github.com/99designs/gqlgen/graphql/playground"
 )
 
 const defaultPort = "8083"
@@ -34,14 +36,18 @@ func main() {
 	//migrations.Init()
 	srv := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{Resolvers: graph.NewResolver()}))
 
-	http.Handle("/query", tokenMiddleware(srv))
-	http.Handle("/", playground.Handler("GraphQL playground", "/query"))
+	r := mux.NewRouter()
+
+	r.Handle("/query", tokenMiddleware(srv))
+	r.Handle("/", playground.Handler("GraphQL playground", "/query"))
+	r.Handle("/metrics", promhttp.Handler())
+	msHandler := handlers.LoggingHandler(os.Stdout, r)
 
 	go grpcSchoolServer()
 	go grpcSagaServer()
 
-	log.Printf("connect to http://localhost:%s/ for GraphQL playground", port)
-	log.Fatal(http.ListenAndServe(":"+port, nil))
+	log.Printf("SagaService is running on http://localhost:%s", port)
+	log.Fatal(http.ListenAndServe(":"+port, msHandler))
 }
 
 func grpcSchoolServer() {
