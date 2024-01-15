@@ -12,7 +12,6 @@ import (
 // IResultRepository GOLANG INTERFACE
 // Implements five CRUD methods for queries and mutations on Result.
 type IResultRepository interface {
-	//Todo only return items that are not soft deleted
 	CreateResult(newResult *model.Result) (*model.Result, error)
 	UpdateResult(id string, updatedResult model.Result) (*model.Result, error)
 	GetResultByID(id string) (*model.Result, error)
