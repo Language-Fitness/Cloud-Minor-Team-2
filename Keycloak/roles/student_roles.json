@@ -30,6 +30,9 @@
     "name": "filter_module_made_by_name"
   },
   {
+    "name": "filter_module_category"
+  },
+  {
     "name": "openai_generate_explanation"
   },
   {
@@ -61,5 +64,8 @@
   },
   {
     "name": "openai_get_school"
+  },
+  {
+    "name": "filter_class_module_id"
   }
 ]
