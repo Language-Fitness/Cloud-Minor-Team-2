@@ -3,7 +3,6 @@ package main
 import (
 	"Class/graph"
 	"Class/internal/auth"
-	"Class/internal/database/migrations"
 	"Class/internal/service"
 	"Class/proto/pb"
 	"github.com/99designs/gqlgen/graphql/handler"
@@ -42,14 +41,7 @@ func main() {
 	r.Handle("/metrics", promhttp.Handler())
 	msHandler := handlers.LoggingHandler(os.Stdout, r)
 
-	//tokenMiddleware := auth.Middleware
-	//
-	migrations.Init()
-	//
-	//srv := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{Resolvers: graph.NewResolver()}))
-	//
-	//http.Handle("/query", tokenMiddleware(srv))
-	//http.Handle("/", playground.Handler("GraphQL playground", "/query"))
+	//migrations.Init()
 
 	go grpcSagaServer()
 
