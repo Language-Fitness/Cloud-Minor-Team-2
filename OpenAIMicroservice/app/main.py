@@ -2,8 +2,12 @@ from fastapi import FastAPI
 from starlette_graphene3 import GraphQLApp, make_graphiql_handler
 from graphql_api.schema import schema as graphene_schema
 import uvicorn
+from prometheus_fastapi_instrumentator import Instrumentator
 
 app = FastAPI()
+
+# Initialize and start the instrumentator
+Instrumentator().instrument(app).expose(app)
 
 # Define the /graphql_api endpoint with GraphiQL enabled for development
 app.add_websocket_route(
