@@ -1,67 +1,67 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: exercise-microservice
+  name: saga-microservice
   labels:
-    app.kubernetes.io/part-of: exercise-microservice
+    app.kubernetes.io/part-of: saga-microservice
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: exercise-microservice
+      app: saga-microservice
   template:
     metadata:
       labels:
-        app: exercise-microservice
+        app: saga-microservice
     spec:
       containers:
-        - name: exercise-microservice
+        - name: saga-microservice
           image: microservice_image
           ports:
-            - containerPort: 8084
-            - containerPort: 9095
+            - containerPort: 8083
+            - containerPort: 9090
           readinessProbe:
             timeoutSeconds: 3
             initialDelaySeconds: 5
             httpGet:
               path: "/health/ready"
-              port: 8084
+              port: 8083
           livenessProbe:
             timeoutSeconds: 3
             initialDelaySeconds: 30
             httpGet:
               path: "/health/live"
-              port: 8084
+              port: 8083
 ---
 kind: Service
 apiVersion: v1
 metadata:
-  name: exercise-microservice-service
+  name: saga-microservice-service
   annotations:
     description: Exposes and load balances the application pods
   labels:
-    app: exercise-microservice
+    app: saga-microservice
 spec:
   ports:
     - name: http
-      port: 8084
-      targetPort: 8084
+      port: 8083
+      targetPort: 8083
     - name: tcp
-      port: 9095
-      targetPort: 9095
+      port: 9090
+      targetPort: 9090
       protocol: TCP
   selector:
-    app: exercise-microservice
+    app: saga-microservice
 ---
 kind: Route
 apiVersion: route.openshift.io/v1
 metadata:
-  name: exercise-microservice-route
+  name: saga-microservice-route
   labels:
-    app: exercise-microservice
+    app: saga-microservice
 spec:
   port:
-    targetPort: 8084
+    targetPort: 8083
   to:
     kind: Service
-    name: exercise-microservice-service
+    name: saga-microservice-service

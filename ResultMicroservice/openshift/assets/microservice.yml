@@ -19,6 +19,7 @@ spec:
           image: microservice_image
           ports:
             - containerPort: 8085
+            - containerPort: 9094
           readinessProbe:
             timeoutSeconds: 3
             initialDelaySeconds: 5
@@ -45,6 +46,10 @@ spec:
     - name: http
       port: 8085
       targetPort: 8085
+    - name: tcp
+      port: 9094
+      targetPort: 9094
+      protocol: TCP
   selector:
     app: result-microservice
 ---

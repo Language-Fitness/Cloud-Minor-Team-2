@@ -20,18 +20,19 @@ spec:
           ports:
             - containerPort: 8083
             - containerPort: 9050
-          readinessProbe:
-            timeoutSeconds: 3
-            initialDelaySeconds: 5
-            httpGet:
-              path: "/health/ready"
-              port: 8083
-          livenessProbe:
-            timeoutSeconds: 3
-            initialDelaySeconds: 30
-            httpGet:
-              path: "/health/live"
-              port: 8083
+            - containerPort: 9092
+#          readinessProbe:
+#            timeoutSeconds: 5
+#            initialDelaySeconds: 20
+#            httpGet:
+#              path: "/health/ready"
+#              port: 8083
+#          livenessProbe:
+#            timeoutSeconds: 10
+#            initialDelaySeconds: 30
+#            httpGet:
+#              path: "/health/live"
+#              port: 8083
 ---
 kind: Service
 apiVersion: v1
@@ -49,6 +50,10 @@ spec:
     - name: tcp
       port: 9050
       targetPort: 9050
+      protocol: TCP
+    - name: tcp-saga
+      port: 9092
+      targetPort: 9092
       protocol: TCP
   selector:
     app: school-microservice

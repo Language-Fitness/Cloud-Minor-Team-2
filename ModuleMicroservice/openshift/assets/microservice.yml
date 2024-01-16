@@ -19,18 +19,19 @@ spec:
           image: microservice_image
           ports:
             - containerPort: 8081
-          readinessProbe:
-            timeoutSeconds: 3
-            initialDelaySeconds: 5
-            httpGet:
-              path: "/health/ready"
-              port: 8081
-          livenessProbe:
-            timeoutSeconds: 3
-            initialDelaySeconds: 30
-            httpGet:
-              path: "/health/live"
-              port: 8081
+            - containerPort: 9091
+#          readinessProbe:
+#            timeoutSeconds: 3
+#            initialDelaySeconds: 5
+#            httpGet:
+#              path: "/health/ready"
+#              port: 8081
+#          livenessProbe:
+#            timeoutSeconds: 3
+#            initialDelaySeconds: 30
+#            httpGet:
+#              path: "/health/live"
+#              port: 8081
 ---
 kind: Service
 apiVersion: v1
@@ -45,6 +46,10 @@ spec:
     - name: http
       port: 8081
       targetPort: 8081
+    - name: tcp
+      port: 9091
+      targetPort: 9091
+      protocol: TCP
   selector:
     app: module-microservice
 ---

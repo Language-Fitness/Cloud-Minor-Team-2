@@ -9,6 +9,7 @@ services:
     ports:
       - "8083:8083"
       - "9050:9050"
+      - "9092:9092"
 
   mongodb:
     container_name: mongodb

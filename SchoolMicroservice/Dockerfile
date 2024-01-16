@@ -17,6 +17,7 @@ COPY / .
 
 EXPOSE 8083
 EXPOSE 9050
+EXPOSE 9092
 
 RUN go build -o main .
 

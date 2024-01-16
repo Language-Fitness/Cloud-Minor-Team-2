@@ -3,6 +3,7 @@ package main
 import (
 	"Class/graph"
 	"Class/internal/auth"
+	"Class/internal/database/migrations"
 	"Class/internal/service"
 	"Class/proto/pb"
 	"github.com/99designs/gqlgen/graphql/handler"
@@ -41,7 +42,7 @@ func main() {
 	r.Handle("/metrics", promhttp.Handler())
 	msHandler := handlers.LoggingHandler(os.Stdout, r)
 
-	//migrations.Init()
+	migrations.Init()
 
 	go grpcSagaServer()
 
@@ -50,7 +51,7 @@ func main() {
 }
 
 func grpcSagaServer() {
-	lis, err := net.Listen("tcp", ":9092")
+	lis, err := net.Listen("tcp", ":9093")
 	if err != nil {
 		log.Fatalf("Failed to listen: %v", err)
 	}

@@ -50,7 +50,7 @@ func main() {
 }
 
 func grpcSagaServer() {
-	lis, err := net.Listen("tcp", ":9093")
+	lis, err := net.Listen("tcp", ":9095")
 	if err != nil {
 		log.Fatalf("Failed to listen: %v", err)
 	}
