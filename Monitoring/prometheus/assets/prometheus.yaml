@@ -8,7 +8,7 @@ metadata:
     app: prometheus
     project: language-fitness
 spec:
-  replicas: 2
+  replicas: 1
   serviceAccountName: prometheus-sa
   securityContext: {}
   serviceMonitorSelector:
