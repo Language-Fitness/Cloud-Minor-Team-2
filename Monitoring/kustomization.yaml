@@ -1,0 +1,13 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - Grafana/assets/subscription.yaml
+  - Grafana/assets/dashboard.yaml
+  - Grafana/assets/datasource.yaml
+  - Grafana/assets/grafana.yaml
+  - Grafana/assets/route.yaml
+  - Prometheus/assets/route.yaml
+  - Prometheus/assets/service-monitor.yaml
+  - Prometheus/assets/service-account.yaml
+  - Prometheus/assets/subscription.yaml
+  - Prometheus/assets/prometheus.yaml
