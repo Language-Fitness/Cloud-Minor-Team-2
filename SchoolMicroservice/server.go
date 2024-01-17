@@ -33,17 +33,23 @@ func main() {
 	}
 
 	tokenMiddleware := auth.Middleware
-
-	migrations.Init()
 	srv := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{Resolvers: graph.NewResolver()}))
 
 	r := mux.NewRouter()
-
 	r.Handle("/query", tokenMiddleware(srv))
 	r.Handle("/", playground.Handler("GraphQL playground", "/query"))
 	r.Handle("/metrics", promhttp.Handler())
 	msHandler := handlers.LoggingHandler(os.Stdout, r)
 
+	r.HandleFunc("/health/live", func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+	})
+
+	r.HandleFunc("/health/ready", func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+	})
+
+	migrations.Init()
 	go grpcSchoolServer()
 	go grpcSagaServer()
 

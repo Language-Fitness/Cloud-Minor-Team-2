@@ -31,17 +31,22 @@ func main() {
 		log.Fatal("Error loading .env file")
 	}
 
-	migrations.InitResult()
-	// Prometheus Metrics
-	http.Handle("/metrics", promhttp.Handler())
-
 	tokenMiddleware := auth.Middleware
-
 	srv := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{Resolvers: graph.NewResolver()}))
 
 	http.Handle("/query", tokenMiddleware(srv))
 	http.Handle("/", playground.Handler("GraphQL playground", "/query"))
+	http.Handle("/metrics", promhttp.Handler())
 
+	http.HandleFunc("/health/live", func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+	})
+
+	http.HandleFunc("/health/ready", func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+	})
+
+	migrations.InitResult()
 	go grpcSagaServer()
 
 	log.Printf("connect to http://localhost:%s/ for GraphQL playground", port)

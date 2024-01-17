@@ -4,7 +4,6 @@ import (
 	"Module/graph"
 	"Module/internal/auth"
 	"Module/internal/database"
-	"Module/internal/database/migrations"
 	"Module/internal/service"
 	"Module/proto/pb"
 	"github.com/99designs/gqlgen/graphql/handler"
@@ -32,18 +31,24 @@ func main() {
 		log.Fatal("Error loading .env file")
 	}
 
-	migrations.Init()
 	graphQLServer := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{Resolvers: graph.NewResolver()}))
-
 	tokenMiddleware := auth.Middleware
 
 	r := mux.NewRouter()
-
 	r.Handle("/query", tokenMiddleware(graphQLServer))
 	r.Handle("/", playground.Handler("GraphQL playground", "/query"))
 	r.Handle("/metrics", promhttp.Handler())
 	msHandler := handlers.LoggingHandler(os.Stdout, r)
 
+	r.HandleFunc("/health/live", func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+	})
+
+	r.HandleFunc("/health/ready", func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+	})
+
+	//migrations.Init()
 	go grpcSagaServer()
 
 	// Start the HTTP server

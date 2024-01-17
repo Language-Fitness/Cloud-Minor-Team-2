@@ -9,6 +9,17 @@ app = FastAPI()
 # Initialize and start the instrumentator
 Instrumentator().instrument(app).expose(app)
 
+
+@app.get("/health/ready")
+async def get_readiness():
+    return {"status": "OK"}
+
+
+@app.get("/health/live")
+async def get_liveness():
+    return {"status": "OK"}
+
+
 # Define the /graphql_api endpoint with GraphiQL enabled for development
 app.add_websocket_route(
     "/query",

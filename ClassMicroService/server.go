@@ -3,7 +3,6 @@ package main
 import (
 	"Class/graph"
 	"Class/internal/auth"
-	"Class/internal/database/migrations"
 	"Class/internal/service"
 	"Class/proto/pb"
 	"github.com/99designs/gqlgen/graphql/handler"
@@ -32,18 +31,23 @@ func main() {
 	}
 
 	graphQLServer := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{Resolvers: graph.NewResolver()}))
-
 	tokenMiddleware := auth.Middleware
 
 	r := mux.NewRouter()
-
 	r.Handle("/query", tokenMiddleware(graphQLServer))
 	r.Handle("/", playground.Handler("GraphQL playground", "/query"))
 	r.Handle("/metrics", promhttp.Handler())
 	msHandler := handlers.LoggingHandler(os.Stdout, r)
 
-	migrations.Init()
+	r.HandleFunc("/health/live", func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+	})
 
+	r.HandleFunc("/health/ready", func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+	})
+
+	//migrations.Init()
 	go grpcSagaServer()
 
 	log.Printf("SagaService is running on http://localhost:%s", port)

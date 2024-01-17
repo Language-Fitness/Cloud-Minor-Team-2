@@ -4,7 +4,6 @@ import (
 	"ExerciseMicroservice/graph"
 	"ExerciseMicroservice/internal/auth"
 	"ExerciseMicroservice/internal/database"
-	"ExerciseMicroservice/internal/database/migrations"
 	service "ExerciseMicroservice/internal/rpc"
 	"ExerciseMicroservice/proto/pb"
 	"github.com/joho/godotenv"
@@ -31,18 +30,22 @@ func main() {
 		log.Fatal("Error loading .env file")
 	}
 
-	// Prometheus Metrics
-	http.Handle("/metrics", promhttp.Handler())
-
 	tokenMiddleware := auth.Middleware
-
-	migrations.InitExercise()
-
 	srv := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{Resolvers: graph.NewResolver()}))
 
 	http.Handle("/query", tokenMiddleware(srv))
 	http.Handle("/", playground.Handler("GraphQL playground", "/query"))
+	http.Handle("/metrics", promhttp.Handler())
 
+	http.HandleFunc("/health/live", func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+	})
+
+	http.HandleFunc("/health/ready", func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+	})
+
+	//migrations.InitExercise()
 	go grpcSagaServer()
 
 	log.Printf("connect to http://localhost:%s/ for GraphQL playground", port)
