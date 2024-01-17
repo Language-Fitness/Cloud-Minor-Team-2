@@ -38,12 +38,12 @@ spec:
 kind: Service
 apiVersion: v1
 metadata:
-  name: openai-microservice-app-service
+  name: openai-microservice-service
   namespace: bramterlouw-dev
   annotations:
     description: Exposes and load balances the application pods
   labels:
-    name: openai-microservice-app-service
+    name: openai-microservice-service
     app: openai-microservice-app
     project: language-fitness
 spec:
@@ -60,7 +60,7 @@ metadata:
   name: openai-microservice-route
   namespace: bramterlouw-dev
   labels:
-    name: openai-microservice-app-route
+    name: openai-microservice-route
     app: openai-microservice-app
     project: language-fitness
 spec:
