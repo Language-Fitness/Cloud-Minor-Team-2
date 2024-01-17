@@ -52,7 +52,7 @@ spec:
       port: 4000
       targetPort: 4000
   selector:
-    app: openai-microservice-deployment
+    name: openai-microservice-deployment
 ---
 kind: Route
 apiVersion: route.openshift.io/v1
