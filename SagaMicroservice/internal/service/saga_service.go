@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"errors"
 	"github.com/google/uuid"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -48,6 +49,11 @@ func NewSagaService(collection *mongo.Collection) ISagaService {
 
 //goland:noinspection SpellCheckingInspection,SpellCheckingInspection,SpellCheckingInspection,SpellCheckingInspection,SpellCheckingInspection,SpellCheckingInspection,SpellCheckingInspection,SpellCheckingInspection,SpellCheckingInspection,SpellCheckingInspection,SpellCheckingInspection,SpellCheckingInspection,SpellCheckingInspection,SpellCheckingInspection,SpellCheckingInspection,SpellCheckingInspection,SpellCheckingInspection,SpellCheckingInspection,SpellCheckingInspection,SpellCheckingInspection,SpellCheckingInspection,SpellCheckingInspection,SpellCheckingInspection,SpellCheckingInspection,SpellCheckingInspection,SpellCheckingInspection,SpellCheckingInspection,SpellCheckingInspection,SpellCheckingInspection,SpellCheckingInspection,SpellCheckingInspection,SpellCheckingInspection,SpellCheckingInspection,SpellCheckingInspection,SpellCheckingInspection,SpellCheckingInspection,SpellCheckingInspection,SpellCheckingInspection,SpellCheckingInspection,SpellCheckingInspection,SpellCheckingInspection,SpellCheckingInspection,SpellCheckingInspection,SpellCheckingInspection,SpellCheckingInspection,SpellCheckingInspection,SpellCheckingInspection,SpellCheckingInspection,SpellCheckingInspection,SpellCheckingInspection,SpellCheckingInspection,SpellCheckingInspection,SpellCheckingInspection,SpellCheckingInspection,SpellCheckingInspection,SpellCheckingInspection,SpellCheckingInspection
 func (s SagaService) InitSagaSteps(token string, filter *model.SagaFilter) (*model.SuccessMessage, error) {
+	SagaObjectCheck, err3 := s.Repo.GetSagaObjectByIDAndType(filter.ObjectID, filter.ObjectType)
+	if err3 != nil || SagaObjectCheck != nil || SagaObjectCheck.ObjectStatus == model.SagaObjectStatusDeleted {
+		return nil, errors.New("saga Object already exist and is correctly deleted")
+	}
+
 	sagaObject, err := s.initializeSagaObject(token, filter)
 	if err != nil {
 		return nil, err
@@ -84,7 +90,7 @@ func (s SagaService) InitSagaSteps(token string, filter *model.SagaFilter) (*mod
 		ObjectStatus: response.ObjectStatus,
 	}
 
-	sagaObject, err = s.updateSagaObject(sagaObject, &requestUpdated, sagaObject, err)
+	sagaObject, err = s.updateSagaObject(sagaObject, &requestUpdated, sagaObject)
 	if err != nil {
 		return nil, err
 	}
@@ -246,7 +252,7 @@ func (s SagaService) softDeleteChildren(token string, sagaObject *model.SagaObje
 			ObjectStatus: response.ObjectStatus,
 		}
 
-		updateSagaObject, err3 := s.updateSagaObject(child, &requestUpdated, sagaObject, err)
+		updateSagaObject, err3 := s.updateSagaObject(child, &requestUpdated, sagaObject)
 		if err3 != nil {
 			return err3
 		}
@@ -335,6 +341,11 @@ func (s SagaService) undeleteItems(token string, sagaObject *model.SagaObject) e
 			return err
 		}
 
+		_, err3 := s.updateSagaObject(child, &request, sagaObject)
+		if err3 != nil {
+			return err3
+		}
+
 		res := s.undeleteItems(token, child)
 		if res != nil {
 			log.Printf("failed to call FindObject RPC: %v", err)
@@ -416,7 +427,7 @@ func convertToModelObjectType(objectType pb.SagaObjectType) model.SagaObjectType
 	}
 }
 
-func (s SagaService) updateSagaObject(child *model.SagaObject, response *pb.ObjectRequest, sagaObject *model.SagaObject, err error) (*model.SagaObject, error) {
+func (s SagaService) updateSagaObject(child *model.SagaObject, response *pb.ObjectRequest, sagaObject *model.SagaObject) (*model.SagaObject, error) {
 	updatedSagaObject := model.SagaObject{
 		ID:           child.ID,
 		ObjectID:     child.ObjectID,
