@@ -6,16 +6,13 @@ metadata:
 spec:
   params:
     - name: GITHUB-URL
-      value: <!!!!>
+      value: /Language-Fitness/Gateway
     - name: IMAGE-REGISTRY-URL
       value: quay.io/bramterlouw/gateway
   pipelineRef:
     name: gateway-pipeline
   timeout: 1h0m0s
   workspaces:
-    - name: ssh-creds
-      secret:
-        secretName: <!!!!>-github-ssh-key
     - name: docker-credentials
       secret:
         secretName: quay-registry-secret
