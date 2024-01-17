@@ -48,7 +48,7 @@ metadata:
     project: language-fitness
 spec:
   ports:
-    - name: openai-microservice
+    - name: http
       port: 4000
       targetPort: 4000
   selector:

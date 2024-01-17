@@ -15,6 +15,6 @@ spec:
     matchLabels:
       project: language-fitness
   endpoints:
-    - port: openai-microservice
+    - port: http
       path: /metrics
       interval: 30s
