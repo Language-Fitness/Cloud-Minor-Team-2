@@ -3051,20 +3051,13 @@ func (ec *executionContext) unmarshalInputSagaFilter(ctx context.Context, obj in
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"soft_deleted", "object_id", "object_type"}
+	fieldsInOrder := [...]string{"object_id", "object_type"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
 			continue
 		}
 		switch k {
-		case "soft_deleted":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("soft_deleted"))
-			data, err := ec.unmarshalNBoolean2bool(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.SoftDeleted = data
 		case "object_id":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("object_id"))
 			data, err := ec.unmarshalNString2string(ctx, v)

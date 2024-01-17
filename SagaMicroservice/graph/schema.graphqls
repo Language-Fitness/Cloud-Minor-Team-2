@@ -34,7 +34,6 @@ type SagaObject {
 }
 
 input SagaFilter {
-  soft_deleted: Boolean!
   object_id: String!
   object_type: SagaObjectTypes!
 }

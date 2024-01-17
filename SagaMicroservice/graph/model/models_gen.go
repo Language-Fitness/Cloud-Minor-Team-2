@@ -9,9 +9,8 @@ import (
 )
 
 type SagaFilter struct {
-	SoftDeleted bool            `json:"soft_deleted"`
-	ObjectID    string          `json:"object_id"`
-	ObjectType  SagaObjectTypes `json:"object_type"`
+	ObjectID   string          `json:"object_id"`
+	ObjectType SagaObjectTypes `json:"object_type"`
 }
 
 type SagaObject struct {
