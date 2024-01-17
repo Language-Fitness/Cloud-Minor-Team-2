@@ -15,9 +15,6 @@ spec:
     matchLabels:
       project: language-fitness
   endpoints:
-    - port: main-container
-      path: /actuator/prometheus
-      interval: 30s
-    - port: my-http-service
+    - port: openai-microservice
       path: /metrics
       interval: 30s
