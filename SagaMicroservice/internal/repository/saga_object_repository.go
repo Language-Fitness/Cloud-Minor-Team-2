@@ -16,7 +16,7 @@ type ISagaObjectRepository interface {
 	CreateSagaObject(newSagaObject *model.SagaObject) (*model.SagaObject, error)
 	UpdateSagaObject(id string, updatedSagaObject model.SagaObject) (*model.SagaObject, error)
 	DeleteSagaObjectByID(id string, existingSagaObject model.SagaObject) error
-	GetSagaObjectByID(id string) (*model.SagaObject, error)
+	GetSagaObjectByIDAndType(id string, sagaType model.SagaObjectTypes) (*model.SagaObject, error)
 	ListSagaObjects(bsonFilter bson.D, paginateOptions *options.FindOptions) ([]*model.SagaObject, error)
 }
 
@@ -96,11 +96,11 @@ func (r *SagaObjectRepository) DeleteSagaObjectByID(id string, existingSagaObjec
 	return nil
 }
 
-func (r *SagaObjectRepository) GetSagaObjectByID(id string) (*model.SagaObject, error) {
+func (r *SagaObjectRepository) GetSagaObjectByIDAndType(id string, sagaType model.SagaObjectTypes) (*model.SagaObject, error) {
 	ctx, cancel := context.WithTimeout(context.TODO(), time.Second*10) // 10-second timeout
 	defer cancel()
 
-	filter := bson.M{"id": id}
+	filter := bson.M{"id": id, "sagaType": sagaType}
 	var result model.SagaObject
 
 	err := r.collection.FindOne(ctx, filter).Decode(&result)
