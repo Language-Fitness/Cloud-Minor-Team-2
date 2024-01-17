@@ -7,11 +7,13 @@ spec:
   replicas: 1
   selector:
     matchLabels:
-      app: openai-microservice
+      name: openai-microservice-deployment
+      app: openai-microservice-app
       project: language-fitness
   template:
     metadata:
       labels:
+        name: openai-microservice-deployment
         app: openai-microservice-app
         project: language-fitness
     spec:
