@@ -1,3 +1,5 @@
+import sys
+sys.path.append('../..')
 import unittest
 from graphql_api.validators import (
     validate_minimum_int,
