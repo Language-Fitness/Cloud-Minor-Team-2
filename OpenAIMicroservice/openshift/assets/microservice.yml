@@ -7,10 +7,12 @@ spec:
   selector:
     matchLabels:
       app: openai-microservice
+      project: language-fitness
   template:
     metadata:
       labels:
         app: openai-microservice
+        project: language-fitness
     spec:
       containers:
         - name: openai-microservice
@@ -38,6 +40,7 @@ metadata:
     description: Exposes and load balances the application pods
   labels:
     app: openai-microservice
+    project: language-fitness
 spec:
   ports:
     - name: http
@@ -52,6 +55,7 @@ metadata:
   name: openai-microservice-route
   labels:
     app: openai-microservice
+    project: language-fitness
 spec:
   port:
     targetPort: 4000
