@@ -2,14 +2,17 @@ kind: Service
 apiVersion: v1
 metadata:
   name: exercise-mongodb-service
+  namespace: bramterlouw-dev
   annotations:
     description: Exposes and load balances the application pods
   labels:
-    app: exercise-mongodb
+    name: exercise-mongodb-service
+    app: exercise-microservice-app
+    project: language-fitness
 spec:
   ports:
     - name: tcp
       port: 27017
       targetPort: 27017
   selector:
-    app: exercise-mongodb
+    name: exercise-mongodb

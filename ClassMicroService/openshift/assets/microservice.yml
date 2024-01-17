@@ -1,18 +1,23 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: class-microservice
+  name: class-microservice-deployment
+  namespace: bramterlouw-dev
   labels:
     app.kubernetes.io/part-of: class-microservice
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: class-microservice
+      name: class-microservice-deployment
+      app: class-microservice-app
+      project: language-fitness
   template:
     metadata:
       labels:
-        app: class-microservice
+        name: class-microservice-deployment
+        app: class-microservice-app
+        project: language-fitness
     spec:
       containers:
         - name: class-microservice
@@ -22,7 +27,7 @@ spec:
             - containerPort: 9093
           readinessProbe:
             timeoutSeconds: 3
-            initialDelaySeconds: 10
+            initialDelaySeconds: 3
             httpGet:
               path: "/health/ready"
               port: 8082
@@ -37,10 +42,13 @@ kind: Service
 apiVersion: v1
 metadata:
   name: class-microservice-service
+  namespace: bramterlouw-dev
   annotations:
     description: Exposes and load balances the application pods
   labels:
-    app: class-microservice
+    name: class-microservice-service
+    app: class-microservice-app
+    project: language-fitness
 spec:
   ports:
     - name: http
@@ -51,14 +59,17 @@ spec:
       targetPort: 9093
       protocol: TCP
   selector:
-    app: class-microservice
+    name: class-microservice-deployment
 ---
 kind: Route
 apiVersion: route.openshift.io/v1
 metadata:
   name: class-microservice-route
+  namespace: bramterlouw-dev
   labels:
-    app: class-microservice
+    name: class-microservice-route
+    app: class-microservice-app
+    project: language-fitness
 spec:
   port:
     targetPort: 8082

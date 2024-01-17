@@ -2,17 +2,22 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: exercise-microservice
+  namespace: bramterlouw-dev
   labels:
     app.kubernetes.io/part-of: exercise-microservice
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: exercise-microservice
+      name: exercise-microservice-deployment
+      app: exercise-microservice-app
+      project: language-fitness
   template:
     metadata:
       labels:
-        app: exercise-microservice
+        name: exercise-microservice-deployment
+        app: exercise-microservice-app
+        project: language-fitness
     spec:
       containers:
         - name: exercise-microservice
@@ -37,10 +42,13 @@ kind: Service
 apiVersion: v1
 metadata:
   name: exercise-microservice-service
+  namespace: bramterlouw-dev
   annotations:
     description: Exposes and load balances the application pods
   labels:
-    app: exercise-microservice
+    name: exercise-microservice-service
+    app: exercise-microservice-app
+    project: language-fitness
 spec:
   ports:
     - name: http
@@ -51,14 +59,17 @@ spec:
       targetPort: 9095
       protocol: TCP
   selector:
-    app: exercise-microservice
+    name: exercise-microservice-deployment
 ---
 kind: Route
 apiVersion: route.openshift.io/v1
 metadata:
   name: exercise-microservice-route
+  namespace: bramterlouw-dev
   labels:
-    app: exercise-microservice
+    name: exercise-microservice-route
+    app: exercise-microservice-app
+    project: language-fitness
 spec:
   port:
     targetPort: 8084

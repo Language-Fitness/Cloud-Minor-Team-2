@@ -1,18 +1,23 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: school-microservice
+  name: school-microservice-deployment
+  namespace: bramterlouw-dev
   labels:
     app.kubernetes.io/part-of: school-microservice
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: school-microservice
+      name: school-microservice-deployment
+      app: school-microservice-app
+      project: language-fitness
   template:
     metadata:
       labels:
-        app: school-microservice
+        name: school-microservice-deployment
+        app: school-microservice-app
+        project: language-fitness
     spec:
       containers:
         - name: school-microservice
@@ -21,27 +26,30 @@ spec:
             - containerPort: 8083
             - containerPort: 9050
             - containerPort: 9092
-#          readinessProbe:
-#            timeoutSeconds: 5
-#            initialDelaySeconds: 20
-#            httpGet:
-#              path: "/health/ready"
-#              port: 8083
-#          livenessProbe:
-#            timeoutSeconds: 10
-#            initialDelaySeconds: 30
-#            httpGet:
-#              path: "/health/live"
-#              port: 8083
+          readinessProbe:
+            timeoutSeconds: 5
+            initialDelaySeconds: 20
+            httpGet:
+              path: "/health/ready"
+              port: 8083
+          livenessProbe:
+            timeoutSeconds: 10
+            initialDelaySeconds: 30
+            httpGet:
+              path: "/health/live"
+              port: 8083
 ---
 kind: Service
 apiVersion: v1
 metadata:
   name: school-microservice-service
+  namespace: bramterlouw-dev
   annotations:
     description: Exposes and load balances the application pods
   labels:
-    app: school-microservice
+    name: school-microservice-service
+    app: school-microservice-app
+    project: language-fitness
 spec:
   ports:
     - name: http
@@ -56,14 +64,17 @@ spec:
       targetPort: 9092
       protocol: TCP
   selector:
-    app: school-microservice
+    name: school-microservice-deployment
 ---
 kind: Route
 apiVersion: route.openshift.io/v1
 metadata:
   name: school-microservice-route
+  namespace: bramterlouw-dev
   labels:
-    app: school-microservice
+    name: school-microservice-route
+    app: school-microservice-app
+    project: language-fitness
 spec:
   port:
     targetPort: 8083

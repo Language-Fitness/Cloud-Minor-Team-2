@@ -1,18 +1,23 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: saga-microservice
+  name: saga-microservice-deployment
+  namespace: bramterlouw-dev
   labels:
     app.kubernetes.io/part-of: saga-microservice
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: saga-microservice
+      name: saga-microservice-deployment
+      app: saga-microservice-app
+      project: language-fitness
   template:
     metadata:
       labels:
-        app: saga-microservice
+        name: saga-microservice-deployment
+        app: saga-microservice-app
+        project: language-fitness
     spec:
       containers:
         - name: saga-microservice
@@ -37,10 +42,13 @@ kind: Service
 apiVersion: v1
 metadata:
   name: saga-microservice-service
+  namespace: bramterlouw-dev
   annotations:
     description: Exposes and load balances the application pods
   labels:
-    app: saga-microservice
+    name: saga-microservice-service
+    app: saga-microservice-app
+    project: language-fitness
 spec:
   ports:
     - name: http
@@ -51,14 +59,17 @@ spec:
       targetPort: 9090
       protocol: TCP
   selector:
-    app: saga-microservice
+    name: saga-microservice-deployment
 ---
 kind: Route
 apiVersion: route.openshift.io/v1
 metadata:
   name: saga-microservice-route
+  namespace: bramterlouw-dev
   labels:
-    app: saga-microservice
+    name: saga-microservice-route
+    app: saga-microservice-app
+    project: language-fitness
 spec:
   port:
     targetPort: 8083

@@ -1,18 +1,23 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: module-microservice
+  name: module-microservice-deployment
+  namespace: bramterlouw-dev
   labels:
     app.kubernetes.io/part-of: module-microservice
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: module-microservice
+      name: module-microservice-deployment
+      app: module-microservice-app
+      project: language-fitness
   template:
     metadata:
       labels:
-        app: module-microservice
+        name: module-microservice-deployment
+        app: module-microservice-app
+        project: language-fitness
     spec:
       containers:
         - name: module-microservice
@@ -20,27 +25,30 @@ spec:
           ports:
             - containerPort: 8081
             - containerPort: 9091
-#          readinessProbe:
-#            timeoutSeconds: 3
-#            initialDelaySeconds: 5
-#            httpGet:
-#              path: "/health/ready"
-#              port: 8081
-#          livenessProbe:
-#            timeoutSeconds: 3
-#            initialDelaySeconds: 30
-#            httpGet:
-#              path: "/health/live"
-#              port: 8081
+          readinessProbe:
+            timeoutSeconds: 3
+            initialDelaySeconds: 5
+            httpGet:
+              path: "/health/ready"
+              port: 8081
+          livenessProbe:
+            timeoutSeconds: 3
+            initialDelaySeconds: 30
+            httpGet:
+              path: "/health/live"
+              port: 8081
 ---
 kind: Service
 apiVersion: v1
 metadata:
   name: module-microservice-service
+  namespace: bramterlouw-dev
   annotations:
     description: Exposes and load balances the application pods
   labels:
-    app: module-microservice
+    name: module-microservice-service
+    app: module-microservice-app
+    project: language-fitness
 spec:
   ports:
     - name: http
@@ -51,14 +59,17 @@ spec:
       targetPort: 9091
       protocol: TCP
   selector:
-    app: module-microservice
+    name: module-microservice-deployment
 ---
 kind: Route
 apiVersion: route.openshift.io/v1
 metadata:
   name: module-microservice-route
+  namespace: bramterlouw-dev
   labels:
-    app: module-microservice
+    name: module-microservice-route
+    app: module-microservice-app
+    project: language-fitness
 spec:
   port:
     targetPort: 8081

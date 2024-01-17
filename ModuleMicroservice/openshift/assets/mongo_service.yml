@@ -2,14 +2,17 @@ kind: Service
 apiVersion: v1
 metadata:
   name: module-mongodb-service
+  namespace: bramterlouw-dev
   annotations:
     description: Exposes and load balances the application pods
   labels:
-    app: module-mongodb
+    name: module-mongodb-service
+    app: module-microservice-app
+    project: language-fitness
 spec:
   ports:
     - name: tcp
       port: 27017
       targetPort: 27017
   selector:
-    app: module-mongodb
+    name: module-mongodb

@@ -28,7 +28,7 @@ enum join__Graph {
     EXERCISES @join__graph(name: "exercises", url: "http://exercise-microservice-service:8084/query")
     OPENAI @join__graph(name: "openai", url: "http://openai-microservice-service:4000/query")
     RESULTS @join__graph(name: "results", url: "http://result-microservice-service:8085/query")
-    SAGA @join__graph(name: "saga", url: "http://saga-microservice-service:3/query")
+    SAGA @join__graph(name: "saga", url: "http://saga-microservice-service:8083/query")
 }
 
 #enum join__Graph {

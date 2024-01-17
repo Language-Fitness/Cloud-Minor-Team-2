@@ -2,17 +2,22 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: result-microservice
+  namespace: bramterlouw-dev
   labels:
     app.kubernetes.io/part-of: result-microservice
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: result-microservice
+      name: result-microservice-deployment
+      app: result-microservice-app
+      project: language-fitness
   template:
     metadata:
       labels:
-        app: result-microservice
+        name: result-microservice-deployment
+        app: result-microservice-app
+        project: language-fitness
     spec:
       containers:
         - name: result-microservice
@@ -37,10 +42,13 @@ kind: Service
 apiVersion: v1
 metadata:
   name: result-microservice-service
+  namespace: bramterlouw-dev
   annotations:
     description: Exposes and load balances the application pods
   labels:
-    app: result-microservice
+    name: result-microservice-service
+    app: result-microservice-app
+    project: language-fitness
 spec:
   ports:
     - name: http
@@ -51,14 +59,17 @@ spec:
       targetPort: 9094
       protocol: TCP
   selector:
-    app: result-microservice
+    name: result-microservice-deployment
 ---
 kind: Route
 apiVersion: route.openshift.io/v1
 metadata:
   name: result-microservice-route
+  namespace: bramterlouw-dev
   labels:
-    app: result-microservice
+    name: result-microservice-route
+    app: result-microservice-app
+    project: language-fitness
 spec:
   port:
     targetPort: 8085
