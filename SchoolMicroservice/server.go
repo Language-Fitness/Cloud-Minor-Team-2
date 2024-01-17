@@ -15,7 +15,6 @@ import (
 	"school/graph"
 	"school/internal/auth"
 	"school/internal/database"
-	"school/internal/database/migrations"
 	"school/internal/service"
 	"school/proto/pb"
 )
@@ -49,7 +48,7 @@ func main() {
 		w.WriteHeader(http.StatusOK)
 	})
 
-	migrations.Init()
+	//migrations.Init()
 	go grpcSchoolServer()
 	go grpcSagaServer()
 

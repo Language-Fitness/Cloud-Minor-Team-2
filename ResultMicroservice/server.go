@@ -4,7 +4,6 @@ import (
 	"ResultMicroservice/graph"
 	"ResultMicroservice/internal/auth"
 	"ResultMicroservice/internal/database"
-	"ResultMicroservice/internal/database/migrations"
 	service "ResultMicroservice/internal/rpc"
 	"ResultMicroservice/proto/pb"
 	"github.com/joho/godotenv"
@@ -46,7 +45,7 @@ func main() {
 		w.WriteHeader(http.StatusOK)
 	})
 
-	migrations.InitResult()
+	//migrations.InitResult()
 	go grpcSagaServer()
 
 	log.Printf("connect to http://localhost:%s/ for GraphQL playground", port)

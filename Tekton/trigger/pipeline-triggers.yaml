@@ -9,8 +9,6 @@ spec:
       description: the registry url.
     - name: GITHUB-URL
       description: the git repository url.
-    - name: PROJECT-NAME
-      description: the name of the project.
     - name: PIPELINE-NAME
       description: the pipeline to be run.
   resourceTemplates:
@@ -29,9 +27,6 @@ spec:
           - name: IMAGE-REGISTRY-URL
             value: $(tt.params.IMAGE-REGISTRY-URL)
         workspaces:
-          - name: ssh-creds
-            secret:
-              secretName: "$(tt.params.PROJECT-NAME)-github-ssh-key"
           - name: docker-credentials
             secret:
               secretName: quay-registry-secret
@@ -47,11 +42,9 @@ metadata:
 spec:
   params:
     - name: GITHUB-URL
-      value: "git@github.com:BramTerlouw/$(body.GITHUB-URL)"
+      value: "$(body.GITHUB-URL)"
     - name: IMAGE-REGISTRY-URL
       value: "$(body.IMAGE-REGISTRY-URL)"
-    - name: PROJECT-NAME
-      value: "$(body.PROJECT-NAME)"
     - name: PIPELINE-NAME
       value: "$(body.PIPELINE-NAME)"
 ---

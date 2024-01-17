@@ -27,11 +27,11 @@ spec:
         cd /workspace/output/app/tests/unit
 
 
-        python assistant_api_adapter_test.py >>
+        python test_assistant_api_adapter.py >>
         /workspace/output/all_test_results.txt
         
         
-        python validators_test.py >>
+        python test_validators.py >>
         /workspace/output/all_test_results.txt
 
 
