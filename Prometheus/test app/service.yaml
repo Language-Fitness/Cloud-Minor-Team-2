@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: g-monitoring-app2-service
+  namespace: bramterlouw-dev
+  labels:
+    name: g-monitoring-app2-service
+    app: g-monitoring-app2-app
+    project: language-fitness
+spec:
+  ports:
+    - name: main-container
+      port: 8080
+      targetPort: 8080
+  selector:
+    name: g-monitoring-app2-deployment

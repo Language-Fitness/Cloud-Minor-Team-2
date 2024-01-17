@@ -1,7 +1,8 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: openai-microservice
+  name: openai-microservice-deployment
+  namespace: bramterlouw-dev
 spec:
   replicas: 1
   selector:
@@ -11,7 +12,7 @@ spec:
   template:
     metadata:
       labels:
-        app: openai-microservice
+        app: openai-microservice-app
         project: language-fitness
     spec:
       containers:
@@ -36,25 +37,29 @@ kind: Service
 apiVersion: v1
 metadata:
   name: openai-microservice-service
+  namespace: bramterlouw-dev
   annotations:
     description: Exposes and load balances the application pods
   labels:
-    app: openai-microservice
+    name: openai-microservice-app-service
+    app: openai-microservice-app
     project: language-fitness
 spec:
   ports:
-    - name: http
+    - name: openai-microservice
       port: 4000
       targetPort: 4000
   selector:
-    app: openai-microservice
+    app: openai-microservice-deployment
 ---
 kind: Route
 apiVersion: route.openshift.io/v1
 metadata:
   name: openai-microservice-route
+  namespace: bramterlouw-dev
   labels:
-    app: openai-microservice
+    name: openai-microservice-app-route
+    app: openai-microservice-app
     project: language-fitness
 spec:
   port:

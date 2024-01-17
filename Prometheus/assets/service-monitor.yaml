@@ -6,6 +6,7 @@ metadata:
   labels:
     name: prometheus-service-monitor
     app: prometheus
+    project: language-fitness
 spec:
   namespaceSelector:
     matchNames:
