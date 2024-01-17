@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: exercise-microservice
+  name: exercise-microservice-deployment
   namespace: bramterlouw-dev
   labels:
     app.kubernetes.io/part-of: exercise-microservice

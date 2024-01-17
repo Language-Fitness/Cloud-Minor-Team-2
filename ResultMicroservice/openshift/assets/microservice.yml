@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: result-microservice
+  name: result-microservice-deployment
   namespace: bramterlouw-dev
   labels:
     app.kubernetes.io/part-of: result-microservice
