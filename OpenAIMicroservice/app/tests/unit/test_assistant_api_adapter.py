@@ -1,3 +1,6 @@
+import sys
+sys.path.append('../..')
+
 import base64
 import json
 import unittest
@@ -8,7 +11,6 @@ from openai.types.beta.threads.message_content_text import Text
 from services.openai.assistant_api_adapter import AssistantAPIAdapter
 from utils.exceptions.assistant_api_exception import AssistantAPIException
 import logging
-
 
 class TestAssistantAPIAdapter(unittest.TestCase):
     @classmethod

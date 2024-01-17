@@ -10,12 +10,15 @@ spec:
       image: python:3.10.6-slim
       resources: { }
       script: |
-        cd /workspace/output/App
+        apt-get update
+        apt-get install -y libmagic1
+        
+        cd /workspace/output/app
 
         pip install -r requirements.txt
 
-        python /workspace/output/App/Tests/Unit/test_assistant_api_adapter.py >> /workspace/output/all_test_results.txt
-        python /workspace/output/App/Tests/Unit/test_openai_assistant_manager.py >> /workspace/output/all_test_results.txt
+        python /workspace/output/app/tests/unit/test_assistant_api_adapter.py >> /workspace/output/all_test_results.txt
+        python /workspace/output/app/tests/unit/test_openai_assistant_manager.py >> /workspace/output/all_test_results.txt
 
         # Check if 'OK' exists in the file
         if grep -q 'OK' /workspace/output/all_test_results.txt; then

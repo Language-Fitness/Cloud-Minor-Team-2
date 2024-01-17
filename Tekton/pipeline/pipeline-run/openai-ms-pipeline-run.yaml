@@ -1,0 +1,21 @@
+apiVersion: tekton.dev/v1beta1
+kind: PipelineRun
+metadata:
+  name: openai-ms-pipeline-run
+  namespace: bramterlouw-dev
+spec:
+  params:
+    - name: GITHUB-URL
+      value: /Language-Fitness/OpenAI-Microservice
+    - name: IMAGE-REGISTRY-URL
+      value: quay.io/bramterlouw/openai-microservice
+  pipelineRef:
+    name: openai-ms-pipeline
+  timeout: 1h0m0s
+  workspaces:
+    - name: docker-credentials
+      secret:
+        secretName: quay-registry-secret
+    - name: source
+      persistentVolumeClaim:
+        claimName: claim1
