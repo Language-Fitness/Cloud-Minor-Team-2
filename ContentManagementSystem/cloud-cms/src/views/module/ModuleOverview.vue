@@ -46,6 +46,8 @@ export default {
       description: '',
       difficulty: '',
       category: '',
+      isPrivate: false,
+      key: ''
     },
 
     defaultItem: {
@@ -53,6 +55,8 @@ export default {
       description: '',
       difficulty: '',
       category: '',
+      isPrivate: false,
+      key: ''
     },
   }),
   computed: {
@@ -151,8 +155,63 @@ export default {
       this.closeDelete()
     },
 
-    save() {
-      // TODO: SAVE LOGIC
+    async save() {
+      let store = useAuthStore()
+
+      const graphqlEndpoint = 'https://gandalf-the-gateway-bramterlouw-dev.apps.ocp2-inholland.joran-bergfeld.com/';
+
+      const headers = {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${store.accessToken}`,
+      };
+
+      const graphqlQuery = `
+        mutation CreateModule($input: ModuleInputCreate!) {
+          createModule(input: $input) {
+            id
+            name
+            description
+            school_id
+            category
+            difficulty
+            made_by
+            private
+            key
+          }
+        }
+      `;
+
+      const variables = {
+        input: {
+          category: "Werkwoordvervoeging",
+          description: "This is a module werkwoordvervoeging.",
+          difficulty: "B1",
+          key: "",
+          name: "Demo Module Werkwoordvervoeging",
+          private: false,
+          school_id: "5be98816-b53d-4648-b89e-9cdf46800952"
+        }
+      }
+
+      // try {
+      //   const response = await axios.post(
+      //       graphqlEndpoint,
+      //       {
+      //         query: graphqlQuery,
+      //         variables,
+      //       },
+      //       {headers}
+      //   );
+      //
+      //   const {data} = response.data;
+      //   console.log(data)
+      //
+      // } catch (error) {
+      //   console.error('GraphQL request failed', error);
+      // } finally {
+      //   this.loading = false;
+      // }
+
       this.close()
     },
 
@@ -320,14 +379,24 @@ export default {
                       cols="12"
                   >
                     <v-combobox
+                        class="mb-5"
                         v-model="editedItem.category"
                         hide-details
                         :items="categories"
                         label="Category"
                     ></v-combobox>
-
                   </v-col>
                 </v-row>
+
+                <div class="d-flex flex-row">
+                  <v-checkbox v-model="editedItem.isPrivate"></v-checkbox>
+                      <v-text-field
+                          :disabled="!editedItem.isPrivate"
+                          class="w-75"
+                          v-model="editedItem.name"
+                          label="Private key"
+                      ></v-text-field>
+                </div>
               </v-container>
             </v-card-text>
 

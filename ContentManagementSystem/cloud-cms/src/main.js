@@ -34,7 +34,8 @@ watch(() => authStore.isAuthenticated, (newIsAuthenticated) => {
 
 let refreshTokenInterval;
 const refreshTokenFunc = async () => {
-    await authStore.refresh()
+    // await authStore.refresh()
+    console.log('Refresh has en error, has to do with the env files i think.')
 };
 const startRefreshTokenInterval = () => {
     refreshTokenInterval = setInterval(refreshTokenFunc, 30000);

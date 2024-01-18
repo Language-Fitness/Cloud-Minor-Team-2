@@ -44,6 +44,11 @@ export const useAuthStore = defineStore('auth', {
         },
 
         async refresh() {
+
+            console.log(import.meta.env.KEYCLOAK_CLIENT_ID)
+            console.log(import.meta.env.KEYCLOAK_CLIENT_SECRET)
+            console.log(this.refresh())
+
             const formData = new URLSearchParams();
             formData.append('grant_type', 'refresh_token');
             formData.append('client_id', import.meta.env.KEYCLOAK_CLIENT_ID);
