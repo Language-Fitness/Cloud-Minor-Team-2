@@ -1,10 +1,12 @@
 <script setup>
 import { RouterView } from 'vue-router'
 import SideNav from "@/components/nav/side-nav.vue";
+import {useAuthStore} from "@/stores/store";
+const store = useAuthStore()
 </script>
 
 <template>
-  <header v-if="true">
+  <header v-if="store.isAuthenticated">
     <side-nav></side-nav>
   </header>
 

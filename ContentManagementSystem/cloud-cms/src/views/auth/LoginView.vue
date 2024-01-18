@@ -7,25 +7,24 @@ export default defineComponent({
   name: "LoginView",
   data: () => ({
     valid: false,
-    username: '',
-    password: '',
+    username: 'admin@admin.com',
+    password: 'secret',
     nameRules: [
       value => {
         if (value) return true
         return 'Name is required.'
       },
-      value => {
-        if (value?.length <= 10) return true
-        return 'Name must be less than 10 characters.'
-      },
     ],
   }),
   methods: {
     async login() {
-      // const authStore = useAuthStore(); <- should go somewhere else ???
-      // await authStore.login(this.username, this.password);
-      await router.push('/')
-    }
+      const authStore = useAuthStore();
+      let loggedIn = await authStore.login(this.username, this.password);
+
+      if (loggedIn) {
+        await router.push('/')
+      }
+    },
   }
 })
 </script>
@@ -60,7 +59,7 @@ export default defineComponent({
           ></v-text-field>
         </v-col>
       </v-row>
-      <v-btn @click="login" type="submit" block class="mt-5">Submit</v-btn>
+      <v-btn @click="login" type="button" block class="mt-5">Submit</v-btn>
     </v-container>
   </v-form>
 </template>

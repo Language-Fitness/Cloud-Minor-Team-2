@@ -1,5 +1,6 @@
 <script setup>
 import router from '@/router'
+import {useAuthStore} from "@/stores/store";
 
 const items = [
   { text: 'Home', icon: 'mdi-home', link: '/' },
@@ -12,6 +13,12 @@ const items = [
 function navigateTo(route) {
   router.push(route)
 }
+
+async function logout() {
+  const authStore = useAuthStore();
+  await authStore.logout();
+  navigateTo('/login')
+}
 </script>
 
 
@@ -22,7 +29,8 @@ function navigateTo(route) {
   >
     <v-layout>
       <v-navigation-drawer permanent absolute>
-        <v-list>
+        <v-list class="d-flex flex-column pa-1">
+          <v-btn @click="logout" type="button" class="w-100 mb-1">Logout</v-btn>
           <v-list-item
               prepend-avatar="https://cdn.vuetifyjs.com/images/john.png"
               title="Bram Terlouw"
@@ -31,7 +39,6 @@ function navigateTo(route) {
           >
           </v-list-item>
         </v-list>
-
         <v-divider></v-divider>
 
         <v-list

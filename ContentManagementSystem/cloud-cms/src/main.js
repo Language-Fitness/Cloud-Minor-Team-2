@@ -1,7 +1,7 @@
 import './assets/main.css'
 
-import { createApp } from 'vue'
-import { createPinia } from 'pinia'
+import {createApp, watch} from 'vue'
+import {createPinia} from 'pinia'
 
 // Vuetify
 import 'vuetify/styles'
@@ -16,11 +16,33 @@ const vuetify = createVuetify({
 
 import App from './App.vue'
 import router from './router'
+import {useAuthStore} from "@/stores/store";
 
 const app = createApp(App)
 
 app.use(createPinia())
+
+const authStore = useAuthStore();
+watch(() => authStore.isAuthenticated, (newIsAuthenticated) => {
+    if (newIsAuthenticated) {
+        startRefreshTokenInterval();
+    } else {
+        stopRefreshTokenInterval();
+    }
+});
+
+
+let refreshTokenInterval;
+const refreshTokenFunc = async () => {
+    await authStore.refresh()
+};
+const startRefreshTokenInterval = () => {
+    refreshTokenInterval = setInterval(refreshTokenFunc, 30000);
+};
+const stopRefreshTokenInterval = () => {
+    clearInterval(refreshTokenInterval);
+};
+
 app.use(router)
 app.use(vuetify)
-
 app.mount('#app')
