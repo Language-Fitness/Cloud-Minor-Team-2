@@ -170,12 +170,12 @@ export default {
 
       const variables = {
         input: {
-          category: "Spelling",
-          description: "This is a module Spelling.",
-          difficulty: "B1",
-          key: "",
-          name: "Demo Module Spelling",
-          private: false,
+          category: this.editedItem.category,
+          description: this.editedItem.category,
+          difficulty: this.editedItem.category,
+          key: this.editedItem.category,
+          name: this.editedItem.category,
+          private: this.editedItem.category,
           school_id: "5be98816-b53d-4648-b89e-9cdf46800952"
         }
       }

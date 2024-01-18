@@ -27,7 +27,7 @@ export default {
     headers: headers,
     difficulties: ['A1', 'A2', 'B1', 'B2', 'C1', 'C2'],
     name_search: '',
-    name_type_search: '',
+    name_type_search: 'eq',
     difficulty_search: '',
     module_id_search: '',
     soft_deleted_search: false,
@@ -147,13 +147,141 @@ export default {
       this.closeDelete()
     },
 
-    save() {
-      // TODO: SAVE LOGIC
+    async save() {
+      let store = useAuthStore()
+
+      const graphqlEndpoint = 'https://gandalf-the-gateway-bramterlouw-dev.apps.ocp2-inholland.joran-bergfeld.com/';
+
+      const headers = {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${store.accessToken}`,
+      };
+
+      const graphqlQuery = `
+        mutation CreateClass($input: ClassInput!) {
+          createClass(input: $input) {
+            id
+            module_Id
+            name
+            description
+            difficulty
+            made_by
+            created_at
+            updated_at
+            soft_deleted
+          }
+        }
+      `;
+
+      const variables = {
+        input: {
+          name: this.editedItem.name,
+          module_Id: this.editedItem.module_id,
+          description: this.editedItem.description,
+          difficulty: this.editedItem.difficulty,
+        }
+      }
+
+      try {
+        const response = await axios.post(
+            graphqlEndpoint,
+            {
+              query: graphqlQuery,
+              variables,
+            },
+            {headers}
+        );
+
+        console.log(response)
+        const {data} = response.data;
+        console.log(data)
+
+      } catch (error) {
+        console.error('GraphQL request failed', error);
+      } finally {
+        this.loading = false;
+      }
+
       this.close()
     },
 
     goToClasses(item) {
       router.push('/exercise');
+    },
+
+    async filter() {
+      let store = useAuthStore()
+
+      const graphqlEndpoint = 'https://gandalf-the-gateway-bramterlouw-dev.apps.ocp2-inholland.joran-bergfeld.com/';
+
+      const headers = {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${store.accessToken}`,
+      };
+
+      const graphqlQuery = `
+         query ListClasses($filter: ListClassFilter, $paginate: Paginator) {
+          listClasses(filter: $filter, paginate: $paginate) {
+            id
+            name
+            description
+            difficulty
+            module_Id
+            made_by
+          }
+        }
+      `;
+
+      let filter = this.buildFilter()
+      const variables = {
+        filter: filter,
+        paginate: {
+          Step: 0,
+          amount: 10
+        }
+      }
+
+      try {
+        const response = await axios.post(
+            graphqlEndpoint,
+            {
+              query: graphqlQuery,
+              variables,
+            },
+            {headers}
+        );
+
+        const {data} = response.data;
+
+        if (data.listClasses) {
+          this.serverItems = data.listClasses;
+          this.totalItems = 1000;
+        }
+      } catch (error) {
+        console.error('GraphQL request failed', error);
+      } finally {
+        this.loading = false;
+      }
+    },
+
+    buildFilter() {
+      const params = {}
+
+      if (this.name_search !== '') {
+        params.name = {
+          type: this.name_type_search,
+          input: this.name_search
+        }
+      }
+
+      if (this.module_id_search !== '') {
+        params.module_Id = this.module_id_search;
+      }
+
+      if (this.difficulty_search !== '') {
+        params.difficulty = this.difficulty_search;
+      }
+      return params
     }
   },
 }
@@ -174,7 +302,7 @@ export default {
       </p>
 
       <div class="filter-wrapper w-100 d-flex flex-row">
-        <div class="filter-container">
+        <div class="filter-container w-50">
           <h3 class="ml-2">Filter options</h3>
 
           <div class="d-flex flex-row flex-nowrap w-100">
@@ -189,7 +317,7 @@ export default {
             <v-combobox
                 v-model="name_type_search"
                 hide-details
-                :items="['', 'equals', 'not equals', 'starts', 'ends']"
+                :items="['eq', 'ne', 'starts', 'ends']"
                 density="compact"
                 class="mt-2 mr-2 ml-1"
             ></v-combobox>
@@ -222,6 +350,7 @@ export default {
             <v-combobox
                 v-if="isAdmin"
                 v-model="soft_deleted_search"
+                disabled
                 hide-details
                 :items="[true, false]"
                 density="compact"
@@ -234,11 +363,16 @@ export default {
             <v-text-field
                 v-if="isAdmin"
                 v-model="made_by_search"
+                disabled
                 hide-details
                 placeholder="Made by..."
                 class="ma-2"
                 density="compact">
             </v-text-field>
+          </div>
+
+          <div class="w-50">
+            <v-btn @click="filter" type="button" color="primary" class="ma-2">Filter</v-btn>
           </div>
         </div>
         <!-- MODALS -->
