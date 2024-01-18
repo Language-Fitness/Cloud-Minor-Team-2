@@ -22,7 +22,7 @@ export default defineComponent({
       let loggedIn = await authStore.login(this.username, this.password);
 
       if (loggedIn) {
-        await router.push('/')
+        await router.push('/home')
       }
     },
   },

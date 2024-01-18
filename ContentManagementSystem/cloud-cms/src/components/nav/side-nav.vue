@@ -3,7 +3,7 @@ import router from '@/router'
 import {useAuthStore} from "@/stores/store";
 
 const items = [
-  { text: 'Home', icon: 'mdi-home', link: '/' },
+  { text: 'Home', icon: 'mdi-home', link: '/home' },
   { text: 'School', icon: 'mdi-school', link: '/school' },
   { text: 'Module', icon: 'mdi-view-module', link: '/module' },
   { text: 'Class', icon: 'mdi-google-classroom', link: '/class' },
@@ -17,7 +17,7 @@ function navigateTo(route) {
 async function logout() {
   const authStore = useAuthStore();
   await authStore.logout();
-  navigateTo('/login')
+  navigateTo('/')
 }
 </script>
 

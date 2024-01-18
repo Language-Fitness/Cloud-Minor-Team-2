@@ -4,20 +4,6 @@ import {headers} from "@/views/module/modules";
 import axios from "axios";
 import {useAuthStore} from "@/stores/store";
 
-const FakeAPI = {
-  async fetch({page, itemsPerPage}) {
-    return new Promise(resolve => {
-      setTimeout(() => {
-        const start = (page - 1) * itemsPerPage
-        const end = start + itemsPerPage
-        const items = modules.slice()
-
-        const paginated = items.slice(start, end)
-        resolve({items: paginated, total: items.length})
-      }, 500)
-    })
-  },
-}
 export default {
   data: () => ({
     isAdmin: true,
@@ -26,7 +12,7 @@ export default {
     categories: ['Grammatica', 'Spelling', 'Woordenschat', 'Werkwoordspelling', 'Fastlane'],
     difficulties: ['A1', 'A2', 'B1', 'B2', 'C1', 'C2'],
     name_search: '',
-    name_type_search: '',
+    name_type_search: 'eq',
     difficulty_search: '',
     category_search: '',
     private_search: false,
@@ -111,10 +97,11 @@ export default {
         );
 
         const {data} = response.data;
-        console.log(data)
 
-        this.serverItems = data.listModules;
-        this.totalItems = 1000;
+        if (data.listModules) {
+          this.serverItems = data.listModules;
+          this.totalItems = 1000;
+        }
       } catch (error) {
         console.error('GraphQL request failed', error);
       } finally {
@@ -183,40 +170,117 @@ export default {
 
       const variables = {
         input: {
-          category: "Werkwoordvervoeging",
-          description: "This is a module werkwoordvervoeging.",
+          category: "Spelling",
+          description: "This is a module Spelling.",
           difficulty: "B1",
           key: "",
-          name: "Demo Module Werkwoordvervoeging",
+          name: "Demo Module Spelling",
           private: false,
           school_id: "5be98816-b53d-4648-b89e-9cdf46800952"
         }
       }
 
-      // try {
-      //   const response = await axios.post(
-      //       graphqlEndpoint,
-      //       {
-      //         query: graphqlQuery,
-      //         variables,
-      //       },
-      //       {headers}
-      //   );
-      //
-      //   const {data} = response.data;
-      //   console.log(data)
-      //
-      // } catch (error) {
-      //   console.error('GraphQL request failed', error);
-      // } finally {
-      //   this.loading = false;
-      // }
+      try {
+        const response = await axios.post(
+            graphqlEndpoint,
+            {
+              query: graphqlQuery,
+              variables,
+            },
+            {headers}
+        );
+
+        const {data} = response.data;
+        console.log(data)
+
+      } catch (error) {
+        console.error('GraphQL request failed', error);
+      } finally {
+        this.loading = false;
+      }
 
       this.close()
     },
 
     goToClasses(item) {
       console.log(item.id)
+    },
+
+    async filter() {
+      let store = useAuthStore()
+
+      const graphqlEndpoint = 'https://gandalf-the-gateway-bramterlouw-dev.apps.ocp2-inholland.joran-bergfeld.com/';
+
+      const headers = {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${store.accessToken}`,
+      };
+
+      const graphqlQuery = `
+        query ListModules($filter: ModuleFilter, $paginate: Paginator) {
+          listModules(filter: $filter, paginate: $paginate) {
+            id
+            name
+            school_id
+            description
+            category
+            difficulty
+            made_by
+            private
+          }
+        }
+      `;
+
+      let filter = this.buildFilter()
+      const variables = {
+        filter: filter,
+        paginate: {
+          Step: 0,
+          amount: 10
+        }
+      }
+
+      try {
+        const response = await axios.post(
+            graphqlEndpoint,
+            {
+              query: graphqlQuery,
+              variables,
+            },
+            {headers}
+        );
+
+        const {data} = response.data;
+
+        if (data.listModules) {
+          this.serverItems = data.listModules;
+          this.totalItems = 1000;
+        }
+      } catch (error) {
+        console.error('GraphQL request failed', error);
+      } finally {
+        this.loading = false;
+      }
+    },
+
+    buildFilter() {
+      const params = {}
+
+      if (this.name_search !== '') {
+        params.name = {
+          type: this.name_type_search,
+          input: this.name_search
+        }
+      }
+
+      if (this.category_search !== '') {
+        params.category = this.category_search;
+      }
+
+      if (this.difficulty_search !== '') {
+        params.difficulty = this.difficulty_search;
+      }
+      return params
     }
   }
   ,
@@ -253,7 +317,7 @@ export default {
             <v-combobox
                 v-model="name_type_search"
                 hide-details
-                :items="['', 'equals', 'not equals', 'starts', 'ends']"
+                :items="['eq', 'ne', 'starts', 'ends']"
                 density="compact"
                 class="mt-2 mr-2 ml-1"
             ></v-combobox>
@@ -271,17 +335,6 @@ export default {
           </div>
 
           <div class="w-50">
-            <v-text-field
-                v-if="isAdmin"
-                v-model="made_by_search"
-                hide-details
-                placeholder="Made by..."
-                class="ma-2"
-                density="compact">
-            </v-text-field>
-          </div>
-
-          <div class="w-50">
             <v-combobox
                 v-model="difficulty_search"
                 hide-details
@@ -293,8 +346,21 @@ export default {
           </div>
 
           <div class="w-50">
+            <v-text-field
+                v-if="isAdmin"
+                v-model="made_by_search"
+                disabled
+                hide-details
+                placeholder="Made by..."
+                class="ma-2"
+                density="compact">
+            </v-text-field>
+          </div>
+
+          <div class="w-50">
             <v-combobox
                 v-model="private_search"
+                disabled
                 hide-details
                 :items="[true, false]"
                 density="compact"
@@ -307,12 +373,17 @@ export default {
             <v-combobox
                 v-if="isAdmin"
                 v-model="soft_deleted_search"
+                disabled
                 hide-details
                 :items="[true, false]"
                 density="compact"
                 label="Soft deleted"
                 class="ma-2"
             ></v-combobox>
+          </div>
+
+          <div class="w-50">
+            <v-btn @click="filter" type="button" color="primary" class="ma-2">Filter</v-btn>
           </div>
         </div>
 
@@ -393,7 +464,7 @@ export default {
                       <v-text-field
                           :disabled="!editedItem.isPrivate"
                           class="w-75"
-                          v-model="editedItem.name"
+                          v-model="editedItem.key"
                           label="Private key"
                       ></v-text-field>
                 </div>

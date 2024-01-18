@@ -43,6 +43,15 @@ const stopRefreshTokenInterval = () => {
     clearInterval(refreshTokenInterval);
 };
 
+router.beforeEach((to, from) => {
+    if (to.meta.requiresAuth) {
+        if (!authStore.isAuthenticated && to.name !== 'login') {
+            console.log('yes')
+            router.push('/')
+        }
+    }
+})
+
 app.use(router)
 app.use(vuetify)
 app.mount('#app')
