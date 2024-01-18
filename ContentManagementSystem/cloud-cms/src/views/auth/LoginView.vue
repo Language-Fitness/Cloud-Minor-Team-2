@@ -25,7 +25,8 @@ export default defineComponent({
         await router.push('/')
       }
     },
-  }
+  },
+
 })
 </script>
 

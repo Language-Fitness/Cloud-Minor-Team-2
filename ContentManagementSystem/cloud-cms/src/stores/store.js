@@ -14,8 +14,8 @@ export const useAuthStore = defineStore('auth', {
         async login(username, password) {
             const formData = new URLSearchParams();
             formData.append('grant_type', 'password');
-            formData.append('client_id', 'login-client');
-            formData.append('client_secret', 'xcfwgB7pZMyw9FshhZpcbyCwwmov10ux');
+            formData.append('client_id', import.meta.env.VITE_KEYCLOAK_CLIENT_ID);
+            formData.append('client_secret', import.meta.env.VITE_KEYCLOAK_CLIENT_SECRET);
             formData.append('username', username);
             formData.append('password', password);
 
@@ -44,15 +44,10 @@ export const useAuthStore = defineStore('auth', {
         },
 
         async refresh() {
-
-            console.log(import.meta.env.KEYCLOAK_CLIENT_ID)
-            console.log(import.meta.env.KEYCLOAK_CLIENT_SECRET)
-            console.log(this.refresh())
-
             const formData = new URLSearchParams();
             formData.append('grant_type', 'refresh_token');
-            formData.append('client_id', import.meta.env.KEYCLOAK_CLIENT_ID);
-            formData.append('client_secret', import.meta.env.KEYCLOAK_CLIENT_SECRET);
+            formData.append('client_id', import.meta.env.VITE_KEYCLOAK_CLIENT_ID);
+            formData.append('client_secret', import.meta.env.VITE_KEYCLOAK_CLIENT_SECRET);
             formData.append('refresh_token', this.refreshToken)
 
             try {
