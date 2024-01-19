@@ -1,12 +1,10 @@
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
-  name: prometheus-service-monitor
+  name: application-monitor
   namespace: monitoring
   labels:
-    name: prometheus-service-monitor
     app: prometheus
-    project: language-fitness
 spec:
   namespaceSelector:
     matchNames:

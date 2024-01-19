@@ -1,0 +1,22 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: kube-state-metrics-monitor
+  namespace: monitoring
+  labels:
+    app: prometheus
+spec:
+  namespaceSelector:
+    matchNames:
+      - openshift-monitoring
+  selector:
+    matchExpressions:
+      - { key: app.kubernetes.io/name, operator: In, values: [kube-state-metrics] }
+  endpoints:
+    - port: https-main
+      path: /metrics
+      interval: 30s
+      scheme: https
+      tlsConfig:
+        insecureSkipVerify: true
+      bearerTokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token

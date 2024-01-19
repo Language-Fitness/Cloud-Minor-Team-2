@@ -7,7 +7,9 @@ resources:
   - grafana/assets/grafana.yaml
   - grafana/assets/route.yaml
   - prometheus/assets/route.yaml
-  - prometheus/assets/service-monitor.yaml
+  - prometheus/assets/openshift-monitoring.yaml
+  - prometheus/assets/application-monitor.yaml
+  - prometheus/assets/pod-monitoring.yaml
   - prometheus/assets/service-account.yaml
   - prometheus/assets/subscription.yaml
   - prometheus/assets/prometheus.yaml

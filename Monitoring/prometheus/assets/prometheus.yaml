@@ -8,10 +8,10 @@ metadata:
     app: prometheus
     project: language-fitness
 spec:
-  replicas: 1
+  replicas: 2
   serviceAccountName: prometheus-sa
   securityContext: {}
   serviceMonitorSelector:
     matchLabels:
-      name: prometheus-service-monitor
+      app: prometheus
     ruleSelector: {}
