@@ -206,7 +206,7 @@ export default {
     },
 
     goToClasses(item) {
-      router.push('/exercise');
+      router.push('/class/' + item.id + '/exercises');
     },
 
     async filter() {

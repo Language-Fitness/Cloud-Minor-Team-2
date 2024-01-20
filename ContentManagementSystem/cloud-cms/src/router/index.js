@@ -35,7 +35,7 @@ const router = createRouter({
       }
     },
     {
-      path: '/exercise',
+      path: '/class/:id/exercises',
       name: 'exercise',
       component: () => import('../views/exercise/ExerciseOverview.vue'),
       meta: {

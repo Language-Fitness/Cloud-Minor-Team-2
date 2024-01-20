@@ -65,6 +65,7 @@ type Module
     difficulty: LanguageLevel! @join__field(graph: MODULES)
     category: Category! @join__field(graph: MODULES)
     made_by: String! @join__field(graph: MODULES)
+    made_by_name: String! @join__field(graph: MODULES)
     private: Boolean! @join__field(graph: MODULES)
     key: String @join__field(graph: MODULES)
     created_at: String @join__field(graph: MODULES)
@@ -82,6 +83,7 @@ type ModuleInfo
     difficulty: LanguageLevel! @join__field(graph: MODULES)
     category: Category! @join__field(graph: MODULES)
     made_by: String! @join__field(graph: MODULES)
+    made_by_name: String! @join__field(graph: MODULES)
     private: Boolean! @join__field(graph: MODULES)
 }
 

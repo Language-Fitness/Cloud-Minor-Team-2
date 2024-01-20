@@ -35,7 +35,6 @@ export default {
 
     // Search filters
     name_search: '',
-    question_search: '',
     name_type_search: '',
     difficulty_search: '',
     soft_deleted_search: false,
@@ -113,7 +112,9 @@ export default {
       `;
 
       const variables = {
-        filter: {},
+        filter: {
+          class_Id: this.$route.params.id
+        },
         paginator: {
           Step: 0,
           amount: 10
@@ -129,11 +130,13 @@ export default {
             },
             {headers}
         );
-        const {data} = response.data;
-        console.log(data)
 
-        this.serverItems = data.ListExercise;
-        this.totalItems = 1000;
+        const {data} = response.data;
+
+        if (data) {
+          this.serverItems = data.ListExercise;
+          this.totalItems = 1000;
+        }
       } catch (error) {
         console.error('GraphQL request failed', error);
       } finally {
@@ -189,6 +192,83 @@ export default {
 
     SaveAndNext() {
       this.editedItem = this.genQuestions[1]
+    },
+
+    async filter() {
+      let store = useAuthStore()
+
+      const graphqlEndpoint = 'https://gandalf-the-gateway-bramterlouw-dev.apps.ocp2-inholland.joran-bergfeld.com/';
+
+      const headers = {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${store.accessToken}`,
+      };
+
+      const graphqlQuery = `
+         query ListClasses($filter: ListClassFilter, $paginate: Paginator) {
+          listClasses(filter: $filter, paginate: $paginate) {
+            id
+            name
+            description
+            difficulty
+            module_Id
+            made_by
+          }
+        }
+      `;
+
+      let filter = this.buildFilter()
+      const variables = {
+        filter: filter,
+        paginate: {
+          Step: 0,
+          amount: 10
+        }
+      }
+
+      try {
+        const response = await axios.post(
+            graphqlEndpoint,
+            {
+              query: graphqlQuery,
+              variables,
+            },
+            {headers}
+        );
+
+        const {data} = response.data;
+
+        if (data) {
+          this.serverItems = data.ListExercise;
+          this.totalItems = 1000;
+        }
+      } catch (error) {
+        console.error('GraphQL request failed', error);
+      } finally {
+        this.loading = false;
+      }
+    },
+
+    buildFilter() {
+      const params = {}
+
+      if (this.name_search !== '') {
+        params.name = {
+          type: this.name_type_search,
+          input: this.name_search
+        }
+      }
+
+      if (this.module_id_search !== '') {
+        params.module_Id = this.module_id_search;
+      }
+
+      if (this.difficulty_search !== '') {
+        params.difficulty = this.difficulty_search;
+      }
+
+      params.class_Id = this.$route.params.id;
+      return params
     }
   },
 }
@@ -209,7 +289,7 @@ export default {
       </p>
 
       <h3 class="my-2 pa-2 w-100" :style="'border: 1px solid lightgray'">Class:
-        2055b38e-992d-11ee-b9d1-0242ac120002
+        {{this.$route.params.id}}
       </h3>
 
       <div class="filter-wrapper w-100 d-flex flex-row">
@@ -233,16 +313,6 @@ export default {
           </div>
 
           <div class="w-50">
-            <v-text-field
-                v-model="question_search"
-                hide-details
-                placeholder="Question..."
-                class="mt-2 ml-2 mr-2"
-                density="compact">
-            </v-text-field>
-          </div>
-
-          <div class="w-50">
             <v-combobox
                 v-model="difficulty_search"
                 hide-details
@@ -258,6 +328,7 @@ export default {
             <v-combobox
                 v-if="isAdmin"
                 v-model="soft_deleted_search"
+                disabled
                 hide-details
                 :items="[true, false]"
                 density="compact"
@@ -270,11 +341,16 @@ export default {
             <v-text-field
                 v-if="isAdmin"
                 v-model="made_by_search"
+                disabled
                 hide-details
                 placeholder="Made by..."
                 class="ma-2"
                 density="compact">
             </v-text-field>
+          </div>
+
+          <div class="w-50">
+            <v-btn @click="filter" type="button" color="primary" class="ma-2">Filter</v-btn>
           </div>
         </div>
 
