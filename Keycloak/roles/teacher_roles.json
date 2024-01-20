@@ -58,5 +58,8 @@
   },
   {
     "name": "get_result_all"
+  },
+  {
+    "name": "saga_service_action"
   }
 ]
