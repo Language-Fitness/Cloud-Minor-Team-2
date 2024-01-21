@@ -1,0 +1,26 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  labels:
+    app: vue-cloud-cms
+  annotations:
+    cert-manager.io/issuer: acme-issuer-production
+    acme.cert-manager.io/http01-edit-in-place: "true"
+  name: vue-cloud-cms-ingres
+  namespace: bramterlouw-dev
+spec:
+  rules:
+    - host: vue-cloud-cms-bramterlouw-dev.apps.ocp2-inholland.joran-bergfeld.com
+      http:
+        paths:
+          - pathType: Prefix
+            path: /
+            backend:
+              service:
+                name: vue-cloud-cms-service
+                port:
+                  number: 8080
+  tls:
+    - hosts:
+        - vue-cloud-cms-bramterlouw-dev.apps.ocp2-inholland.joran-bergfeld.com
+      secretName: vue-cloud-cms-ingres-cert

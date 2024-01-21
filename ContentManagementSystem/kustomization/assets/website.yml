@@ -2,14 +2,17 @@ kind: Deployment
 apiVersion: apps/v1
 metadata:
   name: vue-cloud-cms
+  namespace: bramterlouw-dev
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
+      name: vue-cloud-cms
       app: vue-cloud-cms
   template:
     metadata:
       labels:
+        name: vue-cloud-cms
         app: vue-cloud-cms
     spec:
       containers:
@@ -25,23 +28,28 @@ kind: Service
 apiVersion: v1
 metadata:
   name: vue-cloud-cms-service
+  namespace: bramterlouw-dev
   annotations:
     description: Exposes and load balances the application pods
   labels:
+    name: vue-cloud-cms-service
     app: vue-cloud-cms
 spec:
+  type: LoadBalancer
   ports:
     - name: http
       port: 8080
       targetPort: 8080
   selector:
-    app: vue-cloud-cms
+    name: vue-cloud-cms
 ---
 kind: Route
 apiVersion: route.openshift.io/v1
 metadata:
   name: vue-cloud-cms-route
+  namespace: bramterlouw-dev
   labels:
+    name: vue-cloud-cms-route
     app: vue-cloud-cms
 spec:
   port:

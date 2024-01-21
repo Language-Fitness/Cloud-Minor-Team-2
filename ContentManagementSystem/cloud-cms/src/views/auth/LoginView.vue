@@ -32,7 +32,7 @@ export default defineComponent({
 
 <template>
   <v-form v-model="valid" class="w-100">
-    <v-container class="mx-auto my-5 w-25 d-flex flex-column border-solid">
+    <v-container class="mx-auto my-5 w-25 d-flex flex-column border">
       <h2>Login</h2>
 
       <v-row>
@@ -56,6 +56,7 @@ export default defineComponent({
           <v-text-field
               v-model="password"
               label="Password"
+              type="password"
               required
           ></v-text-field>
         </v-col>
