@@ -30,14 +30,15 @@ async function logout() {
     <v-layout>
       <v-navigation-drawer permanent absolute>
         <v-list class="d-flex flex-column pa-1">
-          <v-btn @click="logout" type="button" class="w-100 mb-1">Logout</v-btn>
-          <v-list-item
-              prepend-avatar="https://cdn.vuetifyjs.com/images/john.png"
-              title="Bram Terlouw"
-              subtitle="bram@teacher.com"
-              height="50"
-          >
-          </v-list-item>
+          <div class="d-flex justify-space-between">
+            <v-list-item
+                title="Bram Terlouw"
+                subtitle="admin@admin.com"
+                height="50"
+            >
+            </v-list-item>
+            <v-btn icon="mdi-logout" size="small" class="mt-1 mr-3" @click="logout"></v-btn>
+          </div>
         </v-list>
         <v-divider></v-divider>
 

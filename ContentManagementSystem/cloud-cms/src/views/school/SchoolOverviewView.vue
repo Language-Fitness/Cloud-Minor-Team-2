@@ -1,5 +1,7 @@
 <script>
 import {headers, schools} from "@/views/school/school";
+import {useAuthStore} from "@/stores/store";
+import axios from "axios";
 
 const FakeAPI = {
   async fetch({page, itemsPerPage}) {
@@ -51,13 +53,59 @@ export default {
     },
   },
   methods: {
-    loadItems({page, itemsPerPage}) {
-      this.loading = true
-      FakeAPI.fetch({page, itemsPerPage}).then(({items, total}) => {
-        this.serverItems = items
-        this.totalItems = total
-        this.loading = false
-      })
+    async loadItems({page, itemsPerPage}) {
+      this.loading = true;
+      let store = useAuthStore()
+
+      const graphqlEndpoint = 'https://gandalf-the-gateway-bramterlouw-dev.apps.ocp2-inholland.joran-bergfeld.com/';
+
+      const headers = {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${store.accessToken}`,
+      };
+
+      const graphqlQuery = `
+        query ListSchools($filter: ListSchoolFilter, $paginate: Paginator) {
+          listSchools(filter: $filter, paginate: $paginate) {
+            has_openai_access
+            id
+            location
+            made_by
+            name
+          }
+        }
+      `;
+
+      const variables = {
+        filter: {
+        },
+        paginate: {
+          Step: 0,
+          amount: 10
+        }
+      }
+
+      try {
+        const response = await axios.post(
+            graphqlEndpoint,
+            {
+              query: graphqlQuery,
+              variables,
+            },
+            {headers}
+        );
+
+        const {data} = response.data;
+
+        if (data.listSchools) {
+          this.serverItems = data.listSchools;
+          this.totalItems = 1000;
+        }
+      } catch (error) {
+        console.error('GraphQL request failed', error);
+      } finally {
+        this.loading = false;
+      }
     },
 
     editItem(item) {
@@ -109,15 +157,16 @@ export default {
 
     <div v-if="isAdmin" class="wrapper">
       <p class="tab-description">
-        Lorem ipsum dolor sit amet, consectetur adipisicing elit. Delectus hic libero natus nemo obcaecati velit,
-        voluptatibus. Aliquam aliquid atque cum cumque fugit hic id, ipsam nulla quisquam sequi. Aut commodi
-        consequatur dicta dolorem eos, eveniet fuga magni, nobis officiis possimus quo repellendus, tempora totam!
-        Doloremque exercitationem neque repudiandae! Facilis, quae.
+        Op de pagina voor scholen biedt CRUD-functionaliteit een gestructureerde en efficiënte manier om gegevens
+        te beheren. CRUD staat voor Create, Read, Update en Delete, vier fundamentele bewerkingen die essentieel zijn
+        voor gegevensbeheer in een systeem. Deze functionaliteit zijn te doen door admins.
       </p>
 
-      <div class="filter-container">
+      <div class="filter-wrapper d-flex w-100 flex-row">
+      <div class="filter-container w-500">
+        <h3 class="ml-2">Filter options</h3>
 
-        <div class="d-flex flex-row flex-nowrap w-50">
+        <div class="d-flex flex-row flex-nowrap w-100">
           <v-text-field
               v-if="isAdmin"
               :style="'flex-basis: 70%'"
@@ -137,7 +186,7 @@ export default {
           ></v-combobox>
         </div>
 
-        <div class="w-25">
+        <div class="w-50">
           <v-text-field
               v-if="isAdmin"
               v-model="location_search"
@@ -148,10 +197,11 @@ export default {
           </v-text-field>
         </div>
 
-        <div class="w-25">
+        <div class="w-50">
           <v-combobox
               v-if="isAdmin"
               v-model="soft_deleted_search"
+              disabled
               hide-details
               :items="[true, false]"
               density="compact"
@@ -160,16 +210,22 @@ export default {
           ></v-combobox>
         </div>
 
-        <div class="w-25">
+        <div class="w-50">
           <v-text-field
               v-if="isAdmin"
               v-model="made_by_search"
+              disabled
               hide-details
               placeholder="Made by..."
               class="ma-2"
               density="compact">
           </v-text-field>
         </div>
+
+        <div class="w-50">
+          <v-btn @click="filter" type="button" color="primary" class="ma-2">Filter</v-btn>
+        </div>
+      </div>
 
         <!-- MODALS -->
         <v-dialog
@@ -239,6 +295,7 @@ export default {
             </v-card-actions>
           </v-card>
         </v-dialog>
+      </div>
 
         <!-- DELETION MODAL -->
         <v-dialog v-model="dialogDelete" max-width="500px">
@@ -256,7 +313,7 @@ export default {
             </v-card-actions>
           </v-card>
         </v-dialog>
-      </div>
+
       <v-data-table-server
           height="100%"
           class="table-entity"
@@ -326,5 +383,10 @@ header {
 .table-entity {
   margin: 20px 0 0 0;
   border: 1px solid lightgray;
+}
+
+.filter-wrapper {
+  justify-content: space-between;
+  align-items: flex-end;
 }
 </style>

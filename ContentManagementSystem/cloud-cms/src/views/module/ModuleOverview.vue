@@ -298,10 +298,9 @@ export default {
 
     <div class="wrapper">
       <p class="tab-description">
-        Lorem ipsum dolor sit amet, consectetur adipisicing elit. Delectus hic libero natus nemo obcaecati velit,
-        voluptatibus. Aliquam aliquid atque cum cumque fugit hic id, ipsam nulla quisquam sequi. Aut commodi
-        consequatur dicta dolorem eos, eveniet fuga magni, nobis officiis possimus quo repellendus, tempora totam!
-        Doloremque exercitationem neque repudiandae! Facilis, quae.
+        Op de pagina voor modules biedt CRUD-functionaliteit een gestructureerde en efficiënte manier om gegevens
+        te beheren. CRUD staat voor Create, Read, Update en Delete, vier fundamentele bewerkingen die essentieel zijn
+        voor gegevensbeheer in een systeem. Deze functionaliteit zijn te doen door zowel leraren als admins.
       </p>
 
       <div class="filter-wrapper d-flex w-100 flex-row">
