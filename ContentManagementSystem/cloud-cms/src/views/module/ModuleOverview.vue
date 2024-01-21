@@ -171,11 +171,11 @@ export default {
       const variables = {
         input: {
           category: this.editedItem.category,
-          description: this.editedItem.category,
-          difficulty: this.editedItem.category,
-          key: this.editedItem.category,
-          name: this.editedItem.category,
-          private: this.editedItem.category,
+          description: this.editedItem.description,
+          difficulty: this.editedItem.difficulty,
+          key: this.editedItem.key,
+          name: this.editedItem.name,
+          private: this.editedItem.isPrivate,
           school_id: "5be98816-b53d-4648-b89e-9cdf46800952"
         }
       }
@@ -191,7 +191,6 @@ export default {
         );
 
         const {data} = response.data;
-        console.log(data)
 
       } catch (error) {
         console.error('GraphQL request failed', error);
@@ -199,11 +198,12 @@ export default {
         this.loading = false;
       }
 
+      await this.loadItems({page: 0, itemsPerPage: 10})
       this.close()
     },
 
     goToClasses(item) {
-      console.log(item.id)
+      this.$router.push("/class?module=" + item.id)
     },
 
     async filter() {
@@ -254,8 +254,11 @@ export default {
 
         if (data.listModules) {
           this.serverItems = data.listModules;
-          this.totalItems = 1000;
+        } else {
+          this.serverItems = []
         }
+        this.totalItems = 1000;
+
       } catch (error) {
         console.error('GraphQL request failed', error);
       } finally {

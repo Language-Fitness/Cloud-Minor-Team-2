@@ -3,39 +3,26 @@ import {exercises, headers, generatedQuestions} from "@/views/exercise/exercise"
 import axios from "axios";
 import {useAuthStore} from "@/stores/store";
 
-const FakeAPI = {
-  async fetch({page, itemsPerPage}) {
-    return new Promise(resolve => {
-      setTimeout(() => {
-        const start = (page - 1) * itemsPerPage
-        const end = start + itemsPerPage
-        const items = exercises.slice()
-
-        const paginated = items.slice(start, end)
-        resolve({items: paginated, total: items.length})
-      }, 500)
-    })
-  },
-}
-
 export default {
   data: () => ({
     // Show extra functionality if admin
     isAdmin: true,
 
     //Show generated functionality
-    canGenerate: false, // (only if user has access to this)
+    isGenerating: false,
+
     questionsToGenerate: 2,
+    questionDifficulty: 'B2',
+    questionSubject: 'woordenschat',
+
     hasGenerated: false,
     genQuestions: [],
 
     // Combobox items
-    question_types: ['MC'],
     difficulties: ['A1', 'A2', 'B1', 'B2', 'C1', 'C2'],
 
     // Search filters
     name_search: '',
-    name_type_search: '',
     difficulty_search: '',
     soft_deleted_search: false,
     made_by_search: '',
@@ -54,22 +41,22 @@ export default {
     // Item for editing item
     editedIndex: -1,
     editedItem: {
-      class_id: '',
+      class_Id: '',
+      module_Id: '',
       name: '',
       question: '',
-      answers: [],
-      pos_correct_answer: 0,
+      answers: ['', '', '', '', ''],
       question_type: 'MC',
       difficulty: '',
     },
 
     // Item for opening 'New Item' tab
     defaultItem: {
-      class_id: '',
+      class_Id: '',
+      module_Id: '',
       name: '',
       question: '',
-      answers: [],
-      pos_correct_answer: 0,
+      answers: ['', '', '', '', ''],
       question_type: 'MC',
       difficulty: '',
     },
@@ -133,7 +120,7 @@ export default {
 
         const {data} = response.data;
 
-        if (data) {
+        if (data.ListExercise) {
           this.serverItems = data.ListExercise;
           this.totalItems = 1000;
         }
@@ -174,24 +161,124 @@ export default {
       })
     },
 
-    generate() {
-      this.genQuestions = generatedQuestions
-      this.hasGenerated = true
-      this.editedItem = this.genQuestions[0]
+    async generate() {
+      let token = await this.generateMc()
+      this.isGenerating = true
+
+      const intervalId = setInterval(async () => {
+        let res = await this.retrieveMc(token);
+
+        if (res.message !== 'Response still pending, please wait.') {
+          clearInterval(intervalId)
+
+          // Set the generated save button for form
+          this.hasGenerated = true
+
+          // Set the response questions
+          this.genQuestions = res.questions
+
+          // Enable all inputs
+          this.isGenerating = false
+
+          // Fill form with values
+          this.setEditForm()
+        }
+      }, 5000);
+    },
+
+    setEditForm() {
+      this.editedItem.answers = []
+      this.editedItem.name = this.genQuestions[0].questionSubject
+      this.editedItem.question = this.genQuestions[0].questionText
+      this.editedItem.difficulty = this.genQuestions[0].questionLevel
+      this.editedItem.class_Id = this.$route.params.id
+      this.editedItem.module_Id = this.$route.query.module;
+
+      this.genQuestions[0].answerOptions.forEach((element, index) => {
+        this.editedItem.answers.push({
+          correct: element === this.genQuestions[0].correctAnswer,
+          value: element
+        })
+      });
+
+      console.log(this.editedItem)
     },
 
     deleteItemConfirm() {
-      // TODO: DELETE LOGIC
       this.closeDelete()
     },
 
-    save() {
-      // TODO: SAVE LOGIC
-      this.close()
+    async save() {
+      let store = useAuthStore()
+
+      const graphqlEndpoint = 'https://gandalf-the-gateway-bramterlouw-dev.apps.ocp2-inholland.joran-bergfeld.com/';
+
+      const headers = {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${store.accessToken}`,
+      };
+
+      const graphqlQuery = `
+        mutation Mutation($exercise: ExerciseInput!) {
+          CreateExercise(exercise: $exercise) {
+            id
+            module_id
+            class_Id
+            name
+            difficulty
+            question
+            answers {
+              value
+              correct
+            }
+            made_by
+            created_at
+            updated_at
+            soft_deleted
+          }
+        }
+      `;
+
+      const variables = {
+        exercise: {
+          class_Id: this.editedItem.class_Id,
+          module_id: this.editedItem.module_Id,
+          name: this.editedItem.name,
+          difficulty: this.editedItem.difficulty,
+          question: this.editedItem.question,
+          answers: this.editedItem.answers
+        }
+      }
+
+      try {
+        const response = await axios.post(
+            graphqlEndpoint,
+            {
+              query: graphqlQuery,
+              variables,
+            },
+            {headers}
+        );
+
+        const {data} = response.data;
+        this.genQuestions.shift()
+
+      } catch (error) {
+        console.error('GraphQL request failed', error);
+      } finally {
+        this.loading = false;
+      }
     },
 
-    SaveAndNext() {
-      this.editedItem = this.genQuestions[1]
+    async SaveAndNext() {
+      if (this.genQuestions.length === 1) {
+        await this.save()
+        await this.loadItems({page: 0, itemsPerPage: 10})
+        this.close()
+      } else {
+        await this.save()
+        this.setEditForm()
+      }
     },
 
     async filter() {
@@ -205,14 +292,19 @@ export default {
       };
 
       const graphqlQuery = `
-         query ListClasses($filter: ListClassFilter, $paginate: Paginator) {
-          listClasses(filter: $filter, paginate: $paginate) {
-            id
-            name
-            description
+         query ListExercise($filter: ExerciseFilter!, $paginator: Paginator!) {
+          ListExercise(filter: $filter, paginator: $paginator) {
+            answers {
+              correct
+              value
+            }
+            class_Id
             difficulty
-            module_Id
+            id
             made_by
+            module_id
+            name
+            question
           }
         }
       `;
@@ -220,7 +312,7 @@ export default {
       let filter = this.buildFilter()
       const variables = {
         filter: filter,
-        paginate: {
+        paginator: {
           Step: 0,
           amount: 10
         }
@@ -237,11 +329,15 @@ export default {
         );
 
         const {data} = response.data;
+        console.log(response)
 
-        if (data) {
+        if (data.ListExercise) {
           this.serverItems = data.ListExercise;
-          this.totalItems = 1000;
+        } else {
+          this.serverItems = []
         }
+        this.totalItems = 1000;
+
       } catch (error) {
         console.error('GraphQL request failed', error);
       } finally {
@@ -253,14 +349,7 @@ export default {
       const params = {}
 
       if (this.name_search !== '') {
-        params.name = {
-          type: this.name_type_search,
-          input: this.name_search
-        }
-      }
-
-      if (this.module_id_search !== '') {
-        params.module_Id = this.module_id_search;
+        params.name = this.name_search
       }
 
       if (this.difficulty_search !== '') {
@@ -269,6 +358,102 @@ export default {
 
       params.class_Id = this.$route.params.id;
       return params
+    },
+
+    async generateMc() {
+      let store = useAuthStore()
+
+      const graphqlEndpoint = 'https://gandalf-the-gateway-bramterlouw-dev.apps.ocp2-inholland.joran-bergfeld.com/';
+
+      const headers = {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${store.accessToken}`,
+      };
+
+      const graphqlQuery = `
+      mutation generateMC($amountQuestions: Int!, $questionLevel: LevelEnum!, $questionSubject: SubjectEnum!) {
+        generateMultipleChoiceQuestions (
+          amountQuestions: $amountQuestions,
+          questionLevel: $questionLevel,
+          questionSubject: $questionSubject
+        ) {
+          response {
+            status
+            message
+            token
+          }
+        }
+      }
+  `;
+
+      try {
+        const response = await axios.post(
+            graphqlEndpoint,
+            {
+              query: graphqlQuery,
+              variables: {
+                amountQuestions: this.questionsToGenerate,
+                questionLevel: this.questionDifficulty,
+                questionSubject: this.questionSubject,
+              },
+            },
+            {headers}
+        );
+        const {data} = response.data;
+        return data.generateMultipleChoiceQuestions.response.token
+
+      } catch (error) {
+        console.error('GraphQL request failed', error);
+      }
+    },
+
+    async retrieveMc(token) {
+      let store = useAuthStore()
+
+      const graphqlEndpoint = 'https://gandalf-the-gateway-bramterlouw-dev.apps.ocp2-inholland.joran-bergfeld.com/';
+
+      const headers = {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${store.accessToken}`,
+      };
+
+      const graphqlQuery = `
+        query RetrieveMultipleChoiceQuestions($token: String!) {
+          retrieveMultipleChoiceQuestions(token: $token) {
+            status
+            message
+            questions {
+              questionType
+              questionLevel
+              questionSubject
+              questionText
+              answerOptions
+              correctAnswer
+            }
+          }
+        }
+      `
+
+      const variables = {
+        token: token,
+      }
+
+      try {
+        const response = await axios.post(
+            graphqlEndpoint,
+            {
+              query: graphqlQuery,
+              variables
+            },
+            {headers}
+        );
+
+        const {data} = response.data;
+        return {message: data.retrieveMultipleChoiceQuestions.message, questions: data.retrieveMultipleChoiceQuestions.questions}
+
+      } catch (error) {
+        console.error('GraphQL request failed', error);
+      }
     }
   },
 }
@@ -303,13 +488,6 @@ export default {
                 class="mt-2 ml-2"
                 density="compact">
             </v-text-field>
-            <v-combobox
-                v-model="name_type_search"
-                hide-details
-                :items="['', 'equals', 'not equals', 'starts', 'ends']"
-                density="compact"
-                class="mt-2 mr-2 ml-1"
-            ></v-combobox>
           </div>
 
           <div class="w-50">
@@ -381,21 +559,50 @@ export default {
             <v-card-text class="ma-0 pt-0">
               <v-container dense>
 
-                <v-row no-gutters v-if="!hasGenerated && this.editedIndex === -1">
+                <v-row v-if="!hasGenerated && this.editedIndex === -1">
                   <v-col
                       cols="6"
                   >
                     <v-combobox
+                        :disabled="isGenerating"
                         class="mb-5"
-                        density="compact"
                         v-model="questionsToGenerate"
                         hide-details
                         :items="[2,3,4,5,6,7,8,9,10]"
                         label="How many questions to generate?"
                     ></v-combobox>
                   </v-col>
+
+                  <v-col
+                      cols="6"
+                  >
+                    <v-combobox
+                        :disabled="isGenerating"
+                        class="mb-5"
+                        v-model="questionDifficulty"
+                        hide-details
+                        :items="difficulties"
+                        label="Difficulty"
+                    ></v-combobox>
+                  </v-col>
+                </v-row>
+
+                <v-row v-if="!hasGenerated && this.editedIndex === -1">
+                  <v-col cols="6">
+                    <v-combobox
+                        :disabled="isGenerating"
+                        class="mb-5"
+                        v-model="questionSubject"
+                        hide-details
+                        :items="['grammatica', 'spelling', 'woordenschat', 'uitdrukkingen', 'interpunctie', 'werkwoordvervoegingen']"
+                        label="Subject"
+                    ></v-combobox>
+                  </v-col>
+
+
                   <v-col cols="6" class="pl-2">
                     <v-btn
+                        :disabled="isGenerating"
                         color="blue-darken-1"
                         variant="outlined"
                         @click="generate"
@@ -412,6 +619,7 @@ export default {
                       cols="12"
                   >
                     <v-text-field
+                        :disabled="isGenerating"
                         v-model="editedItem.name"
                         label="Name"
                     ></v-text-field>
@@ -423,6 +631,7 @@ export default {
                       cols="12"
                   >
                     <v-text-field
+                        :disabled="isGenerating"
                         v-model="editedItem.question"
                         label="Question"
                     ></v-text-field>
@@ -435,17 +644,7 @@ export default {
                         cols="6"
                     >
                       <v-combobox
-                          class="mb-5"
-                          v-model="editedItem.question_type"
-                          hide-details
-                          :items="question_types"
-                          label="Question type"
-                      ></v-combobox>
-                    </v-col>
-                    <v-col
-                        cols="6"
-                    >
-                      <v-combobox
+                          :disabled="isGenerating"
                           class="mb-5"
                           v-model="editedItem.difficulty"
                           hide-details
@@ -457,39 +656,22 @@ export default {
                 </v-row>
 
                 <v-row>
-                  <v-col cols="6">
-                    <v-text-field
-                        v-model="todo"
-                        label="Answer 1"
-                    ></v-text-field>
-                    <v-text-field
-                        v-model="todo"
-                        label="Answer 3"
-                    ></v-text-field>
-                    <v-text-field
-                        v-model="todo"
-                        label="Answer 5"
-                    ></v-text-field>
+                  <v-col cols="12">
+                    <v-row>
+                      <v-col v-for="(answer, index) in editedItem.answers" :key="index" cols="6">
+                        <v-text-field :disabled="isGenerating" v-model="answer.value" :label="'Answer ' + (index + 1)"></v-text-field>
+                      </v-col>
+                    </v-row>
                   </v-col>
 
-                  <v-col cols="6">
-                    <v-text-field
-                        v-model="todo"
-                        label="Answer 2"
-                    ></v-text-field>
-                    <v-text-field
-                        v-model="todo"
-                        label="Answer 4"
-                    ></v-text-field>
-                  </v-col>
                 </v-row>
               </v-container>
             </v-card-text>
 
             <!-- EDITING CONFIRMATION SECTION -->
             <v-card-actions class="flex-row justify-space-between mx-5">
-
               <v-btn
+                  :disabled="isGenerating"
                   color="blue-darken-1"
                   variant="text"
                   @click="close"
@@ -498,6 +680,7 @@ export default {
               </v-btn>
 
               <v-btn
+                  :disabled="isGenerating"
                   v-if="hasGenerated"
                   color="blue-darken-1"
                   variant="text"
@@ -507,6 +690,7 @@ export default {
               </v-btn>
 
               <v-btn
+                  :disabled="isGenerating"
                   v-else
                   color="blue-darken-1"
                   variant="text"

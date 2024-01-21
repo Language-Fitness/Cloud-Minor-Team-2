@@ -5,21 +5,6 @@ import router from '@/router'
 import axios from "axios";
 import {useAuthStore} from "@/stores/store";
 
-const FakeAPI = {
-  async fetch({page, itemsPerPage}) {
-    return new Promise(resolve => {
-      setTimeout(() => {
-        const start = (page - 1) * itemsPerPage
-        const end = start + itemsPerPage
-        const items = classes.slice()
-
-        const paginated = items.slice(start, end)
-        resolve({items: paginated, total: items.length})
-      }, 500)
-    })
-  },
-}
-
 export default {
   data: () => ({
     isAdmin: true,
@@ -60,6 +45,14 @@ export default {
       return this.editedIndex === -1 ? 'New Item' : 'Edit Item'
     },
   },
+  created() {
+    const moduleIdFromQuery = this.$route.query.module;
+    if (moduleIdFromQuery) {
+      this.defaultItem.module_id = moduleIdFromQuery;
+      this.editedItem.module_id = moduleIdFromQuery;
+      this.module_id_search = moduleIdFromQuery
+    }
+  },
   methods: {
     async loadItems({page, itemsPerPage}) {
       this.loading = true;
@@ -84,8 +77,15 @@ export default {
         }
       `;
 
+      let filter = {}
+      if (this.$route.query.module) {
+        filter = {
+          module_id: this.$route.query.module
+        }
+      }
+
       const variables = {
-        filter: {},
+        filter: filter,
         paginate: {
           Step: 0,
           amount: 10
@@ -103,10 +103,11 @@ export default {
         );
 
         const {data} = response.data;
-        console.log(data)
 
-        this.serverItems = data.listClasses;
-        this.totalItems = 1000;
+        if (data.listClasses) {
+          this.serverItems = data.listClasses;
+          this.totalItems = 1000;
+        }
       } catch (error) {
         console.error('GraphQL request failed', error);
       } finally {
@@ -203,10 +204,11 @@ export default {
       }
 
       this.close()
+      await this.loadItems({page: 0, itemsPerPage: 10})
     },
 
     goToClasses(item) {
-      router.push('/class/' + item.id + '/exercises');
+      router.push('/class/' + item.id + '/exercises?module=' + item.module_Id);
     },
 
     async filter() {
@@ -255,8 +257,11 @@ export default {
 
         if (data.listClasses) {
           this.serverItems = data.listClasses;
-          this.totalItems = 1000;
+        } else {
+          this.serverItems = []
         }
+        this.totalItems = 1000;
+
       } catch (error) {
         console.error('GraphQL request failed', error);
       } finally {
