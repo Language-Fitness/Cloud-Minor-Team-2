@@ -7,7 +7,7 @@ export const headers = [
     {title: 'Classes', key: 'classes', align: 'center', sortable: false},
 ]
 
-export const categories = ['Grammatica', 'Spelling', 'Woordenschat', 'Werkwoordspelling', 'Fastlane']
+export const categories = ['Grammatica', 'Spelling', 'Woordenschat', 'Werkwoordspelling', 'Uitdrukkingen', 'Interpunctie', 'Werkwoordvervoegingen', 'Fast_Track']
 
 export const difficulties = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2']
 

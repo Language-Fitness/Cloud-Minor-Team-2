@@ -13,7 +13,7 @@ export default {
   data: () => ({
     // Show extra functionality if admin
     isAdmin: true,
-
+    categories: ['Grammatica', 'Spelling', 'Woordenschat', 'Werkwoordspelling', 'Uitdrukkingen', 'Interpunctie', 'Werkwoordvervoegingen', 'Fast_Track'],
     //Show generated functionality
     isGenerating: false,
 
@@ -536,7 +536,7 @@ export default {
                         class="mb-5"
                         v-model="questionSubject"
                         hide-details
-                        :items="['grammatica', 'spelling', 'woordenschat', 'uitdrukkingen', 'interpunctie', 'werkwoordvervoegingen']"
+                        :items="categories"
                         label="Subject"
                     ></v-combobox>
                   </v-col>
