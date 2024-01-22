@@ -1,22 +1,7 @@
 <script>
-import {headers, schools} from "@/views/school/school";
+import {headers, listSchoolsQuery} from "@/views/school/school";
 import {useAuthStore} from "@/stores/store";
 import axios from "axios";
-
-const FakeAPI = {
-  async fetch({page, itemsPerPage}) {
-    return new Promise(resolve => {
-      setTimeout(() => {
-        const start = (page - 1) * itemsPerPage
-        const end = start + itemsPerPage
-        const items = schools.slice()
-
-        const paginated = items.slice(start, end)
-        resolve({items: paginated, total: items.length})
-      }, 500)
-    })
-  },
-}
 
 export default {
   data: () => ({
@@ -57,24 +42,12 @@ export default {
       this.loading = true;
       let store = useAuthStore()
 
-      const graphqlEndpoint = 'https://gandalf-the-gateway-bramterlouw-dev.apps.ocp2-inholland.joran-bergfeld.com/';
-
+      const graphqlEndpoint = import.meta.env.VITE_GATEWAY_ENDPOINT;;
+      const graphqlQuery = listSchoolsQuery;
       const headers = {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${store.accessToken}`,
       };
-
-      const graphqlQuery = `
-        query ListSchools($filter: ListSchoolFilter, $paginate: Paginator) {
-          listSchools(filter: $filter, paginate: $paginate) {
-            has_openai_access
-            id
-            location
-            made_by
-            name
-          }
-        }
-      `;
 
       const variables = {
         filter: {
@@ -137,12 +110,10 @@ export default {
     },
 
     deleteItemConfirm() {
-      // TODO: DELETE LOGIC
       this.closeDelete()
     },
 
     save() {
-      // TODO: SAVE LOGIC
       this.close()
     },
   },
@@ -164,7 +135,8 @@ export default {
 
       <div class="filter-wrapper d-flex w-100 flex-row">
       <div class="filter-container w-500">
-        <h3 class="ml-2">Filter options</h3>
+        <h2 class="ml-2">Filter options</h2>
+        <v-divider></v-divider>
 
         <div class="d-flex flex-row flex-nowrap w-100">
           <v-text-field
@@ -223,7 +195,7 @@ export default {
         </div>
 
         <div class="w-50">
-          <v-btn @click="filter" type="button" color="primary" class="ma-2">Filter</v-btn>
+          <v-btn type="button" color="primary" class="ma-2">Filter</v-btn>
         </div>
       </div>
 
@@ -301,8 +273,6 @@ export default {
         <v-dialog v-model="dialogDelete" max-width="500px">
           <v-card class="flex-column align-center pa-5">
             <v-card-title class="text-h5">Are you sure you want to delete this item?</v-card-title>
-
-            <v-checkbox v-if="isAdmin" class="pa-0" hide-details label="Hard delete"></v-checkbox>
 
             <v-card-text class="pt-0">You will not be able to recover this item.</v-card-text>
 

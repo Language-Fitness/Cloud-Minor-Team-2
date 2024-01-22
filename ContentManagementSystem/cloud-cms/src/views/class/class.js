@@ -7,41 +7,45 @@ export const headers = [
     {title: 'Exercises', key: 'exercises', align: 'center', sortable: false},
 ]
 
-export const classes = [
-    {
-        id: '2055b38e-992d-11ee-b9d1-0242ac120002',
-        module_id: '19b4f4fe-992d-11ee-b9d1-0242ac120002',
-        name: 'Les 1',
-        description: 'This is a class description.',
-        difficulty: 'A1',
-        category: 'Grammatica',
-        made_by: 'Toon Otten',
-    },
-    {
-        id: '2055b38e-992d-11ee-b9d1-0242ac120002',
-        module_id: '19b4f4fe-992d-11ee-b9d1-0242ac120002',
-        name: 'Les 2',
-        description: 'This is a class description.',
-        difficulty: 'A2',
-        category: 'Grammatica',
-        made_by: 'Toon Otten',
-    },
-    {
-        id: '2055b38e-992d-11ee-b9d1-0242ac120002',
-        module_id: '19b4f4fe-992d-11ee-b9d1-0242ac120002',
-        name: 'Les 3',
-        description: 'This is a class description.',
-        difficulty: 'B1',
-        category: 'Grammatica',
-        made_by: 'Toon Otten',
-    },
-    {
-        id: '2055b38e-992d-11ee-b9d1-0242ac120002',
-        module_id: '19b4f4fe-992d-11ee-b9d1-0242ac120002',
-        name: 'Les 4',
-        description: 'This is a class description.',
-        difficulty: 'B2',
-        category: 'Grammatica',
-        made_by: 'Toon Otten',
-    },
-]
+export const difficulties = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2']
+
+export const listClassesQuery = `
+    query ListClasses($filter: ListClassFilter, $paginate: Paginator) {
+      listClasses(filter: $filter, paginate: $paginate) {
+        id
+        name
+        description
+        difficulty
+        module_Id
+        made_by
+      }
+    }
+`;
+
+export const deleteClassQuery = `
+    mutation DeleteObject($filter: SagaFilter) {
+      deleteObject(filter: $filter) {
+        id
+        object_id
+        object_type
+        text
+        status
+      }
+    }
+`;
+
+export const createClassQuery = `
+    mutation CreateClass($input: ClassInput!) {
+      createClass(input: $input) {
+        id
+        module_Id
+        name
+        description
+        difficulty
+        made_by
+        created_at
+        updated_at
+        soft_deleted
+      }
+    }
+`;

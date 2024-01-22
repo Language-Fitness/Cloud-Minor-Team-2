@@ -7,83 +7,49 @@ export const headers = [
     {title: 'Classes', key: 'classes', align: 'center', sortable: false},
 ]
 
-export const modules = [
-    {
-        id: '2cccd034-9900-11ee-b9d1-0242ac120002',
-        name: 'Module Grammatica A1',
-        description: 'This is a module description.',
-        difficulty: 'A1',
-        category: 'Grammatica',
-        made_by: 'Toon Otten',
-    },
-    {
-        id: '2cccd034-9900-11ee-b9d1-0242ac120002',
-        name: 'Module Grammatica A2',
-        description: 'This is a module description.',
-        difficulty: 'A2',
-        category: 'Grammatica',
-        made_by: 'Toon Otten',
-    },
-    {
-        id: '2cccd034-9900-11ee-b9d1-0242ac120002',
-        name: 'Module Grammatica B1',
-        description: 'This is a module description.',
-        difficulty: 'B1',
-        category: 'Grammatica',
-        made_by: 'Toon Otten',
-    },
-    {
-        id: '2cccd034-9900-11ee-b9d1-0242ac120002',
-        name: 'Module Grammatica B2',
-        description: 'This is a module description.',
-        difficulty: 'B2',
-        category: 'Grammatica',
-        made_by: 'Toon Otten',
-    },
-    {
-        id: '2cccd034-9900-11ee-b9d1-0242ac120002',
-        name: 'Module Grammatica C1',
-        description: 'This is a module description.',
-        difficulty: 'C1',
-        category: 'Grammatica',
-        made_by: 'Toon Otten',
-    }, {
-        id: '2cccd034-9900-11ee-b9d1-0242ac120002',
-        name: 'Module Grammatica C2',
-        description: 'This is a module description.',
-        difficulty: 'C2',
-        category: 'Grammatica',
-        made_by: 'Toon Otten',
-    }, {
-        id: '2cccd034-9900-11ee-b9d1-0242ac120002',
-        name: 'Module Grammatica C2+',
-        description: 'This is a module description.',
-        difficulty: 'C2',
-        category: 'Grammatica',
-        made_by: 'Toon Otten',
-    },
-    {
-        id: '2cccd034-9900-11ee-b9d1-0242ac120002',
-        name: 'Module Grammatica C2++',
-        description: 'This is a module description.',
-        difficulty: 'C2',
-        category: 'Grammatica',
-        made_by: 'Toon Otten',
-    },
-    {
-        id: '2cccd034-9900-11ee-b9d1-0242ac120002',
-        name: 'Module Grammatica Mixed',
-        description: 'This is a module description.',
-        difficulty: 'Fastlane',
-        category: 'Grammatica',
-        made_by: 'Toon Otten',
-    },
-    {
-        id: '2cccd034-9900-11ee-b9d1-0242ac120002',
-        name: 'Module Grammatica Mixed',
-        description: 'This is a module description.',
-        difficulty: 'Fastlane',
-        category: 'Grammatica',
-        made_by: 'Toon Otten',
-    },
-]
+export const categories = ['Grammatica', 'Spelling', 'Woordenschat', 'Werkwoordspelling', 'Fastlane']
+
+export const difficulties = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2']
+
+export const listModulesQuery = `
+    query ListModules($filter: ModuleFilter, $paginate: Paginator) {
+      listModules(filter: $filter, paginate: $paginate) {
+        id
+        name
+        school_id
+        description
+        category
+        difficulty
+        made_by
+        private
+      }
+    }
+`;
+
+export const deleteModuleQuery = `
+    mutation DeleteObject($filter: SagaFilter) {
+      deleteObject(filter: $filter) {
+        id
+        object_id
+        object_type
+        text
+        status
+      }
+    }
+`;
+
+export const createModuleQuery = `
+    mutation CreateModule($input: ModuleInputCreate!) {
+      createModule(input: $input) {
+        id
+        name
+        description
+        school_id
+        category
+        difficulty
+        made_by
+        private
+        key
+      }
+    }
+`;

@@ -9,4 +9,4 @@ resources:
 images:
   - name: cloud-cms
     newName: quay.io/bramterlouw/cloud-cms
-    newTag: latest
+    newTag: v1.0.0-20240118.1550

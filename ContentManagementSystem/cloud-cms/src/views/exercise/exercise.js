@@ -6,140 +6,88 @@ export const headers = [
     {title: 'Actions', key: 'actions', align: 'start', sortable: false},
 ]
 
-export const exercises = [
-    {
-        id: '6ef831f6-99b9-11ee-b9d1-0242ac120002',
-        class_id: '2055b38e-992d-11ee-b9d1-0242ac120002',
-        name: 'Question 1 (Grammatica)',
-        question: 'This is an example question?',
-        answers: ['Answer A', 'Answer B', 'Answer C'],
-        pos_correct_answer: 0,
-        question_type: 'MC',
-        difficulty: 'B2',
-        made_by: 'Toon Otten',
-    },
-    {
-        id: '6ef831f6-99b9-11ee-b9d1-0242ac120002',
-        class_id: '2055b38e-992d-11ee-b9d1-0242ac120002',
-        name: 'Question 2 (Grammatica)',
-        question: 'This is an example question?',
-        answers: ['Answer A', 'Answer B', 'Answer C'],
-        pos_correct_answer: 0,
-        question_type: 'MC',
-        difficulty: 'B2',
-        made_by: 'Toon Otten',
-    },
-    {
-        id: '6ef831f6-99b9-11ee-b9d1-0242ac120002',
-        class_id: '2055b38e-992d-11ee-b9d1-0242ac120002',
-        name: 'Question 3 (Grammatica)',
-        question: 'This is an example question?',
-        answers: ['Answer A', 'Answer B', 'Answer C'],
-        pos_correct_answer: 0,
-        question_type: 'MC',
-        difficulty: 'B2',
-        made_by: 'Toon Otten',
-    },
-    {
-        id: '6ef831f6-99b9-11ee-b9d1-0242ac120002',
-        class_id: '2055b38e-992d-11ee-b9d1-0242ac120002',
-        name: 'Question 4 (Grammatica)',
-        question: 'This is an example question?',
-        answers: ['Answer A', 'Answer B', 'Answer C'],
-        pos_correct_answer: 0,
-        question_type: 'MC',
-        difficulty: 'B2',
-        made_by: 'Toon Otten',
-    },
-    {
-        id: '6ef831f6-99b9-11ee-b9d1-0242ac120002',
-        class_id: '2055b38e-992d-11ee-b9d1-0242ac120002',
-        name: 'Question 5 (Grammatica)',
-        question: 'This is an example question?',
-        answers: ['Answer A', 'Answer B', 'Answer C'],
-        pos_correct_answer: 0,
-        question_type: 'MC',
-        difficulty: 'B2',
-        made_by: 'Toon Otten',
-    },
-    {
-        id: '6ef831f6-99b9-11ee-b9d1-0242ac120002',
-        class_id: '2055b38e-992d-11ee-b9d1-0242ac120002',
-        name: 'Question 6 (Grammatica)',
-        question: 'This is an example question?',
-        answers: ['Answer A', 'Answer B', 'Answer C'],
-        pos_correct_answer: 0,
-        question_type: 'MC',
-        difficulty: 'B2',
-        made_by: 'Toon Otten',
-    },
-    {
-        id: '6ef831f6-99b9-11ee-b9d1-0242ac120002',
-        class_id: '2055b38e-992d-11ee-b9d1-0242ac120002',
-        name: 'Question 7 (Grammatica)',
-        question: 'This is an example question?',
-        answers: ['Answer A', 'Answer B', 'Answer C'],
-        pos_correct_answer: 0,
-        question_type: 'MC',
-        difficulty: 'B2',
-        made_by: 'Toon Otten',
-    },
-    {
-        id: '6ef831f6-99b9-11ee-b9d1-0242ac120002',
-        class_id: '2055b38e-992d-11ee-b9d1-0242ac120002',
-        name: 'Question 8 (Grammatica)',
-        question: 'This is an example question?',
-        answers: ['Answer A', 'Answer B', 'Answer C'],
-        pos_correct_answer: 0,
-        question_type: 'MC',
-        difficulty: 'B2',
-        made_by: 'Toon Otten',
-    },
-    {
-        id: '6ef831f6-99b9-11ee-b9d1-0242ac120002',
-        class_id: '2055b38e-992d-11ee-b9d1-0242ac120002',
-        name: 'Question 9 (Grammatica)',
-        question: 'This is an example question?',
-        answers: ['Answer A', 'Answer B', 'Answer C'],
-        pos_correct_answer: 0,
-        question_type: 'MC',
-        difficulty: 'B2',
-        made_by: 'Toon Otten',
-    },
-    {
-        id: '6ef831f6-99b9-11ee-b9d1-0242ac120002',
-        class_id: '2055b38e-992d-11ee-b9d1-0242ac120002',
-        name: 'Question 10 (Grammatica)',
-        question: 'This is an example question?',
-        answers: ['Answer A', 'Answer B', 'Answer C'],
-        pos_correct_answer: 0,
-        question_type: 'MC',
-        difficulty: 'B2',
-        made_by: 'Toon Otten',
-    },
-]
+export const difficulties = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2']
 
-export const generatedQuestions = [
-    {
-        id: '6ef831f6-99b9-11ee-b9d1-0242ac120002',
-        class_id: '2055b38e-992d-11ee-b9d1-0242ac120002',
-        name: 'Generated question 1',
-        question: 'This is an example question?',
-        answers: ['Answer A', 'Answer B', 'Answer C'],
-        pos_correct_answer: 0,
-        question_type: 'MC',
-        difficulty: 'B2',
-        made_by: 'Toon Otten',
-    },
-    {
-        id: '6ef831f6-99b9-11ee-b9d1-0242ac120002',
-        class_id: '2055b38e-992d-11ee-b9d1-0242ac120002',
-        name: 'Generated question 2',
-        question: 'This is an example question?',
-        answers: ['Answer A', 'Answer B', 'Answer C'],
-        pos_correct_answer: 0,
-        question_type: 'MC',
-        difficulty: 'B2',
-        made_by: 'Toon Otten',
-    },
-]
+export const listExercisesQuery = `
+    query ListExercise($filter: ExerciseFilter!, $paginator: Paginator!) {
+      ListExercise(filter: $filter, paginator: $paginator) {
+        answers {
+          correct
+          value
+        }
+        class_Id
+        difficulty
+        id
+        made_by
+        module_id
+        name
+        question
+      }
+    }
+`;
+
+export const deleteExerciseQuery = `
+    mutation DeleteObject($filter: SagaFilter) {
+      deleteObject(filter: $filter) {
+        id
+        object_id
+        object_type
+        text
+        status
+      }
+    }
+`;
+
+export const createExerciseQuery = `
+    mutation Mutation($exercise: ExerciseInput!) {
+      CreateExercise(exercise: $exercise) {
+        id
+        module_id
+        class_Id
+        name
+        difficulty
+        question
+        answers {
+          value
+          correct
+        }
+        made_by
+        created_at
+        updated_at
+        soft_deleted
+      }
+    }
+`;
+
+export const generateMcQuery = `
+  mutation generateMC($amountQuestions: Int!, $questionLevel: LevelEnum!, $questionSubject: SubjectEnum!) {
+    generateMultipleChoiceQuestions (
+      amountQuestions: $amountQuestions,
+      questionLevel: $questionLevel,
+      questionSubject: $questionSubject
+    ) {
+      response {
+        status
+        message
+        token
+      }
+    }
+  }
+`;
+
+export const retrieveMcQuery = `
+    query RetrieveMultipleChoiceQuestions($token: String!) {
+      retrieveMultipleChoiceQuestions(token: $token) {
+        status
+        message
+        questions {
+          questionType
+          questionLevel
+          questionSubject
+          questionText
+          answerOptions
+          correctAnswer
+        }
+      }
+    }
+`

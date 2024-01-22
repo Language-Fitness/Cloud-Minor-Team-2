@@ -1,6 +1,5 @@
 <script>
-import {headers} from "@/views/class/class";
-import {classes} from "@/views/class/class";
+import {createClassQuery, deleteClassQuery, difficulties, headers, listClassesQuery} from "@/views/class/class";
 import router from '@/router'
 import axios from "axios";
 import {useAuthStore} from "@/stores/store";
@@ -10,7 +9,7 @@ export default {
     isAdmin: true,
     itemsPerPage: 10,
     headers: headers,
-    difficulties: ['A1', 'A2', 'B1', 'B2', 'C1', 'C2'],
+    difficulties: difficulties,
     name_search: '',
     name_type_search: 'eq',
     difficulty_search: '',
@@ -24,6 +23,7 @@ export default {
 
     dialog: false,
     dialogDelete: false,
+    classToDelete: '',
     editedIndex: -1,
 
     editedItem: {
@@ -57,25 +57,13 @@ export default {
     async loadItems({page, itemsPerPage}) {
       this.loading = true;
       let store = useAuthStore()
-      const graphqlEndpoint = 'https://gandalf-the-gateway-bramterlouw-dev.apps.ocp2-inholland.joran-bergfeld.com/';
 
+      const graphqlEndpoint = import.meta.env.VITE_GATEWAY_ENDPOINT;
+      const graphqlQuery = listClassesQuery;
       const headers = {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${store.accessToken}`,
       };
-
-      const graphqlQuery = `
-        query ListClasses($filter: ListClassFilter, $paginate: Paginator) {
-          listClasses(filter: $filter, paginate: $paginate) {
-            id
-            name
-            description
-            difficulty
-            module_Id
-            made_by
-          }
-        }
-      `;
 
       let filter = {}
       if (this.$route.query.module) {
@@ -122,8 +110,7 @@ export default {
     },
 
     deleteItem(item) {
-      this.editedIndex = classes.findIndex((cl) => cl.id === item.id)
-      this.editedItem = Object.assign({}, item)
+      this.classToDelete = item.id
       this.dialogDelete = true
     },
 
@@ -143,36 +130,54 @@ export default {
       })
     },
 
-    deleteItemConfirm() {
-      // TODO: DELETE LOGIC
+    async deleteItemConfirm() {
+      let store = useAuthStore()
+
+      const graphqlEndpoint = import.meta.env.VITE_GATEWAY_ENDPOINT;
+      const graphqlQuery = deleteClassQuery;
+      const headers = {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${store.accessToken}`,
+      };
+
+      const variables = {
+        filter: {
+          object_id: this.classToDelete,
+          object_type: "Class"
+        }
+      }
+
+      try {
+        const response = await axios.post(
+            graphqlEndpoint,
+            {
+              query: graphqlQuery,
+              variables,
+            },
+            {headers}
+        );
+
+        const {data} = response.data;
+
+      } catch (error) {
+        console.error('GraphQL request failed', error);
+      } finally {
+        this.loading = false;
+      }
+
+      await this.loadItems({page: 0, itemsPerPage: 10})
       this.closeDelete()
     },
 
     async save() {
       let store = useAuthStore()
 
-      const graphqlEndpoint = 'https://gandalf-the-gateway-bramterlouw-dev.apps.ocp2-inholland.joran-bergfeld.com/';
-
+      const graphqlEndpoint = import.meta.env.VITE_GATEWAY_ENDPOINT;
+      const graphqlQuery = createClassQuery;
       const headers = {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${store.accessToken}`,
       };
-
-      const graphqlQuery = `
-        mutation CreateClass($input: ClassInput!) {
-          createClass(input: $input) {
-            id
-            module_Id
-            name
-            description
-            difficulty
-            made_by
-            created_at
-            updated_at
-            soft_deleted
-          }
-        }
-      `;
 
       const variables = {
         input: {
@@ -193,9 +198,7 @@ export default {
             {headers}
         );
 
-        console.log(response)
         const {data} = response.data;
-        console.log(data)
 
       } catch (error) {
         console.error('GraphQL request failed', error);
@@ -214,25 +217,12 @@ export default {
     async filter() {
       let store = useAuthStore()
 
-      const graphqlEndpoint = 'https://gandalf-the-gateway-bramterlouw-dev.apps.ocp2-inholland.joran-bergfeld.com/';
-
+      const graphqlEndpoint = import.meta.env.VITE_GATEWAY_ENDPOINT;
+      const graphqlQuery = listClassesQuery;
       const headers = {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${store.accessToken}`,
       };
-
-      const graphqlQuery = `
-         query ListClasses($filter: ListClassFilter, $paginate: Paginator) {
-          listClasses(filter: $filter, paginate: $paginate) {
-            id
-            name
-            description
-            difficulty
-            module_Id
-            made_by
-          }
-        }
-      `;
 
       let filter = this.buildFilter()
       const variables = {
@@ -253,6 +243,7 @@ export default {
             {headers}
         );
 
+        console.log(response)
         const {data} = response.data;
 
         if (data.listClasses) {
@@ -280,7 +271,7 @@ export default {
       }
 
       if (this.module_id_search !== '') {
-        params.module_Id = this.module_id_search;
+        params.module_id = this.module_id_search;
       }
 
       if (this.difficulty_search !== '') {
@@ -307,7 +298,8 @@ export default {
 
       <div class="filter-wrapper w-100 d-flex flex-row">
         <div class="filter-container w-50">
-          <h3 class="ml-2">Filter options</h3>
+          <h2 class="ml-2">Filter options</h2>
+          <v-divider></v-divider>
 
           <div class="d-flex flex-row flex-nowrap w-100">
             <v-text-field
@@ -476,8 +468,6 @@ export default {
       <v-dialog v-model="dialogDelete" max-width="500px">
         <v-card class="flex-column align-center pa-5">
           <v-card-title class="text-h5">Are you sure you want to delete this item?</v-card-title>
-
-          <v-checkbox v-if="isAdmin" class="pa-0" hide-details label="Hard delete"></v-checkbox>
 
           <v-card-text class="pt-0">You will not be able to recover this item.</v-card-text>
 

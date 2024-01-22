@@ -1,5 +1,11 @@
 <script>
-import {exercises, headers, generatedQuestions} from "@/views/exercise/exercise";
+import {
+  createExerciseQuery,
+  deleteExerciseQuery, difficulties,
+  generateMcQuery,
+  headers,
+  listExercisesQuery, retrieveMcQuery
+} from "@/views/exercise/exercise";
 import axios from "axios";
 import {useAuthStore} from "@/stores/store";
 
@@ -19,7 +25,7 @@ export default {
     genQuestions: [],
 
     // Combobox items
-    difficulties: ['A1', 'A2', 'B1', 'B2', 'C1', 'C2'],
+    difficulties: difficulties,
 
     // Search filters
     name_search: '',
@@ -37,6 +43,7 @@ export default {
     // Open/close dialogs
     dialog: false,
     dialogDelete: false,
+    exerciseToDelete: '',
 
     // Item for editing item
     editedIndex: -1,
@@ -73,30 +80,12 @@ export default {
       this.loading = true;
       let store = useAuthStore()
 
-      const graphqlEndpoint = 'https://gandalf-the-gateway-bramterlouw-dev.apps.ocp2-inholland.joran-bergfeld.com/';
-
+      const graphqlEndpoint = import.meta.env.VITE_GATEWAY_ENDPOINT;
+      const graphqlQuery = listExercisesQuery;
       const headers = {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${store.accessToken}`,
       };
-
-      const graphqlQuery = `
-        query ListExercise($filter: ExerciseFilter!, $paginator: Paginator!) {
-          ListExercise(filter: $filter, paginator: $paginator) {
-            answers {
-              correct
-              value
-            }
-            class_Id
-            difficulty
-            id
-            made_by
-            module_id
-            name
-            question
-          }
-        }
-      `;
 
       const variables = {
         filter: {
@@ -132,14 +121,11 @@ export default {
     },
 
     editItem(item) {
-      this.editedIndex = exercises.findIndex((cl) => cl.id === item.id)
-      this.editedItem = Object.assign({}, item)
       this.dialog = true
     },
 
     deleteItem(item) {
-      this.editedIndex = exercises.findIndex((cl) => cl.id === item.id)
-      this.editedItem = Object.assign({}, item)
+      this.exerciseToDelete = item.id
       this.dialogDelete = true
     },
 
@@ -171,16 +157,9 @@ export default {
         if (res.message !== 'Response still pending, please wait.') {
           clearInterval(intervalId)
 
-          // Set the generated save button for form
           this.hasGenerated = true
-
-          // Set the response questions
           this.genQuestions = res.questions
-
-          // Enable all inputs
           this.isGenerating = false
-
-          // Fill form with values
           this.setEditForm()
         }
       }, 5000);
@@ -200,44 +179,56 @@ export default {
           value: element
         })
       });
-
-      console.log(this.editedItem)
     },
 
-    deleteItemConfirm() {
+    async deleteItemConfirm() {
+      let store = useAuthStore()
+
+      const graphqlEndpoint = import.meta.env.VITE_GATEWAY_ENDPOINT;
+      const graphqlQuery = deleteExerciseQuery;
+      const headers = {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${store.accessToken}`,
+      };
+
+      const variables = {
+        filter: {
+          object_id: this.exerciseToDelete,
+          object_type: "Exercise"
+        }
+      }
+
+      try {
+        const response = await axios.post(
+            graphqlEndpoint,
+            {
+              query: graphqlQuery,
+              variables,
+            },
+            {headers}
+        );
+
+        const {data} = response.data;
+
+      } catch (error) {
+        console.error('GraphQL request failed', error);
+      } finally {
+        this.loading = false;
+      }
+
+      await this.loadItems({page: 0, itemsPerPage: 10})
       this.closeDelete()
     },
 
     async save() {
       let store = useAuthStore()
 
-      const graphqlEndpoint = 'https://gandalf-the-gateway-bramterlouw-dev.apps.ocp2-inholland.joran-bergfeld.com/';
-
+      const graphqlEndpoint = import.meta.env.VITE_GATEWAY_ENDPOINT;
+      const graphqlQuery = createExerciseQuery;
       const headers = {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${store.accessToken}`,
       };
-
-      const graphqlQuery = `
-        mutation Mutation($exercise: ExerciseInput!) {
-          CreateExercise(exercise: $exercise) {
-            id
-            module_id
-            class_Id
-            name
-            difficulty
-            question
-            answers {
-              value
-              correct
-            }
-            made_by
-            created_at
-            updated_at
-            soft_deleted
-          }
-        }
-      `;
 
       const variables = {
         exercise: {
@@ -284,30 +275,12 @@ export default {
     async filter() {
       let store = useAuthStore()
 
-      const graphqlEndpoint = 'https://gandalf-the-gateway-bramterlouw-dev.apps.ocp2-inholland.joran-bergfeld.com/';
-
+      const graphqlEndpoint = import.meta.env.VITE_GATEWAY_ENDPOINT;
+      const graphqlQuery = listExercisesQuery;
       const headers = {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${store.accessToken}`,
       };
-
-      const graphqlQuery = `
-         query ListExercise($filter: ExerciseFilter!, $paginator: Paginator!) {
-          ListExercise(filter: $filter, paginator: $paginator) {
-            answers {
-              correct
-              value
-            }
-            class_Id
-            difficulty
-            id
-            made_by
-            module_id
-            name
-            question
-          }
-        }
-      `;
 
       let filter = this.buildFilter()
       const variables = {
@@ -363,28 +336,12 @@ export default {
     async generateMc() {
       let store = useAuthStore()
 
-      const graphqlEndpoint = 'https://gandalf-the-gateway-bramterlouw-dev.apps.ocp2-inholland.joran-bergfeld.com/';
-
+      const graphqlEndpoint = import.meta.env.VITE_GATEWAY_ENDPOINT;
+      const graphqlQuery = generateMcQuery;
       const headers = {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${store.accessToken}`,
       };
-
-      const graphqlQuery = `
-      mutation generateMC($amountQuestions: Int!, $questionLevel: LevelEnum!, $questionSubject: SubjectEnum!) {
-        generateMultipleChoiceQuestions (
-          amountQuestions: $amountQuestions,
-          questionLevel: $questionLevel,
-          questionSubject: $questionSubject
-        ) {
-          response {
-            status
-            message
-            token
-          }
-        }
-      }
-  `;
 
       try {
         const response = await axios.post(
@@ -410,29 +367,12 @@ export default {
     async retrieveMc(token) {
       let store = useAuthStore()
 
-      const graphqlEndpoint = 'https://gandalf-the-gateway-bramterlouw-dev.apps.ocp2-inholland.joran-bergfeld.com/';
-
+      const graphqlEndpoint = import.meta.env.VITE_GATEWAY_ENDPOINT;
+      const graphqlQuery = retrieveMcQuery;
       const headers = {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${store.accessToken}`,
       };
-
-      const graphqlQuery = `
-        query RetrieveMultipleChoiceQuestions($token: String!) {
-          retrieveMultipleChoiceQuestions(token: $token) {
-            status
-            message
-            questions {
-              questionType
-              questionLevel
-              questionSubject
-              questionText
-              answerOptions
-              correctAnswer
-            }
-          }
-        }
-      `
 
       const variables = {
         token: token,
@@ -472,12 +412,15 @@ export default {
         voor gegevensbeheer in een systeem. Deze functionaliteit zijn te doen door zowel leraren als admins.
       </p>
 
-      <h3 class="my-2 pa-2 w-100" :style="'border: 1px solid lightgray'">Class:
+      <h3 class="my-2 pa-2" :style="'border: 1px solid lightgray'">Class:
         {{this.$route.params.id}}
       </h3>
 
       <div class="filter-wrapper w-100 d-flex flex-row">
         <div class="filter-container">
+          <h2 class="ml-2">Filter options</h2>
+          <v-divider></v-divider>
+
           <div class="d-flex flex-row flex-nowrap w-100">
             <v-text-field
                 :style="'flex-basis: 70%'"
@@ -707,8 +650,6 @@ export default {
       <v-dialog v-model="dialogDelete" max-width="500px">
         <v-card class="flex-column align-center pa-5">
           <v-card-title class="text-h5">Are you sure you want to delete this item?</v-card-title>
-
-          <v-checkbox v-if="isAdmin" class="pa-0" hide-details label="Hard delete"></v-checkbox>
 
           <v-card-text class="pt-0">You will not be able to recover this item.</v-card-text>
 

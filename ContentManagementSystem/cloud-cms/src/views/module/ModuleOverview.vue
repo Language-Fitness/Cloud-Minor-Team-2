@@ -1,5 +1,5 @@
 <script>
-import {modules} from "@/views/module/modules";
+import {categories, createModuleQuery, deleteModuleQuery, difficulties, listModulesQuery} from "@/views/module/modules";
 import {headers} from "@/views/module/modules";
 import axios from "axios";
 import {useAuthStore} from "@/stores/store";
@@ -9,8 +9,8 @@ export default {
     isAdmin: true,
     itemsPerPage: 10,
     headers: headers,
-    categories: ['Grammatica', 'Spelling', 'Woordenschat', 'Werkwoordspelling', 'Fastlane'],
-    difficulties: ['A1', 'A2', 'B1', 'B2', 'C1', 'C2'],
+    categories: categories,
+    difficulties: difficulties,
     name_search: '',
     name_type_search: 'eq',
     difficulty_search: '',
@@ -25,6 +25,7 @@ export default {
 
     dialog: false,
     dialogDelete: false,
+    moduleToDelete: '',
     editedIndex: -1,
 
     editedItem: {
@@ -55,27 +56,12 @@ export default {
       this.loading = true;
       let store = useAuthStore()
 
-      const graphqlEndpoint = 'https://gandalf-the-gateway-bramterlouw-dev.apps.ocp2-inholland.joran-bergfeld.com/';
-
+      const graphqlEndpoint = import.meta.env.VITE_GATEWAY_ENDPOINT;
+      const graphqlQuery = listModulesQuery;
       const headers = {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${store.accessToken}`,
       };
-
-      const graphqlQuery = `
-        query ListModules($filter: ModuleFilter, $paginate: Paginator) {
-          listModules(filter: $filter, paginate: $paginate) {
-            id
-            name
-            school_id
-            description
-            category
-            difficulty
-            made_by
-            private
-          }
-        }
-      `;
 
       const variables = {
         filter: {
@@ -116,8 +102,7 @@ export default {
     },
 
     deleteItem(item) {
-      this.editedIndex = modules.findIndex((module) => module.id === item.id)
-      this.editedItem = Object.assign({}, item)
+      this.moduleToDelete = item.id
       this.dialogDelete = true
     },
 
@@ -137,46 +122,20 @@ export default {
       })
     },
 
-    deleteItemConfirm() {
-      // TODO: DELETE LOGIC
-      this.closeDelete()
-    },
-
-    async save() {
+    async deleteItemConfirm() {
       let store = useAuthStore()
 
-      const graphqlEndpoint = 'https://gandalf-the-gateway-bramterlouw-dev.apps.ocp2-inholland.joran-bergfeld.com/';
-
+      const graphqlEndpoint = import.meta.env.VITE_GATEWAY_ENDPOINT;
+      const graphqlQuery = deleteModuleQuery;
       const headers = {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${store.accessToken}`,
       };
 
-      const graphqlQuery = `
-        mutation CreateModule($input: ModuleInputCreate!) {
-          createModule(input: $input) {
-            id
-            name
-            description
-            school_id
-            category
-            difficulty
-            made_by
-            private
-            key
-          }
-        }
-      `;
-
       const variables = {
-        input: {
-          category: this.editedItem.category,
-          description: this.editedItem.description,
-          difficulty: this.editedItem.difficulty,
-          key: this.editedItem.key,
-          name: this.editedItem.name,
-          private: this.editedItem.isPrivate,
-          school_id: "5be98816-b53d-4648-b89e-9cdf46800952"
+        filter: {
+          object_id: this.moduleToDelete,
+          object_type: "Module"
         }
       }
 
@@ -199,6 +158,49 @@ export default {
       }
 
       await this.loadItems({page: 0, itemsPerPage: 10})
+      this.closeDelete()
+    },
+
+    async save() {
+      let store = useAuthStore()
+
+      const graphqlEndpoint = import.meta.env.VITE_GATEWAY_ENDPOINT;
+      const graphqlQuery = createModuleQuery;
+      const headers = {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${store.accessToken}`,
+      };
+
+      const variables = {
+        input: {
+          category: this.editedItem.category,
+          description: this.editedItem.description,
+          difficulty: this.editedItem.difficulty,
+          key: this.editedItem.key,
+          name: this.editedItem.name,
+          private: this.editedItem.isPrivate,
+          school_id: "5be98816-b53d-4648-b89e-9cdf46800952"
+        }
+      }
+
+      try {
+        const response = await axios.post(
+            graphqlEndpoint,
+            {
+              query: graphqlQuery,
+              variables,
+            },
+            {headers}
+        );
+        const {data} = response.data;
+
+      } catch (error) {
+        console.error('GraphQL request failed', error);
+      } finally {
+        this.loading = false;
+      }
+
+      await this.loadItems({page: 0, itemsPerPage: 10})
       this.close()
     },
 
@@ -209,27 +211,12 @@ export default {
     async filter() {
       let store = useAuthStore()
 
-      const graphqlEndpoint = 'https://gandalf-the-gateway-bramterlouw-dev.apps.ocp2-inholland.joran-bergfeld.com/';
-
+      const graphqlEndpoint = import.meta.env.VITE_GATEWAY_ENDPOINT;
+      const graphqlQuery = listModulesQuery;
       const headers = {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${store.accessToken}`,
       };
-
-      const graphqlQuery = `
-        query ListModules($filter: ModuleFilter, $paginate: Paginator) {
-          listModules(filter: $filter, paginate: $paginate) {
-            id
-            name
-            school_id
-            description
-            category
-            difficulty
-            made_by
-            private
-          }
-        }
-      `;
 
       let filter = this.buildFilter()
       const variables = {
@@ -305,7 +292,8 @@ export default {
 
       <div class="filter-wrapper d-flex w-100 flex-row">
         <div class="filter-container w-50">
-          <h3 class="ml-2">Filter options</h3>
+          <h2 class="ml-2">Filter options</h2>
+          <v-divider></v-divider>
 
           <div class="d-flex flex-row flex-nowrap w-100">
             <v-text-field
@@ -498,8 +486,6 @@ export default {
       <v-dialog v-model="dialogDelete" max-width="500px">
         <v-card class="flex-column align-center pa-5">
           <v-card-title class="text-h5">Are you sure you want to delete this item?</v-card-title>
-
-          <v-checkbox v-if="isAdmin" class="pa-0" hide-details label="Hard delete"></v-checkbox>
 
           <v-card-text class="pt-0">You will not be able to recover this item.</v-card-text>
 

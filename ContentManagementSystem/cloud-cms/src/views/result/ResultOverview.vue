@@ -1,5 +1,5 @@
 <script>
-import {headers} from "@/views/result/results";
+import {headers, listResultQuery} from "@/views/result/results";
 import axios from "axios";
 import {useAuthStore} from "@/stores/store";
 
@@ -24,26 +24,12 @@ export default {
       this.loading = true;
       let store = useAuthStore()
 
-      const graphqlEndpoint = 'https://gandalf-the-gateway-bramterlouw-dev.apps.ocp2-inholland.joran-bergfeld.com/';
-
+      const graphqlEndpoint = import.meta.env.VITE_GATEWAY_ENDPOINT;
+      const graphqlQuery = listResultQuery;
       const headers = {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${store.accessToken}`,
       };
-
-      const graphqlQuery = `
-        query Query($filter: ResultFilter!, $paginator: Paginator!) {
-          ListResults(filter: $filter, paginator: $paginator) {
-            id
-            module_id
-            class_id
-            exercise_id
-            user_id
-            input
-            result
-          }
-        }
-      `;
 
       const variables = {
         filter: {
@@ -100,26 +86,12 @@ export default {
     async filter() {
       let store = useAuthStore()
 
-      const graphqlEndpoint = 'https://gandalf-the-gateway-bramterlouw-dev.apps.ocp2-inholland.joran-bergfeld.com/';
-
+      const graphqlEndpoint = import.meta.env.VITE_GATEWAY_ENDPOINT;
+      const graphqlQuery = listResultQuery;
       const headers = {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${store.accessToken}`,
       };
-
-      const graphqlQuery = `
-        query Query($filter: ResultFilter!, $paginator: Paginator!) {
-          ListResults(filter: $filter, paginator: $paginator) {
-            id
-            module_id
-            class_id
-            exercise_id
-            user_id
-            input
-            result
-          }
-        }
-      `;
 
       let filter = this.buildFilter()
       const variables = {
@@ -189,7 +161,8 @@ export default {
 
       <div class="filter-wrapper d-flex w-100 flex-row">
         <div class="filter-container w-50">
-          <h3 class="ml-2">Filter options</h3>
+          <h2 class="ml-2">Filter options</h2>
+          <v-divider></v-divider>
 
           <div class="d-flex flex-row flex-nowrap w-100">
             <div class="w-50">
