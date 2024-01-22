@@ -38,14 +38,14 @@ spec:
       "editable": true,
       "fiscalYearStartMonth": 0,
       "graphTooltip": 0,
-      "id": 4,
+      "id": 2,
       "links": [],
       "liveNow": false,
       "panels": [
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "45cce825-c7d8-451b-b51d-c1c29e33431a"
+            "uid": "3acf85e2-5303-4f27-9185-eec17b95cca1"
           },
           "fieldConfig": {
             "defaults": {
@@ -112,7 +112,7 @@ spec:
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "45cce825-c7d8-451b-b51d-c1c29e33431a"
+            "uid": "3acf85e2-5303-4f27-9185-eec17b95cca1"
           },
           "fieldConfig": {
             "defaults": {
@@ -204,7 +204,7 @@ spec:
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "45cce825-c7d8-451b-b51d-c1c29e33431a"
+            "uid": "3acf85e2-5303-4f27-9185-eec17b95cca1"
           },
           "fieldConfig": {
             "defaults": {
@@ -296,7 +296,7 @@ spec:
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "45cce825-c7d8-451b-b51d-c1c29e33431a"
+            "uid": "3acf85e2-5303-4f27-9185-eec17b95cca1"
           },
           "fieldConfig": {
             "defaults": {
@@ -375,8 +375,8 @@ spec:
                 "type": "prometheus",
                 "uid": "2705e754-e60d-424b-ad93-4b43cd3c99ea"
               },
-              "editorMode": "builder",
-              "expr": "increase(http_requests_total{namespace=\"bramterlouw-dev\", container=\"$microservices\", method=\"POST\", handler=\"/query\"}[1m])",
+              "editorMode": "code",
+              "expr": "increase(http_requests_total{namespace=\"bramterlouw-dev\", container=\"$microservices\", method=\"POST\", handler=\"/query\"}[1m])\r\nor\r\nincrease(http_request_total{namespace=\"bramterlouw-dev\", container=\"$microservices\", method=\"POST\", handler=\"/\"}[1m])\r\n",
               "legendFormat": "{{pod}}",
               "range": true,
               "refId": "A"
@@ -393,9 +393,9 @@ spec:
         "list": [
           {
             "current": {
-              "selected": false,
-              "text": "module-microservice",
-              "value": "module-microservice"
+              "selected": true,
+              "text": "gandalf-the-gateway",
+              "value": "gandalf-the-gateway"
             },
             "hide": 0,
             "includeAll": false,
@@ -403,7 +403,7 @@ spec:
             "name": "microservices",
             "options": [
               {
-                "selected": false,
+                "selected": true,
                 "text": "gandalf-the-gateway",
                 "value": "gandalf-the-gateway"
               },
@@ -418,7 +418,7 @@ spec:
                 "value": "class-microservice"
               },
               {
-                "selected": true,
+                "selected": false,
                 "text": "module-microservice",
                 "value": "module-microservice"
               },
