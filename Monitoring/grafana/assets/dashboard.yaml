@@ -38,14 +38,14 @@ spec:
       "editable": true,
       "fiscalYearStartMonth": 0,
       "graphTooltip": 0,
-      "id": 3,
+      "id": 2,
       "links": [],
       "liveNow": false,
       "panels": [
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "2705e754-e60d-424b-ad93-4b43cd3c99ea"
+            "uid": "45cce825-c7d8-451b-b51d-c1c29e33431a"
           },
           "fieldConfig": {
             "defaults": {
@@ -99,7 +99,7 @@ spec:
               },
               "editorMode": "builder",
               "exemplar": false,
-              "expr": "count(kube_pod_container_info{exported_namespace=\"bramterlouw-dev\", exported_container=\"$Microservices\"})",
+              "expr": "count(kube_pod_container_info{exported_namespace=\"bramterlouw-dev\", exported_container=\"$var_microservices\"})",
               "instant": true,
               "legendFormat": "__auto",
               "range": false,
@@ -112,7 +112,7 @@ spec:
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "2705e754-e60d-424b-ad93-4b43cd3c99ea"
+            "uid": "45cce825-c7d8-451b-b51d-c1c29e33431a"
           },
           "fieldConfig": {
             "defaults": {
@@ -192,7 +192,7 @@ spec:
                 "uid": "2705e754-e60d-424b-ad93-4b43cd3c99ea"
               },
               "editorMode": "builder",
-              "expr": "container_cpu_usage_seconds_total{exported_namespace=\"bramterlouw-dev\", container=\"$Microservices\"}",
+              "expr": "container_cpu_usage_seconds_total{exported_namespace=\"bramterlouw-dev\", container=\"$var_microservices\"}",
               "legendFormat": "{{pod}}",
               "range": true,
               "refId": "A"
@@ -204,7 +204,7 @@ spec:
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "2705e754-e60d-424b-ad93-4b43cd3c99ea"
+            "uid": "45cce825-c7d8-451b-b51d-c1c29e33431a"
           },
           "fieldConfig": {
             "defaults": {
@@ -284,7 +284,7 @@ spec:
                 "uid": "2705e754-e60d-424b-ad93-4b43cd3c99ea"
               },
               "editorMode": "builder",
-              "expr": "container_memory_usage_bytes{exported_namespace=\"bramterlouw-dev\", container=\"$Microservices\"}",
+              "expr": "container_memory_usage_bytes{exported_namespace=\"bramterlouw-dev\", container=\"$var_microservices\"}",
               "legendFormat": "{{pod}}",
               "range": true,
               "refId": "A"
@@ -296,7 +296,7 @@ spec:
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "2705e754-e60d-424b-ad93-4b43cd3c99ea"
+            "uid": "45cce825-c7d8-451b-b51d-c1c29e33431a"
           },
           "fieldConfig": {
             "defaults": {
@@ -376,7 +376,7 @@ spec:
                 "uid": "2705e754-e60d-424b-ad93-4b43cd3c99ea"
               },
               "editorMode": "builder",
-              "expr": "increase(http_requests_total{namespace=\"bramterlouw-dev\", container=\"$Microservices\", method=\"POST\", handler=\"/query\"}[1m])",
+              "expr": "increase(http_requests_total{namespace=\"bramterlouw-dev\", container=\"$var_microservices\", method=\"POST\", handler=\"/query\"}[1m])",
               "legendFormat": "{{pod}}",
               "range": true,
               "refId": "A"
@@ -393,14 +393,14 @@ spec:
         "list": [
           {
             "current": {
-              "selected": true,
-              "text": "class-microservice",
-              "value": "class-microservice"
+              "selected": false,
+              "text": "module-microservice",
+              "value": "module-microservice"
             },
             "hide": 0,
             "includeAll": false,
             "multi": false,
-            "name": "Microservices",
+            "name": "var_microservices",
             "options": [
               {
                 "selected": false,
@@ -413,12 +413,12 @@ spec:
                 "value": "exercise-microservice"
               },
               {
-                "selected": true,
+                "selected": false,
                 "text": "class-microservice",
                 "value": "class-microservice"
               },
               {
-                "selected": false,
+                "selected": true,
                 "text": "module-microservice",
                 "value": "module-microservice"
               },
@@ -458,6 +458,6 @@ spec:
       "timezone": "",
       "title": "Language Fitness Dashboard",
       "uid": "bQ2RGX5Ik",
-      "version": 9,
+      "version": 18,
       "weekStart": ""
     }
