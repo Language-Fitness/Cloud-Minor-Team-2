@@ -17,564 +17,447 @@ spec:
         "list": [
           {
             "builtIn": 1,
-            "datasource": "-- Grafana --",
+            "datasource": {
+              "type": "grafana",
+              "uid": "-- Grafana --"
+            },
             "enable": true,
             "hide": true,
             "iconColor": "rgba(0, 211, 255, 1)",
             "name": "Annotations & Alerts",
+            "target": {
+              "limit": 100,
+              "matchAny": false,
+              "tags": [],
+              "type": "dashboard"
+            },
             "type": "dashboard"
           }
         ]
       },
       "editable": true,
-      "gnetId": null,
+      "fiscalYearStartMonth": 0,
       "graphTooltip": 0,
-      "id": 1,
-      "iteration": 1586846207609,
+      "id": 3,
       "links": [],
+      "liveNow": false,
       "panels": [
         {
-          "collapsed": false,
+          "datasource": {
+            "type": "prometheus",
+            "uid": "2705e754-e60d-424b-ad93-4b43cd3c99ea"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              }
+            },
+            "overrides": []
+          },
           "gridPos": {
-            "h": 1,
-            "w": 24,
+            "h": 8,
+            "w": 12,
             "x": 0,
             "y": 0
           },
-          "id": 8,
-          "panels": [],
-          "title": "CPU",
-          "type": "row"
+          "id": 4,
+          "options": {
+            "colorMode": "value",
+            "graphMode": "area",
+            "justifyMode": "auto",
+            "orientation": "auto",
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "textMode": "auto"
+          },
+          "pluginVersion": "9.1.6",
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "2705e754-e60d-424b-ad93-4b43cd3c99ea"
+              },
+              "editorMode": "builder",
+              "exemplar": false,
+              "expr": "count(kube_pod_container_info{exported_namespace=\"bramterlouw-dev\", exported_container=\"$Microservices\"})",
+              "instant": true,
+              "legendFormat": "__auto",
+              "range": false,
+              "refId": "A"
+            }
+          ],
+          "title": "Amount Running Pods ($Microservices)",
+          "type": "stat"
         },
         {
-          "aliasColors": {},
-          "bars": false,
-          "dashLength": 10,
-          "dashes": false,
-          "fill": 1,
+          "datasource": {
+            "type": "prometheus",
+            "uid": "2705e754-e60d-424b-ad93-4b43cd3c99ea"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "drawStyle": "line",
+                "fillOpacity": 10,
+                "gradientMode": "opacity",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "auto",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              }
+            },
+            "overrides": []
+          },
           "gridPos": {
-            "h": 6,
+            "h": 8,
+            "w": 12,
+            "x": 12,
+            "y": 0
+          },
+          "id": 8,
+          "options": {
+            "legend": {
+              "calcs": [],
+              "displayMode": "table",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "tooltip": {
+              "mode": "single",
+              "sort": "none"
+            }
+          },
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "2705e754-e60d-424b-ad93-4b43cd3c99ea"
+              },
+              "editorMode": "builder",
+              "expr": "container_cpu_usage_seconds_total{exported_namespace=\"bramterlouw-dev\", container=\"$Microservices\"}",
+              "legendFormat": "{{pod}}",
+              "range": true,
+              "refId": "A"
+            }
+          ],
+          "title": "CPU Usage ($Microservices)",
+          "type": "timeseries"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "2705e754-e60d-424b-ad93-4b43cd3c99ea"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "drawStyle": "line",
+                "fillOpacity": 10,
+                "gradientMode": "opacity",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "auto",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              }
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 8,
             "w": 12,
             "x": 0,
-            "y": 1
-          },
-          "id": 10,
-          "legend": {
-            "avg": false,
-            "current": false,
-            "max": false,
-            "min": false,
-            "show": true,
-            "total": false,
-            "values": false
-          },
-          "lines": true,
-          "linewidth": 1,
-          "links": [],
-          "nullPointMode": "null",
-          "options": {},
-          "percentage": false,
-          "pointradius": 2,
-          "points": false,
-          "renderer": "flot",
-          "seriesOverrides": [],
-          "spaceLength": 10,
-          "stack": false,
-          "steppedLine": false,
-          "targets": [
-            {
-              "expr": "system_cpu_usage {endpoint=~\"$endpoint\",service=~\"$service\",pod=~\"$pod\",namespace=~\"$namespace\", uri!~\".*actuator.*\"}",
-              "format": "time_series",
-              "intervalFactor": 1,
-              "refId": "A"
-            },
-            {
-              "expr": "process_cpu_usage {endpoint=~\"$endpoint\",service=~\"$service\",pod=~\"$pod\",namespace=~\"$namespace\", uri!~\".*actuator.*\"}",
-              "format": "time_series",
-              "intervalFactor": 1,
-              "refId": "B"
-            }
-          ],
-          "thresholds": [],
-          "timeFrom": null,
-          "timeRegions": [],
-          "timeShift": null,
-          "title": "CPU  Usage",
-          "tooltip": {
-            "shared": true,
-            "sort": 0,
-            "value_type": "individual"
-          },
-          "type": "graph",
-          "xaxis": {
-            "buckets": null,
-            "mode": "time",
-            "name": null,
-            "show": true,
-            "values": []
-          },
-          "yaxes": [
-            {
-              "format": "short",
-              "label": null,
-              "logBase": 1,
-              "max": null,
-              "min": null,
-              "show": true
-            },
-            {
-              "format": "short",
-              "label": null,
-              "logBase": 1,
-              "max": null,
-              "min": null,
-              "show": true
-            }
-          ],
-          "yaxis": {
-            "align": false,
-            "alignLevel": null
-          }
-        },
-        {
-          "aliasColors": {},
-          "bars": false,
-          "dashLength": 10,
-          "dashes": false,
-          "fill": 1,
-          "gridPos": {
-            "h": 6,
-            "w": 11,
-            "x": 12,
-            "y": 1
-          },
-          "id": 12,
-          "legend": {
-            "avg": false,
-            "current": false,
-            "max": false,
-            "min": false,
-            "show": true,
-            "total": false,
-            "values": false
-          },
-          "lines": true,
-          "linewidth": 1,
-          "nullPointMode": "null",
-          "options": {},
-          "percentage": false,
-          "pointradius": 2,
-          "points": false,
-          "renderer": "flot",
-          "seriesOverrides": [],
-          "spaceLength": 10,
-          "stack": false,
-          "steppedLine": false,
-          "targets": [
-            {
-              "expr": "system_load_average_1m{endpoint=~\"$endpoint\",service=~\"$service\",pod=~\"$pod\",namespace=~\"$namespace\"}",
-              "format": "time_series",
-              "intervalFactor": 1,
-              "refId": "A"
-            },
-            {
-              "expr": "system_cpu_count{endpoint=~\"$endpoint\",service=~\"$service\",pod=~\"$pod\",namespace=~\"$namespace\"}",
-              "format": "time_series",
-              "intervalFactor": 1,
-              "refId": "B"
-            }
-          ],
-          "thresholds": [],
-          "timeFrom": null,
-          "timeRegions": [],
-          "timeShift": null,
-          "title": "Load Average",
-          "tooltip": {
-            "shared": true,
-            "sort": 0,
-            "value_type": "individual"
-          },
-          "type": "graph",
-          "xaxis": {
-            "buckets": null,
-            "mode": "time",
-            "name": null,
-            "show": true,
-            "values": []
-          },
-          "yaxes": [
-            {
-              "format": "short",
-              "label": null,
-              "logBase": 1,
-              "max": null,
-              "min": null,
-              "show": true
-            },
-            {
-              "format": "short",
-              "label": null,
-              "logBase": 1,
-              "max": null,
-              "min": null,
-              "show": true
-            }
-          ],
-          "yaxis": {
-            "align": false,
-            "alignLevel": null
-          }
-        },
-        {
-          "collapsed": false,
-          "gridPos": {
-            "h": 1,
-            "w": 24,
-            "x": 0,
-            "y": 7
+            "y": 8
           },
           "id": 6,
-          "panels": [],
-          "title": "HTTP",
-          "type": "row"
-        },
-        {
-          "aliasColors": {},
-          "bars": false,
-          "dashLength": 10,
-          "dashes": false,
-          "fill": 1,
-          "gridPos": {
-            "h": 8,
-            "w": 12,
-            "x": 0,
-            "y": 8
+          "options": {
+            "legend": {
+              "calcs": [],
+              "displayMode": "table",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "tooltip": {
+              "mode": "single",
+              "sort": "none"
+            }
           },
-          "id": 2,
-          "legend": {
-            "avg": false,
-            "current": false,
-            "max": false,
-            "min": false,
-            "show": true,
-            "total": false,
-            "values": false
-          },
-          "lines": true,
-          "linewidth": 1,
-          "links": [],
-          "nullPointMode": "null",
-          "options": {},
-          "percentage": false,
-          "pointradius": 2,
-          "points": false,
-          "renderer": "flot",
-          "seriesOverrides": [],
-          "spaceLength": 10,
-          "stack": false,
-          "steppedLine": false,
           "targets": [
             {
-              "expr": "http_server_requests_seconds_count {endpoint=~\"$endpoint\",service=~\"$service\",pod=~\"$pod\",namespace=~\"$namespace\",exception=\"None\", uri!~\".*actuator.*\"}",
-              "format": "time_series",
-              "intervalFactor": 1,
+              "datasource": {
+                "type": "prometheus",
+                "uid": "2705e754-e60d-424b-ad93-4b43cd3c99ea"
+              },
+              "editorMode": "builder",
+              "expr": "container_memory_usage_bytes{exported_namespace=\"bramterlouw-dev\", container=\"$Microservices\"}",
+              "legendFormat": "{{pod}}",
+              "range": true,
               "refId": "A"
             }
           ],
-          "thresholds": [],
-          "timeFrom": null,
-          "timeRegions": [],
-          "timeShift": null,
-          "title": "Request Count",
-          "tooltip": {
-            "shared": true,
-            "sort": 0,
-            "value_type": "individual"
-          },
-          "type": "graph",
-          "xaxis": {
-            "buckets": null,
-            "mode": "time",
-            "name": null,
-            "show": true,
-            "values": []
-          },
-          "yaxes": [
-            {
-              "format": "short",
-              "label": null,
-              "logBase": 1,
-              "max": null,
-              "min": null,
-              "show": true
-            },
-            {
-              "format": "short",
-              "label": null,
-              "logBase": 1,
-              "max": null,
-              "min": null,
-              "show": true
-            }
-          ],
-          "yaxis": {
-            "align": false,
-            "alignLevel": null
-          }
+          "title": "RAM Usage ($Microservices)",
+          "type": "timeseries"
         },
         {
-          "aliasColors": {},
-          "bars": false,
-          "dashLength": 10,
-          "dashes": false,
-          "fill": 1,
+          "datasource": {
+            "type": "prometheus",
+            "uid": "2705e754-e60d-424b-ad93-4b43cd3c99ea"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "drawStyle": "line",
+                "fillOpacity": 10,
+                "gradientMode": "opacity",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "auto",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              }
+            },
+            "overrides": []
+          },
           "gridPos": {
             "h": 8,
             "w": 12,
             "x": 12,
             "y": 8
           },
-          "id": 4,
-          "legend": {
-            "avg": false,
-            "current": false,
-            "max": false,
-            "min": false,
-            "show": true,
-            "total": false,
-            "values": false
+          "id": 10,
+          "options": {
+            "legend": {
+              "calcs": [],
+              "displayMode": "table",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "tooltip": {
+              "mode": "single",
+              "sort": "none"
+            }
           },
-          "lines": true,
-          "linewidth": 1,
-          "links": [],
-          "nullPointMode": "null",
-          "options": {},
-          "percentage": false,
-          "pointradius": 2,
-          "points": false,
-          "renderer": "flot",
-          "seriesOverrides": [],
-          "spaceLength": 10,
-          "stack": false,
-          "steppedLine": false,
           "targets": [
             {
-              "expr": "http_server_requests_seconds_sum{endpoint=~\"$endpoint\",service=~\"$service\",pod=~\"$pod\",namespace=~\"$namespace\",outcome=~\"$outcome\",exception=\"None\", uri!~\".*actuator.*\"}/ http_server_requests_seconds_count{endpoint=~\"$endpoint\",service=~\"$service\",pod=~\"$pod\",namespace=~\"$namespace\",outcome=~\"$outcome\", exception=\"None\", uri!~\".*actuator.*\"}",
-              "format": "time_series",
-              "intervalFactor": 1,
+              "datasource": {
+                "type": "prometheus",
+                "uid": "2705e754-e60d-424b-ad93-4b43cd3c99ea"
+              },
+              "editorMode": "builder",
+              "expr": "increase(http_requests_total{namespace=\"bramterlouw-dev\", container=\"$Microservices\", method=\"POST\", handler=\"/query\"}[1m])",
+              "legendFormat": "{{pod}}",
+              "range": true,
               "refId": "A"
             }
           ],
-          "thresholds": [],
-          "timeFrom": null,
-          "timeRegions": [],
-          "timeShift": null,
-          "title": "Response Time",
-          "tooltip": {
-            "shared": true,
-            "sort": 0,
-            "value_type": "individual"
-          },
-          "type": "graph",
-          "xaxis": {
-            "buckets": null,
-            "mode": "time",
-            "name": null,
-            "show": true,
-            "values": []
-          },
-          "yaxes": [
-            {
-              "format": "short",
-              "label": null,
-              "logBase": 1,
-              "max": null,
-              "min": null,
-              "show": true
-            },
-            {
-              "format": "short",
-              "label": null,
-              "logBase": 1,
-              "max": null,
-              "min": null,
-              "show": true
-            }
-          ],
-          "yaxis": {
-            "align": false,
-            "alignLevel": null
-          }
+          "title": "HTTP Requests ($Microservices)",
+          "type": "timeseries"
         }
       ],
-      "refresh": false,
-      "schemaVersion": 18,
+      "schemaVersion": 37,
       "style": "dark",
       "tags": [],
       "templating": {
         "list": [
           {
-            "allValue": null,
             "current": {
-              "tags": [],
-              "text": "All",
-              "value": "$__all"
+              "selected": true,
+              "text": "class-microservice",
+              "value": "class-microservice"
             },
-            "datasource": "prometheus",
-            "definition": "label_values(namespace)",
             "hide": 0,
-            "includeAll": true,
-            "label": "Namespace",
+            "includeAll": false,
             "multi": false,
-            "name": "namespace",
-            "options": [],
-            "query": "label_values(namespace)",
-            "refresh": 2,
-            "regex": "",
+            "name": "Microservices",
+            "options": [
+              {
+                "selected": false,
+                "text": "gandalf-the-gateway",
+                "value": "gandalf-the-gateway"
+              },
+              {
+                "selected": false,
+                "text": "exercise-microservice",
+                "value": "exercise-microservice"
+              },
+              {
+                "selected": true,
+                "text": "class-microservice",
+                "value": "class-microservice"
+              },
+              {
+                "selected": false,
+                "text": "module-microservice",
+                "value": "module-microservice"
+              },
+              {
+                "selected": false,
+                "text": "result-microservice",
+                "value": "result-microservice"
+              },
+              {
+                "selected": false,
+                "text": "school-microservice",
+                "value": "school-microservice"
+              },
+              {
+                "selected": false,
+                "text": "openai-microservice",
+                "value": "openai-microservice"
+              },
+              {
+                "selected": false,
+                "text": "saga-microservice",
+                "value": "saga-microservice"
+              }
+            ],
+            "query": "gandalf-the-gateway,\nexercise-microservice, class-microservice, module-microservice, result-microservice, school-microservice, openai-microservice, saga-microservice",
+            "queryValue": "",
             "skipUrlSync": false,
-            "sort": 0,
-            "tagValuesQuery": "",
-            "tags": [],
-            "tagsQuery": "",
-            "type": "query",
-            "useTags": false
-          },
-          {
-            "allValue": null,
-            "current": {
-              "tags": [],
-              "text": "All",
-              "value": "$__all"
-            },
-            "datasource": "prometheus",
-            "definition": "label_values(service)",
-            "hide": 0,
-            "includeAll": true,
-            "label": "Service",
-            "multi": false,
-            "name": "service",
-            "options": [],
-            "query": "label_values(service)",
-            "refresh": 1,
-            "regex": "",
-            "skipUrlSync": false,
-            "sort": 0,
-            "tagValuesQuery": "",
-            "tags": [],
-            "tagsQuery": "",
-            "type": "query",
-            "useTags": false
-          },
-          {
-            "allValue": null,
-            "current": {
-              "tags": [],
-              "text": "test-app-deployment",
-              "value": "test-app-deployment"
-            },
-            "datasource": "prometheus",
-            "definition": "label_values(pod)",
-            "hide": 0,
-            "includeAll": true,
-            "label": "Pod",
-            "multi": false,
-            "name": "pod",
-            "options": [],
-            "query": "label_values(pod)",
-            "refresh": 1,
-            "regex": "",
-            "skipUrlSync": false,
-            "sort": 0,
-            "tagValuesQuery": "",
-            "tags": [],
-            "tagsQuery": "",
-            "type": "query",
-            "useTags": false
-          },
-          {
-            "allValue": null,
-            "current": {
-              "tags": [],
-              "text": "main-container",
-              "value": "main-container"
-            },
-            "datasource": "prometheus",
-            "definition": "label_values(endpoint)",
-            "hide": 0,
-            "includeAll": true,
-            "label": "Endpoint",
-            "multi": false,
-            "name": "endpoint",
-            "options": [],
-            "query": "label_values(endpoint)",
-            "refresh": 1,
-            "regex": "",
-            "skipUrlSync": false,
-            "sort": 0,
-            "tagValuesQuery": "",
-            "tags": [],
-            "tagsQuery": "",
-            "type": "query",
-            "useTags": false
-          },
-          {
-            "allValue": null,
-            "current": {
-              "text": "All",
-              "value": "$__all"
-            },
-            "datasource": "prometheus",
-            "definition": "label_values(outcome)",
-            "hide": 0,
-            "includeAll": true,
-            "label": "ResponseStatus",
-            "multi": false,
-            "name": "outcome",
-            "options": [],
-            "query": "label_values(outcome)",
-            "refresh": 1,
-            "regex": "",
-            "skipUrlSync": false,
-            "sort": 0,
-            "tagValuesQuery": "",
-            "tags": [],
-            "tagsQuery": "",
-            "type": "query",
-            "useTags": false
+            "type": "custom"
           }
         ]
       },
       "time": {
-        "from": "now-6h",
+        "from": "now-30m",
         "to": "now"
       },
-      "timepicker": {
-        "refresh_intervals": [
-          "5s",
-          "10s",
-          "30s",
-          "1m",
-          "5m",
-          "15m",
-          "30m",
-          "1h",
-          "2h",
-          "1d"
-        ],
-        "time_options": [
-          "5m",
-          "15m",
-          "1h",
-          "6h",
-          "12h",
-          "24h",
-          "2d",
-          "7d",
-          "30d"
-        ]
-      },
+      "timepicker": {},
       "timezone": "",
       "title": "Language Fitness Dashboard",
-      "uid": "bx14CjjZk",
-      "version": 152
+      "uid": "bQ2RGX5Ik",
+      "version": 9,
+      "weekStart": ""
     }
