@@ -4,7 +4,7 @@ metadata:
   name: gandalf-the-gateway-deployment
   namespace: bramterlouw-dev
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       name: gandalf-the-gateway-deployment
@@ -25,6 +25,10 @@ spec:
           resources:
             limits:
               memory: "250Mi"
+              cpu: 50m
+            requests:
+              memory: 100Mi
+              cpu: 20m
 ---
 kind: Service
 apiVersion: v1
@@ -46,18 +50,31 @@ spec:
   selector:
     name: gandalf-the-gateway-deployment
 ---
-kind: Route
-apiVersion: route.openshift.io/v1
+apiVersion: autoscaling/v1
+kind: HorizontalPodAutoscaler
 metadata:
-  name: gandalf-the-gateway-route
+  name: gandalf-the-gateway-hpa
   namespace: bramterlouw-dev
-  labels:
-    name: gandalf-the-gateway-route
-    app: gandalf-the-gateway-app
-    project: language-fitness
 spec:
-  port:
-    targetPort: 4000
-  to:
-    kind: Service
-    name: gandalf-the-gateway-service
+  maxReplicas: 5
+  minReplicas: 1
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: gandalf-the-gateway-deployment
+#---
+#kind: Route
+#apiVersion: route.openshift.io/v1
+#metadata:
+#  name: gandalf-the-gateway-route
+#  namespace: bramterlouw-dev
+#  labels:
+#    name: gandalf-the-gateway-route
+#    app: gandalf-the-gateway-app
+#    project: language-fitness
+#spec:
+#  port:
+#    targetPort: 4000
+#  to:
+#    kind: Service
+#    name: gandalf-the-gateway-service
