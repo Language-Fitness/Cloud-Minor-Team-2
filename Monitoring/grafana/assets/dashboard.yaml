@@ -38,7 +38,7 @@ spec:
       "editable": true,
       "fiscalYearStartMonth": 0,
       "graphTooltip": 0,
-      "id": 2,
+      "id": 4,
       "links": [],
       "liveNow": false,
       "panels": [
@@ -99,14 +99,14 @@ spec:
               },
               "editorMode": "builder",
               "exemplar": false,
-              "expr": "count(kube_pod_container_info{exported_namespace=\"bramterlouw-dev\", exported_container=\"$var_microservices\"})",
+              "expr": "count(kube_pod_container_info{exported_namespace=\"bramterlouw-dev\", exported_container=\"$microservices\"})",
               "instant": true,
               "legendFormat": "__auto",
               "range": false,
               "refId": "A"
             }
           ],
-          "title": "Amount Running Pods ($Microservices)",
+          "title": "Amount Running Pods ($microservices)",
           "type": "stat"
         },
         {
@@ -192,13 +192,13 @@ spec:
                 "uid": "2705e754-e60d-424b-ad93-4b43cd3c99ea"
               },
               "editorMode": "builder",
-              "expr": "container_cpu_usage_seconds_total{exported_namespace=\"bramterlouw-dev\", container=\"$var_microservices\"}",
+              "expr": "container_cpu_usage_seconds_total{exported_namespace=\"bramterlouw-dev\", container=\"$microservices\"}",
               "legendFormat": "{{pod}}",
               "range": true,
               "refId": "A"
             }
           ],
-          "title": "CPU Usage ($Microservices)",
+          "title": "CPU Usage ($microservices)",
           "type": "timeseries"
         },
         {
@@ -284,13 +284,13 @@ spec:
                 "uid": "2705e754-e60d-424b-ad93-4b43cd3c99ea"
               },
               "editorMode": "builder",
-              "expr": "container_memory_usage_bytes{exported_namespace=\"bramterlouw-dev\", container=\"$var_microservices\"}",
+              "expr": "container_memory_usage_bytes{exported_namespace=\"bramterlouw-dev\", container=\"$microservices\"}",
               "legendFormat": "{{pod}}",
               "range": true,
               "refId": "A"
             }
           ],
-          "title": "RAM Usage ($Microservices)",
+          "title": "RAM Usage ($microservices)",
           "type": "timeseries"
         },
         {
@@ -376,13 +376,13 @@ spec:
                 "uid": "2705e754-e60d-424b-ad93-4b43cd3c99ea"
               },
               "editorMode": "builder",
-              "expr": "increase(http_requests_total{namespace=\"bramterlouw-dev\", container=\"$var_microservices\", method=\"POST\", handler=\"/query\"}[1m])",
+              "expr": "increase(http_requests_total{namespace=\"bramterlouw-dev\", container=\"$microservices\", method=\"POST\", handler=\"/query\"}[1m])",
               "legendFormat": "{{pod}}",
               "range": true,
               "refId": "A"
             }
           ],
-          "title": "HTTP Requests ($Microservices)",
+          "title": "HTTP Requests ($microservices)",
           "type": "timeseries"
         }
       ],
@@ -400,7 +400,7 @@ spec:
             "hide": 0,
             "includeAll": false,
             "multi": false,
-            "name": "var_microservices",
+            "name": "microservices",
             "options": [
               {
                 "selected": false,
@@ -458,6 +458,6 @@ spec:
       "timezone": "",
       "title": "Language Fitness Dashboard",
       "uid": "bQ2RGX5Ik",
-      "version": 18,
+      "version": 2,
       "weekStart": ""
     }
