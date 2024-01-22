@@ -26,6 +26,13 @@ spec:
             - containerPort: 8083
             - containerPort: 9050
             - containerPort: 9092
+          resources:
+            limits:
+              memory: 60Mi
+              cpu: 50m
+            requests:
+              memory: 40Mi
+              cpu: 20m
           readinessProbe:
             timeoutSeconds: 5
             initialDelaySeconds: 20
@@ -51,6 +58,7 @@ metadata:
     app: school-microservice-app
     project: language-fitness
 spec:
+  type: LoadBalancer
   ports:
     - name: http
       port: 8083
@@ -66,18 +74,18 @@ spec:
   selector:
     name: school-microservice-deployment
 ---
-kind: Route
-apiVersion: route.openshift.io/v1
+apiVersion: autoscaling/v1
+kind: HorizontalPodAutoscaler
 metadata:
-  name: school-microservice-route
+  name: school-microservice-hpa
   namespace: bramterlouw-dev
   labels:
-    name: school-microservice-route
+    name: school-microservice-hpa
     app: school-microservice-app
-    project: language-fitness
 spec:
-  port:
-    targetPort: 8083
-  to:
-    kind: Service
-    name: school-microservice-service
+  maxReplicas: 3
+  minReplicas: 1
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: school-microservice-deployment

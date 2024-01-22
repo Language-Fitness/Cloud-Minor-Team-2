@@ -25,6 +25,13 @@ spec:
           ports:
             - containerPort: 8085
             - containerPort: 9094
+          resources:
+            limits:
+              memory: 60Mi
+              cpu: 50m
+            requests:
+              memory: 40Mi
+              cpu: 20m
           readinessProbe:
             timeoutSeconds: 3
             initialDelaySeconds: 5
@@ -50,6 +57,7 @@ metadata:
     app: result-microservice-app
     project: language-fitness
 spec:
+  type: LoadBalancer
   ports:
     - name: http
       port: 8085
@@ -61,18 +69,18 @@ spec:
   selector:
     name: result-microservice-deployment
 ---
-kind: Route
-apiVersion: route.openshift.io/v1
+apiVersion: autoscaling/v1
+kind: HorizontalPodAutoscaler
 metadata:
-  name: result-microservice-route
+  name: result-microservice-hpa
   namespace: bramterlouw-dev
   labels:
-    name: result-microservice-route
+    name: result-microservice-hpa
     app: result-microservice-app
-    project: language-fitness
 spec:
-  port:
-    targetPort: 8085
-  to:
-    kind: Service
-    name: result-microservice-service
+  maxReplicas: 3
+  minReplicas: 1
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: result-microservice-deployment

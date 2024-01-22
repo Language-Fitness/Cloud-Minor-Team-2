@@ -22,6 +22,13 @@ spec:
           image: microservice_image
           ports:
             - containerPort: 4000
+          resources:
+            limits:
+              memory: 60Mi
+              cpu: 50m
+            requests:
+              memory: 40Mi
+              cpu: 20m
           readinessProbe:
             timeoutSeconds: 3
             initialDelaySeconds: 3
@@ -47,6 +54,7 @@ metadata:
     app: openai-microservice-app
     project: language-fitness
 spec:
+  type: LoadBalancer
   ports:
     - name: http
       port: 4000
@@ -54,18 +62,18 @@ spec:
   selector:
     name: openai-microservice-deployment
 ---
-kind: Route
-apiVersion: route.openshift.io/v1
+apiVersion: autoscaling/v1
+kind: HorizontalPodAutoscaler
 metadata:
-  name: openai-microservice-route
+  name: openai-microservice-hpa
   namespace: bramterlouw-dev
   labels:
-    name: openai-microservice-route
+    name: openai-microservice-hpa
     app: openai-microservice-app
-    project: language-fitness
 spec:
-  port:
-    targetPort: 4000
-  to:
-    kind: Service
-    name: openai-microservice-service
+  maxReplicas: 3
+  minReplicas: 1
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: openai-microservice-deployment

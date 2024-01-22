@@ -25,6 +25,13 @@ spec:
           ports:
             - containerPort: 8082
             - containerPort: 9093
+          resources:
+            limits:
+              memory: 60Mi
+              cpu: 50m
+            requests:
+              memory: 40Mi
+              cpu: 20m
           readinessProbe:
             timeoutSeconds: 3
             initialDelaySeconds: 3
@@ -50,6 +57,7 @@ metadata:
     app: class-microservice-app
     project: language-fitness
 spec:
+  type: LoadBalancer
   ports:
     - name: http
       port: 8082
@@ -61,18 +69,18 @@ spec:
   selector:
     name: class-microservice-deployment
 ---
-kind: Route
-apiVersion: route.openshift.io/v1
+apiVersion: autoscaling/v1
+kind: HorizontalPodAutoscaler
 metadata:
-  name: class-microservice-route
+  name: class-microservice-hpa
   namespace: bramterlouw-dev
   labels:
-    name: class-microservice-route
+    name: class-microservice-hpa
     app: class-microservice-app
-    project: language-fitness
 spec:
-  port:
-    targetPort: 8082
-  to:
-    kind: Service
-    name: class-microservice-service
+  maxReplicas: 3
+  minReplicas: 1
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: class-microservice-deployment

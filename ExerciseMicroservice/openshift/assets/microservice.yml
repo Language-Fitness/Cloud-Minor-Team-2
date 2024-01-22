@@ -25,6 +25,13 @@ spec:
           ports:
             - containerPort: 8084
             - containerPort: 9095
+          resources:
+            limits:
+              memory: 60Mi
+              cpu: 50m
+            requests:
+              memory: 40Mi
+              cpu: 20m
           readinessProbe:
             timeoutSeconds: 3
             initialDelaySeconds: 5
@@ -50,6 +57,7 @@ metadata:
     app: exercise-microservice-app
     project: language-fitness
 spec:
+  type: LoadBalancer
   ports:
     - name: http
       port: 8084
@@ -61,18 +69,18 @@ spec:
   selector:
     name: exercise-microservice-deployment
 ---
-kind: Route
-apiVersion: route.openshift.io/v1
+apiVersion: autoscaling/v1
+kind: HorizontalPodAutoscaler
 metadata:
-  name: exercise-microservice-route
+  name: exercise-microservice-hpa
   namespace: bramterlouw-dev
   labels:
-    name: exercise-microservice-route
+    name: exercise-microservice-hpa
     app: exercise-microservice-app
-    project: language-fitness
 spec:
-  port:
-    targetPort: 8084
-  to:
-    kind: Service
-    name: exercise-microservice-service
+  maxReplicas: 3
+  minReplicas: 1
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: exercise-microservice-deployment
