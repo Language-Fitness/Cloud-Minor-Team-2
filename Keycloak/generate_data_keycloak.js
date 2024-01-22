@@ -14,7 +14,7 @@ export const newStudentData = {
 
 export const newStudentAttributes = {
     school_id: 'de4447f4-8855-11ee-b9d1-0242ac120002',
-    whitelist_module: JSON.stringify(['module1', 'module2', 'module3']),
+    whitelist_module: JSON.stringify([]),
     role_id: 'e6707d12-8855-11ee-b9d1-0242ac120002',
     rating: 4.5,
     settings: JSON.stringify({
@@ -41,7 +41,7 @@ export const newTeacherData = {
 
 export const newTeacherAttributes = {
     school_id: 'de4447f4-8855-11ee-b9d1-0242ac120002',
-    whitelist_module: JSON.stringify(['module1', 'module2', 'module3']),
+    whitelist_module: JSON.stringify([]),
     role_id: '7d083854-8857-11ee-b9d1-0242ac120002',
     rating: 4.5,
     settings: JSON.stringify({
@@ -68,7 +68,7 @@ export const newAdminData = {
 
 export const newAdminAttributes = {
     school_id: 'de4447f4-8855-11ee-b9d1-0242ac120002',
-    whitelist_module: JSON.stringify(['module1', 'module2', 'module3']),
+    whitelist_module: JSON.stringify([]),
     role_id: 'a47bae98-8857-11ee-b9d1-0242ac120002',
     rating: 4.5,
     settings: JSON.stringify({
