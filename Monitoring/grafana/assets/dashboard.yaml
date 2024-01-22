@@ -11,7 +11,7 @@ spec:
   instanceSelector:
     matchLabels:
       dashboards: "grafana"
-  json: >
+  jsomon: >
     {
       "annotations": {
         "list": [
