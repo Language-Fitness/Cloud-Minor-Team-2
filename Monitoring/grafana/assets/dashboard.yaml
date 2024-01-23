@@ -192,7 +192,7 @@ spec:
                 "uid": "2705e754-e60d-424b-ad93-4b43cd3c99ea"
               },
               "editorMode": "builder",
-              "expr": "container_cpu_usage_seconds_total{exported_namespace=\"bramterlouw-dev\", container=\"$microservices\"}",
+              "expr": "rate(container_cpu_usage_seconds_total{exported_namespace=\"bramterlouw-dev\", container=\"$microservices\"}[5m])",
               "legendFormat": "{{pod}}",
               "range": true,
               "refId": "A"
@@ -451,13 +451,13 @@ spec:
         ]
       },
       "time": {
-        "from": "now-30m",
+        "from": "now-6h",
         "to": "now"
       },
       "timepicker": {},
       "timezone": "",
       "title": "Language Fitness Dashboard",
       "uid": "bQ2RGX5Ik",
-      "version": 2,
+      "version": 4,
       "weekStart": ""
     }
