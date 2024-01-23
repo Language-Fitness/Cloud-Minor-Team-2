@@ -13,7 +13,7 @@ export default {
   data: () => ({
     // Show extra functionality if admin
     isAdmin: true,
-    categories: ['Grammatica', 'Spelling', 'Woordenschat', 'Werkwoordspelling', 'Uitdrukkingen', 'Interpunctie', 'Werkwoordvervoegingen', 'Fast_Track'],
+    categories: ['grammatica', 'spelling', 'woordenschat', 'uitdrukkingen', 'interpunctie', 'werkwoordvervoegingen'],
     //Show generated functionality
     isGenerating: false,
 
@@ -356,6 +356,7 @@ export default {
             },
             {headers}
         );
+        console.log(response)
         const {data} = response.data;
         return data.generateMultipleChoiceQuestions.response.token
 
@@ -387,7 +388,7 @@ export default {
             },
             {headers}
         );
-
+        console.log(response)
         const {data} = response.data;
         return {message: data.retrieveMultipleChoiceQuestions.message, questions: data.retrieveMultipleChoiceQuestions.questions}
 
